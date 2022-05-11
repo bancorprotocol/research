@@ -8,7 +8,7 @@ extras_require['complete'] = sorted(set(sum(extras_require.values(), [])))
 
 setup(
     name='bancor3_simulator',
-    version='1.0.0',
+    version='1.0.02',
     author='Bancor Network',
     author_email='mike@bancor.network',
     description='Bancor3 Simulator is an open-source python package developed by the Bancor Research Team. It’s meant to assist designing, testing, and validating Bancor v3 behavior.',

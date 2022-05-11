@@ -1,7 +1,4 @@
-Trading
-=======================
-
-### Trading and Fees: Implementation Note
+# Trading
 
 The equations depicted here describe the transition between states; not the method. In the paragraphs below, the nature
 of the trades and fees on Bancor, including the Bancor Vortex is described. A portion of the swap revenue is collected

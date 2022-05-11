@@ -1,6 +1,6 @@
 format: jb-article
-root: chapters/intro
-title: Introduction
+root: chapters/bancor3-simulator
+title: Bancor3 Simulator
 options:
   numbered: false
 sections:
@@ -18,9 +18,9 @@ sections:
       title: Background
     - file: chapters/02/2/re-evaluating-the-insurance-vesting-time
       title: Insurance Vesting Time
-    - file: chapters/02/1/a-7-day-cool-off-period
+    - file: chapters/02/3/a-7-day-cool-off-period
       title: A 7-day Cool-Off Period
-    - file: chapters/02/2/exit-fees
+    - file: chapters/02/4/exit-fees
       title: Exit Fees
     - file: chapters/02/5/single-sided-pool-tokens
       title: Single-Sided Pool Tokens
@@ -62,7 +62,7 @@ sections:
           title: TKN Surplus Examples
         - file: chapters/02/11/1/5/tkn-deficit-examples
           title: TKN Deficit Examples
-        - file: chapters/02/11/1/6/feeds-impermanent-loss-protection
+        - file: chapters/02/11/1/6/external-impermanent-loss-protection
           title: External Impermanent Loss Protection
       - file: chapters/02/11/2/unstaking-bnt
         title: Unstaking BNT
@@ -77,5 +77,5 @@ sections:
       title: Pool Shutdown
     - file: chapters/02/14/rewards-mechanisms
       title: Rewards Mechanisms
-  - file: chapters/03/simulations
+  - file: chapters/03/simulation-example
     title: Simulation Example

@@ -597,7 +597,7 @@ class BancorV3:
                 state.erc20contracts_bnbnt -= bnbnt_renounced
                 state.protocol_wallet_bnbnt -= bnbnt_renounced
                 state.tokens[tkn_name].tkn_trading_liquidity = tkn_trading_liquidity
-                state.tokens[tkn_name].erc20contracts_bntkn -= pool_token_amt
+                # state.tokens[tkn_name].erc20contracts_bntkn -= pool_token_amt
                 state.tokens[tkn_name].staked_tkn -= withdraw_value
                 state.tokens[tkn_name].vault_tkn -= tkn_sent_to_user
                 state.users.users[user_name].wallet[tkn_name].tkn_amt += (
@@ -620,9 +620,9 @@ class BancorV3:
                     id_number
                 ].is_complete = True
                 bnt_amount = withdraw_value * (1 - withdrawal_fee)
-                state.users.users[user_name].wallet[
-                    tkn_name
-                ].bnbnt_amt -= pool_token_amt
+                # state.users.users[user_name].wallet[
+                #     tkn_name
+                # ].bnbnt_amt -= pool_token_amt
                 state.users.users[user_name].wallet[tkn_name].vbnt_amt -= pool_token_amt
                 state.users.users[user_name].wallet[tkn_name].bnt_amt += bnt_amount
                 state.protocol_wallet_bnbnt += pool_token_amt

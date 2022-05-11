@@ -3,8 +3,7 @@
 </p>
 
 
-Background
-=======================
+# Background
 
 Bancor is among the most overlooked and misunderstood DeFi native projects, and its complexities can leave even the
 savviest DeFi natives scratching their heads. With that said, it's maintained a TVL of >$1B for over a year now, and
@@ -12,7 +11,7 @@ continues to have one of the strongest and most intellectually diverse teams in 
 
 Before we dig into where Bancor is headed, we must first understand the intricacies of their past.
 
-### **A Bit About Bancor's History**
+**A Bit About Bancor's History**
 
 
 **Before there was Defi, there was Bancor** It got its name from John Maynard Keynes' currency concept, called the '
@@ -41,20 +40,20 @@ That was their first and last exploit. Since their infancy, the team not only ch
 BNT freeze function from the protocol, but also completely revamped their codebase. As a result, the protocol has run
 smoothly with no security issues since.
 
-### **Enter Bancor v1**
+**Enter Bancor v1**
 
 Bancor invented liquidity pools, calling them "relays" or "smart tokens" at the time. The bonding curve mechanism that
 we all know and love came from this, and enabled protocols like Uniswap or Sushiswap to exist in the way they do now.
 
 Before we dive deeper into Bancor, it's essential that we take some time to emphasize how vital the AMM model truly is.
 
-### **What exactly is an Automated Market Maker(AMM)?**
+**What exactly is an Automated Market Maker(AMM)?**
 
 An AMM is the underlying protocol that makes up decentralized exchanges (DEXs). In centralized exchanges, you have order
 books managed by professional market-making entities. An AMM eliminates both the need for a custodial entity to create
 markets, and the necessity for trade counter-parties.
 
-### **So what's the benefit of using an AMM?**
+**So what's the benefit of using an AMM?**
 
 AMMs were created to decentralize the decision-making process of pricing different assets. With AMMs, Bancor developed
 an alternative to the traditional order-book-based model and facilitated liquidity bootstrapping on-chain by utilizing
@@ -66,7 +65,7 @@ mining rewards paid out from exchange fees. This created a healthy environment i
 mutually beneficial to both the token holders and the token issuers. New tokens were enabled to generate liquidity
 without spending money on bootstrapping initial liquidity themselves, and hiring market makers to help maintain it.
 
-### **How do AMMs work?**
+**How do AMMs work?**
 
 AMMs work by creating a bonding curve consisting of the equation x*y=k. In this formula, x represents the value of
 ReserveTKN1 and y represents the value of ReserveTKN2. K remains a constant. Let's go through a mini case study to best
@@ -89,7 +88,7 @@ asset across different AMMs, opening up arbitrage opportunities. These mispricin
 bots, but opportunities still exist on the lesser-known AMM-based DEXs for the keen investor. While AMMs have been
 incredibly successful over the past few years, they do come with their own set of shortcomings.
 
-### **Being The First Has Its Perks**
+**Being The First Has Its Perks**
 
 ![](https://research.thetie.io/wp-content/uploads/2022/03/image-2.png)
 
@@ -97,7 +96,7 @@ After Bancor launched their V1, they sat in a unique position to lay back and ob
 DeFi. They witnessed more and more DEXs adopt their formula, and determined that the most prominent issues revolved
 around slippage, forced token exposure, high network fees and the big one -- impermanent loss.
 
-### **Let's talk about slippage and why it's important**
+**Let's talk about slippage and why it's important**
 
 Slippage occurs when there isn't enough liquidity to fulfill an order at the exact price it was executed. This can cause
 a substantial shift in the price of an asset from the time an order is placed, to when it gets completely filled. This

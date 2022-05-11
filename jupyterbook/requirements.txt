@@ -1,3 +1,4 @@
 jupyter-book
 numpy
 datascience
+bancor3-simulator

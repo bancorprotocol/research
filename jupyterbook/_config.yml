@@ -9,7 +9,7 @@ exclude_patterns            : ["README.md"]  # Patterns to skip when building th
 #######################################################################################
 # Execution settings
 execute:
-  execute_notebooks         : 'off'  # Whether to execute notebooks at build time. Must be one of ("auto", "force", "cache", "off")
+  execute_notebooks         : 'cache'  # Whether to execute notebooks at build time. Must be one of ("auto", "force", "cache", "off")
   timeout                   : 600    # The maximum time (in seconds) each notebook cell is allowed to run.
 
 #######################################################################################

@@ -14,7 +14,7 @@ setup(
     description='Bancor3 Simulator is an open-source python package developed by the Bancor Research Team. It’s meant to assist designing, testing, and validating Bancor v3 behavior.',
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url='https://github.com/gcode-ai/bancor3_simulator',
+    url='https://github.com/bancorprotocol/simulator-v3',
     install_requires=open('requirements.txt').readlines(),
     extras_require=extras_require,
     tests_require=open('test-requirements.txt').readlines(),

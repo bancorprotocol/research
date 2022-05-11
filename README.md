@@ -1,4 +1,8 @@
-![Bancor 3 Dawn](./docs/images/bancor3.png)
+<p align="center">
+<img width="100%" src="https://d9hhrg4mnvzow.cloudfront.net/try.bancor.network/5edb37d6-open-graph-bancor3_1000000000000000000028.png" alt="bancor3" />
+</p>
+
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 # Bancor Protocol Contracts v3.0 (Dawn Release)
 

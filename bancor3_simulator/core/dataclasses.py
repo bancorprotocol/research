@@ -20,6 +20,7 @@ alpha = settings.alpha
 bnt_funding_limit = settings.bnt_funding_limit
 trading_fee = settings.trading_fee
 
+MAX_UINT112 = 2 ** 112 - 1
 
 @dataclass
 class GlobalSettings:
@@ -129,25 +130,19 @@ class Transaction(GlobalSettings):
         return Fraction(self.ema_rate)
 
     @property
-    def scaled_ema(self) -> int:
-        """Ensures that the ema can be stored as a maximum 112-bit number."""
-        return ceil((max(self.ema.numerator, self.ema.denominator) / (2 ** 112 - 1)))
+    def ema_descale(self) -> int:
+        """Used for descaling the ema into at most 112 bits per component."""
+        return (int(max(self.ema.numerator, self.ema.denominator)) + MAX_UINT112 - 1) // MAX_UINT112
 
     @property
     def ema_compressed_numerator(self) -> int:
         """Used to measure the deviation of solidity fixed point math on protocol calclulations."""
-        if self.scaled_ema > 0:
-            return int(self.ema.numerator / self.scaled_ema)
-        else:
-            return 0
+        return int(self.ema.numerator / self.ema_descale) # `ema_descale > 0` by definition
 
     @property
     def ema_compressed_denominator(self) -> int:
         """Used to measure the deviation of solidity fixed point math on protocol calclulations."""
-        if self.scaled_ema > 0:
-            return int(self.ema.denominator / self.scaled_ema)
-        else:
-            return 0
+        return int(self.ema.denominator / self.ema_descale) # `ema_descale > 0` by definition
 
     @property
     def is_ema_update_allowed(self) -> bool:
@@ -464,7 +459,7 @@ class State(GlobalSettings):
                 ],
                 "spot_rate": [self.tokens[tkn_name].spot_rate],
                 "ema_rate": [self.tokens[tkn_name].ema_rate],
-                "scaled_ema": [self.tokens[tkn_name].scaled_ema],
+                "ema_descale": [self.tokens[tkn_name].ema_descale],
                 "ema_compressed_numerator": [
                     self.tokens[tkn_name].ema_compressed_numerator
                 ],

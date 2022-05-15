@@ -7,6 +7,7 @@ from typing import Tuple
 
 from bancor3_simulator.core.dataclasses import State
 
+MAX_UINT112 = 2 ** 112 - 1
 
 def trade_bnt_for_tkn(
     state,
@@ -178,24 +179,22 @@ def update_ema(
 
 
 def update_compressed_ema(
-    last_spot,
-    last_ema_compressed_numerator,
-    last_ema_compressed_denominator,
-    alpha=Decimal("0.2"),
-):
+    last_spot_numerator: int,
+    last_spot_denominator: int,
+    last_ema_compressed_numerator: int,
+    last_ema_compressed_denominator: int,
+    alpha=20,
+) -> tuple(int, int):
     """
-    Takes the previous spot_rate, and the ema_compressed_numerator and ema_compressed_denominator as inputs.
-    The compressed new_ema is calculated as a Decimal, then compressed.
-    Returns _new_ema_compressed_numerator and _new_ema_compressed_denominator as integers.
+    Takes the current spot rate and the current ema rate as inputs, and returns the new ema rate as output.
     """
-    new_ema = alpha * last_spot + (1 - alpha) * Decimal(
-        last_ema_compressed_numerator / last_ema_compressed_denominator
+    ema_numerator = (
+        last_spot_numerator * last_ema_compressed_denominator * alpha +
+        last_spot_denominator * last_ema_compressed_numerator * (100 - alpha)
     )
-    ema = Fraction(new_ema)
-    scaled = ceil((max(ema.numerator, ema.denominator) / (2**112 - 1)))
-    ema_compressed_numerator = int(ema.numerator / scaled)
-    ema_compressed_denominator = int(ema.denominator / scaled)
-    return ema_compressed_numerator, ema_compressed_denominator
+    ema_denominator = last_spot_denominator * last_ema_compressed_denominator * 100
+    scaled = (max(ema_numerator, ema_denominator) + MAX_UINT112 - 1) // MAX_UINT112
+    return ema_numerator // scaled, ema_denominator // scaled
 
 
 def measure_ema_deviation(

@@ -1,7 +1,5 @@
 """Main supporting logic for protocol staking actions."""
 from decimal import Decimal
-from fractions import Fraction
-from math import ceil
 
 from typing import Tuple
 

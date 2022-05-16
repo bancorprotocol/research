@@ -1,11 +1,10 @@
 from datetime import datetime
-from math import ceil
 import pandas as pd
 from fractions import Fraction
 from decimal import Decimal
 from collections import defaultdict
-from dataclasses import dataclass, asdict, field
-from typing import Dict, List, Any
+from dataclasses import dataclass, field
+from typing import Dict, List
 from bancor3_simulator.core.settings import GlobalSettings as Settings
 
 settings = Settings()

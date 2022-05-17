@@ -1,3 +1,4 @@
+# coding=utf-8
 from datetime import datetime
 import pandas as pd
 from fractions import Fraction
@@ -18,8 +19,8 @@ active_users = settings.active_users
 alpha = settings.alpha
 bnt_funding_limit = settings.bnt_funding_limit
 trading_fee = settings.trading_fee
+max_int = settings.max_int
 
-MAX_UINT112 = 2 ** 112 - 1
 
 @dataclass
 class GlobalSettings:
@@ -85,7 +86,7 @@ class Transaction(GlobalSettings):
     trading_enabled: bool = False
     bnt_trading_liquidity: Decimal = Decimal("0")
     tkn_trading_liquidity: Decimal = Decimal("0")
-    trading_fee: Decimal = Decimal("0.005")
+    trading_fee: Decimal = trading_fee
     bnt_funding_limit: Decimal = Decimal("0")
     bnt_remaining_funding: Decimal = Decimal("0")
     bnt_funding_amount: Decimal = Decimal("0")
@@ -131,17 +132,17 @@ class Transaction(GlobalSettings):
     @property
     def ema_descale(self) -> int:
         """Used for descaling the ema into at most 112 bits per component."""
-        return (int(max(self.ema.numerator, self.ema.denominator)) + MAX_UINT112 - 1) // MAX_UINT112
+        return (int(max(self.ema.numerator, self.ema.denominator)) + max_int - 1) // max_int
 
     @property
     def ema_compressed_numerator(self) -> int:
         """Used to measure the deviation of solidity fixed point math on protocol calclulations."""
-        return int(self.ema.numerator / self.ema_descale) # `ema_descale > 0` by definition
+        return int(self.ema.numerator / self.ema_descale)  # `ema_descale > 0` by definition
 
     @property
     def ema_compressed_denominator(self) -> int:
         """Used to measure the deviation of solidity fixed point math on protocol calclulations."""
-        return int(self.ema.denominator / self.ema_descale) # `ema_descale > 0` by definition
+        return int(self.ema.denominator / self.ema_descale)  # `ema_descale > 0` by definition
 
     @property
     def is_ema_update_allowed(self) -> bool:

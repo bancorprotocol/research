@@ -1,7 +1,5 @@
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from decimal import Decimal
-from fractions import Fraction
-from math import ceil
 
 from bancor3_simulator.core.dataclasses import CooldownState
 

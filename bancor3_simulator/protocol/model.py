@@ -27,7 +27,6 @@ class BancorV3:
     global_settings = GlobalSettings()
     name = global_settings.model
     version = global_settings.version
-    max_int = global_settings.max_int
 
     """
     Args:
@@ -186,7 +185,7 @@ class BancorV3:
         """Exports transaction history record"""
         return pd.concat(self.global_state.history)
 
-    def whitelisted_token(self, tkn_name):
+    def whitelist_token(self, tkn_name):
         """Appends a new token to the whitelisted tokens"""
         return self.global_state.whitelist_tkn(tkn_name)
 

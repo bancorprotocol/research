@@ -9,6 +9,7 @@ from bancor3_simulator.core.settings import GlobalSettings as Settings
 
 settings = Settings()
 timestep = settings.timestep
+max_uint112 = settings.max_uint112
 whitelisted_tokens = settings.whitelisted_tokens
 network_fee = settings.network_fee
 withdrawal_fee = settings.withdrawal_fee
@@ -18,8 +19,6 @@ active_users = settings.active_users
 alpha = settings.alpha
 bnt_funding_limit = settings.bnt_funding_limit
 trading_fee = settings.trading_fee
-
-MAX_UINT112 = 2 ** 112 - 1
 
 @dataclass
 class GlobalSettings:
@@ -131,7 +130,7 @@ class Transaction(GlobalSettings):
     @property
     def ema_descale(self) -> int:
         """Used for descaling the ema into at most 112 bits per component."""
-        return (int(max(self.ema.numerator, self.ema.denominator)) + MAX_UINT112 - 1) // MAX_UINT112
+        return (int(max(self.ema.numerator, self.ema.denominator)) + max_uint112 - 1) // max_uint112
 
     @property
     def ema_compressed_numerator(self) -> int:

@@ -27,7 +27,6 @@ class BancorV3:
     global_settings = GlobalSettings()
     name = global_settings.model
     version = global_settings.version
-    max_int = global_settings.max_int
 
     """
     Args:

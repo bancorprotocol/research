@@ -4,8 +4,10 @@ from decimal import Decimal
 from typing import Tuple
 
 from bancor3_simulator.core.dataclasses import State
+from bancor3_simulator.core.settings import GlobalSettings as Settings
 
-MAX_UINT112 = 2 ** 112 - 1
+settings = Settings()
+max_uint112 = settings.max_uint112
 
 def trade_bnt_for_tkn(
     state,
@@ -191,7 +193,7 @@ def update_compressed_ema(
         last_spot_denominator * last_ema_compressed_numerator * (100 - alpha)
     )
     ema_denominator = last_spot_denominator * last_ema_compressed_denominator * 100
-    scaled = (max(ema_numerator, ema_denominator) + MAX_UINT112 - 1) // MAX_UINT112
+    scaled = (max(ema_numerator, ema_denominator) + max_uint112 - 1) // max_uint112
     return ema_numerator // scaled, ema_denominator // scaled
 
 

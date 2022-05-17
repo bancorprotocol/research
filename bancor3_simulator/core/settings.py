@@ -2,7 +2,7 @@ from decimal import Decimal, getcontext
 from attr import dataclass
 from .constants import (
     QDECIMALS,
-    MAX_INT,
+    MAX_UINT112,
     PRECISION,
     MODEL,
     VERSION,
@@ -21,7 +21,7 @@ class GlobalSettings:
     model = MODEL
     version = VERSION
     eightee_places = QDECIMALS
-    max_int = MAX_INT
+    max_uint112 = MAX_UINT112
     precision = PRECISION
     decimals = DECIMALS
     whitelisted_tokens = list = WHITELISTED_TOKENS

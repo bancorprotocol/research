@@ -186,7 +186,7 @@ class BancorV3:
         """Exports transaction history record"""
         return pd.concat(self.global_state.history)
 
-    def whitelisted_token(self, tkn_name):
+    def whitelist_token(self, tkn_name):
         """Appends a new token to the whitelisted tokens"""
         return self.global_state.whitelist_tkn(tkn_name)
 

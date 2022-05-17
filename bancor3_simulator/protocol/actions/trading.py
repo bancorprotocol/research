@@ -3,6 +3,7 @@ from decimal import Decimal
 
 from typing import Tuple
 
+from bancor3_simulator.core.constants import MAX_INT
 from bancor3_simulator.core.dataclasses import State
 
 MAX_UINT112 = 2 ** 112 - 1
@@ -182,7 +183,7 @@ def update_compressed_ema(
     last_ema_compressed_numerator: int,
     last_ema_compressed_denominator: int,
     alpha=20,
-) -> tuple(int, int):
+) -> Tuple[int, int]:
     """
     Takes the current spot rate and the current ema rate as inputs, and returns the new ema rate as output.
     """
@@ -191,7 +192,7 @@ def update_compressed_ema(
         last_spot_denominator * last_ema_compressed_numerator * (100 - alpha)
     )
     ema_denominator = last_spot_denominator * last_ema_compressed_denominator * 100
-    scaled = (max(ema_numerator, ema_denominator) + MAX_UINT112 - 1) // MAX_UINT112
+    scaled = (max(ema_numerator, ema_denominator) + MAX_INT - 1) // MAX_INT
     return ema_numerator // scaled, ema_denominator // scaled
 
 

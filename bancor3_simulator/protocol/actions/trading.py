@@ -139,7 +139,7 @@ def trade_tkn_for_bnt(
     state.tokens[tkn_name].tkn_trading_liquidity = updated_tkn_liquidity
     state.staked_bnt += trade_fee
     state.tokens[tkn_name].bnt_funding_amount += trade_fee
-    state.tokens[tkn_name].bnt_remaining_funding -= trade_fee
+    # state.tokens[tkn_name].bnt_remaining_funding -= trade_fee
     state.vortex_bnt += bnt_collected_by_vortex
     state.update_spot_rate(tkn_name)
     return state, bnt_sent_to_user
@@ -173,8 +173,8 @@ def update_ema(
     Returns:
         Updated EMA value.
     """
-    print('last_spot ', last_spot)
-    print('last_ema ', last_ema)
+    # print('last_spot ', last_spot)
+    # print('last_ema ', last_ema)
     return alpha * last_spot + (1 - alpha) * last_ema
 
 
@@ -184,7 +184,7 @@ def update_compressed_ema(
     last_ema_compressed_numerator: int,
     last_ema_compressed_denominator: int,
     alpha=20,
-) -> tuple(int, int):
+) -> Tuple[int, int]:
     """
     Takes the current spot rate and the current ema rate as inputs, and returns the new ema rate as output.
     """
@@ -231,17 +231,6 @@ def handle_ema(tkn_name: str, state: State) -> State:
 
     if update_allowed:
         new_ema = update_ema(last_spot, last_ema)
-        # (
-        #     new_ema_compressed_numerator,
-        #     new_ema_compressed_denominator,
-        # ) = update_compressed_ema(
-        #     last_spot,
-        #     last_ema_compressed_numerator,
-        #     last_ema_compressed_denominator,
-        # )
-        # ema_deviation = measure_ema_deviation(
-        #     new_ema, new_ema_compressed_numerator, new_ema_compressed_denominator
-        # )
 
         # set
         state.tokens[tkn_name].ema_last_updated = state.tokens[tkn_name].timestep

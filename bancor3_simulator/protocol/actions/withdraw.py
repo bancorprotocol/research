@@ -74,7 +74,7 @@ def begin_cooldown(state, withdraw_value, tkn_name, user_name):
         pool_token_amt = 0
     id_number = len(state.withdrawal_ids)
     state.withdrawal_ids.append(id_number)
-    state.users.users[user_name].wallet[tkn_name].pending_withdrawals[
+    state.users[user_name].wallet[tkn_name].pending_withdrawals[
         id_number
     ] = CooldownState(
         timestep=timestep,
@@ -86,7 +86,7 @@ def begin_cooldown(state, withdraw_value, tkn_name, user_name):
         is_complete=False,
     )
 
-    state.users.users[user_name].wallet[tkn_name].bntkn_amt -= pool_token_amt
+    state.users[user_name].wallet[tkn_name].bntkn_amt -= pool_token_amt
     state.protocol_bnt_check()
     return id_number
 
@@ -98,10 +98,10 @@ def unpack_cool_down_state(state, user_name, id_number):
     for tkn_name in state.whitelisted_tokens:
         if (
             id_number
-            in state.users.users[user_name].wallet[tkn_name].pending_withdrawals
+            in state.users[user_name].wallet[tkn_name].pending_withdrawals
         ):
             cool_down_state = (
-                state.users.users[user_name]
+                state.users[user_name]
                 .wallet[tkn_name]
                 .pending_withdrawals[id_number]
             )

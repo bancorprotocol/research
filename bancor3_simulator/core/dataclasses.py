@@ -1,3 +1,4 @@
+# coding=utf-8
 from datetime import datetime
 import pandas as pd
 from fractions import Fraction
@@ -8,26 +9,16 @@ from typing import Dict, List
 from bancor3_simulator.core.settings import GlobalSettings as Settings
 
 settings = Settings()
-timestep = settings.timestep
-max_uint112 = settings.max_uint112
-whitelisted_tokens = settings.whitelisted_tokens
-network_fee = settings.network_fee
-withdrawal_fee = settings.withdrawal_fee
-bnt_min_liquidity = settings.bnt_min_liquidity
-cooldown_time = settings.cooldown_time
-active_users = settings.active_users
-alpha = settings.alpha
-bnt_funding_limit = settings.bnt_funding_limit
-trading_fee = settings.trading_fee
+
 
 @dataclass
 class GlobalSettings:
     """Main storage component to hold global variables."""
 
-    network_fee = network_fee
-    withdrawal_fee = withdrawal_fee
-    bnt_min_liquidity = bnt_min_liquidity
-    cooldown_time = cooldown_time
+    network_fee = settings.network_fee
+    withdrawal_fee = settings.withdrawal_fee
+    bnt_min_liquidity = settings.bnt_min_liquidity
+    cooldown_time = settings.cooldown_time
 
 
 @dataclass
@@ -57,41 +48,38 @@ class Wallet(GlobalSettings):
 
 
 @dataclass
-class User(GlobalSettings):
-    """Main user level storage component."""
-
-    user_name: str
-    wallet: Dict[str, Wallet] = field(default_factory=lambda: defaultdict(Wallet))
-
-
-@dataclass
 class Users(GlobalSettings):
     """Main storage component to group users."""
 
+    user_name: str
+    wallet: Dict[str, Wallet] = field(default_factory=lambda: defaultdict(Wallet))
     usernames: list = field(default_factory=list)
-    users: Dict[str, User] = field(default_factory=lambda: defaultdict(User))
-    history: List[Dict[str, User]] = field(default_factory=list)
+    history: List[Dict[str, Wallet]] = field(default_factory=list)
 
 
 @dataclass
 class Transaction(GlobalSettings):
     """Main transaction level storage component."""
 
-    timestep: int = 0
+    timestep: int = settings.timestep
     vault_tkn: Decimal = Decimal("0")
     erc20contracts_bntkn: Decimal = Decimal("0")
     staked_tkn: Decimal = Decimal("0")
     trading_enabled: bool = False
     bnt_trading_liquidity: Decimal = Decimal("0")
     tkn_trading_liquidity: Decimal = Decimal("0")
-    trading_fee: Decimal = Decimal("0.005")
+    trading_fee: Decimal = Decimal(f"{settings.trading_fee}")
     bnt_funding_limit: Decimal = Decimal("0")
-    bnt_remaining_funding: Decimal = Decimal("0")
     bnt_funding_amount: Decimal = Decimal("0")
     external_protection_vault: Decimal = Decimal("0")
     spot_rate: Decimal = Decimal("0")
     ema_rate: Decimal = Decimal("0")
     ema_last_updated: Decimal = Decimal("0")
+
+    @property
+    def bnt_remaining_funding(self):
+        """Computes the BNT funding remaining for the pool."""
+        return self.bnt_funding_limit - self.bnt_funding_amount
 
     @property
     def is_price_stable(self):
@@ -130,17 +118,17 @@ class Transaction(GlobalSettings):
     @property
     def ema_descale(self) -> int:
         """Used for descaling the ema into at most 112 bits per component."""
-        return (int(max(self.ema.numerator, self.ema.denominator)) + max_uint112 - 1) // max_uint112
+        return (int(max(self.ema.numerator, self.ema.denominator)) + settings.max_uint112 - 1) // settings.max_uint112
 
     @property
     def ema_compressed_numerator(self) -> int:
         """Used to measure the deviation of solidity fixed point math on protocol calclulations."""
-        return int(self.ema.numerator / self.ema_descale) # `ema_descale > 0` by definition
+        return int(self.ema.numerator / self.ema_descale)  # `ema_descale > 0` by definition
 
     @property
     def ema_compressed_denominator(self) -> int:
         """Used to measure the deviation of solidity fixed point math on protocol calclulations."""
-        return int(self.ema.denominator / self.ema_descale) # `ema_descale > 0` by definition
+        return int(self.ema.denominator / self.ema_descale)  # `ema_descale > 0` by definition
 
     @property
     def is_ema_update_allowed(self) -> bool:
@@ -167,14 +155,14 @@ class State(GlobalSettings):
     latest_action: str = None
     withdrawal_ids: List[Dict[str, CooldownState]] = field(default_factory=list)
     created_at: datetime = field(default_factory=datetime.now)
-    timestep: int = timestep
-    network_fee: Decimal = network_fee
-    trading_fee: Decimal = trading_fee
-    bnt_min_liquidity: Decimal = bnt_min_liquidity
-    cooldown_time: int = cooldown_time
-    bnt_funding_limit: Decimal = bnt_funding_limit
-    alpha: Decimal = alpha
-    whitelisted_tokens: list = field(default_factory=lambda: whitelisted_tokens)
+    timestep: int = settings.timestep
+    network_fee: Decimal = settings.network_fee
+    trading_fee: Decimal = settings.trading_fee
+    bnt_min_liquidity: Decimal = settings.bnt_min_liquidity
+    cooldown_time: int = settings.cooldown_time
+    bnt_funding_limit: Decimal = settings.bnt_funding_limit
+    alpha: Decimal = settings.alpha
+    whitelisted_tokens: list = field(default_factory=lambda: settings.whitelisted_tokens)
     staked_bnt: Decimal = Decimal("0")
     vault_bnt: Decimal = Decimal("0")
     erc20contracts_bnbnt: Decimal = Decimal("0")
@@ -185,7 +173,10 @@ class State(GlobalSettings):
         default_factory=lambda: defaultdict(Transaction)
     )
     transactions: List[Dict[str, Transaction]] = field(default_factory=list)
-    users: Users = Users()
+    users: Dict[str, Users] = field(
+        default_factory=lambda: defaultdict(Users)
+    )
+    usernames: list = field(default_factory=list)
     history: list = field(default_factory=list)
 
     @property
@@ -213,7 +204,7 @@ class State(GlobalSettings):
         Returns: List of all active users.
 
         """
-        return [usr for usr in self.users.usernames]
+        return [usr for usr in self.usernames]
 
     def list_tokens(self):
         """
@@ -229,11 +220,11 @@ class State(GlobalSettings):
         Args:
             user_name: A unique name identifier for the user.
         """
-        if user_name not in self.users.usernames:
-            self.users.usernames.append(user_name)
-            self.users.users[user_name] = User(user_name=user_name)
-            for tkn_name in whitelisted_tokens:
-                self.users.users[user_name].wallet[tkn_name] = Wallet(tkn_name=tkn_name)
+        if user_name not in self.usernames:
+            self.usernames.append(user_name)
+            self.users[user_name] = Users(user_name=user_name)
+            for tkn_name in settings.whitelisted_tokens:
+                self.users[user_name].wallet[tkn_name] = Wallet(tkn_name=tkn_name)
 
     def init_protocol(self, whitelisted_tokens: List[str], usernames: List[str]):
         """On system genesis this method builds initial wallet placeholders and users.
@@ -248,7 +239,7 @@ class State(GlobalSettings):
                 self.tokens[tkn_name] = Transaction(tkn_name)
 
         for usr in usernames:
-            if usr not in self.users.usernames:
+            if usr not in self.usernames:
                 self.create_user(usr)
 
         return self
@@ -405,7 +396,7 @@ class State(GlobalSettings):
         Returns:
             withdraw_value converted into pool token units
         """
-        user_bntkn_amt = self.users.users[user_name].wallet[tkn_name].bntkn_amt
+        user_bntkn_amt = self.users[user_name].wallet[tkn_name].bntkn_amt
         if withdraw_value > user_bntkn_amt:
             raise ValueError(
                 f"User cannot withdraw more than their current wallet holdings allow.available {tkn_name}={user_bntkn_amt}"

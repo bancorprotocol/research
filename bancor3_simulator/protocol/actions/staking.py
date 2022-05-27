@@ -66,7 +66,14 @@ def pool_depth_adjustment(tkn_name: str, state: State) -> Tuple[Decimal, Decimal
         bnt_increase, tkn_increase (Decimal, Decimal): The quantities of BNT and TKN to add to the pool trading
                                                         liquidity during a deposit.
     """
+    timestep = state.timestep
     bnt_increase = tkn_increase = Decimal("0")
+
+    # Setting the bnt_funding_limit as follows is not a general solution.
+    # Currently, the bnt_funding_limit is used as a global setting, however, throughout the codebase it is setup
+    # to be a per-pool tuneable parameter. Setting as follows overrides the per-pool value to the global value.
+    state.tokens[tkn_name].bnt_funding_limit = state.bnt_funding_limit
+
     trading_enabled = state.tokens[tkn_name].trading_enabled
     is_price_stable = state.tokens[tkn_name].is_price_stable
     bnt_remaining_funding = state.tokens[tkn_name].bnt_remaining_funding
@@ -83,6 +90,7 @@ def pool_depth_adjustment(tkn_name: str, state: State) -> Tuple[Decimal, Decimal
             avg_tkn_trading_liquidity <= tkn_excess
             and bnt_trading_liquidity <= bnt_remaining_funding
         ):
+            print('case1')
             bnt_increase = bnt_trading_liquidity
             tkn_increase = modified_tkn_increase(
                 state,
@@ -93,11 +101,10 @@ def pool_depth_adjustment(tkn_name: str, state: State) -> Tuple[Decimal, Decimal
             )
 
         elif (
-            avg_tkn_trading_liquidity <= tkn_excess
-            and bnt_trading_liquidity > bnt_remaining_funding
-            or avg_tkn_trading_liquidity > tkn_excess
-            and tkn_excess_bnt_equivalence >= bnt_remaining_funding
+            avg_tkn_trading_liquidity <= tkn_excess and bnt_trading_liquidity > bnt_remaining_funding
+            or avg_tkn_trading_liquidity > tkn_excess and tkn_excess_bnt_equivalence >= bnt_remaining_funding
         ):
+            print('case2')
             bnt_increase = bnt_remaining_funding
             tkn_increase = modified_tkn_increase(
                 state,
@@ -108,13 +115,10 @@ def pool_depth_adjustment(tkn_name: str, state: State) -> Tuple[Decimal, Decimal
             )
 
         elif (
-            tkn_excess < avg_tkn_trading_liquidity
-            and bnt_trading_liquidity <= bnt_remaining_funding
-            or avg_tkn_trading_liquidity > tkn_excess
-            and bnt_trading_liquidity
-            > bnt_remaining_funding
-            > tkn_excess_bnt_equivalence
+            tkn_excess < avg_tkn_trading_liquidity and bnt_trading_liquidity <= bnt_remaining_funding
+            or avg_tkn_trading_liquidity > tkn_excess and bnt_trading_liquidity > bnt_remaining_funding > tkn_excess_bnt_equivalence
         ):
+            print('case3')
             bnt_increase = modified_bnt_increase(
                 state,
                 tkn_excess,

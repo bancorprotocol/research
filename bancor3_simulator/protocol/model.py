@@ -20,6 +20,21 @@ from bancor3_simulator.protocol.actions.withdraw import (
     WithdrawalAlgorithm, begin_cooldown,
 )
 
+# User and staking rewards contract
+# +----------------+--------------+-------------+
+# | Action         | Transfer     | Receive     |
+# +----------------+--------------+-------------+
+# | join           | pool tokens  | position    |
+# +----------------+--------------+-------------+
+# | depositAndJoin | tokens       | position    |
+# +----------------+--------------+-------------+
+# | leave          | position     | pool tokens |
+# +----------------+--------------+-------------+
+# | claimRewards   |              | tokens      |
+# +----------------+--------------+-------------+
+# | stakeRewards   |              | pool tokens |
+# +----------------+--------------+-------------+
+
 
 class BancorV3:
     """Main Bancor v3 Protocol Logic."""
@@ -101,8 +116,6 @@ class BancorV3:
             self.global_state.tokens[tkn_name].trading_fee = trading_fee
             self.global_state.tokens[tkn_name].bnt_funding_limit = bnt_funding_limit
         self.history = []
-
-
 
     @property
     def list_users(self):
@@ -213,7 +226,7 @@ class BancorV3:
             print(e)
 
         try:
-            wallet_test = self.global_state.users.users[user_name].wallet
+            wallet_test = self.global_state.users[user_name].wallet
         except ValueError(
                 "user_name not found. Create a new user by calling the .create_user(user_name) method"
         ) as e:
@@ -236,9 +249,9 @@ class BancorV3:
         bnbnt_amt = state.bnbnt_amt(tkn_amt)
 
         # actuation
-        state.users.users[user_name].wallet[tkn_name].tkn_amt -= tkn_amt
-        state.users.users[user_name].wallet[tkn_name].bntkn_amt += bnbnt_amt
-        state.users.users[user_name].wallet[tkn_name].vbnt_amt += bnbnt_amt
+        state.users[user_name].wallet[tkn_name].tkn_amt -= tkn_amt
+        state.users[user_name].wallet[tkn_name].bntkn_amt += bnbnt_amt
+        state.users[user_name].wallet[tkn_name].vbnt_amt += bnbnt_amt
         state.protocol_wallet_bnbnt -= tkn_amt
         self.global_state.latest_tkn = tkn_name
         self.global_state.latest_amt = tkn_amt
@@ -260,8 +273,10 @@ class BancorV3:
         bntkn_amt = state.bntkn_rate(tkn_name) * tkn_amt
 
         # actuation
-        state.users.users[user_name].wallet[tkn_name].tkn_amt -= tkn_amt
-        state.users.users[user_name].wallet[tkn_name].bntkn_amt += bntkn_amt
+        # user actuation
+        state.users[user_name].wallet[tkn_name].tkn_amt -= tkn_amt
+        state.users[user_name].wallet[tkn_name].bntkn_amt += bntkn_amt
+        # ledger actuation
         state.tokens[tkn_name].erc20contracts_bntkn += bntkn_amt
         state.tokens[tkn_name].vault_tkn += tkn_amt
         state.tokens[tkn_name].staked_tkn += tkn_amt
@@ -273,8 +288,11 @@ class BancorV3:
         state.tokens[tkn_name].bnt_trading_liquidity += bnt_increase
         state.tokens[tkn_name].tkn_trading_liquidity += tkn_increase
         state.tokens[tkn_name].bnt_funding_amount += bnt_increase
-        state.tokens[tkn_name].bnt_remaining_funding -= bnt_increase
-        state.protocol_wallet_bnbnt -= bnt_increase
+        # state.tokens[tkn_name].bnt_remaining_funding -= bnt_increase
+
+        # TODO: Crosscheck Barak with Mark on the following line, results disagree
+        # state.protocol_wallet_bnbnt -= bnt_increase
+
         state = mint_protocol_bnt(state, bnt_increase)
         state.update_spot_rate(tkn_name)
         state = state.check_pool_shutdown(tkn_name)
@@ -314,7 +332,7 @@ class BancorV3:
             print(e)
 
         try:
-            wallet_test = self.global_state.users.users[user_name].wallet
+            wallet_test = self.global_state.users[user_name].wallet
         except ValueError(
                 "user_name not found. Create a new user by calling the .create_user(user_name) method"
         ) as e:
@@ -340,7 +358,7 @@ class BancorV3:
                 trading_fee,
                 network_fee,
             ) = get_trade_inputs(state, target_token)
-
+            print("trade1 ", timestep, trading_fee, network_fee, swap_amount)
             # solve
             state, target_sent_to_user = trade_bnt_for_tkn(
                 state,
@@ -362,7 +380,7 @@ class BancorV3:
                 trading_fee,
                 network_fee,
             ) = get_trade_inputs(state, source_token)
-
+            print("trade2 ", timestep, trading_fee, network_fee, swap_amount)
             # solve
             state, target_sent_to_user = trade_tkn_for_bnt(
                 state,
@@ -389,7 +407,7 @@ class BancorV3:
                 trading_fee,
                 network_fee,
             ) = get_trade_inputs(state, source_token)
-
+            print("trade3 ", timestep, trading_fee, network_fee, swap_amount)
             # solve
             state, intermediate_bnt = trade_tkn_for_bnt(
                 state,
@@ -400,7 +418,6 @@ class BancorV3:
                 swap_amount,
                 tkn_name,
             )
-
 
             # sense
             (
@@ -428,8 +445,8 @@ class BancorV3:
             target_sent_to_user = Decimal("0")
 
         # actuate
-        state.users.users[user_name].wallet[source_token].tkn_amt -= swap_amount
-        state.users.users[user_name].wallet[source_token].tkn_amt += target_sent_to_user
+        state.users[user_name].wallet[source_token].tkn_amt -= swap_amount
+        state.users[user_name].wallet[target_token].tkn_amt += target_sent_to_user
         state.protocol_bnt_check()
         self.global_state.latest_tkn = source_token + "->" + target_token
         self.global_state.latest_amt = swap_amount
@@ -454,9 +471,10 @@ class BancorV3:
         bnt_trading_liquidity = state.tokens[tkn_name].bnt_trading_liquidity
         tkn_trading_liquidity = state.tokens[tkn_name].tkn_trading_liquidity
         trading_fee = state.tokens[tkn_name].trading_fee
-        user_tkn = state.users.users[user_name].wallet[tkn_name].tkn_amt
-        user_bnt = state.users.users[user_name].wallet[tkn_name].bnt_amt
+        user_tkn = state.users[user_name].wallet[tkn_name].tkn_amt
+        user_bnt = state.users[user_name].wallet[tkn_name].bnt_amt
         is_trading_enabled = state.tokens[tkn_name].trading_enabled
+
 
         if is_trading_enabled:
             (
@@ -550,7 +568,7 @@ class BancorV3:
             is_price_stable = state.tokens[tkn_name].is_price_stable
 
             if cool_down_complete and is_price_stable:
-                state.users.users[user_name].wallet[tkn_name].pending_withdrawals[
+                state.users[user_name].wallet[tkn_name].pending_withdrawals[
                     id_number
                 ].is_complete = True
 
@@ -589,7 +607,7 @@ class BancorV3:
                 state.tokens[tkn_name].bnt_trading_liquidity = updated_bnt_liquidity
                 state.staked_bnt -= bnt_renounced
                 state.vault_bnt -= bnt_renounced
-                state.tokens[tkn_name].bnt_remaining_funding += bnt_renounced
+                # state.tokens[tkn_name].bnt_remaining_funding += bnt_renounced
                 state.tokens[tkn_name].bnt_funding_amount -= bnt_renounced
 
                 bnbnt_renounced = bnbnt_rate * bnt_renounced
@@ -599,31 +617,31 @@ class BancorV3:
                 # state.tokens[tkn_name].erc20contracts_bntkn -= pool_token_amt
                 state.tokens[tkn_name].staked_tkn -= withdraw_value
                 state.tokens[tkn_name].vault_tkn -= tkn_sent_to_user
-                state.users.users[user_name].wallet[tkn_name].tkn_amt += (
+                state.users[user_name].wallet[tkn_name].tkn_amt += (
                         tkn_sent_to_user + external_protection_compensation
                 )
                 state.tokens[
                     tkn_name
                 ].external_protection_vault -= external_protection_compensation
-                state.users.users[user_name].wallet["bnt"].tkn_amt += bnt_sent_to_user
+                state.users[user_name].wallet["bnt"].tkn_amt += bnt_sent_to_user
                 state.update_spot_rate(tkn_name)
 
         else:
 
             sufficient_vbnt = (
-                    state.users.users[user_name].wallet["bnt"].vbnt_amt >= pool_token_amt
+                    state.users[user_name].wallet["bnt"].vbnt_amt >= pool_token_amt
             )
 
             if cool_down_complete and sufficient_vbnt:
-                state.users.users[user_name].wallet[tkn_name].pending_withdrawals[
+                state.users[user_name].wallet[tkn_name].pending_withdrawals[
                     id_number
                 ].is_complete = True
                 bnt_amount = withdraw_value * (1 - withdrawal_fee)
-                # state.users.users[user_name].wallet[
+                # state.users[user_name].wallet[
                 #     tkn_name
                 # ].bnbnt_amt -= pool_token_amt
-                state.users.users[user_name].wallet[tkn_name].vbnt_amt -= pool_token_amt
-                state.users.users[user_name].wallet[tkn_name].bnt_amt += bnt_amount
+                state.users[user_name].wallet[tkn_name].vbnt_amt -= pool_token_amt
+                state.users[user_name].wallet[tkn_name].bnt_amt += bnt_amount
                 state.protocol_wallet_bnbnt += pool_token_amt
 
         state.protocol_bnt_check()
@@ -681,14 +699,10 @@ class BancorV3:
 
         if requirements_met():
             state.tokens[tkn_name].trading_enabled = True
-            state.tokens[tkn_name].spot_rate = state.tokens[
-                tkn_name
-            ].ema_rate = bootstrap_rate()
+            state.tokens[tkn_name].spot_rate = state.tokens[tkn_name].ema_rate = bootstrap_rate()
             state.tokens[tkn_name].bnt_trading_liquidity = bnt_bootstrap_liquidity()
             state.tokens[tkn_name].bnt_funding_amount = bnt_bootstrap_liquidity()
-            state.tokens[tkn_name].bnt_remaining_funding = (
-                    bnt_funding_limit - bnt_bootstrap_liquidity()
-            )
+            # state.tokens[tkn_name].bnt_remaining_funding = bnt_funding_limit - bnt_bootstrap_liquidity()
             state.tokens[tkn_name].tkn_trading_liquidity = tkn_bootstrap_liquidity()
 
             mint_protocol_bnt(state, bnt_bootstrap_liquidity())
@@ -803,6 +817,10 @@ class BancorV3:
         self.global_state.network_fee = Decimal(
             json_data["networkFee"].replace("%", "")
         ) * Decimal(".01")
+
+        # OVERRIDE
+        # self.global_state.network_fee = Decimal(".0")
+
         self.global_state.withdrawal_fee = Decimal(
             json_data["withdrawalFee"].replace("%", "")
         ) * Decimal(".01")
@@ -810,20 +828,24 @@ class BancorV3:
             json_data["epVaultBalance"]
         )
         self.global_settings.decimals = Decimal(json_data["tknDecimals"])
-        self.global_state.bnt_min_liquidity = Decimal(json_data["bntMinLiquidity"])
-        self.global_state.bnt_funding_limit = Decimal(json_data["bntFundingLimit"])
-        for tkn in ["bnt", "tkn"]:
-            self.global_state.tokens[tkn].trading_fee = Decimal(
+        self.global_state.bnt_min_liquidity = self.bnt_min_liquidity = Decimal(json_data["bntMinLiquidity"])
+        self.global_state.bnt_funding_limit = self.bnt_funding_limit = Decimal(json_data["bntFundingLimit"])
+        trading_fee = Decimal(
                 json_data["tradingFee"].replace("%", "")
             ) * Decimal(".01")
+        # trading_fee = Decimal(0.0)
+        self.global_state.trading_fee = trading_fee
+        self.trading_fee = trading_fee
+        for tkn in ["bnt", "tkn"]:
+            self.global_state.tokens[tkn].trading_fee = trading_fee
 
         for user in json_data["users"]:
             user_name = user["id"]
             self.create_user(user_name)
             tknBalance = Decimal(user["tknBalance"])
             bntBalance = Decimal(user["bntBalance"])
-            self.global_state.users.users[user_name].wallet["tkn"].tkn_amt = tknBalance
-            self.global_state.users.users[user_name].wallet["bnt"].tkn_amt = bntBalance
+            self.global_state.users[user_name].wallet["tkn"].tkn_amt = tknBalance
+            self.global_state.users[user_name].wallet["bnt"].tkn_amt = bntBalance
 
         self.json_data = json_data
 

@@ -207,7 +207,7 @@ class BancorV3:
                 trading_fee,
                 network_fee,
             ) = get_trade_inputs(state, target_token)
-            print("trade1 ", unix_timestamp, trading_fee, network_fee, swap_amount)
+
             # solve
             state, target_sent_to_user = trade_bnt_for_tkn(
                 state,
@@ -229,7 +229,7 @@ class BancorV3:
                 trading_fee,
                 network_fee,
             ) = get_trade_inputs(state, source_token)
-            print("trade2 ", unix_timestamp, trading_fee, network_fee, swap_amount)
+
             # solve
             state, target_sent_to_user = trade_tkn_for_bnt(
                 state,

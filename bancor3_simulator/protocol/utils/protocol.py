@@ -26,7 +26,9 @@ def mint_protocol_bnt(state: State, tkn_amt: Decimal) -> State:
     return state
 
 
-def handle_logging(tkn_name, tkn_amt, action_name, user_name, iter_transaction_id, state):
+def handle_logging(
+    tkn_name, tkn_amt, action_name, user_name, iter_transaction_id, state
+):
     state.log.tkn_name = tkn_name
     state.log.tkn_amt = tkn_amt
     state.log.action_name = action_name

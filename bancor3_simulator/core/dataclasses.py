@@ -1,3 +1,4 @@
+# coding=utf-8
 from datetime import datetime
 import pandas as pd
 from fractions import Fraction
@@ -8,33 +9,33 @@ from typing import Dict, List
 from bancor3_simulator.core.settings import GlobalSettings as Settings
 
 settings = Settings()
-timestep = settings.timestep
-max_uint112 = settings.max_uint112
-whitelisted_tokens = settings.whitelisted_tokens
-network_fee = settings.network_fee
-withdrawal_fee = settings.withdrawal_fee
-bnt_min_liquidity = settings.bnt_min_liquidity
-cooldown_time = settings.cooldown_time
-active_users = settings.active_users
-alpha = settings.alpha
-bnt_funding_limit = settings.bnt_funding_limit
-trading_fee = settings.trading_fee
+
+
+@dataclass
+class Log:
+    """Dataclass for logging the most recent action."""
+
+    tkn_name: str = None
+    tkn_amt: Decimal = Decimal("0")
+    action_name: str = None
+    user_name: str = None
+
 
 @dataclass
 class GlobalSettings:
     """Main storage component to hold global variables."""
 
-    network_fee = network_fee
-    withdrawal_fee = withdrawal_fee
-    bnt_min_liquidity = bnt_min_liquidity
-    cooldown_time = cooldown_time
+    network_fee = settings.network_fee
+    withdrawal_fee = settings.withdrawal_fee
+    bnt_min_liquidity = settings.bnt_min_liquidity
+    cooldown_time = settings.cooldown_time
 
 
 @dataclass
 class CooldownState(GlobalSettings):
     """Main storage component to track pending withdrawals."""
 
-    timestep: int
+    unix_timestamp: int
     user_name: str
     withdrawal_id: int
     tkn_name: str
@@ -44,7 +45,7 @@ class CooldownState(GlobalSettings):
 
 
 @dataclass
-class Wallet(GlobalSettings):
+class WalletState(GlobalSettings):
     """Main wallet level storage component."""
 
     tkn_name: str
@@ -57,41 +58,38 @@ class Wallet(GlobalSettings):
 
 
 @dataclass
-class User(GlobalSettings):
-    """Main user level storage component."""
-
-    user_name: str
-    wallet: Dict[str, Wallet] = field(default_factory=lambda: defaultdict(Wallet))
-
-
-@dataclass
-class Users(GlobalSettings):
+class UserState(GlobalSettings):
     """Main storage component to group users."""
 
+    user_name: str
+    wallet: Dict[str, WalletState] = field(default_factory=lambda: defaultdict(WalletState))
     usernames: list = field(default_factory=list)
-    users: Dict[str, User] = field(default_factory=lambda: defaultdict(User))
-    history: List[Dict[str, User]] = field(default_factory=list)
+    history: List[Dict[str, WalletState]] = field(default_factory=list)
 
 
 @dataclass
-class Transaction(GlobalSettings):
-    """Main transaction level storage component."""
+class PoolState(GlobalSettings):
+    """Individual pool/token state."""
 
-    timestep: int = 0
+    unix_timestamp: int = settings.unix_timestamp
     vault_tkn: Decimal = Decimal("0")
     erc20contracts_bntkn: Decimal = Decimal("0")
     staked_tkn: Decimal = Decimal("0")
     trading_enabled: bool = False
     bnt_trading_liquidity: Decimal = Decimal("0")
     tkn_trading_liquidity: Decimal = Decimal("0")
-    trading_fee: Decimal = Decimal("0.005")
+    trading_fee: Decimal = Decimal(f"{settings.trading_fee}")
     bnt_funding_limit: Decimal = Decimal("0")
-    bnt_remaining_funding: Decimal = Decimal("0")
     bnt_funding_amount: Decimal = Decimal("0")
     external_protection_vault: Decimal = Decimal("0")
     spot_rate: Decimal = Decimal("0")
     ema_rate: Decimal = Decimal("0")
     ema_last_updated: Decimal = Decimal("0")
+
+    @property
+    def bnt_remaining_funding(self):
+        """Computes the BNT funding remaining for the pool."""
+        return self.bnt_funding_limit - self.bnt_funding_amount
 
     @property
     def is_price_stable(self):
@@ -130,22 +128,22 @@ class Transaction(GlobalSettings):
     @property
     def ema_descale(self) -> int:
         """Used for descaling the ema into at most 112 bits per component."""
-        return (int(max(self.ema.numerator, self.ema.denominator)) + max_uint112 - 1) // max_uint112
+        return (int(max(self.ema.numerator, self.ema.denominator)) + settings.max_uint112 - 1) // settings.max_uint112
 
     @property
     def ema_compressed_numerator(self) -> int:
         """Used to measure the deviation of solidity fixed point math on protocol calclulations."""
-        return int(self.ema.numerator / self.ema_descale) # `ema_descale > 0` by definition
+        return int(self.ema.numerator / self.ema_descale)  # `ema_descale > 0` by definition
 
     @property
     def ema_compressed_denominator(self) -> int:
         """Used to measure the deviation of solidity fixed point math on protocol calclulations."""
-        return int(self.ema.denominator / self.ema_descale) # `ema_descale > 0` by definition
+        return int(self.ema.denominator / self.ema_descale)  # `ema_descale > 0` by definition
 
     @property
     def is_ema_update_allowed(self) -> bool:
         """Returns True if the moving average has not been updated on the existing block."""
-        return int(self.timestep) != int(self.ema_last_updated)
+        return int(self.unix_timestamp) != int(self.ema_last_updated)
 
     @property
     def ema_deviation(self) -> Decimal:
@@ -159,37 +157,49 @@ class Transaction(GlobalSettings):
 
 
 @dataclass
-class State(GlobalSettings):
-    "Main system state storage component."
-    latest_tkn: str = None
-    latest_amt: Decimal = Decimal("0")
-    latest_user_name: str = None
-    latest_action: str = None
-    withdrawal_ids: List[Dict[str, CooldownState]] = field(default_factory=list)
-    created_at: datetime = field(default_factory=datetime.now)
-    timestep: int = timestep
-    network_fee: Decimal = network_fee
-    trading_fee: Decimal = trading_fee
-    bnt_min_liquidity: Decimal = bnt_min_liquidity
-    cooldown_time: int = cooldown_time
-    bnt_funding_limit: Decimal = bnt_funding_limit
-    alpha: Decimal = alpha
-    whitelisted_tokens: list = field(default_factory=lambda: whitelisted_tokens)
+class State:
+    "Main system state."
+
+    transaction_id: int = 0
+    unix_timestamp: int = settings.unix_timestamp
+    trading_fee: Decimal = settings.trading_fee
+    bnt_funding_limit: Decimal = settings.bnt_funding_limit
+    alpha: Decimal = settings.alpha
     staked_bnt: Decimal = Decimal("0")
     vault_bnt: Decimal = Decimal("0")
     erc20contracts_bnbnt: Decimal = Decimal("0")
     protocol_wallet_bnbnt: Decimal = Decimal("0")
     vortex_bnt: Decimal = Decimal("0")
     vortex_vbnt_burned: Decimal = Decimal("0")
-    tokens: Dict[str, Transaction] = field(
-        default_factory=lambda: defaultdict(Transaction)
+    price_feeds: pd.DataFrame = pd.read_parquet(settings.price_feeds_path)
+    whitelisted_tokens: list = field(default_factory=lambda: settings.whitelisted_tokens)
+    pools: Dict[str, PoolState] = field(
+        default_factory=lambda: defaultdict(PoolState)
     )
-    transactions: List[Dict[str, Transaction]] = field(default_factory=list)
-    users: Users = Users()
+    users: Dict[str, UserState] = field(
+        default_factory=lambda: defaultdict(UserState)
+    )
+    withdrawal_ids: List[Dict[str, CooldownState]] = field(default_factory=list)
+    usernames: list = field(default_factory=list)
     history: list = field(default_factory=list)
+    log: Log = field(default_factory=Log)
+
+    # Default global variables can be overriden via initialization parameters in the BancorV3 class
+    network_fee: Decimal = settings.network_fee
+    withdrawal_fee: Decimal = settings.withdrawal_fee
+    bnt_min_liquidity: Decimal = settings.bnt_min_liquidity
+    cooldown_time: int = settings.cooldown_time
 
     @property
-    def bnbnt_rate(self):
+    def bnt_price(self) -> Decimal:
+        return Decimal(self.price_feeds.at[self.unix_timestamp, "bnt"])
+
+    @property
+    def bnt_virtual_balance(self) -> Decimal:
+        return Decimal("1") / Decimal(self.price_feeds.at[self.unix_timestamp, "bnt"])
+
+    @property
+    def bnbnt_rate(self) -> Decimal:
         """Determines the bnbnt issuance rate, used for bnbnt issuance for the protocol during tkn deposits.
         Also used to determine the exchange between users and the protocol during bnt deposits.
 
@@ -203,19 +213,41 @@ class State(GlobalSettings):
             bnbnt_rate = Decimal(self.erc20contracts_bnbnt / self.staked_bnt)
         return bnbnt_rate
 
-    def step(self):
-        """Increments the timestep +1"""
-        self.timestep += 1
+    def tkn_price(self, tkn_name: str) -> Decimal:
+        if tkn_name == "vbnt":
+            tkn_price = self.bnt_price / self.bnbnt_rate
+        else:
+            tkn_price = Decimal(self.price_feeds.at[self.unix_timestamp, tkn_name])
+        return tkn_price
 
-    def list_users(self):
+    def tkn_virtual_balance(self, tkn_name: str) -> Decimal:
+        return Decimal("1") / self.tkn_price(tkn_name)
+
+    def virtual_rate(self, tkn_name: str) -> Decimal:
+        return self.bnt_virtual_balance / self.tkn_virtual_balance(tkn_name)
+
+    def tkn_bootstrap_liquidity(self, tkn_name: str) -> Decimal:
+        return self.pools[tkn_name].bnt_bootstrap_liquidity / self.virtual_rate(tkn_name)
+
+    def bootstrap_requirements_met(self, tkn_name: str) -> bool:
+        return self.pools[tkn_name].vault_tkn >= self.tkn_bootstrap_liquidity(tkn_name)
+
+    def bootstrap_rate(self, tkn_name: str) -> Decimal:
+        return self.bnt_virtual_balance / self.tkn_virtual_balance(tkn_name)
+
+    def step(self):
+        """Increments the unix_timestamp +1"""
+        self.unix_timestamp += 1
+
+    def list_users(self) -> list:
         """
 
         Returns: List of all active users.
 
         """
-        return [usr for usr in self.users.usernames]
+        return [usr for usr in self.usernames]
 
-    def list_tokens(self):
+    def list_tokens(self) -> list:
         """
 
         Returns: List of all active whitelisted_tokens.
@@ -229,26 +261,26 @@ class State(GlobalSettings):
         Args:
             user_name: A unique name identifier for the user.
         """
-        if user_name not in self.users.usernames:
-            self.users.usernames.append(user_name)
-            self.users.users[user_name] = User(user_name=user_name)
-            for tkn_name in whitelisted_tokens:
-                self.users.users[user_name].wallet[tkn_name] = Wallet(tkn_name=tkn_name)
+        if user_name not in self.usernames:
+            self.usernames.append(user_name)
+            self.users[user_name] = UserState(user_name=user_name)
+            for tkn_name in settings.whitelisted_tokens:
+                self.users[user_name].wallet[tkn_name] = WalletState(tkn_name=tkn_name)
 
     def init_protocol(self, whitelisted_tokens: List[str], usernames: List[str]):
         """On system genesis this method builds initial wallet placeholders and users.
 
         Args:
-            whitelisted_tokens: List of whitelisted tokens.
+            whitelisted_tokens: List of whitelisted pools.
             usernames: List of users to initialize the system with.
         """
         for tkn_name in whitelisted_tokens:
             if tkn_name not in self.whitelisted_tokens:
                 self.whitelist_tkn(tkn_name)
-                self.tokens[tkn_name] = Transaction(tkn_name)
+                self.pools[tkn_name] = PoolState(tkn_name)
 
         for usr in usernames:
-            if usr not in self.users.usernames:
+            if usr not in self.usernames:
                 self.create_user(usr)
 
         return self
@@ -266,8 +298,8 @@ class State(GlobalSettings):
         Returns:
 
         """
-        _timestep = self.timestep
-        bnt_price = Decimal(price_feeds.at[_timestep, "bnt"])
+        unix_timestamp = self.unix_timestamp
+        bnt_price = Decimal(price_feeds.at[unix_timestamp, "bnt"])
         if tkn_name == "vbnt":
 
             bnbnt_rate = self.bnbnt_rate
@@ -275,7 +307,7 @@ class State(GlobalSettings):
             # vbnt_price
             tkn_price = bnt_price / bnbnt_rate
         else:
-            tkn_price = Decimal(price_feeds.at[_timestep, tkn_name])
+            tkn_price = Decimal(price_feeds.at[unix_timestamp, tkn_name])
         return self, tkn_price, bnt_price
 
     def check_pool_shutdown(self, tkn_name):
@@ -284,10 +316,10 @@ class State(GlobalSettings):
         This function is called after changes in the bnt funding limits of a pool, after tkn deposits, and before tkn withdrawals.
         This function returns nothing.
         """
-        trading_enabled = self.tokens[tkn_name].trading_enabled
-        _bnt_min_liquidity = self.bnt_min_liquidity
-        bnt_trading_liquidity = self.tokens[tkn_name].bnt_trading_liquidity
-        if bnt_trading_liquidity < _bnt_min_liquidity and trading_enabled:
+        trading_enabled = self.pools[tkn_name].trading_enabled
+        bnt_min_liquidity = self.bnt_min_liquidity
+        bnt_trading_liquidity = self.pools[tkn_name].bnt_trading_liquidity
+        if bnt_trading_liquidity < bnt_min_liquidity and trading_enabled:
             self.shutdown_pool(tkn_name)
         return self
 
@@ -298,18 +330,17 @@ class State(GlobalSettings):
         This function returns nothing.
         """
 
-        bnt_trading_liquidity = self.tokens[tkn_name].bnt_trading_liquidity
+        bnt_trading_liquidity = self.pools[tkn_name].bnt_trading_liquidity
         bnbnt_renounced = self.bnbnt_amt(bnt_trading_liquidity)
 
         # actuator tasks
-        self.tokens[tkn_name].trading_enabled = False
-        self.tokens[tkn_name].bnt_trading_liquidity = Decimal("0")
+        self.pools[tkn_name].trading_enabled = False
+        self.pools[tkn_name].bnt_trading_liquidity = Decimal("0")
         self.staked_bnt -= bnt_trading_liquidity
         self.vault_bnt -= bnt_trading_liquidity
         self.erc20contracts_bnbnt -= bnbnt_renounced
         self.protocol_wallet_bnbnt -= bnbnt_renounced
-        self.tokens[tkn_name].bnt_funding_amount -= bnt_trading_liquidity
-        self.tokens[tkn_name].bnt_remaining_funding += bnt_trading_liquidity
+        self.pools[tkn_name].bnt_funding_amount -= bnt_trading_liquidity
         self.tkn_trading_liquidity = Decimal("0")
         return self
 
@@ -320,28 +351,28 @@ class State(GlobalSettings):
             tkn_name: Name of the token being transacted.
         """
         if (
-                self.tokens[tkn_name].bnt_trading_liquidity == 0
-                and self.tokens[tkn_name].tkn_trading_liquidity == 0
+                self.pools[tkn_name].bnt_trading_liquidity == 0
+                and self.pools[tkn_name].tkn_trading_liquidity == 0
         ):
             spot_rate = Decimal(0)
         else:
             spot_rate = (
-                    self.tokens[tkn_name].bnt_trading_liquidity
-                    / self.tokens[tkn_name].tkn_trading_liquidity
+                    self.pools[tkn_name].bnt_trading_liquidity
+                    / self.pools[tkn_name].tkn_trading_liquidity
             )
-        self.tokens[tkn_name].spot_rate = spot_rate
+        self.pools[tkn_name].spot_rate = spot_rate
 
     def bntkn_rate(self, tkn_name):
         """Computes the bntkn issuance rate for tkn deposits, based on the staking ledger and the current bntkn supply"""
         if (
-                self.tokens[tkn_name].erc20contracts_bntkn == 0
-                and self.tokens[tkn_name].staked_tkn == 0
+                self.pools[tkn_name].erc20contracts_bntkn == 0
+                and self.pools[tkn_name].staked_tkn == 0
         ):
             bntkn_rate = Decimal("1")
         else:
             bntkn_rate = (
-                    self.tokens[tkn_name].erc20contracts_bntkn
-                    / self.tokens[tkn_name].staked_tkn
+                    self.pools[tkn_name].erc20contracts_bntkn
+                    / self.pools[tkn_name].staked_tkn
             )
         return bntkn_rate
 
@@ -378,22 +409,6 @@ class State(GlobalSettings):
         """
         return self.bntkn_rate(tkn_name) * tkn_amt
 
-    def virtual_rate(self, bnt_price, tkn_price):
-        """
-        Takes bntVirtualBalance and tknTokenVirtualBalance as inputs.
-        Returns bntVirtualBalance/tknTokenVirtualBalance.
-        """
-        bnt_virtual_balance = Decimal("1") / bnt_price
-        tkn_virtual_balance = Decimal("1") / tkn_price
-        return bnt_virtual_balance / tkn_virtual_balance
-
-    def tkn_bootstrap_liquidity(self, bnt_bootstrap_liquidity, bnt_price, tkn_price):
-        """
-        Returns the bntBootstrapLiquidity divided by virtualRate.
-        This is the tkn equivalnce of twice the bntMinLiquidity (i.e. the bntBootstrapLiquidity)
-        """
-        return bnt_bootstrap_liquidity / self.virtual_rate(bnt_price, tkn_price)
-
     def pool_tkn_amt(self, user_name: str, tkn_name: str, withdraw_value: Decimal):
         """The users bntkn is converted into its tkn equivalent, and these values are stored in the pending_withdrawals with the current timestamp number.
 
@@ -405,13 +420,13 @@ class State(GlobalSettings):
         Returns:
             withdraw_value converted into pool token units
         """
-        user_bntkn_amt = self.users.users[user_name].wallet[tkn_name].bntkn_amt
+        user_bntkn_amt = self.users[user_name].wallet[tkn_name].bntkn_amt
         if withdraw_value > user_bntkn_amt:
             raise ValueError(
                 f"User cannot withdraw more than their current wallet holdings allow.available {tkn_name}={user_bntkn_amt}"
             )
-        pool_token_supply = self.tokens[tkn_name].erc20contracts_bntkn
-        staked_amt = self.tokens[tkn_name].staked_tkn
+        pool_token_supply = self.pools[tkn_name].erc20contracts_bntkn
+        staked_amt = self.pools[tkn_name].staked_tkn
         return (lambda a, b, c: a * b / c)(
             pool_token_supply, withdraw_value, staked_amt
         )
@@ -422,7 +437,7 @@ class State(GlobalSettings):
         """
 
         total_bnt_trading_liquidity = sum(
-            self.tokens[tkn_name].bnt_trading_liquidity
+            self.pools[tkn_name].bnt_trading_liquidity
             for tkn_name in self.whitelisted_tokens
             if tkn_name != "bnt"
         )
@@ -436,36 +451,36 @@ class State(GlobalSettings):
         """Logs main parameters after each action."""
         for tkn_name in self.list_tokens():
             state_variables = {
-                "timestep": [self.timestep],
-                "latest_action": [self.latest_action],
-                "latest_amt": [self.latest_amt],
-                "latest_user_name": [self.latest_user_name],
-                "latest_tkn": [self.latest_tkn],
+                "unix_timestamp": [self.unix_timestamp],
+                "latest_action": [self.log.action_name],
+                "latest_amt": [self.log.tkn_amt],
+                "latest_user_name": [self.log.user_name],
+                "latest_tkn": [self.log.tkn_name],
                 "tkn_name": [tkn_name],
-                "vault_tkn": [self.tokens[tkn_name].vault_tkn],
-                "erc20contracts_bntkn": [self.tokens[tkn_name].erc20contracts_bntkn],
-                "staked_tkn": [self.tokens[tkn_name].staked_tkn],
-                "trading_enabled": [self.tokens[tkn_name].trading_enabled],
-                "bnt_trading_liquidity": [self.tokens[tkn_name].bnt_trading_liquidity],
-                "tkn_trading_liquidity": [self.tokens[tkn_name].tkn_trading_liquidity],
-                "trading_fee": [self.tokens[tkn_name].trading_fee],
-                "bnt_funding_limit": [self.tokens[tkn_name].bnt_funding_limit],
-                "bnt_remaining_funding": [self.tokens[tkn_name].bnt_remaining_funding],
-                "bnt_funding_amount": [self.tokens[tkn_name].bnt_funding_amount],
+                "vault_tkn": [self.pools[tkn_name].vault_tkn],
+                "erc20contracts_bntkn": [self.pools[tkn_name].erc20contracts_bntkn],
+                "staked_tkn": [self.pools[tkn_name].staked_tkn],
+                "trading_enabled": [self.pools[tkn_name].trading_enabled],
+                "bnt_trading_liquidity": [self.pools[tkn_name].bnt_trading_liquidity],
+                "tkn_trading_liquidity": [self.pools[tkn_name].tkn_trading_liquidity],
+                "trading_fee": [self.pools[tkn_name].trading_fee],
+                "bnt_funding_limit": [self.pools[tkn_name].bnt_funding_limit],
+                "bnt_remaining_funding": [self.pools[tkn_name].bnt_remaining_funding],
+                "bnt_funding_amount": [self.pools[tkn_name].bnt_funding_amount],
                 "external_protection_vault": [
-                    self.tokens[tkn_name].external_protection_vault
+                    self.pools[tkn_name].external_protection_vault
                 ],
-                "spot_rate": [self.tokens[tkn_name].spot_rate],
-                "ema_rate": [self.tokens[tkn_name].ema_rate],
-                "ema_descale": [self.tokens[tkn_name].ema_descale],
+                "spot_rate": [self.pools[tkn_name].spot_rate],
+                "ema_rate": [self.pools[tkn_name].ema_rate],
+                "ema_descale": [self.pools[tkn_name].ema_descale],
                 "ema_compressed_numerator": [
-                    self.tokens[tkn_name].ema_compressed_numerator
+                    self.pools[tkn_name].ema_compressed_numerator
                 ],
                 "ema_compressed_denominator": [
-                    self.tokens[tkn_name].ema_compressed_denominator
+                    self.pools[tkn_name].ema_compressed_denominator
                 ],
-                "ema_deviation": [self.tokens[tkn_name].ema_deviation],
-                "ema_last_updated": [self.tokens[tkn_name].ema_last_updated],
+                "ema_deviation": [self.pools[tkn_name].ema_deviation],
+                "ema_last_updated": [self.pools[tkn_name].ema_last_updated],
                 "network_fee": [self.network_fee],
                 "withdrawal_fee": [self.withdrawal_fee],
                 "bnt_min_liquidity": [self.bnt_min_liquidity],

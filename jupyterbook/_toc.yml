@@ -22,8 +22,8 @@ sections:
       title: A 7-day Cool-Off Period
     - file: chapters/02/4/exit-fees
       title: Exit Fees
-    - file: chapters/02/5/single-sided-pool-tokens
-      title: Single-Sided Pool Tokens
+    - file: chapters/02/5/single-sided-pool-transactions
+      title: Single-Sided PoolState Tokens
     - file: chapters/02/6/single-sided-stakers-as-first-class-citizens
       title: Single-Sided Stakers
     - file: chapters/02/7/bootstrapping-behavior
@@ -52,8 +52,8 @@ sections:
       - file: chapters/02/11/1/unstaking-tkn
         title: Unstaking TKN
         sections:
-        - file: chapters/02/11/1/1/pool-tokens
-          title: Pool Tokens - Status Quo and Bancor 2 Redesign
+        - file: chapters/02/11/1/1/pool-transactions
+          title: PoolState Tokens - Status Quo and Bancor 2 Redesign
         - file: chapters/02/11/1/2/committing-to-the-cooldown
           title: Committing to the Cooldown
         - file: chapters/02/11/1/3/introduction-to-the-withdrawal-algorithm
@@ -74,7 +74,7 @@ sections:
     - file: chapters/02/12/bancor-vortex
       title: Bancor Vortex
     - file: chapters/02/13/pool-shutdown
-      title: Pool Shutdown
+      title: PoolState Shutdown
     - file: chapters/02/14/rewards-mechanisms
       title: Rewards Mechanisms
   - file: chapters/03/simulation-example

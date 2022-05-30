@@ -62,7 +62,9 @@ class UserState(GlobalSettings):
     """Main storage component to group users."""
 
     user_name: str
-    wallet: Dict[str, WalletState] = field(default_factory=lambda: defaultdict(WalletState))
+    wallet: Dict[str, WalletState] = field(
+        default_factory=lambda: defaultdict(WalletState)
+    )
     usernames: list = field(default_factory=list)
     history: List[Dict[str, WalletState]] = field(default_factory=list)
 
@@ -95,9 +97,9 @@ class PoolState(GlobalSettings):
     def is_price_stable(self):
         """Computes the deviation between the spot and ema bnt/tkn rates. True if the deviation is less than 1%."""
         return (
-                Decimal("0.99") * self.ema_rate
-                <= self.spot_rate
-                <= Decimal("1.01") * self.ema_rate
+            Decimal("0.99") * self.ema_rate
+            <= self.spot_rate
+            <= Decimal("1.01") * self.ema_rate
         )
 
     @property
@@ -128,17 +130,25 @@ class PoolState(GlobalSettings):
     @property
     def ema_descale(self) -> int:
         """Used for descaling the ema into at most 112 bits per component."""
-        return (int(max(self.ema.numerator, self.ema.denominator)) + settings.max_uint112 - 1) // settings.max_uint112
+        return (
+            int(max(self.ema.numerator, self.ema.denominator))
+            + settings.max_uint112
+            - 1
+        ) // settings.max_uint112
 
     @property
     def ema_compressed_numerator(self) -> int:
         """Used to measure the deviation of solidity fixed point math on protocol calclulations."""
-        return int(self.ema.numerator / self.ema_descale)  # `ema_descale > 0` by definition
+        return int(
+            self.ema.numerator / self.ema_descale
+        )  # `ema_descale > 0` by definition
 
     @property
     def ema_compressed_denominator(self) -> int:
         """Used to measure the deviation of solidity fixed point math on protocol calclulations."""
-        return int(self.ema.denominator / self.ema_descale)  # `ema_descale > 0` by definition
+        return int(
+            self.ema.denominator / self.ema_descale
+        )  # `ema_descale > 0` by definition
 
     @property
     def is_ema_update_allowed(self) -> bool:
@@ -172,13 +182,11 @@ class State:
     vortex_bnt: Decimal = Decimal("0")
     vortex_vbnt_burned: Decimal = Decimal("0")
     price_feeds: pd.DataFrame = pd.read_parquet(settings.price_feeds_path)
-    whitelisted_tokens: list = field(default_factory=lambda: settings.whitelisted_tokens)
-    pools: Dict[str, PoolState] = field(
-        default_factory=lambda: defaultdict(PoolState)
+    whitelisted_tokens: list = field(
+        default_factory=lambda: settings.whitelisted_tokens
     )
-    users: Dict[str, UserState] = field(
-        default_factory=lambda: defaultdict(UserState)
-    )
+    pools: Dict[str, PoolState] = field(default_factory=lambda: defaultdict(PoolState))
+    users: Dict[str, UserState] = field(default_factory=lambda: defaultdict(UserState))
     withdrawal_ids: List[Dict[str, CooldownState]] = field(default_factory=list)
     usernames: list = field(default_factory=list)
     history: list = field(default_factory=list)
@@ -227,7 +235,9 @@ class State:
         return self.bnt_virtual_balance / self.tkn_virtual_balance(tkn_name)
 
     def tkn_bootstrap_liquidity(self, tkn_name: str) -> Decimal:
-        return self.pools[tkn_name].bnt_bootstrap_liquidity / self.virtual_rate(tkn_name)
+        return self.pools[tkn_name].bnt_bootstrap_liquidity / self.virtual_rate(
+            tkn_name
+        )
 
     def bootstrap_requirements_met(self, tkn_name: str) -> bool:
         return self.pools[tkn_name].vault_tkn >= self.tkn_bootstrap_liquidity(tkn_name)
@@ -351,28 +361,28 @@ class State:
             tkn_name: Name of the token being transacted.
         """
         if (
-                self.pools[tkn_name].bnt_trading_liquidity == 0
-                and self.pools[tkn_name].tkn_trading_liquidity == 0
+            self.pools[tkn_name].bnt_trading_liquidity == 0
+            and self.pools[tkn_name].tkn_trading_liquidity == 0
         ):
             spot_rate = Decimal(0)
         else:
             spot_rate = (
-                    self.pools[tkn_name].bnt_trading_liquidity
-                    / self.pools[tkn_name].tkn_trading_liquidity
+                self.pools[tkn_name].bnt_trading_liquidity
+                / self.pools[tkn_name].tkn_trading_liquidity
             )
         self.pools[tkn_name].spot_rate = spot_rate
 
     def bntkn_rate(self, tkn_name):
         """Computes the bntkn issuance rate for tkn deposits, based on the staking ledger and the current bntkn supply"""
         if (
-                self.pools[tkn_name].erc20contracts_bntkn == 0
-                and self.pools[tkn_name].staked_tkn == 0
+            self.pools[tkn_name].erc20contracts_bntkn == 0
+            and self.pools[tkn_name].staked_tkn == 0
         ):
             bntkn_rate = Decimal("1")
         else:
             bntkn_rate = (
-                    self.pools[tkn_name].erc20contracts_bntkn
-                    / self.pools[tkn_name].staked_tkn
+                self.pools[tkn_name].erc20contracts_bntkn
+                / self.pools[tkn_name].staked_tkn
             )
         return bntkn_rate
 

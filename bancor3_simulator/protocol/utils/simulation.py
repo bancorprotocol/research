@@ -2,7 +2,11 @@
 import random
 from decimal import Decimal
 from bancor3_simulator.core.settings import GlobalSettings as Settings
-from bancor3_simulator.protocol.actions import update_ema, trade_tkn_to_ema, trade_bnt_to_ema
+from bancor3_simulator.protocol.actions import (
+    update_ema,
+    trade_tkn_to_ema,
+    trade_bnt_to_ema,
+)
 
 settings = Settings()
 
@@ -117,7 +121,9 @@ class MonteCarlo:
             tokens = [token for token in protocol.state.whitelisted_tokens]
             source_token = tokens.pop(tokens.index(random.choice(tokens)))
             target_token = random.choice(tokens)
-            source_liquidity = protocol.state.transactions[source_token].tkn_trading_liquidity
+            source_liquidity = protocol.state.transactions[
+                source_token
+            ].tkn_trading_liquidity
             user_funds = protocol.state.users[user_name].wallet[source_token].tkn_amt
             for i in range(random.randint(1, 5)):
                 swap_amount = MonteCarlo.randomise_amounts(source_liquidity)
@@ -136,7 +142,7 @@ class MonteCarlo:
             user_name = random.choice([user for user in protocol.state.usernames])
             token_name = random.choice(settings.whitelisted_tokens)
             user_tkn = protocol.state.users[user_name].wallet[token_name].tkn_amt
-            user_bnt = protocol.state.users[user_name].wallet['bnt'].tkn_amt
+            user_bnt = protocol.state.users[user_name].wallet["bnt"].tkn_amt
             bnbnt_supply = protocol.state.erc20contracts_bnbnt
             protocol_bnbnt = protocol.state.protocol_wallet_bnbnt
             staked_bnt = protocol.state.staked_bnt
@@ -144,7 +150,9 @@ class MonteCarlo:
             user_funds = protocol.state.users[user_name].wallet[token_name].tkn_amt
             if token_name != "bnt":
                 master_vault_balance = protocol.state.transactions[token_name].vault_tkn
-                state, token_price, bnt_price = protocol.state.get_prices(token_name, protocol.price_feeds)
+                state, token_price, bnt_price = protocol.state.get_prices(
+                    token_name, protocol.price_feeds
+                )
                 master_vault_tvl = MonteCarlo.get_master_vault_tvl(
                     master_vault_balance, token_price
                 )
@@ -158,7 +166,7 @@ class MonteCarlo:
 
             elif token_name == "bnt":
                 if bnbnt_supply > 0 and MonteCarlo.is_protocol_bnbnt_healthy(
-                        protocol_bnbnt, bnbnt_supply
+                    protocol_bnbnt, bnbnt_supply
                 ):
                     maximum_bnt_deposit = MonteCarlo.get_maximum_bnt_deposit(
                         bnbnt_supply, protocol_bnbnt, bnbnt_rate, user_bnt
@@ -175,7 +183,9 @@ class MonteCarlo:
 
         for i in range(random.randint(1, 10)):
             user = random.choice([user for user in protocol.state.usernames])
-            tokens = [token for token in protocol.state.whitelisted_tokens if token != "bnt"]
+            tokens = [
+                token for token in protocol.state.whitelisted_tokens if token != "bnt"
+            ]
             token_name = random.choice(tokens)
             if protocol.state.transactions[token_name].trading_enabled:
                 protocol.arbitrage_trade(token_name, user)
@@ -185,8 +195,12 @@ class MonteCarlo:
     @staticmethod
     def process_force_moving_average(protocol, token_name, user_tkn, user_bnt):
 
-        tkn_trading_liquidity = protocol.state.transactions[token_name].tkn_trading_liquidity
-        bnt_trading_liquidity = protocol.state.transactions[token_name].bnt_trading_liquidity
+        tkn_trading_liquidity = protocol.state.transactions[
+            token_name
+        ].tkn_trading_liquidity
+        bnt_trading_liquidity = protocol.state.transactions[
+            token_name
+        ].bnt_trading_liquidity
         trading_fee = protocol.state.transactions[token_name].trading_fee
         network_fee = protocol.state.network_fee
         ema_rate = protocol.state.transactions[token_name].ema_rate
@@ -195,14 +209,24 @@ class MonteCarlo:
         if ema_rate < spot_rate:
             source_token = token_name
             target_token = "bnt"
-            trade_amount = trade_tkn_to_ema(bnt_trading_liquidity, tkn_trading_liquidity, trading_fee, network_fee,
-                                            future_ema)
+            trade_amount = trade_tkn_to_ema(
+                bnt_trading_liquidity,
+                tkn_trading_liquidity,
+                trading_fee,
+                network_fee,
+                future_ema,
+            )
             user_capability = user_tkn > trade_amount
         elif ema_rate > spot_rate:
             source_token = "bnt"
             target_token = token_name
-            trade_amount = trade_bnt_to_ema(bnt_trading_liquidity, tkn_trading_liquidity, trading_fee, network_fee,
-                                            future_ema)
+            trade_amount = trade_bnt_to_ema(
+                bnt_trading_liquidity,
+                tkn_trading_liquidity,
+                trading_fee,
+                network_fee,
+                future_ema,
+            )
             user_capability = user_bnt > trade_amount
         else:
             source_token = token_name
@@ -215,10 +239,14 @@ class MonteCarlo:
     @staticmethod
     def force_moving_average(protocol, token_name, user_name):
         user_tkn = protocol.state.users[user_name].wallet[token_name].tkn_amt
-        user_bnt = protocol.state.users[user_name].wallet['bnt'].tkn_amt
+        user_bnt = protocol.state.users[user_name].wallet["bnt"].tkn_amt
         if protocol.state.transactions[token_name].trading_enabled:
-            trade_amount, source_token, target_token, user_capability = MonteCarlo.process_force_moving_average(
-                token_name, user_tkn, user_bnt)
+            (
+                trade_amount,
+                source_token,
+                target_token,
+                user_capability,
+            ) = MonteCarlo.process_force_moving_average(token_name, user_tkn, user_bnt)
             if user_capability:
                 protocol.trade(trade_amount, source_token, target_token, user_name)
             else:
@@ -232,8 +260,14 @@ class MonteCarlo:
     def random_ema_force_trades(protocol):
 
         for i in range(random.randint(1, 10)):
-            user_name = random.choice([user for user in protocol.global_state.usernames])
-            tokens = [token for token in protocol.global_state.whitelisted_tokens if token != "bnt"]
+            user_name = random.choice(
+                [user for user in protocol.global_state.usernames]
+            )
+            tokens = [
+                token
+                for token in protocol.global_state.whitelisted_tokens
+                if token != "bnt"
+            ]
             token_name = random.choice(tokens)
             if protocol.global_state.transactions[token_name].trading_enabled:
                 MonteCarlo.force_moving_average(token_name, user_name)
@@ -247,7 +281,11 @@ class MonteCarlo:
     @staticmethod
     def random_enable_trading(protocol):
 
-        tokens = [token for token in protocol.global_state.whitelisted_tokens if token != "bnt"]
+        tokens = [
+            token
+            for token in protocol.global_state.whitelisted_tokens
+            if token != "bnt"
+        ]
         for token_name in tokens:
             bnt_min_liquidity = protocol.global_state.bnt_min_liquidity
 
@@ -255,12 +293,18 @@ class MonteCarlo:
                 state = protocol.global_state
                 state.tkn_name = token_name
 
-                state, state.tkn_price, state.bnt_price = state.get_prices(token_name, protocol.price_feeds)
+                state, state.tkn_price, state.bnt_price = state.get_prices(
+                    token_name, protocol.price_feeds
+                )
 
                 bnt_virtual_balance = protocol.bnt_virtual_balance
                 tkn_virtual_balance = protocol.tkn_virtual_balance
-                smallest_bnt_funding_limit = MonteCarlo.get_minimum_bnt_funding(bnt_min_liquidity)
-                bnt_funding_limit = MonteCarlo.randomise_amounts(smallest_bnt_funding_limit)
+                smallest_bnt_funding_limit = MonteCarlo.get_minimum_bnt_funding(
+                    bnt_min_liquidity
+                )
+                bnt_funding_limit = MonteCarlo.randomise_amounts(
+                    smallest_bnt_funding_limit
+                )
                 protocol.enable_trading(
                     token_name,
                     bnt_virtual_balance,

@@ -1,6 +1,4 @@
 
-I
-bancor3_simulator/main.py,5/f/5ffeaffdee29e5ef68c026e4d43094f3be4e7d48
 R
 "bancor3_simulator/core/__init__.py,c/c/cc3561117b38938e1ec49180fb708873bb9ccf2a
 X

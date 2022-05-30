@@ -268,7 +268,7 @@ Bancor V3 proposes a considerable upgrade to the architecture of the protocol wi
 primary issues present in V2 and improving user experience by introducing several new features including:
 
 - **Instant** impermanent loss protection
-- A redesigned framework for **Single Side Pool Tokens**
+- A redesigned framework for **Single Side PoolState Tokens**
 - **Unlimited cap** for deposits with the introduction of "Superfluid Liquidity" and Infinity Pools
 - Flash Loans
 - Deeper liquidity & reduced transaction costs by using Bancor's new **Omnipool**

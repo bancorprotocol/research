@@ -25,7 +25,7 @@ The Dawn release includes the following features:
 - Auto-compounding Rewards
 - Dual Rewards
 - Third Party IL Protection
-- Composable Pool Tokens
+- Composable PoolState Tokens
 - Tokenomics Redesign
 - Flash Loans
 

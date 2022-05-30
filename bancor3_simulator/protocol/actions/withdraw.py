@@ -11,17 +11,43 @@ class Result:
     updated_tkn_liquidity: Decimal("0")
     tkn_sent_to_user: Decimal("0")
     bnt_sent_to_user: Decimal("0")
+#
+#
+# def begin_cooldown(protocol, withdraw_value, tkn_name, user_name, unix_timestamp=None):
+#     """Takes the username and a quantity of tkn pools as inputs.
+#     The users bntkn is converted into its tkn equivalent, and these values are stored in the pendingWithdrawals with the current timestamp number.
+#     After a fixed time duration, these items can be retrieved and passed to the withdrawal algorithm.
+#
+#     Args:
+#         withdraw_value: The tkn/bnt value to withdraw.
+#         tkn_name: The name of the token being transacted.
+#         user_name: The name of the user performing the transaction.
+#         unix_timestamp: The current unix_timestamp.
+#
+#     Returns:
+#         id_number (int): A unique withdrawal ID number to track the cooldown time to withdraw.
+#     """
+#
+#     state = protocol.global_state
+#     if unix_timestamp is not None:
+#         state.pools[tkn_name].unix_timestamp = unix_timestamp
+#         state.unix_timestamp = unix_timestamp
+#     else:
+#         state.pools[tkn_name].unix_timestamp = 0
+#         state.unix_timestamp = 0
+#
+#     return begin_cooldown(state, withdraw_value, tkn_name, user_name)
 
 
 def external_protection(
-    bnt_trading_liquidity,
-    average_tkn_trading_liquidity,
-    withdrawal_fee,
-    bnt_sent_to_user,
-    external_protection_tkn_balance,
-    tkn_withdraw_value,
-    tkn_sent_to_user,
-    trading_enabled,
+        bnt_trading_liquidity,
+        average_tkn_trading_liquidity,
+        withdrawal_fee,
+        bnt_sent_to_user,
+        external_protection_tkn_balance,
+        tkn_withdraw_value,
+        tkn_sent_to_user,
+        trading_enabled,
 ):
     """
     This replaces any BNT that would have been received by the user with TKN.
@@ -53,16 +79,16 @@ def external_protection(
 
 def begin_cooldown(state, withdraw_value, tkn_name, user_name):
     """
-    Takes the username and a quantity of tkn tokens as inputs.
+    Takes the username and a quantity of tkn pools as inputs.
     The users bntkn is converted into its tkn equivalent, and these values are stored in the pendingWithdrawals with the current timestamp number.
     After a fixed time duration, these items can be retrieved and passed to the withdrawal algorithm.
     """
-    timestep = state.timestep
+    unix_timestamp = state.unix_timestamp
     staked_amt = (
-        state.tokens[tkn_name].staked_tkn if tkn_name != "bnt" else state.staked_bnt
+        state.pools[tkn_name].staked_tkn if tkn_name != "bnt" else state.staked_bnt
     )
     pool_token_supply = (
-        state.tokens[tkn_name].erc20contracts_bntkn
+        state.pools[tkn_name].erc20contracts_bntkn
         if tkn_name != "bnt"
         else state.erc20contracts_bnbnt
     )
@@ -77,7 +103,7 @@ def begin_cooldown(state, withdraw_value, tkn_name, user_name):
     state.users[user_name].wallet[tkn_name].pending_withdrawals[
         id_number
     ] = CooldownState(
-        timestep=timestep,
+        unix_timestamp=unix_timestamp,
         withdrawal_id=id_number,
         user_name=user_name,
         tkn_name=tkn_name,
@@ -97,22 +123,22 @@ def unpack_cool_down_state(state, user_name, id_number):
     """
     for tkn_name in state.whitelisted_tokens:
         if (
-            id_number
-            in state.users[user_name].wallet[tkn_name].pending_withdrawals
+                id_number
+                in state.users[user_name].wallet[tkn_name].pending_withdrawals
         ):
             cool_down_state = (
                 state.users[user_name]
-                .wallet[tkn_name]
-                .pending_withdrawals[id_number]
+                    .wallet[tkn_name]
+                    .pending_withdrawals[id_number]
             )
             if not cool_down_state.is_complete:
-                cooldown_timestep = cool_down_state.timestep
+                cooldown_unix_timestamp = cool_down_state.unix_timestamp
                 tkn_name = cool_down_state.tkn_name
                 pool_token_amt = cool_down_state.pool_token_amt
                 withdrawal_value = cool_down_state.tkn_amt
                 return (
                     id_number,
-                    cooldown_timestep,
+                    cooldown_unix_timestamp,
                     tkn_name,
                     pool_token_amt,
                     withdrawal_value,
@@ -150,10 +176,10 @@ class WithdrawalAlgorithm:
         m = self.trading_fee
         n = self.withdrawal_fee
         hmax = (
-            b
-            * e
-            * (e * n + m * (b + c - e))
-            / ((1 - m) * (b + c - e) * (b + c - e * (1 - n)))
+                b
+                * e
+                * (e * n + m * (b + c - e))
+                / ((1 - m) * (b + c - e) * (b + c - e * (1 - n)))
         )
         return hmax
 
@@ -169,10 +195,10 @@ class WithdrawalAlgorithm:
         m = self.trading_fee
         n = self.withdrawal_fee
         hmax = (
-            b
-            * e
-            * (e * n - m * (b + c - e * (1 - n)))
-            / ((1 - m) * (b + c - e) * (b + c - e * (1 - n)))
+                b
+                * e
+                * (e * n - m * (b + c - e * (1 - n)))
+                / ((1 - m) * (b + c - e) * (b + c - e * (1 - n)))
         )
         return hmax
 
@@ -200,9 +226,9 @@ class WithdrawalAlgorithm:
         n = self.withdrawal_fee
         x = self.withdraw_value
         updated_bnt_liquidity = (
-            a
-            * (b * e - m * (b * e + x * (b + c - e * (1 - n))))
-            / ((1 - m) * (b * e + x * (b + c - e * (1 - n))))
+                a
+                * (b * e - m * (b * e + x * (b + c - e * (1 - n))))
+                / ((1 - m) * (b * e + x * (b + c - e * (1 - n))))
         )
         bnt_renounced = Decimal("0")
         updated_tkn_liquidity = (b * e + x * (b + c + e * (n - 1))) / e
@@ -217,7 +243,7 @@ class WithdrawalAlgorithm:
         )
 
     def default_withdrawal_surplus_covered(
-        self,
+            self,
     ):
         """
         @Dev
@@ -274,7 +300,7 @@ class WithdrawalAlgorithm:
         n = self.withdrawal_fee
         x = self.withdraw_value
         updated_bnt_liquidity = (
-            a * b * e / (b * e + x * (1 - m) * (b + c - e * (1 - n)))
+                a * b * e / (b * e + x * (1 - m) * (b + c - e * (1 - n)))
         )
         bnt_renounced = Decimal("0")
         updated_tkn_liquidity = (b * e + x * (b + c - e * (1 - n))) / e
@@ -388,11 +414,11 @@ class WithdrawalAlgorithm:
         )
 
     def process_withdrawal(
-        self,
-        updated_bnt_liquidity: Decimal = Decimal("0"),
-        bnt_renounced: Decimal = Decimal("0"),
-        updated_tkn_liquidity: Decimal = Decimal("0"),
-        tkn_sent_to_user: Decimal = Decimal("0"),
+            self,
+            updated_bnt_liquidity: Decimal = Decimal("0"),
+            bnt_renounced: Decimal = Decimal("0"),
+            updated_tkn_liquidity: Decimal = Decimal("0"),
+            tkn_sent_to_user: Decimal = Decimal("0"),
     ):
         """
         Evaluates the conditions, and calls the appropriate functions

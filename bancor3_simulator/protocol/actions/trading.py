@@ -24,13 +24,19 @@ def enable_trading(state, tkn_name):
     # state, tkn_price, bnt_price = state.get_prices(tkn_name, state.price_feeds)
     if state.bootstrap_requirements_met(tkn_name):
         state.pools[tkn_name].trading_enabled = True
-        state.pools[tkn_name].spot_rate = state.pools[tkn_name].ema_rate = state.bootstrap_rate(tkn_name)
-        state.pools[tkn_name].bnt_trading_liquidity = state.pools[tkn_name].bnt_bootstrap_liquidity
-        state.pools[tkn_name].bnt_funding_amount = state.pools[tkn_name].bnt_bootstrap_liquidity
-        state.pools[tkn_name].tkn_trading_liquidity = state.tkn_bootstrap_liquidity(tkn_name)
+        state.pools[tkn_name].spot_rate = state.pools[
+            tkn_name
+        ].ema_rate = state.bootstrap_rate(tkn_name)
+        state.pools[tkn_name].bnt_trading_liquidity = state.pools[
+            tkn_name
+        ].bnt_bootstrap_liquidity
+        state.pools[tkn_name].bnt_funding_amount = state.pools[
+            tkn_name
+        ].bnt_bootstrap_liquidity
+        state.pools[tkn_name].tkn_trading_liquidity = state.tkn_bootstrap_liquidity(
+            tkn_name
+        )
         mint_protocol_bnt(state, state.pools[tkn_name].bnt_bootstrap_liquidity)
-
-        print(tkn_name, 'bnt_bootstrap_liquidity', state.pools[tkn_name].bnt_bootstrap_liquidity)
 
     state.protocol_bnt_check()
     return state
@@ -52,7 +58,7 @@ def arbitrage_trade(state: State, tkn_name: str, user_name: str):
     tkn_trading_liquidity = state.pools[tkn_name].tkn_trading_liquidity
     trading_fee = state.pools[tkn_name].trading_fee
     user_tkn = state.users[user_name].wallet[tkn_name].tkn_amt
-    user_bnt = state.users[user_name].wallet['bnt'].tkn_amt
+    user_bnt = state.users[user_name].wallet["bnt"].tkn_amt
     is_trading_enabled = state.pools[tkn_name].trading_enabled
 
     if is_trading_enabled:
@@ -74,9 +80,7 @@ def arbitrage_trade(state: State, tkn_name: str, user_name: str):
         if user_capability:
             state.trade(trade_amount, source_token, target_token, user_name)
         else:
-            print(
-                "The user has insufficient funds to close the arbitrage opportunity."
-            )
+            print("The user has insufficient funds to close the arbitrage opportunity.")
             pass
     else:
         print("Trading is disabled")
@@ -84,14 +88,14 @@ def arbitrage_trade(state: State, tkn_name: str, user_name: str):
 
 
 def trade_bnt_for_tkn(
-        state: State,
-        bnt_trading_liquidity: Decimal,
-        tkn_trading_liquidity: Decimal,
-        trading_fee: Decimal,
-        network_fee: Decimal,
-        bnt_amt: Decimal,
-        tkn_name: str,
-        direction: str = "bnt",
+    state: State,
+    bnt_trading_liquidity: Decimal,
+    tkn_trading_liquidity: Decimal,
+    trading_fee: Decimal,
+    network_fee: Decimal,
+    bnt_amt: Decimal,
+    tkn_name: str,
+    direction: str = "bnt",
 ) -> Tuple[State, Decimal]:
     """
     Takes bntAmount, tokenName as inputs.
@@ -143,7 +147,6 @@ def trade_bnt_for_tkn(
     )
 
     # actuate
-    print('updated_bnt_liquidity ', updated_bnt_liquidity)
     state.vault_bnt += bnt_amt
     state.pools[tkn_name].vault_tkn -= tkn_sent_to_user
     state.pools[tkn_name].bnt_trading_liquidity = updated_bnt_liquidity
@@ -155,14 +158,14 @@ def trade_bnt_for_tkn(
 
 
 def trade_tkn_for_bnt(
-        state: State,
-        bnt_trading_liquidity: Decimal,
-        tkn_trading_liquidity: Decimal,
-        trading_fee: Decimal,
-        network_fee: Decimal,
-        tkn_amt: Decimal,
-        tkn_name: str,
-        direction="tkn",
+    state: State,
+    bnt_trading_liquidity: Decimal,
+    tkn_trading_liquidity: Decimal,
+    trading_fee: Decimal,
+    network_fee: Decimal,
+    tkn_amt: Decimal,
+    tkn_name: str,
+    direction="tkn",
 ):
     """Main logic to process swaps/trades from TKN->BNT"""
 
@@ -207,7 +210,6 @@ def trade_tkn_for_bnt(
         direction,
     )
 
-    print('updated_bnt_liquidity ', updated_bnt_liquidity)
     # actuate
     state.vault_bnt -= bnt_sent_to_user
     state.pools[tkn_name].vault_tkn += tkn_amt
@@ -235,7 +237,7 @@ def get_trade_inputs(state, tkn_name):
 
 
 def update_ema(
-        last_spot: Decimal, last_ema: Decimal, alpha: Decimal = Decimal("0.2")
+    last_spot: Decimal, last_ema: Decimal, alpha: Decimal = Decimal("0.2")
 ) -> Decimal:
     """The ema update is part of the Bancor security system, and is allowed to update only once per bloack per pool.
     This method is called before a trade is performed, therefore the ema is a lagging average.
@@ -252,35 +254,37 @@ def update_ema(
 
 
 def update_compressed_ema(
-        last_spot_numerator: int,
-        last_spot_denominator: int,
-        last_ema_compressed_numerator: int,
-        last_ema_compressed_denominator: int,
-        alpha=20,
+    last_spot_numerator: int,
+    last_spot_denominator: int,
+    last_ema_compressed_numerator: int,
+    last_ema_compressed_denominator: int,
+    alpha=20,
 ) -> Tuple[int, int]:
     """
     Takes the current spot rate and the current ema rate as inputs, and returns the new ema rate as output.
     """
     ema_numerator = (
-            last_spot_numerator * last_ema_compressed_denominator * alpha +
-            last_spot_denominator * last_ema_compressed_numerator * (100 - alpha)
+        last_spot_numerator * last_ema_compressed_denominator * alpha
+        + last_spot_denominator * last_ema_compressed_numerator * (100 - alpha)
     )
     ema_denominator = last_spot_denominator * last_ema_compressed_denominator * 100
-    scaled = (max(ema_numerator, ema_denominator) + settings.max_uint112 - 1) // settings.max_uint112
+    scaled = (
+        max(ema_numerator, ema_denominator) + settings.max_uint112 - 1
+    ) // settings.max_uint112
     return ema_numerator // scaled, ema_denominator // scaled
 
 
 def measure_ema_deviation(
-        new_ema, new_ema_compressed_numerator, new_ema_compressed_denominator
+    new_ema, new_ema_compressed_numerator, new_ema_compressed_denominator
 ):
     """
     Takes the accerate ema_rate, and the ema_compressed_numerator and ema_compressed_denominator as inputs.
     Returns the deviation between these values as ema_rate/ema_compressed_rate.
     """
     return (
-            new_ema
-            * Decimal(new_ema_compressed_denominator)
-            / Decimal(new_ema_compressed_numerator)
+        new_ema
+        * Decimal(new_ema_compressed_denominator)
+        / Decimal(new_ema_compressed_numerator)
     )
 
 
@@ -313,14 +317,14 @@ def handle_ema(tkn_name: str, state: State) -> State:
 
 
 def process_arbitrage_trade(
-        tkn_name: str,
-        tkn_token_virtual_balance: Decimal,
-        bnt_virtual_balance: Decimal,
-        bnt_trading_liquidity: Decimal,
-        tkn_trading_liquidity: Decimal,
-        trading_fee: Decimal,
-        user_tkn: Decimal,
-        user_bnt: Decimal,
+    tkn_name: str,
+    tkn_token_virtual_balance: Decimal,
+    bnt_virtual_balance: Decimal,
+    bnt_trading_liquidity: Decimal,
+    tkn_trading_liquidity: Decimal,
+    trading_fee: Decimal,
+    user_tkn: Decimal,
+    user_bnt: Decimal,
 ) -> Tuple[Decimal, str, str, bool]:
     """Computes the appropriate arbitrage trade on the token_name pool.
     Returns user_capability == True if the user has sufficient funds to close the opportunity, else returns
@@ -345,23 +349,23 @@ def process_arbitrage_trade(
     p = bnt_virtual_balance
     q = tkn_token_virtual_balance
     bnt_trade_amount = (
-                               -Decimal("2") * a * q
-                               + b * m * p
-                               + (
-                                       (Decimal("2") * a * q - b * m * p) ** Decimal("2")
-                                       - Decimal("4") * a * q * (a * q - b * p)
-                               )
-                               ** (Decimal("1") / Decimal("2"))
-                       ) / (Decimal("2") * q)
+        -Decimal("2") * a * q
+        + b * m * p
+        + (
+            (Decimal("2") * a * q - b * m * p) ** Decimal("2")
+            - Decimal("4") * a * q * (a * q - b * p)
+        )
+        ** (Decimal("1") / Decimal("2"))
+    ) / (Decimal("2") * q)
     tkn_trade_amount = (
-                               -Decimal("2") * b * p
-                               + a * m * q
-                               + (
-                                       (Decimal("2") * b * p - a * m * q) ** Decimal("2")
-                                       - Decimal("4") * b * p * (b * p - a * q)
-                               )
-                               ** (Decimal("1") / Decimal("2"))
-                       ) / (Decimal("2") * p)
+        -Decimal("2") * b * p
+        + a * m * q
+        + (
+            (Decimal("2") * b * p - a * m * q) ** Decimal("2")
+            - Decimal("4") * b * p * (b * p - a * q)
+        )
+        ** (Decimal("1") / Decimal("2"))
+    ) / (Decimal("2") * p)
 
     if bnt_trade_amount > 0:
         source_token = "bnt"
@@ -379,7 +383,7 @@ def process_arbitrage_trade(
 
 
 def changed_bnt_trading_liquidity(
-        a: Decimal, b: Decimal, d: Decimal, e: Decimal, x: Decimal, direction: str
+    a: Decimal, b: Decimal, d: Decimal, e: Decimal, x: Decimal, direction: str
 ) -> Decimal:
     """Computes the changes state values according to the swap algorithm.
 
@@ -394,15 +398,14 @@ def changed_bnt_trading_liquidity(
     Returns:
         bnt_trading_liquidity: (Decimal) Changed state BNT trading liquidity value.
     """
-    print('a, b, d, e, x, direction', a, b, d, e, x, direction)
-    if direction == 'tkn':
-        return a*(b + d*x*(1 - e))/(b + x)
-    elif direction == 'bnt':
-        return (a*(a + x) + d*(1 - e)*(a*x + x**2))/(a + d*x)
+    if direction == "tkn":
+        return a * (b + d * x * (1 - e)) / (b + x)
+    elif direction == "bnt":
+        return (a * (a + x) + d * (1 - e) * (a * x + x**2)) / (a + d * x)
 
 
 def changed_tkn_trading_liquidity(
-        a: Decimal, b: Decimal, d: Decimal, x: Decimal, direction: str
+    a: Decimal, b: Decimal, d: Decimal, x: Decimal, direction: str
 ) -> Decimal:
     """Computes the changes state values according to the swap algorithm.
 
@@ -417,14 +420,14 @@ def changed_tkn_trading_liquidity(
         tkn_trading_liquidity: (Decimal) Changed state TKN trading liquidity value.
 
     """
-    if direction == 'tkn':
+    if direction == "tkn":
         return b + x
-    elif direction == 'bnt':
-        return b*(a + d*x)/(a + x)
+    elif direction == "bnt":
+        return b * (a + d * x) / (a + x)
 
 
 def target_amount(
-        a: Decimal, b: Decimal, d: Decimal, x: Decimal, direction: str
+    a: Decimal, b: Decimal, d: Decimal, x: Decimal, direction: str
 ) -> Decimal:
     """Computes the changes state values according to the swap algorithm.
 
@@ -446,7 +449,7 @@ def target_amount(
 
 
 def vortex_collection(
-        a: Decimal, b: Decimal, d: Decimal, e: Decimal, x: Decimal, direction: str
+    a: Decimal, b: Decimal, d: Decimal, e: Decimal, x: Decimal, direction: str
 ) -> Decimal:
     """Computes the changes state values according to the swap algorithm.
 
@@ -469,7 +472,7 @@ def vortex_collection(
 
 
 def swap_fee_collection(
-        a: Decimal, b: Decimal, d: Decimal, e: Decimal, x: Decimal, direction: str
+    a: Decimal, b: Decimal, d: Decimal, e: Decimal, x: Decimal, direction: str
 ) -> Decimal:
     """
 
@@ -491,11 +494,11 @@ def swap_fee_collection(
 
 
 def trade_tkn_to_ema(
-        bnt_trading_liquidity: Decimal,
-        tkn_trading_liquidity: Decimal,
-        trading_fee: Decimal,
-        network_fee: Decimal,
-        future_ema: Decimal,
+    bnt_trading_liquidity: Decimal,
+    tkn_trading_liquidity: Decimal,
+    trading_fee: Decimal,
+    network_fee: Decimal,
+    future_ema: Decimal,
 ) -> Decimal:
     """Outputs the tkn_amount that should be traded to force the ema and the spot price together on a given pool.
 
@@ -516,25 +519,25 @@ def trade_tkn_to_ema(
     e = network_fee
     f = future_ema
     tkn_amount = (
-                         (a * d * (Decimal("1") - e) - Decimal("2") * f * b)
-                         + (
-                                 a
-                                 * (
-                                         Decimal("4") * f * b * (Decimal("1") - d * (Decimal("1") - e))
-                                         + a * d ** Decimal("2") * (Decimal("1") - e) ** Decimal("2")
-                                 )
-                         )
-                         ** (Decimal("1") / Decimal("2"))
-                 ) / (Decimal("2") * f)
+        (a * d * (Decimal("1") - e) - Decimal("2") * f * b)
+        + (
+            a
+            * (
+                Decimal("4") * f * b * (Decimal("1") - d * (Decimal("1") - e))
+                + a * d ** Decimal("2") * (Decimal("1") - e) ** Decimal("2")
+            )
+        )
+        ** (Decimal("1") / Decimal("2"))
+    ) / (Decimal("2") * f)
     return tkn_amount
 
 
 def trade_bnt_to_ema(
-        bnt_trading_liquidity,
-        tkn_trading_liquidity,
-        trading_fee,
-        network_fee,
-        future_ema,
+    bnt_trading_liquidity,
+    tkn_trading_liquidity,
+    trading_fee,
+    network_fee,
+    future_ema,
 ):
     """Calling this function will analyze the state of any pool, and create a swap that drives the ema and the spot price together.
 
@@ -554,27 +557,27 @@ def trade_bnt_to_ema(
     e = network_fee
     f = future_ema
     x = (
-                -Decimal("2") * a
-                + b * d * f
-                + (
-                        (Decimal("2") * a - b * d * f) ** Decimal("2")
-                        - Decimal("4") * a * (a - b * f)
-                )
-                ** (Decimal("1") / Decimal("2"))
-        ) / Decimal("2")
+        -Decimal("2") * a
+        + b * d * f
+        + (
+            (Decimal("2") * a - b * d * f) ** Decimal("2")
+            - Decimal("4") * a * (a - b * f)
+        )
+        ** (Decimal("1") / Decimal("2"))
+    ) / Decimal("2")
     a_recursion = (
-                          a * (a + x) + d * (Decimal("1") - e) * (a * x + x ** Decimal("2"))
-                  ) / (a + d * x)
+        a * (a + x) + d * (Decimal("1") - e) * (a * x + x ** Decimal("2"))
+    ) / (a + d * x)
     b_recursion = b * (a + d * x) / (a + x)
     n = 0
     p = Decimal("0.001")
     while a_recursion / b_recursion < f:
         n += 1
         p += Decimal("0.0001")
-        x += x * (f ** p - (a_recursion / b_recursion) ** p) / f
+        x += x * (f**p - (a_recursion / b_recursion) ** p) / f
         a_recursion = (
-                              a * (a + x) + d * (Decimal("1") - e) * (a * x + x ** Decimal("2"))
-                      ) / (a + d * x)
+            a * (a + x) + d * (Decimal("1") - e) * (a * x + x ** Decimal("2"))
+        ) / (a + d * x)
         b_recursion = b * (a + d * x) / (a + x)
         if n > 20000:
             break

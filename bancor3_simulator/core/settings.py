@@ -17,7 +17,7 @@ getcontext().prec = PRECISION
 
 @dataclass
 class GlobalSettings:
-    timestep = 0
+    unix_timestamp = 0
     model = MODEL
     version = VERSION
     eightee_places = QDECIMALS

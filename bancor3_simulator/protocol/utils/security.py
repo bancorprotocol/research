@@ -1,21 +1,21 @@
 # coding=utf-8
-def getContracttokenDictionary():
+def get_contracttoken_dictionary():
     """
-    @Dev
-    Returns the tokenContract : TKN dictionary.
+    @_dev
+    _returns the token_contract : _t_k_n dictionary.
     """
-    contractTokenDictionary = {
-        "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE" : "eth",
-        "0x6B175474E89094C44Da98b954EedeAC495271d0F" : "dai",
-        "0x514910771AF9Ca656af840dff83E8264EcF986CA" : "link",
-        "0x1F573D6Fb3F13d689FF844B4cE37794d79a7FF1C" : "bnt"
+    contract_token_dictionary = {
+        "0x_eeeee_eeee_ee_eee_ee_ee_eee_e_e_eeeee_eeeeeeee_e_ee_e" : "eth",
+        "0x6_b175474_e89094_c44_da98b954_eede_a_c495271d0_f" : "dai",
+        "0x514910771_a_f9_ca656af840dff83_e8264_ec_f986_c_a" : "link",
+        "0x1_f573_d6_fb3_f13d689_f_f844_b4c_e37794d79a7_f_f1_c" : "bnt"
     }
-    return(contractTokenDictionary)
+    return(contract_token_dictionary)
 
-def getEmptyMonitor():
+def get_empty_monitor():
     """
-    @Dev
-    Returns an empty monitor dictionary.
+    @_dev
+    _returns an empty monitor dictionary.
     """
     monitor = {
         "token deposits" : {
@@ -81,231 +81,229 @@ def getEmptyMonitor():
 
 
 
-# *** Main Security Functions ***
-
-
-def contractNetworkFeePPMUpdated(df, index, blockNumber, txHash):
+# *** _main _security _functions ***
+def contract_network_fee_ppm_updated(df, index, block_number, tx_hash):
     """
-    @Dev
-    Processes the newFeePPM event from the contracts.
+    @_dev
+    _processes the new_fee_ppm event from the contracts.
     """
-    newFeePPM = getContractFeePPM(df, index)
-    newNetworkFee = contractConvertPPM(newFeePPM)
-    changeNetworkFee(newNetworkFee)
+    new_fee_ppm = get_contract_fee_ppm(df, index)
+    new_network_fee = contract_convert_ppm(new_fee_ppm)
+    change_network_fee(new_network_fee)
     return(None)
 
-def contractTradingFeePPMUpdated(df, index, blockNumber, txHash):
+def contract_trading_fee_ppm_updated(df, index, block_number, tx_hash):
     """
-    @Dev
-    Processes the TradingFeePPMUpdated event from the contracts.
+    @_dev
+    _processes the _trading_fee_ppm_updated event from the contracts.
     """
-    newFeePPM = getContractFeePPM(df, index)
-    newTradingFee = contractConvertPPM(newFeePPM)
-    tokenName = getContractTokenName(df, index)
-    changeTradingFee(tokenName, newTradingFee)
+    new_fee_ppm = get_contract_fee_ppm(df, index)
+    new_trading_fee = contract_convert_ppm(new_fee_ppm)
+    token_name = get_contract_token_name(df, index)
+    change_trading_fee(token_name, new_trading_fee)
     return(None)
 
-def contractDepositingEnabled(df, index, blockNumber, txHash):
+def contract_depositing_enabled(df, index, block_number, tx_hash):
     """
-    @Dev
-    Processes the DepositingEnabled event from the contracts.
+    @_dev
+    _processes the _depositing_enabled event from the contracts.
     """
-    doNothing()
+    do_nothing()
     return(None)
 
-def contractFundingLimits(df, index, blockNumber, txHash):
+def contract_funding_limits(df, index, block_number, tx_hash):
     """
-    @Dev
-    Processes the FundingLimits event from the contracts.
+    @_dev
+    _processes the _funding_limits event from the contracts.
     """
-    tokenName = getContractTokenName(df, index)
-    updatedBntFundingLimit = getContractFundingLimit(df, index)
-    changeBntFundingLimit(tokenName, updatedBntFundingLimit)
+    token_name = get_contract_token_name(df, index)
+    updated_bnt_funding_limit = get_contract_funding_limit(df, index)
+    change_bnt_funding_limit(token_name, updated_bnt_funding_limit)
     return(None)
 
-def contractTradingEnabled(df, index, blockNumber, txHash):
+def contract_trading_enabled(df, index, block_number, tx_hash):
     """
-    @Dev
-    Processes the DepositingEnabled event from the contracts.
+    @_dev
+    _processes the _depositing_enabled event from the contracts.
     """
-    newStatus = getContractNewStatus(df, index)
-    if newStatus == True:
-        tokenName = getContractTokenName(df, index)
-        tokenDecimals = getContractTokenDecimals(df, index)
-        bntVirtualBalance = getContractBntNewLiquidity(df, index)
-        tknTokenVirtualBalance = getContractTknNewLiquidity(df, index, tokenDecimals)
-        bntFundingLimit = getContractLastBntFundingLimit(tokenName)
-        enableTrading(tokenName, bntVirtualBalance, tknTokenVirtualBalance, bntFundingLimit)
+    new_status = get_contract_new_status(df, index)
+    if new_status == _true:
+        token_name = get_contract_token_name(df, index)
+        token_decimals = get_contract_token_decimals(df, index)
+        bnt_virtual_balance = get_contract_bnt_new_liquidity(df, index)
+        tkn_token_virtual_balance = get_contract_tkn_new_liquidity(df, index, token_decimals)
+        bnt_funding_limit = get_contract_last_bnt_funding_limit(token_name)
+        enable_trading(token_name, bnt_virtual_balance, tkn_token_virtual_balance, bnt_funding_limit)
     else:
-        doNothing()
+        do_nothing()
     return(None)
 
-def contractDepositTkn(df, index, blockNumber, txHash):
+def contract_deposit_tkn(df, index, block_number, tx_hash):
     """
-    @Dev
-    Processes the depositTKN event from the contracts.
+    @_dev
+    _processes the deposit_t_k_n event from the contracts.
     """
-    tokenName = getContractTokenName(df, index)
-    tokenDecimals = getContractTokenDecimals(df, index)
-    tknAmount = getContractTokenAmount(df, index, tokenDecimals)
+    token_name = get_contract_token_name(df, index)
+    token_decimals = get_contract_token_decimals(df, index)
+    tkn_amount = get_contract_token_amount(df, index, token_decimals)
     (
-        contractMasterVaultTknBalance,
-        contractStakingLedgerTknBalance,
-        contractErc20ContractTknBalance,
-        contractBntknAmount) = getContractDepositTknOutputs(df, index, tokenDecimals)
-    newTimestamp(blockNumber)
-    depositTKN(tknAmount, tokenName, user)
+        contract_master_vault_tkn_balance,
+        contract_staking_ledger_tkn_balance,
+        contract_erc20_contract_tkn_balance,
+        contract_bntkn_amount) = get_contract_deposit_tkn_outputs(df, index, token_decimals)
+    new_timestamp(block_number)
+    deposit_t_k_n(tkn_amount, token_name, user)
     (
-        simulatorMasterVaultTknBalance,
-        simulatorStakingLedgerTknBalance,
-        simulatorErc20ContractTknBalance,
-        simulatorBntknAmount) = getSimulationDepositTknOutputs(tokenName)
-    depositTknComparisson(
-        blockNumber,
-        txHash,
-        tokenName,
-        tknAmount,
-        contractMasterVaultTknBalance, simulatorMasterVaultTknBalance,
-        contractStakingLedgerTknBalance, simulatorStakingLedgerTknBalance,
-        contractErc20ContractTknBalance, simulatorErc20ContractTknBalance,
-        contractBntknAmount, simulatorBntknAmount)
+        simulator_master_vault_tkn_balance,
+        simulator_staking_ledger_tkn_balance,
+        simulator_erc20_contract_tkn_balance,
+        simulator_bntkn_amount) = get_simulation_deposit_tkn_outputs(token_name)
+    deposit_tkn_comparisson(
+        block_number,
+        tx_hash,
+        token_name,
+        tkn_amount,
+        contract_master_vault_tkn_balance, simulator_master_vault_tkn_balance,
+        contract_staking_ledger_tkn_balance, simulator_staking_ledger_tkn_balance,
+        contract_erc20_contract_tkn_balance, simulator_erc20_contract_tkn_balance,
+        contract_bntkn_amount, simulator_bntkn_amount)
     return(None)
 
-def contractWithdrawalInitiated(df, index, blockNumber, txHash):
+def contract_withdrawal_initiated(df, index, block_number, tx_hash):
     """
-    @Dev
-    Processes the depositTKN event from the contracts.
+    @_dev
+    _processes the deposit_t_k_n event from the contracts.
     """
-    tokenName = getContractTokenName(df, index)
-    tokenDecimals = getContractTokenDecimals(df, index)
-    withdrawValue = getContractReserveTokenAmount(df, index, tokenDecimals)
-    contractPoolTokenAmount = getContractWithdrawalInitiatedOutputs(df, index)
-    newTimestamp(blockNumber)
-    beginCooldown(withdrawValue, tokenName, user)
-    simulatorPoolTokenAmount = getSimulatedWithdrawalInitiatedOutputs()
-    withdrawalInitiatedComparisson(
-        blockNumber,
-        txHash,
-        tokenName,
-        withdrawValue,
-        contractPoolTokenAmount,
-        simulatorPoolTokenAmount)
+    token_name = get_contract_token_name(df, index)
+    token_decimals = get_contract_token_decimals(df, index)
+    withdraw_value = get_contract_reserve_token_amount(df, index, token_decimals)
+    contract_pool_token_amount = get_contract_withdrawal_initiated_outputs(df, index)
+    new_timestamp(block_number)
+    begin_cooldown(withdraw_value, token_name, user)
+    simulator_pool_token_amount = get_simulated_withdrawal_initiated_outputs()
+    withdrawal_initiated_comparisson(
+        block_number,
+        tx_hash,
+        token_name,
+        withdraw_value,
+        contract_pool_token_amount,
+        simulator_pool_token_amount)
     return(None)
 
-def contractDepositBnt(df, index, blockNumber, txHash):
+def contract_deposit_bnt(df, index, block_number, tx_hash):
     """
-    @Dev
-    Processes the depositTKN event from the contracts.
+    @_dev
+    _processes the deposit_t_k_n event from the contracts.
     """
-    bntAmount = getContractBntAmount(df, index)
-    contractPoolTokenAmount, contractVbntAmount = getContractDepositBntOutputs(df, index)
-    newTimestamp(blockNumber)
-    depositBNT(bntAmount, user)
-    simulatorPoolTokenAmount, simulatorVbntAmount = getSimulatorDepositBntOutputs()
-    depositBntComparisson(
-        blockNumber,
-        txHash,
-        bntAmount,
-        contractPoolTokenAmount,
-        contractVbntAmount,
-        simulatorPoolTokenAmount,
-        simulatorVbntAmount)
+    bnt_amount = get_contract_bnt_amount(df, index)
+    contract_pool_token_amount, contract_vbnt_amount = get_contract_deposit_bnt_outputs(df, index)
+    new_timestamp(block_number)
+    deposit_b_n_t(bnt_amount, user)
+    simulator_pool_token_amount, simulator_vbnt_amount = get_simulator_deposit_bnt_outputs()
+    deposit_bnt_comparisson(
+        block_number,
+        tx_hash,
+        bnt_amount,
+        contract_pool_token_amount,
+        contract_vbnt_amount,
+        simulator_pool_token_amount,
+        simulator_vbnt_amount)
     return(None)
 
-def contractTrade(df, index, blockNumber, txHash):
+def contract_trade(df, index, block_number, tx_hash):
     """
-    @Dev
-    Processes the trade event from the contracts.
+    @_dev
+    _processes the trade event from the contracts.
     """
     (
-        sourceToken,
-        sourceTokenAmount,
-        targetToken,
-        contractTargetTokenAmount,
-        contractBntPrevLiquidity,
-        contractBntNewLiquidity,
-        contractTknPrevLiquidity,
-        contractTknNewLiquidity,
-        contractFeeAmount,
-        impliedTradingFee,
-        impliedNetworkFee,
-        impliedFeeToStakingLedger,
-        impliedBntToVortexLedger) = getContractTradeOutputs(df, index, txHash)
-    trade(sourceTokenAmount, sourceToken, targetToken, user)
+        source_token,
+        source_token_amount,
+        target_token,
+        contract_target_token_amount,
+        contract_bnt_prev_liquidity,
+        contract_bnt_new_liquidity,
+        contract_tkn_prev_liquidity,
+        contract_tkn_new_liquidity,
+        contract_fee_amount,
+        implied_trading_fee,
+        implied_network_fee,
+        implied_fee_to_staking_ledger,
+        implied_bnt_to_vortex_ledger) = get_contract_trade_outputs(df, index, tx_hash)
+    trade(source_token_amount, source_token, target_token, user)
     (
-        trueTradingFee,
-        simulatedBntPrevLiquidity,
-        simulatedBntNewLiquidity,
-        simulatedTknPrevLiquidity,
-        simulatedTknNewLiquidity) = getSimulatedTradingPoolVars(sourceToken, targetToken)
+        true_trading_fee,
+        simulated_bnt_prev_liquidity,
+        simulated_bnt_new_liquidity,
+        simulated_tkn_prev_liquidity,
+        simulated_tkn_new_liquidity) = get_simulated_trading_pool_vars(source_token, target_token)
     (
-        simulatedTargetTokenAmount,
-        simulatedFeeToStakingLedger,
-        simulatedBntToVortexLedger) = getSimulatedTradingOutputs(targetToken)
-    trueNetworkFee = nonUsers["globalProtocolSettings"]["networkFee"][-1]
-    simulatedFeeAmount = getSimulatedFeeAmount(
-        sourceToken,
-        sourceTokenAmount,
-        simulatedBntPrevLiquidity,
-        simulatedTknPrevLiquidity,
-        trueTradingFee)
-    tradeComparisson(
-    blockNumber,
-    txHash,
-    sourceTokenAmount,
-    sourceToken,
-    targetToken,
-    contractTargetTokenAmount, simulatedTargetTokenAmount,
-    contractBntPrevLiquidity, simulatedBntPrevLiquidity,
-    contractTknPrevLiquidity, simulatedTknPrevLiquidity,
-    contractBntNewLiquidity, simulatedBntNewLiquidity,
-    contractTknNewLiquidity, simulatedTknNewLiquidity,
-    impliedTradingFee, trueTradingFee,
-    impliedNetworkFee, trueNetworkFee,
-    contractFeeAmount, simulatedFeeAmount,
-    impliedFeeToStakingLedger, simulatedFeeToStakingLedger,
-    impliedBntToVortexLedger, simulatedBntToVortexLedger)
+        simulated_target_token_amount,
+        simulated_fee_to_staking_ledger,
+        simulated_bnt_to_vortex_ledger) = get_simulated_trading_outputs(target_token)
+    true_network_fee = non_users["global_protocol_settings"]["network_fee"][-1]
+    simulated_fee_amount = get_simulated_fee_amount(
+        source_token,
+        source_token_amount,
+        simulated_bnt_prev_liquidity,
+        simulated_tkn_prev_liquidity,
+        true_trading_fee)
+    trade_comparisson(
+    block_number,
+    tx_hash,
+    source_token_amount,
+    source_token,
+    target_token,
+    contract_target_token_amount, simulated_target_token_amount,
+    contract_bnt_prev_liquidity, simulated_bnt_prev_liquidity,
+    contract_tkn_prev_liquidity, simulated_tkn_prev_liquidity,
+    contract_bnt_new_liquidity, simulated_bnt_new_liquidity,
+    contract_tkn_new_liquidity, simulated_tkn_new_liquidity,
+    implied_trading_fee, true_trading_fee,
+    implied_network_fee, true_network_fee,
+    contract_fee_amount, simulated_fee_amount,
+    implied_fee_to_staking_ledger, simulated_fee_to_staking_ledger,
+    implied_bnt_to_vortex_ledger, simulated_bnt_to_vortex_ledger)
     return(None)
 
-contractFunctionDictionary = {
-    "NetworkFeePPMUpdated" : contractNetworkFeePPMUpdated,
-    "TradingFeePPMUpdated" : contractTradingFeePPMUpdated,
-    "DepositingEnabled" : contractDepositingEnabled,
-    "TradingEnabled" : contractTradingEnabled,
-    "FundingLimits" : contractFundingLimits,
-    "depositTKN" :  contractDepositTkn,
-    "WithdrawalInitiated" : contractWithdrawalInitiated,
-    "depositBNT" : contractDepositBnt,
-    "trade" : contractTrade
+contract_function_dictionary = {
+    "_network_fee_ppm_updated" : contract_network_fee_ppm_updated,
+    "_trading_fee_ppm_updated" : contract_trading_fee_ppm_updated,
+    "_depositing_enabled" : contract_depositing_enabled,
+    "_trading_enabled" : contract_trading_enabled,
+    "_funding_limits" : contract_funding_limits,
+    "deposit_t_k_n" :  contract_deposit_tkn,
+    "_withdrawal_initiated" : contract_withdrawal_initiated,
+    "deposit_b_n_t" : contract_deposit_bnt,
+    "trade" : contract_trade
 }
 
-def securityMonitor(events):
+def security_monitor(events):
     df = pd.read_csv(events)
     for index in df.index:
         print(index)
-        copyRows()
-        blockNumber = getContractBlockNumber(df, index)
-        newTimestamp(blockNumber)
-        txHash = getTxHash(df, index)
+        copy_rows()
+        block_number = get_contract_block_number(df, index)
+        new_timestamp(block_number)
+        tx_hash = get_tx_hash(df, index)
         type = df["type"][index]
-        function = contractFunctionDictionary[type]
-        function(df, index, blockNumber, txHash)
+        function = contract_function_dictionary[type]
+        function(df, index, block_number, tx_hash)
 
-def monitorCharts(monitor):
-    monitorTokenDeposits = pd.DataFrame.from_dict(monitor["token deposits"])
-    monitorWithdrawalsInitiated = pd.DataFrame.from_dict(monitor["withdrawals initiated"])
-    monitorBntDeposits = pd.DataFrame.from_dict(monitor["bnt deposits"])
-    monitorTrades = pd.DataFrame.from_dict(monitor["trades"])
+def monitor_charts(monitor):
+    monitor_token_deposits = pd._data_frame.from_dict(monitor["token deposits"])
+    monitor_withdrawals_initiated = pd._data_frame.from_dict(monitor["withdrawals initiated"])
+    monitor_bnt_deposits = pd._data_frame.from_dict(monitor["bnt deposits"])
+    monitor_trades = pd._data_frame.from_dict(monitor["trades"])
     sns.set(rc={
         'axes.facecolor':'black',
         'figure.facecolor':'black',
         'text.color': 'white',
         'xtick.color': 'white',
         'ytick.color': 'white',
-        'axes.grid': False,
+        'axes.grid': _false,
         'axes.labelcolor': 'white'})
-    monitorTokenDeposits.columns
-    for monitordict in [monitorTokenDeposits, monitorWithdrawalsInitiated, monitorBntDeposits, monitorTrades]:
+    monitor_token_deposits.columns
+    for monitordict in [monitor_token_deposits, monitor_withdrawals_initiated, monitor_bnt_deposits, monitor_trades]:
         begin = [i for i,c in enumerate(monitordict.keys()) if 'simulated' in c][0]-1
         zippy = list(zip(monitordict.keys()[begin::2],monitordict.keys()[begin+1::2]))
         count = 0
@@ -314,7 +312,7 @@ def monitorCharts(monitor):
             fig = plt.figure()
             fig.set_size_inches(6,6)
             print(zippy[i][0])
-            print("Compare max deviation from ethereum vs simulated:")
+            print("_compare max deviation from ethereum vs simulated:")
             print(abs((monitordict.loc[:,zippy[i][1]] - monitordict.loc[:,zippy[i][0]])/monitordict.loc[:,zippy[i][1]]).max())
             sns.lineplot(data = monitordict, x = 'block number', y = (monitordict.loc[:,zippy[i][1]] - monitordict.loc[:,zippy[i][0]])/monitordict.loc[:,zippy[i][1]], color='r')
             plt.show()

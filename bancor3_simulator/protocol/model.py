@@ -9,14 +9,19 @@ import pandas as pd
 from bancor3_simulator.core.dataclasses import State
 from bancor3_simulator.core.settings import GlobalSettings
 from bancor3_simulator.protocol.actions.staking import (
-    stake_bnt, stake_tkn,
+    stake_bnt,
+    stake_tkn,
 )
 from bancor3_simulator.protocol.actions.trading import (
-    get_trade_inputs, trade_bnt_for_tkn, trade_tkn_for_bnt, enable_trading,
+    get_trade_inputs,
+    trade_bnt_for_tkn,
+    trade_tkn_for_bnt,
+    enable_trading,
 )
 from bancor3_simulator.protocol.actions.withdraw import (
     unpack_cool_down_state,
-    WithdrawalAlgorithm, begin_cooldown
+    WithdrawalAlgorithm,
+    begin_cooldown,
 )
 from bancor3_simulator.protocol.utils.protocol import handle_logging
 
@@ -48,20 +53,20 @@ class BancorV3:
     """
 
     def __init__(
-            self,
-            unix_timestamp=0,
-            alpha=global_settings.alpha,
-            bnt_min_liquidity=global_settings.bnt_min_liquidity,
-            withdrawal_fee=global_settings.withdrawal_fee,
-            cooldown_time=global_settings.cooldown_time,
-            bnt_funding_limit=global_settings.bnt_funding_limit,
-            network_fee=global_settings.network_fee,
-            trading_fee=global_settings.trading_fee,
-            whitelisted_tokens=global_settings.whitelisted_tokens,
-            price_feeds_path=global_settings.price_feeds_path,
-            price_feeds: pd.DataFrame = None,
-            active_users: list = None,
-            transaction_id: int = 0
+        self,
+        unix_timestamp=0,
+        alpha=global_settings.alpha,
+        bnt_min_liquidity=global_settings.bnt_min_liquidity,
+        withdrawal_fee=global_settings.withdrawal_fee,
+        cooldown_time=global_settings.cooldown_time,
+        bnt_funding_limit=global_settings.bnt_funding_limit,
+        network_fee=global_settings.network_fee,
+        trading_fee=global_settings.trading_fee,
+        whitelisted_tokens=global_settings.whitelisted_tokens,
+        price_feeds_path=global_settings.price_feeds_path,
+        price_feeds: pd.DataFrame = None,
+        active_users: list = None,
+        transaction_id: int = 0,
     ):
 
         self.json_data = None
@@ -85,7 +90,7 @@ class BancorV3:
             bnt_funding_limit=bnt_funding_limit,
             alpha=alpha,
             whitelisted_tokens=whitelisted_tokens,
-            price_feeds=price_feeds
+            price_feeds=price_feeds,
         )
 
         self.global_state.init_protocol(
@@ -121,7 +126,11 @@ class BancorV3:
         return self.stake(tkn_name, tkn_amt, user_name, unix_timestamp)
 
     def stake(
-            self, tkn_name: str, tkn_amt: Decimal, user_name: str, unix_timestamp: int = None
+        self,
+        tkn_name: str,
+        tkn_amt: Decimal,
+        user_name: str,
+        unix_timestamp: int = None,
     ):
         """Router for staking tkn or bnt"""
 
@@ -138,23 +147,27 @@ class BancorV3:
         try:
             wallet_test = self.global_state.users[user_name].wallet
         except ValueError(
-                "user_name not found. Create a new user by calling the .create_user(user_name) method"
+            "user_name not found. Create a new user by calling the .create_user(user_name) method"
         ) as e:
             print(e)
 
         state = self.global_state
         if tkn_name == "bnt":
             state = stake_bnt(state, tkn_name, tkn_amt, user_name, unix_timestamp)
-            action_name = 'stake_bnt'
+            action_name = "stake_bnt"
         else:
             state = stake_tkn(state, tkn_name, tkn_amt, user_name, unix_timestamp)
-            action_name = 'stake_tkn'
+            action_name = "stake_tkn"
 
         self.iter_transaction_id()
-        state = handle_logging(tkn_name, tkn_amt, action_name, user_name, self.transaction_id, state)
+        state = handle_logging(
+            tkn_name, tkn_amt, action_name, user_name, self.transaction_id, state
+        )
         self.global_state = state
 
-    def trade(self, swap_amount, source_token, target_token, user_name, unix_timestamp=None):
+    def trade(
+        self, swap_amount, source_token, target_token, user_name, unix_timestamp=None
+    ):
         """Main logic to process Trade/Swap transactions. Performs routing to specilized methods for solving individual
         cases.
 
@@ -183,7 +196,7 @@ class BancorV3:
         try:
             wallet_test = self.global_state.users[user_name].wallet
         except ValueError(
-                "user_name not found. Create a new user by calling the .create_user(user_name) method"
+            "user_name not found. Create a new user by calling the .create_user(user_name) method"
         ) as e:
             print(e)
 
@@ -242,10 +255,10 @@ class BancorV3:
             )
 
         elif (
-                source_token != "bnt"
-                and target_token != "bnt"
-                and is_trading_enabled_source
-                and is_trading_enabled_target
+            source_token != "bnt"
+            and target_token != "bnt"
+            and is_trading_enabled_source
+            and is_trading_enabled_target
         ):
 
             # sense
@@ -297,8 +310,14 @@ class BancorV3:
         state.users[user_name].wallet[target_token].tkn_amt += target_sent_to_user
         state.protocol_bnt_check()
         self.iter_transaction_id()
-        state = handle_logging(source_token + "->" + target_token, swap_amount, "trade", user_name, self.transaction_id,
-                               state)
+        state = handle_logging(
+            source_token + "->" + target_token,
+            swap_amount,
+            "trade",
+            user_name,
+            self.transaction_id,
+            state,
+        )
         self.global_state = state
 
     def begin_cooldown(self, withdraw_value, tkn_name, user_name, unix_timestamp=None):
@@ -400,7 +419,7 @@ class BancorV3:
                 state.pools[tkn_name].staked_tkn -= withdraw_value
                 state.pools[tkn_name].vault_tkn -= tkn_sent_to_user
                 state.users[user_name].wallet[tkn_name].tkn_amt += (
-                        tkn_sent_to_user + external_protection_compensation
+                    tkn_sent_to_user + external_protection_compensation
                 )
                 state.pools[
                     tkn_name
@@ -411,7 +430,7 @@ class BancorV3:
         else:
 
             sufficient_vbnt = (
-                    state.users[user_name].wallet["bnt"].vbnt_amt >= pool_token_amt
+                state.users[user_name].wallet["bnt"].vbnt_amt >= pool_token_amt
             )
 
             if cool_down_complete and sufficient_vbnt:
@@ -420,12 +439,14 @@ class BancorV3:
                 ].is_complete = True
                 bnt_amount = withdraw_value * (1 - withdrawal_fee)
                 state.users[user_name].wallet[tkn_name].vbnt_amt -= pool_token_amt
-                state.users[user_name].wallet['bnt'].tkn_amt += bnt_amount
+                state.users[user_name].wallet["bnt"].tkn_amt += bnt_amount
                 state.protocol_wallet_bnbnt += pool_token_amt
 
         state.protocol_bnt_check()
         self.iter_transaction_id()
-        state = handle_logging(tkn_name, withdraw_value, "withdraw", user_name, self.transaction_id, state)
+        state = handle_logging(
+            tkn_name, withdraw_value, "withdraw", user_name, self.transaction_id, state
+        )
         self.global_state = state
 
     def dao_msig_init_pools(self, pools: list) -> None:
@@ -471,46 +492,46 @@ class BancorV3:
         QDECIMALS = Decimal(10) ** -decimals
         dic = {
             "Trading Liquidity": [""]
-                                 + [
-                                     f"bnt={self.global_state.pools[tkn_name].bnt_trading_liquidity.quantize(QDECIMALS)} {tkn_name}="
-                                     + str(
-                                         self.global_state.pools[tkn_name].tkn_trading_liquidity.quantize(
-                                             QDECIMALS
-                                         )
-                                     )
-                                     for tkn_name in self.global_state.whitelisted_tokens
-                                     if tkn_name != "bnt"
-                                 ]
-                                 + [""],
+            + [
+                f"bnt={self.global_state.pools[tkn_name].bnt_trading_liquidity.quantize(QDECIMALS)} {tkn_name}="
+                + str(
+                    self.global_state.pools[tkn_name].tkn_trading_liquidity.quantize(
+                        QDECIMALS
+                    )
+                )
+                for tkn_name in self.global_state.whitelisted_tokens
+                if tkn_name != "bnt"
+            ]
+            + [""],
             "Vault": [f"bnt={self.global_state.vault_bnt.quantize(QDECIMALS)}"]
-                     + [
-                         f"{tkn_name}="
-                         + str(self.global_state.pools[tkn_name].vault_tkn.quantize(QDECIMALS))
-                         for tkn_name in self.global_state.whitelisted_tokens
-                         if tkn_name != "bnt"
-                     ],
+            + [
+                f"{tkn_name}="
+                + str(self.global_state.pools[tkn_name].vault_tkn.quantize(QDECIMALS))
+                for tkn_name in self.global_state.whitelisted_tokens
+                if tkn_name != "bnt"
+            ],
             "Staking": [f"bnt={self.global_state.staked_bnt.quantize(QDECIMALS)}"]
-                       + [
-                           f"{tkn_name}="
-                           + str(self.global_state.pools[tkn_name].staked_tkn.quantize(QDECIMALS))
-                           for tkn_name in self.global_state.whitelisted_tokens
-                           if tkn_name != "bnt"
-                       ],
+            + [
+                f"{tkn_name}="
+                + str(self.global_state.pools[tkn_name].staked_tkn.quantize(QDECIMALS))
+                for tkn_name in self.global_state.whitelisted_tokens
+                if tkn_name != "bnt"
+            ],
             "ERC20 Contracts": [
-                                   f"bnbnt={self.global_state.erc20contracts_bnbnt.quantize(QDECIMALS)}"
-                               ]
-                               + [
-                                   f"bn{tkn_name}="
-                                   + str(
-                                       self.global_state.pools[tkn_name].erc20contracts_bntkn.quantize(
-                                           QDECIMALS
-                                       )
-                                   )
-                                   for tkn_name in self.global_state.whitelisted_tokens
-                                   if tkn_name != "bnt"
-                               ],
+                f"bnbnt={self.global_state.erc20contracts_bnbnt.quantize(QDECIMALS)}"
+            ]
+            + [
+                f"bn{tkn_name}="
+                + str(
+                    self.global_state.pools[tkn_name].erc20contracts_bntkn.quantize(
+                        QDECIMALS
+                    )
+                )
+                for tkn_name in self.global_state.whitelisted_tokens
+                if tkn_name != "bnt"
+            ],
             "Vortex": ["bnt=" + str(self.global_state.vortex_bnt.quantize(QDECIMALS))]
-                      + ["" for x in range(len(self.global_state.whitelisted_tokens[:-1]))],
+            + ["" for x in range(len(self.global_state.whitelisted_tokens[:-1]))],
             "External Protection": [
                 f"{tkn_name}="
                 + str(
@@ -521,10 +542,10 @@ class BancorV3:
                 for tkn_name in self.global_state.whitelisted_tokens
             ],
             "Protocol WalletState": [
-                                        f"bnbnt="
-                                        + str(self.global_state.protocol_wallet_bnbnt.quantize(QDECIMALS))
-                                    ]
-                                    + ["" for tkn_name in self.global_state.whitelisted_tokens[:-1]],
+                f"bnbnt="
+                + str(self.global_state.protocol_wallet_bnbnt.quantize(QDECIMALS))
+            ]
+            + ["" for tkn_name in self.global_state.whitelisted_tokens[:-1]],
         }
         max_rows = max([len(dic[key]) for key in dic])
         for col in dic:
@@ -540,9 +561,7 @@ class BancorV3:
             path: Path to the JSON file containing the simulation parameters.
         """
         json_data = BancorV3.load_json(path)
-        trading_fee = Decimal(
-            json_data["tradingFee"].replace("%", "")
-        ) * Decimal(".01")
+        trading_fee = Decimal(json_data["tradingFee"].replace("%", "")) * Decimal(".01")
 
         # set params
         self.global_state.network_fee = Decimal(
@@ -561,8 +580,12 @@ class BancorV3:
 
         for tkn in ["bnt", "tkn"]:
             self.global_state.pools[tkn].trading_fee = trading_fee
-            self.global_state.pools[tkn].bnt_min_liquidity = self.global_state.bnt_min_liquidity
-            self.global_state.pools[tkn].bnt_funding_limit = self.global_state.bnt_funding_limit
+            self.global_state.pools[
+                tkn
+            ].bnt_min_liquidity = self.global_state.bnt_min_liquidity
+            self.global_state.pools[
+                tkn
+            ].bnt_funding_limit = self.global_state.bnt_funding_limit
 
         for user in json_data["users"]:
             user_name = user["id"]

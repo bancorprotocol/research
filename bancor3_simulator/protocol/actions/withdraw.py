@@ -11,6 +11,8 @@ class Result:
     updated_tkn_liquidity: Decimal("0")
     tkn_sent_to_user: Decimal("0")
     bnt_sent_to_user: Decimal("0")
+
+
 #
 #
 # def begin_cooldown(protocol, withdraw_value, tkn_name, user_name, unix_timestamp=None):
@@ -40,14 +42,14 @@ class Result:
 
 
 def external_protection(
-        bnt_trading_liquidity,
-        average_tkn_trading_liquidity,
-        withdrawal_fee,
-        bnt_sent_to_user,
-        external_protection_tkn_balance,
-        tkn_withdraw_value,
-        tkn_sent_to_user,
-        trading_enabled,
+    bnt_trading_liquidity,
+    average_tkn_trading_liquidity,
+    withdrawal_fee,
+    bnt_sent_to_user,
+    external_protection_tkn_balance,
+    tkn_withdraw_value,
+    tkn_sent_to_user,
+    trading_enabled,
 ):
     """
     This replaces any BNT that would have been received by the user with TKN.
@@ -122,14 +124,9 @@ def unpack_cool_down_state(state, user_name, id_number):
     Introduced to make the withdrawals eaiser to handle.
     """
     for tkn_name in state.whitelisted_tokens:
-        if (
-                id_number
-                in state.users[user_name].wallet[tkn_name].pending_withdrawals
-        ):
+        if id_number in state.users[user_name].wallet[tkn_name].pending_withdrawals:
             cool_down_state = (
-                state.users[user_name]
-                    .wallet[tkn_name]
-                    .pending_withdrawals[id_number]
+                state.users[user_name].wallet[tkn_name].pending_withdrawals[id_number]
             )
             if not cool_down_state.is_complete:
                 cooldown_unix_timestamp = cool_down_state.unix_timestamp
@@ -176,10 +173,10 @@ class WithdrawalAlgorithm:
         m = self.trading_fee
         n = self.withdrawal_fee
         hmax = (
-                b
-                * e
-                * (e * n + m * (b + c - e))
-                / ((1 - m) * (b + c - e) * (b + c - e * (1 - n)))
+            b
+            * e
+            * (e * n + m * (b + c - e))
+            / ((1 - m) * (b + c - e) * (b + c - e * (1 - n)))
         )
         return hmax
 
@@ -195,10 +192,10 @@ class WithdrawalAlgorithm:
         m = self.trading_fee
         n = self.withdrawal_fee
         hmax = (
-                b
-                * e
-                * (e * n - m * (b + c - e * (1 - n)))
-                / ((1 - m) * (b + c - e) * (b + c - e * (1 - n)))
+            b
+            * e
+            * (e * n - m * (b + c - e * (1 - n)))
+            / ((1 - m) * (b + c - e) * (b + c - e * (1 - n)))
         )
         return hmax
 
@@ -226,9 +223,9 @@ class WithdrawalAlgorithm:
         n = self.withdrawal_fee
         x = self.withdraw_value
         updated_bnt_liquidity = (
-                a
-                * (b * e - m * (b * e + x * (b + c - e * (1 - n))))
-                / ((1 - m) * (b * e + x * (b + c - e * (1 - n))))
+            a
+            * (b * e - m * (b * e + x * (b + c - e * (1 - n))))
+            / ((1 - m) * (b * e + x * (b + c - e * (1 - n))))
         )
         bnt_renounced = Decimal("0")
         updated_tkn_liquidity = (b * e + x * (b + c + e * (n - 1))) / e
@@ -243,7 +240,7 @@ class WithdrawalAlgorithm:
         )
 
     def default_withdrawal_surplus_covered(
-            self,
+        self,
     ):
         """
         @Dev
@@ -300,7 +297,7 @@ class WithdrawalAlgorithm:
         n = self.withdrawal_fee
         x = self.withdraw_value
         updated_bnt_liquidity = (
-                a * b * e / (b * e + x * (1 - m) * (b + c - e * (1 - n)))
+            a * b * e / (b * e + x * (1 - m) * (b + c - e * (1 - n)))
         )
         bnt_renounced = Decimal("0")
         updated_tkn_liquidity = (b * e + x * (b + c - e * (1 - n))) / e
@@ -414,11 +411,11 @@ class WithdrawalAlgorithm:
         )
 
     def process_withdrawal(
-            self,
-            updated_bnt_liquidity: Decimal = Decimal("0"),
-            bnt_renounced: Decimal = Decimal("0"),
-            updated_tkn_liquidity: Decimal = Decimal("0"),
-            tkn_sent_to_user: Decimal = Decimal("0"),
+        self,
+        updated_bnt_liquidity: Decimal = Decimal("0"),
+        bnt_renounced: Decimal = Decimal("0"),
+        updated_tkn_liquidity: Decimal = Decimal("0"),
+        tkn_sent_to_user: Decimal = Decimal("0"),
     ):
         """
         Evaluates the conditions, and calls the appropriate functions

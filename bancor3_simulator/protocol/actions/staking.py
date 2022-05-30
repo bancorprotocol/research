@@ -3,7 +3,6 @@ from decimal import Decimal
 from typing import Tuple
 
 from bancor3_simulator.core.dataclasses import State
-from bancor3_simulator.protocol.utils.protocol import mint_protocol_bnt
 
 
 def stake_bnt(state, tkn_name, tkn_amt, user_name, unix_timestamp):
@@ -22,17 +21,6 @@ def stake_bnt(state, tkn_name, tkn_amt, user_name, unix_timestamp):
     state.users[user_name].wallet[tkn_name].vbnt_amt += bnbnt_amt
     state.protocol_wallet_bnbnt -= tkn_amt
     return state
-
-
-# def update_protocol_owned_liquidity(state, bnt_amount):
-
-# ledger actuation
-# bnbnt_amt = state.bnbnt_rate * bnt_amount
-# state.erc20contracts_bnbnt += bnbnt_amt
-# state.vault_bnt += bnt_amount
-# state.staked_bnt += bnt_amount
-# state.protocol_wallet_bnbnt -= bnbnt_amt
-# return state
 
 
 def stake_tkn(state, tkn_name, tkn_amt, user_name, unix_timestamp):

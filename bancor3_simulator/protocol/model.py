@@ -8,17 +8,17 @@ import pandas as pd
 
 from bancor3_simulator.core.dataclasses import State
 from bancor3_simulator.core.settings import GlobalSettings
-from bancor3_simulator.protocol.actions.staking import (
+from bancor3_simulator.protocol.modules.staking import (
     stake_bnt,
     stake_tkn,
 )
-from bancor3_simulator.protocol.actions.trading import (
+from bancor3_simulator.protocol.modules.trading import (
     get_trade_inputs,
     trade_bnt_for_tkn,
     trade_tkn_for_bnt,
     enable_trading,
 )
-from bancor3_simulator.protocol.actions.withdraw import (
+from bancor3_simulator.protocol.modules.withdraw import (
     unpack_cool_down_state,
     WithdrawalAlgorithm,
     begin_cooldown,
@@ -555,7 +555,7 @@ class BancorV3:
         return pd.DataFrame(dic)
 
     def upload_json_simulation(self, path):
-        """This method uploads a pre-formatted JSON file containing simulation actions to run and report on.
+        """This method uploads a pre-formatted JSON file containing simulation modules to run and report on.
 
         Args:
             path: Path to the JSON file containing the simulation parameters.

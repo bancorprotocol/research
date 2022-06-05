@@ -1,6 +1,5 @@
 from .staking import (
     modified_tkn_increase,
-    mint_protocol_bnt,
     modified_bnt_increase,
     pool_depth_adjustment,
 )

@@ -1,4 +1,4 @@
-"""Main supporting logic for protocol staking actions."""
+"""Main supporting logic for protocol staking modules."""
 from decimal import Decimal
 from typing import Tuple
 
@@ -13,7 +13,7 @@ def stake_bnt(state, tkn_name, tkn_amt, user_name, unix_timestamp):
         state.unix_timestamp = unix_timestamp
 
     # solve
-    bnbnt_amt = state.bnbnt_amt(tkn_amt)
+    bnbnt_amt = state.get_bnbnt_amt(tkn_amt)
 
     # actuation
     state.users[user_name].wallet[tkn_name].tkn_amt -= tkn_amt

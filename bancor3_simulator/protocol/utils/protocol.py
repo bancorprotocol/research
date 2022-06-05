@@ -16,7 +16,7 @@ def mint_protocol_bnt(state: State, tkn_amt: Decimal) -> State:
         state (dataclass object): Updated system state.
 
     """
-    bnbnt_amt = state.bnbnt_amt(tkn_amt)
+    bnbnt_amt = state.get_bnbnt_amt(tkn_amt)
 
     # actuator tasks
     state.vault_bnt += tkn_amt

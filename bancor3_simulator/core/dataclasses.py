@@ -40,7 +40,6 @@ class CooldownState(GlobalSettings):
     withdrawal_id: int
     tkn_name: str
     tkn_amt: Decimal
-    pool_token_amt: Decimal
     is_complete: bool
 
 
@@ -50,11 +49,14 @@ class WalletState(GlobalSettings):
 
     tkn_name: str
     tkn_amt: Decimal = Decimal("0")
+    staked_amt: Decimal = Decimal("0")
     bntkn_amt: Decimal = Decimal("0")
+    rewards_per_tkn_paid: Decimal = Decimal(0)
+    pending_rewards: Decimal = Decimal("0")
+    vbnt_amt: Decimal = Decimal("0")
     pending_withdrawals: Dict[int, CooldownState] = field(
         default_factory=lambda: defaultdict(CooldownState)
     )
-    vbnt_amt: Decimal = Decimal("0")
 
 
 @dataclass
@@ -74,10 +76,10 @@ class PoolState(GlobalSettings):
     """Individual pool/token state."""
 
     unix_timestamp: int = settings.unix_timestamp
-    vault_tkn: Decimal = Decimal("0")
-    erc20contracts_bntkn: Decimal = Decimal("0")
-    staked_tkn: Decimal = Decimal("0")
     trading_enabled: bool = False
+    vault_tkn: Decimal = Decimal("0")
+    staked_tkn: Decimal = Decimal("0")
+    erc20contracts_bntkn: Decimal = Decimal("0")
     bnt_trading_liquidity: Decimal = Decimal("0")
     tkn_trading_liquidity: Decimal = Decimal("0")
     trading_fee: Decimal = Decimal(f"{settings.trading_fee}")
@@ -97,9 +99,9 @@ class PoolState(GlobalSettings):
     def is_price_stable(self):
         """Computes the deviation between the spot and ema bnt/tkn rates. True if the deviation is less than 1%."""
         return (
-            Decimal("0.99") * self.ema_rate
-            <= self.spot_rate
-            <= Decimal("1.01") * self.ema_rate
+                Decimal("0.99") * self.ema_rate
+                <= self.spot_rate
+                <= Decimal("1.01") * self.ema_rate
         )
 
     @property
@@ -131,10 +133,10 @@ class PoolState(GlobalSettings):
     def ema_descale(self) -> int:
         """Used for descaling the ema into at most 112 bits per component."""
         return (
-            int(max(self.ema.numerator, self.ema.denominator))
-            + settings.max_uint112
-            - 1
-        ) // settings.max_uint112
+                       int(max(self.ema.numerator, self.ema.denominator))
+                       + settings.max_uint112
+                       - 1
+               ) // settings.max_uint112
 
     @property
     def ema_compressed_numerator(self) -> int:
@@ -167,8 +169,36 @@ class PoolState(GlobalSettings):
 
 
 @dataclass
+class ProgramState(GlobalSettings):
+    """Rewards program state."""
+    tkn_name: str = None
+    rewards_tkn: str = None
+    start_time: int = 0 * 24 * 60 * 60
+    end_time: int = 0 * 24 * 60 * 60
+    last_update_time: int = 0 * 24 * 60 * 60
+    total_rewards: Decimal = Decimal(0)
+    rewards_amt: Decimal = Decimal(0)
+    rewards_per_tkn: Decimal = Decimal(0)
+    rewards_vault_tkn: Decimal = Decimal("0")
+    providers: list = field(default_factory=list)
+
+    @property
+    def remaining_rewards(self):
+        return self.total_rewards - self.rewards_amt
+
+    @remaining_rewards.setter
+    def remaining_rewards(self, value):
+        self._remaining_rewards = value
+
+    @property
+    def staked_tkn(self) -> Decimal:
+        return sum(
+        [self.providers[user_name].wallet[self.tkn_name].staked_tkn for user_name in self.providers])
+
+
+@dataclass
 class State:
-    "Main system state."
+    """Main system state."""
 
     transaction_id: int = 0
     unix_timestamp: int = settings.unix_timestamp
@@ -187,6 +217,7 @@ class State:
     )
     pools: Dict[str, PoolState] = field(default_factory=lambda: defaultdict(PoolState))
     users: Dict[str, UserState] = field(default_factory=lambda: defaultdict(UserState))
+    programs: Dict[str, ProgramState] = field(default_factory=lambda: defaultdict(ProgramState))
     withdrawal_ids: List[Dict[str, CooldownState]] = field(default_factory=list)
     usernames: list = field(default_factory=list)
     history: list = field(default_factory=list)
@@ -197,6 +228,10 @@ class State:
     withdrawal_fee: Decimal = settings.withdrawal_fee
     bnt_min_liquidity: Decimal = settings.bnt_min_liquidity
     cooldown_time: int = settings.cooldown_time
+
+    @property
+    def programs_count(self) -> int:
+        return len(self.programs) - 1
 
     @property
     def bnt_price(self) -> Decimal:
@@ -341,7 +376,7 @@ class State:
         """
 
         bnt_trading_liquidity = self.pools[tkn_name].bnt_trading_liquidity
-        bnbnt_renounced = self.bnbnt_amt(bnt_trading_liquidity)
+        bnbnt_renounced = self.get_bnbnt_amt(bnt_trading_liquidity)
 
         # actuator tasks
         self.pools[tkn_name].trading_enabled = False
@@ -361,32 +396,32 @@ class State:
             tkn_name: Name of the token being transacted.
         """
         if (
-            self.pools[tkn_name].bnt_trading_liquidity == 0
-            and self.pools[tkn_name].tkn_trading_liquidity == 0
+                self.pools[tkn_name].bnt_trading_liquidity == 0
+                and self.pools[tkn_name].tkn_trading_liquidity == 0
         ):
             spot_rate = Decimal(0)
         else:
             spot_rate = (
-                self.pools[tkn_name].bnt_trading_liquidity
-                / self.pools[tkn_name].tkn_trading_liquidity
+                    self.pools[tkn_name].bnt_trading_liquidity
+                    / self.pools[tkn_name].tkn_trading_liquidity
             )
         self.pools[tkn_name].spot_rate = spot_rate
 
     def bntkn_rate(self, tkn_name):
         """Computes the bntkn issuance rate for tkn deposits, based on the staking ledger and the current bntkn supply"""
         if (
-            self.pools[tkn_name].erc20contracts_bntkn == 0
-            and self.pools[tkn_name].staked_tkn == 0
+                self.pools[tkn_name].erc20contracts_bntkn == 0
+                and self.pools[tkn_name].staked_tkn == 0
         ):
             bntkn_rate = Decimal("1")
         else:
             bntkn_rate = (
-                self.pools[tkn_name].erc20contracts_bntkn
-                / self.pools[tkn_name].staked_tkn
+                    self.pools[tkn_name].erc20contracts_bntkn
+                    / self.pools[tkn_name].staked_tkn
             )
         return bntkn_rate
 
-    def bnbnt_amt(self, tkn_amt: Decimal) -> Decimal:
+    def get_bnbnt_amt(self, tkn_amt: Decimal) -> Decimal:
         """Returns the quantity of bntkn to issue to the user during deposits.
         When called during withdrawal of tkn, it is the amount of bnbnt renounced by the protocol.
 
@@ -394,7 +429,7 @@ class State:
             tkn_amt: Name of the token being transacted.
 
         Returns:
-            bnbnt_amt: bntkn to issue to the user during deposits.
+            get_bnbnt_amt: bntkn to issue to the user during deposits.
         """
         return self.bnbnt_rate * tkn_amt
 

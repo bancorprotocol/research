@@ -2,7 +2,7 @@
 import random
 from decimal import Decimal
 from bancor3_simulator.core.settings import GlobalSettings as Settings
-from bancor3_simulator.protocol.actions import (
+from bancor3_simulator.protocol.modules import (
     update_ema,
     trade_tkn_to_ema,
     trade_bnt_to_ema,

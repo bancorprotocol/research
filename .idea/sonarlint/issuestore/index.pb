@@ -25,8 +25,6 @@ J
 setup.py,8/e/8e2edce0d507e1297474f25c00cae94258db38d8
 f
 6jupyterbook/chapters/02/7/bootstrapping-behavior.ipynb,4/2/4246a13069181e2333707ab4e1bf2f23836233c4
-R
-"bancor3_simulator/core/settings.py,d/b/dbc8c7dfd0ab91390c42ce891b8aee69276f14f1
 `
 0jupyterbook/chapters/02/11/1/unstaking-tkn.ipynb,b/4/b4cb9902c8c208431c3d99c9752d3b96760c98bc
 i
@@ -45,5 +43,3 @@ H
 simulation-example.ipynb,0/1/01b3e953e167c11c9233138665e784562924e90f
 \
 ,bancor3_simulator/protocol/utils/security.py,6/e/6e49c1824698a7e322e0f8a00405e17ef42b5180
-S
-#bancor3_simulator/core/constants.py,2/2/22ae507a542d04f2b45099bce6dc05c0c9a516c6

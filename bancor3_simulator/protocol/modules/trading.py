@@ -1,4 +1,4 @@
-"""Main supporting logic for protocol staking actions."""
+"""Main supporting logic for protocol staking modules."""
 from decimal import Decimal
 
 from typing import Tuple

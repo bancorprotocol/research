@@ -120,19 +120,13 @@ def claim_rewards(state: State,
     return state
 
 
-def pending_rewards(state: State,
+def get_pending_rewards(state: State,
                     provider_id: str,
-                    program_ids: List[str],
+                    program_id: str,
                     curr_time: int):
+    """Returns the current amount of pending rewards entitled to the user/provider wallet."""
 
-    assert len(set(program_ids)) == len(program_ids)
-
-    # Ask Barak about the following
-    # assert len(set(state.pools[program_id].rewards_tkn for program_id in program_ids)) == 1
-
-    return sum(
-        get_pending_rewards(get_rewards_per_tkn(program_id, curr_time), program_id, provider_id) for program_id in
-        program_ids)
+    return calc_pending_rewards(calc_rewards_per_tkn(program_id, curr_time), program_id, provider_id)
 
 
 def take_rewards_snapshot(state: State,
@@ -142,11 +136,11 @@ def take_rewards_snapshot(state: State,
 
     program, provider = get_program_and_provider_state(state, program_id, provider_id)
 
-    rewards_per_tkn = get_rewards_per_tkn(program_id, curr_time)
+    rewards_per_tkn = calc_rewards_per_tkn(program_id, curr_time)
     program.rewards_per_tkn = rewards_per_tkn
     program.last_update_time = max(program.last_update_time, min(program.end_time, curr_time))
 
-    new_pending_rewards = get_pending_rewards(rewards_per_tkn, program_id, provider_id)
+    new_pending_rewards = calc_pending_rewards(rewards_per_tkn, program_id, provider_id)
     if new_pending_rewards != 0:
         provider.wallet[program_id].pending_rewards = new_pending_rewards
 
@@ -155,7 +149,7 @@ def take_rewards_snapshot(state: State,
     return state
 
 
-def get_rewards_per_tkn(state: State, provider_id: str, program_id: str, curr_time: int) -> int or Decimal:
+def calc_rewards_per_tkn(state: State, provider_id: str, program_id: str, curr_time: int) -> int or Decimal:
 
     program, provider = get_program_and_provider_state(state, program_id, provider_id)
 
@@ -172,6 +166,6 @@ def get_rewards_per_tkn(state: State, provider_id: str, program_id: str, curr_ti
     return program.rewards_per_tkn + (n / d if d != 0 else 0)
 
 
-def get_pending_rewards(rewards_per_tkn: int or Decimal, program_id: str, program: ProgramState, provider: UserState):
+def calc_pending_rewards(rewards_per_tkn: int or Decimal, program_id: str, program: ProgramState, provider: UserState):
 
     return provider.wallet[program_id].pending_rewards + provider.wallet[program_id].staked_amt * (rewards_per_tkn - provider.wallet[program_id].rewards_per_tkn_paid)

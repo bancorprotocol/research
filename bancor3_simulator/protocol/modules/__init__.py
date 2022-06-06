@@ -1,8 +1,24 @@
+from .rewards import (
+    get_program,
+    get_provider,
+    get_program_and_provider_state,
+    set_program,
+    set_provider,
+    set_program_and_provider_state,
+    total_rewards,
+    create_program,
+    join_program,
+    leave_program,
+    claim_rewards,
+    get_pending_rewards,
+)
+
 from .staking import (
     modified_tkn_increase,
     modified_bnt_increase,
     pool_depth_adjustment,
 )
+
 from .trading import (
     changed_bnt_trading_liquidity,
     vortex_collection,
@@ -18,4 +34,10 @@ from .trading import (
     update_ema,
     changed_tkn_trading_liquidity,
 )
-from .withdraw import external_protection, WithdrawalAlgorithm, begin_cooldown, unpack_cool_down_state
+
+from .withdraw import (
+    external_protection,
+    WithdrawalAlgorithm,
+    begin_cooldown,
+    unpack_cool_down_state,
+)

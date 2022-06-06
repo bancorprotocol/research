@@ -14,6 +14,8 @@ from .rewards import (
 )
 
 from .staking import (
+    stake_bnt,
+    stake_tkn,
     modified_tkn_increase,
     modified_bnt_increase,
     pool_depth_adjustment,

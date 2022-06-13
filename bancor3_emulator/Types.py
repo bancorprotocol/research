@@ -7,56 +7,57 @@ class uint:
     UNCHECKED = False
 
     def __init__(self, size, other):
+        assert 8 <= size <= 256 and size % 8 == 0
         self.size = size
-        self.data = uint._get(self, other)
+        self.data = uint._data(other) % 2 ** size
 
     def __add__(self, other):
-        return uint(self.size, self.data + uint._get(self, other))
+        return self._new(other, int.__add__)
 
     def __sub__(self, other):
-        return uint(self.size, self.data - uint._get(self, other))
+        return self._new(other, int.__sub__)
 
     def __mul__(self, other):
-        return uint(self.size, self.data * uint._get(self, other))
+        return self._new(other, int.__mul__)
 
     def __truediv__(self, other):
-        return uint(self.size, self.data // uint._get(self, other))
+        return self._new(other, int.__floordiv__)
 
     def __mod__(self, other):
-        return uint(self.size, self.data % uint._get(self, other))
+        return self._new(other, int.__mod__)
 
     def __lshift__(self, other):
-        return uint(self.size, self.data << uint._get(self, other))
+        return self._new(other, int.__lshift__)
 
     def __rshift__(self, other):
-        return uint(self.size, self.data >> uint._get(self, other))
+        return self._new(other, int.__rshift__)
 
     def __and__(self, other):
-        return uint(self.size, self.data & uint._get(self, other))
+        return self._new(other, int.__and__)
 
     def __xor__(self, other):
-        return uint(self.size, self.data ^ uint._get(self, other))
+        return self._new(other, int.__xor__)
 
     def __or__(self, other):
-        return uint(self.size, self.data | uint._get(self, other))
+        return self._new(other, int.__or__)
 
     def __lt__(self, other):
-        return self.data < uint._get(self, other)
+        return self.data < uint._data(other)
 
     def __le__(self, other):
-        return self.data <= uint._get(self, other)
+        return self.data <= uint._data(other)
 
     def __eq__(self, other):
-        return self.data == uint._get(self, other)
+        return self.data == uint._data(other)
 
     def __ne__(self, other):
-        return self.data != uint._get(self, other)
+        return self.data != uint._data(other)
 
     def __gt__(self, other):
-        return self.data > uint._get(self, other)
+        return self.data > uint._data(other)
 
     def __ge__(self, other):
-        return self.data >= uint._get(self, other)
+        return self.data >= uint._data(other)
 
     def __int__(self):
         return int(self.data)
@@ -64,10 +65,16 @@ class uint:
     def __str__(self):
         return str(self.data)
 
+    def _new(self, other, op):
+        data = op(self.data, uint._data(other))
+        size = max(self.size, uint._size(other))
+        assert uint.UNCHECKED or 0 <= data <= 2 ** size - 1
+        return uint(size, data)
+
     @staticmethod
-    def _get(this, other):
-        data = other.data if type(other) is uint else other
-        if uint.UNCHECKED:
-            return data & (2 ** this.size - 1)
-        assert 0 <= data <= 2 ** this.size - 1
-        return data
+    def _data(other):
+        return other.data if type(other) is uint else other
+
+    @staticmethod
+    def _size(other):
+        return other.size if type(other) is uint else (len(hex(other)) - 1) // 2 * 8

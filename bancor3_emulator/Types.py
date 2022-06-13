@@ -1,78 +1,73 @@
-FIXED_POINT = True
-
-def uint256(val = 0): return uint(True, 256, val)
-def uint128(val = 0): return uint(True, 128, val)
-def uint112(val = 0): return uint(True, 112, val)
-def uint32 (val = 0): return uint(True,  32, val)
-
-def unsafe_uint256(val = 0): return uint(False, 256, val)
-def unsafe_uint128(val = 0): return uint(False, 128, val)
-def unsafe_uint112(val = 0): return uint(False, 112, val)
-def unsafe_uint32 (val = 0): return uint(False,  32, val)
+def uint256(data = 0): return uint(256, data)
+def uint128(data = 0): return uint(128, data)
+def uint112(data = 0): return uint(112, data)
+def uint32 (data = 0): return uint( 32, data)
 
 class uint:
-    def __init__(self, safe: bool, size: int, other) -> None:
-        self.safe = safe
+    UNCHECKED = False
+
+    def __init__(self, size, other):
         self.size = size
-        self.val = uint._check(safe, size, other.val if type(other) is uint else other)
+        self.data = uint._get(self, other)
 
     def __add__(self, other):
-        return uint(self.safe, self.size, self.val + uint(self.safe, self.size, other).val)
+        return uint(self.size, self.data + uint._get(self, other))
 
     def __sub__(self, other):
-        return uint(self.safe, self.size, self.val - uint(self.safe, self.size, other).val)
+        return uint(self.size, self.data - uint._get(self, other))
 
     def __mul__(self, other):
-        return uint(self.safe, self.size, self.val * uint(self.safe, self.size, other).val)
+        return uint(self.size, self.data * uint._get(self, other))
 
     def __truediv__(self, other):
-        return uint(self.safe, self.size, self.val // uint(self.safe, self.size, other).val if FIXED_POINT else self.val / uint(self.safe, self.size, other).val)
+        return uint(self.size, self.data // uint._get(self, other))
 
     def __mod__(self, other):
-        return uint(self.safe, self.size, self.val % uint(self.safe, self.size, other).val)
+        return uint(self.size, self.data % uint._get(self, other))
 
     def __lshift__(self, other):
-        return uint(self.safe, self.size, self.val << uint(self.safe, self.size, other).val)
+        return uint(self.size, self.data << uint._get(self, other))
 
     def __rshift__(self, other):
-        return uint(self.safe, self.size, self.val >> uint(self.safe, self.size, other).val)
+        return uint(self.size, self.data >> uint._get(self, other))
 
     def __and__(self, other):
-        return uint(self.safe, self.size, self.val & uint(self.safe, self.size, other).val)
+        return uint(self.size, self.data & uint._get(self, other))
 
     def __xor__(self, other):
-        return uint(self.safe, self.size, self.val ^ uint(self.safe, self.size, other).val)
+        return uint(self.size, self.data ^ uint._get(self, other))
 
     def __or__(self, other):
-        return uint(self.safe, self.size, self.val | uint(self.safe, self.size, other).val)
+        return uint(self.size, self.data | uint._get(self, other))
 
     def __lt__(self, other):
-        return self.val < uint(self.safe, self.size, other).val
+        return self.data < uint._get(self, other)
 
     def __le__(self, other):
-        return self.val <= uint(self.safe, self.size, other).val
+        return self.data <= uint._get(self, other)
 
     def __eq__(self, other):
-        return self.val == uint(self.safe, self.size, other).val
+        return self.data == uint._get(self, other)
 
     def __ne__(self, other):
-        return self.val != uint(self.safe, self.size, other).val
+        return self.data != uint._get(self, other)
 
     def __gt__(self, other):
-        return self.val > uint(self.safe, self.size, other).val
+        return self.data > uint._get(self, other)
 
     def __ge__(self, other):
-        return self.val >= uint(self.safe, self.size, other).val
+        return self.data >= uint._get(self, other)
 
     def __int__(self):
-        return int(self.val)
+        return int(self.data)
 
     def __str__(self):
-        return str(self.val)
+        return str(self.data)
 
     @staticmethod
-    def _check(safe: bool, size: int, val: int) -> int:
-        if safe:
-            assert 0 <= val <= 2 ** size - 1
-            return val
-        return val & (2 ** size - 1)
+    def _get(this, other):
+        data = other.data if type(other) is uint else other
+        if uint.UNCHECKED:
+            return data & (2 ** this.size - 1)
+        assert 0 <= data <= 2 ** this.size - 1
+        return data

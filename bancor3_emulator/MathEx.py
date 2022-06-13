@@ -1,7 +1,6 @@
 from Types import uint
 from Types import uint32
 from Types import uint256
-from Types import unsafe_uint256
 from Fraction import Fraction256
 from Constants import PPM_RESOLUTION
 
@@ -33,10 +32,12 @@ class Sint256:
     * - For example: e^5.521692859 = e^(4 + 1 + 0.5 + 0.021692859) = e^4 * e^1 * e^0.5 * e^0.021692859
 '''
 def exp2(f: Fraction256) -> (Fraction256):
-    x = unsafe_uint256(mulDivF(LN2, f.n, f.d).val);
-    y = unsafe_uint256();
-    z = unsafe_uint256();
-    n = unsafe_uint256();
+    uint.UNCHECKED = True
+
+    x = uint256(mulDivF(LN2, f.n, f.d).val);
+    y = uint256();
+    z = uint256();
+    n = uint256();
 
     if (x >= (ONE << 4)):
         assert False, "Overflow";
@@ -96,6 +97,8 @@ def exp2(f: Fraction256) -> (Fraction256):
         n = (n * 0x00960aadc109e7a3bf4578099615711d7) / 0x0002bf84208204f5977f9a8cf01fdce3d; # multiply by e^(2^+2)
     if ((x & (ONE << 3)) != 0):
         n = (n * 0x0002bf84208204f5977f9a8cf01fdc307) / 0x0000003c6ab775dd0b95b4cbee7e65d11; # multiply by e^(2^+3)
+
+    uint.UNCHECKED = False
 
     return Fraction256({ 'n': n, 'd': ONE });
 
@@ -263,7 +266,7 @@ def _div512(x: Uint512, pow2n) -> (uint):
 def _inv256(d) -> (uint):
     # approximate the root of `f(x) = 1 / x - d` using the newton–raphson convergence method
     x = 1;
-    for i in range(8):
+    for _ in range(8):
         x = _unsafeMul(x, _unsafeSub(2, _unsafeMul(x, d))); # `x = x * (2 - x * d) mod 2 ^ 256`
     return x;
 
@@ -271,19 +274,28 @@ def _inv256(d) -> (uint):
     * @dev returns `(x + y) % 2 ^ 256`
 '''
 def _unsafeAdd(x, y) -> (uint):
-    return unsafe_uint256(x) + unsafe_uint256(y);
+    uint.UNCHECKED = True
+    z = uint256(x) + uint256(y);
+    uint.UNCHECKED = False
+    return z
 
 '''
     * @dev returns `(x - y) % 2 ^ 256`
 '''
 def _unsafeSub(x, y) -> (uint):
-    return unsafe_uint256(x) - unsafe_uint256(y);
+    uint.UNCHECKED = True
+    z = uint256(x) - uint256(y);
+    uint.UNCHECKED = False
+    return z
 
 '''
     * @dev returns `(x * y) % 2 ^ 256`
 '''
 def _unsafeMul(x, y) -> (uint):
-    return unsafe_uint256(x) * unsafe_uint256(y);
+    uint.UNCHECKED = True
+    z = uint256(x) * uint256(y);
+    uint.UNCHECKED = False
+    return z
 
 '''
     * @dev returns `x * y % (2 ^ 256 - 1)`

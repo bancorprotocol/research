@@ -10,12 +10,12 @@ ONE = 0x80000000000000000000000000000000;
 LN2 = 0x58b90bfbe8e7bcd5e4f1d9cc01f97b57;
 
 class Uint512:
-    def __init__(self, x = { 'hi': 0, 'lo': 0 }) -> None:
+    def __init__(self, x = {'hi': 0, 'lo': 0}) -> None:
         self.hi = uint256(x['hi']); # 256 most significant bits
         self.lo = uint256(x['lo']); # 256 least significant bits
 
 class Sint256:
-    def __init__(self, x = { 'value': 0, 'isNeg': False }) -> None:
+    def __init__(self, x = {'value': 0, 'isNeg': False}) -> None:
         self.value = uint256(x['value']);
         self.isNeg = x['isNeg'];
 
@@ -34,7 +34,7 @@ class Sint256:
 def exp2(f: Fraction256) -> (Fraction256):
     uint.UNCHECKED = True
 
-    x = uint256(mulDivF(LN2, f.n, f.d).val);
+    x = mulDivF(LN2, f.n, f.d);
     y = uint256();
     z = uint256();
     n = uint256();
@@ -106,7 +106,7 @@ def exp2(f: Fraction256) -> (Fraction256):
     * @dev returns a fraction with reduced components
 '''
 def reducedFraction(fraction: Fraction256, max: int) -> (Fraction256):
-    scale = uint256(Math.ceilDiv(Math.max(fraction.n, fraction.d), max));
+    scale = Math.ceilDiv(Math.max(fraction.n, fraction.d), max);
     reduced = Fraction256({ 'n': fraction.n / scale, 'd': fraction.d / scale });
     if (reduced.d == 0):
         assert False, "InvalidFraction";
@@ -122,7 +122,6 @@ def weightedAverage(
     weight1,
     weight2
 ) -> (Fraction256):
-    weight1, weight2 = uint256(weight1), uint256(weight2)
     return Fraction256({
         'n': fraction1.n * fraction2.d * weight1 + fraction1.d * fraction2.n * weight2,
         'd': fraction1.d * fraction2.d * (weight1 + weight2)
@@ -137,7 +136,6 @@ def isInRange(
     offsetSample: Fraction256,
     maxDeviationPPM
 ) -> (bool):
-    maxDeviationPPM = uint32(maxDeviationPPM)
     min = mul512(baseSample.n, offsetSample.d * (PPM_RESOLUTION - maxDeviationPPM));
     mid = mul512(baseSample.d, offsetSample.n * PPM_RESOLUTION);
     max = mul512(baseSample.n, offsetSample.d * (PPM_RESOLUTION + maxDeviationPPM));

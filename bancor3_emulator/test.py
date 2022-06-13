@@ -1,5 +1,17 @@
 from Types import uint
+from Types import uint32
+from Types import uint112
+from Types import uint128
 from Types import uint256
+
+for n in [0, 2, 32, 112, 128, 256]:
+    for k in [-1, 0, +1]:
+        x = 2 ** n + k
+        for cast in [uint32, uint112, uint128, uint256]:
+            y = cast(x)
+            print('{}({}) = {}'.format(cast.__name__, x, int(y)))
+            assert y.size == int(cast.__name__[4:])
+            assert int(y) == x & (2 ** y.size - 1)
 
 def add(x, y): return x + y
 def sub(x, y): return x - y

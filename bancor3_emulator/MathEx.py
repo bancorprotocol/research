@@ -1,5 +1,4 @@
 from Types import uint
-from Types import uint32
 from Types import uint256
 from Fraction import Fraction256
 from Constants import PPM_RESOLUTION

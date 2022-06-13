@@ -1,11 +1,5 @@
 from Types import uint
-from Types import uint32
-from Types import uint112
-from Types import uint128
 from Types import uint256
-from Fraction import Fraction112
-from Fraction import Fraction256
-from Constants import PPM_RESOLUTION
 
 def add(x, y): return x + y
 def sub(x, y): return x - y
@@ -28,13 +22,13 @@ def Print(op, x, y, z):
 arr = [1, 2]
 for size in [32, 112, 128, 256]:
     arr.append(2 ** (size - 1) - 1)
-    arr.append(2 ** (size - 1))
-    arr.append(2 ** size - 2)
-    arr.append(2 ** size - 1)
+    arr.append(2 ** (size - 1) - 0)
+    arr.append(2 ** (size - 0) - 2)
+    arr.append(2 ** (size - 0) - 1)
     arr.append(uint(size, 2 ** (size - 1) - 1))
-    arr.append(uint(size, 2 ** (size - 1)))
-    arr.append(uint(size, 2 ** size - 2))
-    arr.append(uint(size, 2 ** size - 1))
+    arr.append(uint(size, 2 ** (size - 1) - 0))
+    arr.append(uint(size, 2 ** (size - 0) - 2))
+    arr.append(uint(size, 2 ** (size - 0) - 1))
     arr.append(uint(size, 2))
     arr.append(uint(size, 1))
 arr.sort(key=uint256)

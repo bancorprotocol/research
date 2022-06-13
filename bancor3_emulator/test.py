@@ -7,73 +7,57 @@ from Fraction import Fraction112
 from Fraction import Fraction256
 from Constants import PPM_RESOLUTION
 
+def add(x, y): return x + y
+def sub(x, y): return x - y
+def mul(x, y): return x * y
+def div(x, y): return x / y if type(x) is uint else x // y
+
+ops = {
+    '+': add,
+    '-': sub,
+    '*': mul,
+    '/': div,
+}
+
 def TypeName(n):
     return 'uint{}'.format(n.size) if type(n) is uint else type(n).__name__
 
-def Print(x, op, y, z):
+def Print(op, x, y, z):
     print('    {}({}) {} {}({}) = {}({})'.format(TypeName(x), x, op, TypeName(y), y, TypeName(z), z))
 
-arr = [x for xs in [[cast(n) for cast in [int, uint32, uint112, uint128, uint256]] for n in [5, 6]] for x in xs]
+arr = [1, 2]
+for size in [32, 112, 128, 256]:
+    arr.append(2 ** (size - 1) - 1)
+    arr.append(2 ** (size - 1))
+    arr.append(2 ** size - 2)
+    arr.append(2 ** size - 1)
+    arr.append(uint(size, 2 ** (size - 1) - 1))
+    arr.append(uint(size, 2 ** (size - 1)))
+    arr.append(uint(size, 2 ** size - 2))
+    arr.append(uint(size, 2 ** size - 1))
+    arr.append(uint(size, 2))
+    arr.append(uint(size, 1))
+arr.sort(key=uint256)
 
-print('\nTest addition:')
-for x in [n for n in arr if type(n) is not int]:
-    for y in arr:
-        Print(x, '+', y, x + y)
-        assert x + y == int(x) + int(y)
-
-print('\nTest subtraction:')
-for x in [n for n in arr if type(n) is not int]:
-    for y in arr:
-        if x >= y:
-            Print(x, '-', y, x - y)
-            assert x - y == int(x) - int(y)
-        else:
+for op in ops.keys():
+    print('Test {}:'.format(op))
+    for x in [n for n in arr if type(n) is not int]:
+        for y in arr:
             try:
-                Print(x, '-', y, x - y)
-                raise Exception
+                z = ops[op](x, y)
+                Print(op, x, y, z)
+                assert int(z) == ops[op](int(x), int(y)), 'arithmetic error'
             except AssertionError as error:
-                Print(x, '-', y, 'reverted')
+                Print(op, x, y, 'reverted')
                 assert not str(error)
+                assert not (0 <= ops[op](int(x), int(y)) <= 2 ** x.size - 1), 'logical error'
 
-print('\nTest multiplication:')
-for x in [n for n in arr if type(n) is not int]:
-    for y in arr:
-        Print(x, '*', y, x * y)
-        assert x * y == int(x) * int(y)
-
-print('\nTest division:')
-for x in [n for n in arr if type(n) is not int]:
-    for y in arr:
-        Print(x, '/', y, x / y)
-        assert x / y == int(x) // int(y)
-
-print('\nTest unchecked subtraction:')
 uint.UNCHECKED = True
-for x in [n for n in arr if type(n) is not int]:
-    for y in arr:
-        if x >= y:
-            Print(x, '-', y, x - y)
-            assert x - y == int(x) - int(y)
-        else:
-            Print(x, '-', y, x - y)
-            assert x - y == int(x) - int(y) + 2 ** x.size
-uint.UNCHECKED = False
-
-arr = [x for xs in [[2 ** (size - 1), 2 ** size - 1, uint(size, 2 ** (size - 1)), uint(size, 2 ** size - 1)] for size in [32, 112, 128, 256]] for x in xs]
-
-print('\nTest addition of large values:')
-for x in [n for n in arr if type(n) is not int]:
-    for y in arr:
-        try:
-            Print(x, '+', y, x + y)
-        except AssertionError as error:
-            Print(x, '+', y, 'reverted')
-            assert not str(error) and int(x) + int(y) > 2 ** x.size - 1
-
-print('\nTest unchecked addition of large values:')
-uint.UNCHECKED = True
-for x in [n for n in arr if type(n) is not int]:
-    for y in arr:
-        Print(x, '+', y, x + y)
-        assert x + y == (int(x) + int(y)) % (2 ** x.size)
+for op in ops.keys():
+    print('Test unchecked {}:'.format(op))
+    for x in [n for n in arr if type(n) is not int]:
+        for y in arr:
+            z = ops[op](x, y)
+            Print(op, x, y, z)
+            assert int(z) == ops[op](int(x), int(y)) % 2 ** max(uint._size(x), uint._size(y)), 'arithmetic error'
 uint.UNCHECKED = False

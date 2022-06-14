@@ -1,4 +1,4 @@
-(base) /Users/barakmanos/Desktop/Bancor/simulator-v3/bancor3_emulator/temp > python test.py
+(base) /Users/barakmanos/Desktop/Bancor/simulator-v3/bancor3_emulator/temp > python test.py 
 uint32(0) = 0
 uint112(0) = 0
 uint128(0) = 0

@@ -41,6 +41,36 @@ class uint:
     def __or__(self, other):
         return self._new(other, int.__or__)
 
+    def __iadd__(self, other):
+        return self._set(self + other)
+
+    def __isub__(self, other):
+        return self._set(self - other)
+
+    def __imul__(self, other):
+        return self._set(self * other)
+
+    def __itruediv__(self, other):
+        return self._set(self / other)
+
+    def __imod__(self, other):
+        return self._set(self % other)
+
+    def __ilshift__(self, other):
+        return self._set(self << other)
+
+    def __irshift__(self, other):
+        return self._set(self >> other)
+
+    def __iand__(self, other):
+        return self._set(self & other)
+
+    def __ixor__(self, other):
+        return self._set(self ^ other)
+
+    def __ior__(self, other):
+        return self._set(self | other)
+
     def __lt__(self, other):
         return self.data < uint._data(other)
 
@@ -64,6 +94,11 @@ class uint:
 
     def __str__(self):
         return str(self.data)
+
+    def _set(self, other):
+        assert self.size >= other.size
+        self.data = other.data
+        return self
 
     def _new(self, other, op):
         data = op(self.data, uint._data(other))

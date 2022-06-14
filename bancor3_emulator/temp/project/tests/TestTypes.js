@@ -1,12 +1,12 @@
-const TestContract = artifacts.require("TestContract");
+const TestTypes = artifacts.require("TestTypes");
 
 const BN = web3.utils.BN;
 
-contract("TestContract", () => {
-    let testContract;
+contract("TestTypes", () => {
+    let testTypes;
 
     before(async () => {
-        testContract = await TestContract.new();
+        testTypes = await TestTypes.new();
     });
 
     function add(x, y) {return x.data.add(y.data);}
@@ -61,7 +61,7 @@ contract("TestContract", () => {
             for (const k of [-1, 0, +1]) {
                 const x = new BN(1).shln(n).addn(k);
                 for (const cast of [32, 112, 128, 256]) {
-                    const y = await testContract[`to_uint_${cast}`](x.maskn(256));
+                    const y = await testTypes[`to_uint_${cast}`](x.maskn(256));
                     console.log(`uint${cast}(${x}) = ${y}`);
                     assert(y.bitLength() <= cast);
                     assert(y.eq(x.maskn(cast)));
@@ -74,7 +74,7 @@ contract("TestContract", () => {
             for (const x of sorted_arr.filter(x => x.type ==='uint')) {
                 for (const y of sorted_arr) {
                     try {
-                        const z = await testContract[`${ops[op].name}_${x.size}_${y.size}`](x.data, y.data);
+                        const z = await testTypes[`${ops[op].name}_${x.size}_${y.size}`](x.data, y.data);
                         Print(op, x, y, z);
                         assert(z.eq(ops[op](x, y)), 'arithmetic error');
                     }
@@ -91,7 +91,7 @@ contract("TestContract", () => {
             console.log(`Test unchecked ${op}:`)
             for (const x of sorted_arr.filter(x => x.type ==='uint')) {
                 for (const y of sorted_arr) {
-                    const z = await testContract[`unchecked_${ops[op].name}_${x.size}_${y.size}`](x.data, y.data);
+                    const z = await testTypes[`unchecked_${ops[op].name}_${x.size}_${y.size}`](x.data, y.data);
                     Print(op, x, y, z);
                     assert(z.eq(ops[op](x, y).add(new BN(1).shln(512)).maskn(Math.max(x.size, y.size))), 'arithmetic error');
                 }
@@ -106,7 +106,7 @@ contract("TestContract", () => {
                     for (const rcast of [32, 112, 128, 256]) {
                         console.log(`    uint${lcast}(${m}) += uint${rcast}(${m})`);
                         try {
-                            const x = await testContract[`iadd_${lcast}_${rcast}`](m.maskn(lcast), m.maskn(rcast));
+                            const x = await testTypes[`iadd_${lcast}_${rcast}`](m.maskn(lcast), m.maskn(rcast));
                             assert(x.eq(m.maskn(lcast).add(m.maskn(rcast))), 'arithmetic error');
                         }
                         catch (error) {
@@ -125,7 +125,7 @@ contract("TestContract", () => {
                     for (const rcast of [32, 112, 128, 256]) {
                         console.log(`    uint${lcast}(${m}) += uint${rcast}(${m})`);
                         try {
-                            const x = await testContract[`unchecked_iadd_${lcast}_${rcast}`](m.maskn(lcast), m.maskn(rcast));
+                            const x = await testTypes[`unchecked_iadd_${lcast}_${rcast}`](m.maskn(lcast), m.maskn(rcast));
                             assert(x.eq(m.maskn(lcast).add(m.maskn(rcast)).maskn(lcast)), 'arithmetic error');
                         }
                         catch (error) {
@@ -144,7 +144,7 @@ contract("TestContract", () => {
                     for (const rcast of [32, 112, 128, 256]) {
                         console.log(`    uint${lcast}(${m}) *= uint${rcast}(${m})`);
                         try {
-                            const x = await testContract[`imul_${lcast}_${rcast}`](m.maskn(lcast), m.maskn(rcast));
+                            const x = await testTypes[`imul_${lcast}_${rcast}`](m.maskn(lcast), m.maskn(rcast));
                             assert(x.eq(m.maskn(lcast).mul(m.maskn(rcast))), 'arithmetic error');
                         }
                         catch (error) {
@@ -163,7 +163,7 @@ contract("TestContract", () => {
                     for (const rcast of [32, 112, 128, 256]) {
                         console.log(`    uint${lcast}(${m}) *= uint${rcast}(${m})`);
                         try {
-                            const x = await testContract[`unchecked_imul_${lcast}_${rcast}`](m.maskn(lcast), m.maskn(rcast));
+                            const x = await testTypes[`unchecked_imul_${lcast}_${rcast}`](m.maskn(lcast), m.maskn(rcast));
                             assert(x.eq(m.maskn(lcast).mul(m.maskn(rcast)).maskn(lcast)), 'arithmetic error');
                         }
                         catch (error) {

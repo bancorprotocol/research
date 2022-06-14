@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: SEE LICENSE IN LICENSE
 pragma solidity 0.8.13;
 
-contract TestContract {
+contract TestTypes {
     function to_uint_32 (uint256 x) external pure returns (uint32 ) {return uint32 (x);}
     function to_uint_112(uint256 x) external pure returns (uint112) {return uint112(x);}
     function to_uint_128(uint256 x) external pure returns (uint128) {return uint128(x);}

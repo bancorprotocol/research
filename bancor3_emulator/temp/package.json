@@ -6,6 +6,7 @@
     "devDependencies": {
         "@nomiclabs/hardhat-truffle5": "2.0.6",
         "@nomiclabs/hardhat-web3": "2.0.0",
+        "@openzeppelin/contracts": "4.5.0",
         "hardhat": "2.9.6"
     }
 }

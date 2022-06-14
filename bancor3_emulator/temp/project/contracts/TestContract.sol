@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: SEE LICENSE IN LICENSE
-pragma solidity 0.8.14;
+pragma solidity 0.8.13;
 
 contract TestContract {
     function to_uint_32 (uint256 x) external pure returns (uint32 ) {return uint32 (x);}

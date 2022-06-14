@@ -1,0 +1,11 @@
+{
+    "scripts": {
+        "build": "hardhat compile",
+        "test": "hardhat test --bail"
+    },
+    "devDependencies": {
+        "@nomiclabs/hardhat-truffle5": "2.0.6",
+        "@nomiclabs/hardhat-web3": "2.0.0",
+        "hardhat": "2.9.6"
+    }
+}

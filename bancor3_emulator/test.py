@@ -12,6 +12,7 @@ for n in [0, 2, 32, 112, 128, 256]:
             print('{}({}) = {}'.format(cast.__name__, x, int(y)))
             assert y.size == int(cast.__name__[4:])
             assert int(y) == x & (2 ** y.size - 1)
+            assert y == cast(y) == uint256(y)
 
 def add(x, y): return x + y
 def sub(x, y): return x - y

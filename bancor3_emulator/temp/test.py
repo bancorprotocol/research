@@ -8,6 +8,14 @@ from Types import uint32
 from Types import uint112
 from Types import uint128
 from Types import uint256
+from MathEx import exp2
+from Fraction import Fraction256
+
+f = Fraction256({'n': 1, 'd': 2})
+k = exp2(f)
+print(str(k))
+
+fdg();
 
 for n in [0, 2, 32, 112, 128, 256]:
     for k in [-1, 0, +1]:

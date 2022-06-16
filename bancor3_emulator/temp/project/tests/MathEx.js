@@ -33,7 +33,7 @@ const comp512Funcs = {
 
 const toUint512 = (x) => [x.shrn(256), x.maskn(256)];
 
-contract.only('MathEx', () => {
+contract('MathEx', () => {
     let mathEx;
 
     before(async () => {

@@ -1,9 +1,8 @@
-from Types import uint
-from Types import uint256
-from Fraction import Fraction256
-from Constants import PPM_RESOLUTION
+from Types import uint, uint256
 
 import Math
+from Fraction import Fraction256
+from Constants import PPM_RESOLUTION
 
 ONE = 0x80000000000000000000000000000000;
 LN2 = 0x58b90bfbe8e7bcd5e4f1d9cc01f97b57;

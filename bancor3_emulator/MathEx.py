@@ -196,7 +196,7 @@ def mulDivC(
 
     w = mulDivF(x, y, z);
     if (_mulMod(x, y, z) > 0):
-        if (w >= type(uint256).max):
+        if (w >= 2 ** 256 - 1):
             assert False, "Overflow";
 
         return w + 1;

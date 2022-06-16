@@ -1,4 +1,4 @@
-sizes = [(n + 1) * 8 for n in range(64)]
+sizes = [(n + 1) * 8 for n in range(32)]
 
 for size in sizes:
     exec('def uint{}(data = 0): return uint({}, data)'.format(size, size))

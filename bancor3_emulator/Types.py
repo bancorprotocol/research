@@ -1,13 +1,13 @@
-def uint256(data = 0): return uint(256, data)
-def uint128(data = 0): return uint(128, data)
-def uint112(data = 0): return uint(112, data)
-def uint32 (data = 0): return uint( 32, data)
+sizes = [(n + 1) * 8 for n in range(64)]
+
+for size in sizes:
+    exec('def uint{}(data = 0): return uint({}, data)'.format(size, size))
 
 class uint:
     UNCHECKED = False
 
     def __init__(self, size, other):
-        assert 8 <= size <= 256 and size % 8 == 0
+        assert size in sizes
         self.size = size
         self.data = uint._data(other) % 2 ** size
 

@@ -19,6 +19,7 @@ module.exports = {
     mocha: {
         useColors: true,
         enableTimeouts: false,
+        timeout: 1000000000,
         reporter: "list" // https://mochajs.org/#reporters
     }
 };

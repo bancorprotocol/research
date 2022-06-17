@@ -1,6 +1,6 @@
 from Types import uint, uint256
 
-import Math
+from Math import Math
 from Fraction import Fraction256
 from Constants import PPM_RESOLUTION
 

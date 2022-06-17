@@ -3,7 +3,7 @@ const PoolCollectionWithdrawal = artifacts.require("TestPoolCollectionWithdrawal
 const fs = require("fs");
 const path = require("path");
 
-contract.only('PoolCollectionWithdrawal', () => {
+contract('PoolCollectionWithdrawal', () => {
     let poolCollectionWithdrawal;
 
     before(async () => {
@@ -21,16 +21,7 @@ contract.only('PoolCollectionWithdrawal', () => {
                 const actualZp = actual.p.isNeg && actual.p.value !== '0' ? '-' + actual.p.value : actual.p.value;
                 const actualZq = actual.q.isNeg && actual.q.value !== '0' ? '-' + actual.q.value : actual.q.value;
                 const actualZr = actual.r.isNeg && actual.r.value !== '0' ? '-' + actual.r.value : actual.r.value;
-                console.log(
-                    fileName + ':',
-                    actualZp,
-                    actualZq,
-                    actualZr,
-                    actual.s,
-                    actual.t,
-                    actual.u,
-                    actual.v
-                );
+                console.log(fileName + ':', actualZp, actualZq, actualZr, actual.s, actual.t, actual.u, actual.v);
             }
         };
     });

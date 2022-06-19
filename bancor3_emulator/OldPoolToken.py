@@ -1,13 +1,13 @@
 from ERC20 import ERC20
 
 '''
- * @dev DSToken represents a token with dynamic supply.
+ * @dev OldPoolToken represents a token with dynamic supply.
  * The owner of the token can mint/burn tokens to/from any account.
  *
 '''
 class OldPoolToken(ERC20):
     '''
-     * @dev initializes a new DSToken instance
+     * @dev initializes a new OldPoolToken instance
      *
      * @param _name       token name
      * @param _symbol     token short symbol, minimum 1 character

@@ -1,4 +1,5 @@
-from Types import mapping, uint, uint8, uint256
+from collections import defaultdict
+from Types import uint, uint8, uint256
 
 '''
  * @dev Implementation of the {IERC20} interface.
@@ -37,8 +38,8 @@ class ERC20:
     def __init__(self, name_: str, symbol_: str) -> None:
         self._name = name_;
         self._symbol = symbol_;
-        self._balances = mapping(uint256());
-        self._allowances = mapping(mapping(uint256()));
+        self._balances = defaultdict(lambda: uint256());
+        self._allowances = defaultdict(lambda: defaultdict(lambda: uint256()));
         self._totalSupply = uint256();
 
     '''
@@ -202,8 +203,6 @@ class ERC20:
         to,
         amount
     ):
-        self._beforeTokenTransfer(from_, to, amount);
-
         fromBalance = self._balances[from_];
         assert fromBalance >= amount, "ERC20: transfer amount exceeds balance";
         uint.UNCHECKED = True

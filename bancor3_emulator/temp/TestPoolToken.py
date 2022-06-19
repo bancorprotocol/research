@@ -36,9 +36,12 @@ for n in range(NUM_OF_ACCOUNTS):
 for n in range(NUM_OF_ACCOUNTS - 1):
     source_account = 'account_{}'.format(n)
     target_account = 'account_{}'.format(n + 1)
-    source_amount = poolToken.balanceOf(source_account);
-    target_amount = poolToken.balanceOf(source_account);
+    source_amount = int(poolToken.balanceOf(source_account));
+    target_amount = int(poolToken.balanceOf(target_account));
+    assert poolToken.allowance(source_account, _msgSender) == 0
     poolToken.approve(source_account, _msgSender, source_amount)
+    assert poolToken.allowance(source_account, _msgSender) == source_amount
     poolToken.transferFrom(_msgSender, source_account, target_account, source_amount)
+    assert poolToken.allowance(source_account, _msgSender) == 0
     assert poolToken.balanceOf(source_account) == 0;
     assert poolToken.balanceOf(target_account) == source_amount + target_amount;

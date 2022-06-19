@@ -9,6 +9,11 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
+"@bancor/token-governance@^0.1.8":
+  version "0.1.8"
+  resolved "https://registry.yarnpkg.com/@bancor/token-governance/-/token-governance-0.1.8.tgz#132b5f94427b0b96770a03b76aae1da6de26e605"
+  integrity sha512-JMLJATFvRa6ZgoZe5rCX43C0pPazqwklWjQvW/Nrjg/ydv+mon9ivaA/G4kJ61HEnepz6ldDPEQAu0jTI5NSPg==
+
 "@ensdomains/address-encoder@^0.1.7":
   version "0.1.9"
   resolved "https://registry.yarnpkg.com/@ensdomains/address-encoder/-/address-encoder-0.1.9.tgz#f948c485443d9ef7ed2c0c4790e931c33334d02d"
@@ -521,6 +526,11 @@
     ethereum-ens "^0.8.0"
     ethers "^4.0.0-beta.1"
     source-map-support "^0.5.19"
+
+"@openzeppelin/contracts-upgradeable@4.5.2":
+  version "4.5.2"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts-upgradeable/-/contracts-upgradeable-4.5.2.tgz#90d9e47bacfd8693bfad0ac8a394645575528d05"
+  integrity sha512-xgWZYaPlrEOQo3cBj97Ufiuv79SPd8Brh4GcFYhPgb6WvAq4ppz8dWKL6h+jLAK01rUqMRp/TS9AdXgAeNvCLA==
 
 "@openzeppelin/contracts@4.5.0":
   version "4.5.0"

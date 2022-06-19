@@ -113,3 +113,15 @@ class uint:
     @staticmethod
     def _size(other):
         return other.size if type(other) is uint else (len(hex(other)) - 1) // 2 * 8
+
+
+class mapping:
+    def __init__(self, type) -> None:
+        self.type = type
+        self.values = {}
+
+    def __getitem__(self, key):
+        return self.values[key] if key in self.values else self.type(0)
+
+    def __setitem__(self, key, value):
+        self.values[key] = value

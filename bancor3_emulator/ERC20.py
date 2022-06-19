@@ -37,8 +37,8 @@ class ERC20:
     def __init__(self, name_: str, symbol_: str) -> None:
         self._name = name_;
         self._symbol = symbol_;
-        self._balances = mapping(uint256);
-        self._allowances = mapping(mapping(uint256));
+        self._balances = mapping(uint256());
+        self._allowances = mapping(mapping(uint256()));
         self._totalSupply = uint256();
 
     '''
@@ -90,8 +90,8 @@ class ERC20:
      * - `to` cannot be the zero address.
      * - the caller must have a balance of at least `amount`.
     '''
-    def transfer(self, to, amount) -> (bool):
-        owner = self._msgSender();
+    def transfer(self, _msgSender, to, amount) -> (bool):
+        owner = _msgSender;
         self._transfer(owner, to, amount);
         return True;
 
@@ -111,8 +111,8 @@ class ERC20:
      *
      * - `spender` cannot be the zero address.
     '''
-    def approve(self, spender, amount) -> (bool):
-        owner = self._msgSender();
+    def approve(self, _msgSender, spender, amount) -> (bool):
+        owner = _msgSender;
         self._approve(owner, spender, amount);
         return True;
 
@@ -132,12 +132,12 @@ class ERC20:
      * - the caller must have allowance for ``from``'s tokens of at least
      * `amount`.
     '''
-    def transferFrom(self,
+    def transferFrom(self, _msgSender,
         from_,
         to,
         amount
     ) -> (bool):
-        spender = self._msgSender();
+        spender = _msgSender;
         self._spendAllowance(from_, spender, amount);
         self._transfer(from_, to, amount);
         return True;
@@ -154,8 +154,8 @@ class ERC20:
      *
      * - `spender` cannot be the zero address.
     '''
-    def increaseAllowance(self, spender, addedValue) -> (bool):
-        owner = self._msgSender();
+    def increaseAllowance(self, _msgSender, spender, addedValue) -> (bool):
+        owner = _msgSender;
         self._approve(owner, spender, self._allowances[owner][spender] + addedValue);
         return True;
 
@@ -173,8 +173,8 @@ class ERC20:
      * - `spender` must have allowance for the caller of at least
      * `subtractedValue`.
     '''
-    def decreaseAllowance(self, spender, subtractedValue) -> (bool):
-        owner = self._msgSender();
+    def decreaseAllowance(self, _msgSender, spender, subtractedValue) -> (bool):
+        owner = _msgSender;
         currentAllowance = self._allowances[owner][spender];
         assert currentAllowance >= subtractedValue, "ERC20: decreased allowance below zero";
         uint.UNCHECKED = True

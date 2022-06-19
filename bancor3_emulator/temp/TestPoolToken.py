@@ -24,6 +24,7 @@ assert poolToken.totalSupply() == 0;
 assert poolToken.reserveToken() == reserveToken;
 
 NUM_OF_ACCOUNTS = 10
+_msgSender = '_msgSender'
 
 for n in range(NUM_OF_ACCOUNTS):
     account = 'account_{}'.format(n)
@@ -31,3 +32,13 @@ for n in range(NUM_OF_ACCOUNTS):
     amount = n + 1
     poolToken.mint(account, amount)
     assert poolToken.balanceOf(account) == amount;
+
+for n in range(NUM_OF_ACCOUNTS - 1):
+    source_account = 'account_{}'.format(n)
+    target_account = 'account_{}'.format(n + 1)
+    source_amount = poolToken.balanceOf(source_account);
+    target_amount = poolToken.balanceOf(source_account);
+    poolToken.approve(source_account, _msgSender, source_amount)
+    poolToken.transferFrom(_msgSender, source_account, target_account, source_amount)
+    assert poolToken.balanceOf(source_account) == 0;
+    assert poolToken.balanceOf(target_account) == source_amount + target_amount;

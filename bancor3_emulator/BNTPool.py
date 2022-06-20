@@ -27,7 +27,7 @@ class BNTPool(Vault):
         initMasterVault,
         initBNTPoolToken
     ) -> None:
-        super().__init__(initBNTGovernance, initVBNTGovernance)
+        Vault().__init__(initBNTGovernance, initVBNTGovernance)
         self._network = initNetwork;
         self._networkSettings = initNetworkSettings;
         self._masterVault = initMasterVault;

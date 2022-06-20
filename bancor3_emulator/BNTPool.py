@@ -13,8 +13,8 @@ from PoolToken import PoolToken
 class BNTPool(Vault):
     class InternalWithdrawalAmounts:
         def __init__(self, x = {'bntAmount': 0, 'withdrawalFeeAmount': 0}) -> None:
-            self.bntAmount = uint256(x.bntAmount)
-            self.withdrawalFeeAmount = uint256(x.withdrawalFeeAmount)
+            self.bntAmount = uint256(x['bntAmount'])
+            self.withdrawalFeeAmount = uint256(x['withdrawalFeeAmount'])
 
     '''
      * @dev a "virtual" constructor that is only used to set immutable state variables

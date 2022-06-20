@@ -6,7 +6,7 @@ import MathEx
 
 '''
  * @dev This library implements the mathematics behind base-token withdrawal.
- * It exposes a single def which takes the following input values:
+ * It exposes a single function which takes the following input values:
  * `a` - BNT trading liquidity
  * `b` - base token trading liquidity
  * `c` - base token excess amount
@@ -39,16 +39,16 @@ import MathEx
  * |           | q = -a*z/(b*e) where z = max(x*(1-n)*b-c*(e-x*(1-n)),0) | q = -a*z/b where z = max(x*(1-n)-c,0)                    |
  * |           | r = -z/e       where z = max(x*(1-n)*b-c*(e-x*(1-n)),0) | r = -z     where z = max(x*(1-n)-c,0)                    |
  * | Default   | s = x*(1-n)*(b+c)/e                                     | s = x*(1-n)                                              |
- * |           | t = see def `externalProtection`                   | t = 0                                                    |
- * |           | u = see def `externalProtection`                   | u = 0                                                    |
+ * |           | t = see function `externalProtection`                   | t = 0                                                    |
+ * |           | u = see function `externalProtection`                   | u = 0                                                    |
  * |           | v = x*n                                                 | v = x*n                                                  |
  * +-----------+---------------------------------------------------------+----------------------------------------------------------+
  * |           | p = 0                                                   | p = 0                                                    |
  * |           | q = 0                                                   | q = 0                                                    |
  * |           | r = 0                                                   | r = 0                                                    |
  * | Bootstrap | s = x*(1-n)*c/e                                         | s = x*(1-n)                                              |
- * |           | t = see def `externalProtection`                   | t = 0                                                    |
- * |           | u = see def `externalProtection`                   | u = 0                                                    |
+ * |           | t = see function `externalProtection`                   | t = 0                                                    |
+ * |           | u = see function `externalProtection`                   | u = 0                                                    |
  * |           | v = x*n                                                 | v = x*n                                                  |
  * +-----------+---------------------------------------------------------+----------------------------------------------------------+
  * Note that for the sake of illustration, both `m` and `n` are assumed normalized (between 0 and 1).

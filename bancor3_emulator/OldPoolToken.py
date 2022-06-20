@@ -18,7 +18,7 @@ class OldPoolToken(ERC20):
         _symbol,
         _decimals
     ) -> None:
-        super().__init__(_name, _symbol)
+        ERC20().__init__(_name, _symbol)
         self._decimals = _decimals;
 
     '''

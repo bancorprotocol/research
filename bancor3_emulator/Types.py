@@ -114,3 +114,6 @@ class uint:
     @staticmethod
     def _size(other):
         return other.size if type(other) is uint else (len(hex(other)) - 1) // 2 * 8
+
+def mulmod(x, y, z) -> (uint):
+    return uint(256, int(x) * int(y) % int(z))

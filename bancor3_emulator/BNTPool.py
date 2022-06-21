@@ -3,7 +3,7 @@ from Types import uint, uint256
 
 from Math import Math
 from Constants import PPM_RESOLUTION
-import MathEx
+from MathEx import MathEx
 from Vault import Vault
 from PoolToken import PoolToken
 
@@ -27,7 +27,7 @@ class BNTPool(Vault):
         initMasterVault,
         initBNTPoolToken
     ) -> None:
-        Vault().__init__(initBNTGovernance, initVBNTGovernance)
+        super().__init__(initBNTGovernance, initVBNTGovernance)
         self._network = initNetwork;
         self._networkSettings = initNetworkSettings;
         self._masterVault = initMasterVault;

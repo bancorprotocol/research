@@ -3,7 +3,7 @@ import os
 
 sys.path.append(os.path.dirname(__file__) + '/..')
 
-import MathEx
+from MathEx import MathEx, Uint512
 from Fraction import Fraction256
 
 MAX_UINT32 = 2 ** 32 - 1
@@ -38,7 +38,8 @@ comp512Funcs = {
     'lte512': MathEx.lte512,
 };
 
-def toUint512(x): return MathEx.Uint512({'hi': x >> 256, 'lo': x & MAX_UINT256})
+def toUint512(x):
+    return Uint512({'hi': x >> 256, 'lo': x & MAX_UINT256})
 
 def testExp(f):
     print('exp2({} / {})'.format(int(f.n), int(f.d)));

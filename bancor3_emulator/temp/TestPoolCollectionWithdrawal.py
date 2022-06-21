@@ -3,7 +3,7 @@ import os
 
 sys.path.append(os.path.dirname(__file__) + '/..')
 
-import PoolCollectionWithdrawal
+from PoolCollectionWithdrawal import PoolCollectionWithdrawal
 import json
 
 for n in range(8):

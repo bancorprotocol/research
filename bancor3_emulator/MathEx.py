@@ -1,4 +1,4 @@
-from Types import uint, uint256
+from Types import uint, uint256, mulmod
 
 from Math import Math
 from Fraction import Fraction256
@@ -20,6 +20,21 @@ class Sint256:
 '''
  * @dev this library provides a set of complex math operations
 '''
+class MathEx:
+    exp2 = None
+    reducedFraction = None
+    weightedAverage = None
+    isInRange = None
+    toPos256 = None
+    toNeg256 = None
+    mulDivF = None
+    mulDivC = None
+    subMax0 = None
+    gt512 = None
+    lt512 = None
+    gte512 = None
+    lte512 = None
+    mul512 = None
 
 '''
     * @dev returns `2 ^ f` by calculating `e ^ (f * ln(2))`, where `e` is Euler's number:
@@ -309,6 +324,6 @@ def _mulMod(
 ) -> (uint):
     return mulmod(x, y, z);
 
-# built-in
-def mulmod(x, y, z) -> (uint):
-    return uint256(int(x) * int(y) % int(z))
+for key in vars(MathEx).keys():
+    if not key.startswith('__'):
+        setattr(MathEx, key, eval(key))

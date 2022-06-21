@@ -1,5 +1,4 @@
-from collections import defaultdict
-from Solidity import uint, uint8, uint256
+from Solidity import uint, uint8, uint256, mapping
 
 '''
  * @dev Implementation of the {IERC20} interface.
@@ -38,8 +37,8 @@ class ERC20:
     def __init__(self, name_: str, symbol_: str) -> None:
         self._name = name_;
         self._symbol = symbol_;
-        self._balances = defaultdict(lambda: uint256());
-        self._allowances = defaultdict(lambda: defaultdict(lambda: uint256()));
+        self._balances = mapping(lambda: uint256());
+        self._allowances = mapping(lambda: mapping(lambda: uint256()));
         self._totalSupply = uint256();
 
     '''

@@ -1,5 +1,4 @@
-from collections import defaultdict
-from Solidity import uint, uint32, uint256
+from Solidity import uint, uint32, uint256, mapping
 
 from Time import Time
 
@@ -59,8 +58,8 @@ class PendingWithdrawals(Time):
         self._bntPool = initBNTPool;
         self._lockDuration = uint32()
         self._nextWithdrawalRequestId = uint256()
-        self._withdrawalRequestIdsByProvider = defaultdict(lambda: set(uint));
-        self._withdrawalRequests = defaultdict(lambda: WithdrawalRequest());
+        self._withdrawalRequestIdsByProvider = mapping(lambda: set(uint));
+        self._withdrawalRequests = mapping(lambda: WithdrawalRequest());
         self._setLockDuration(PendingWithdrawals.DEFAULT_LOCK_DURATION);
 
     '''

@@ -1,4 +1,4 @@
-from Solidity import uint, uint256, mapping, revert
+from Solidity import uint, uint256, mapping, address, revert
 
 from Math import Math
 from Constants import PPM_RESOLUTION
@@ -83,7 +83,7 @@ class BNTPool(Vault):
         return MathEx.mulDivF(
             val,
             poolTokenSupply,
-            val + self._stakedBalance * (poolTokenSupply - self._poolToken.balanceOf(self))
+            val + self._stakedBalance * (poolTokenSupply - self._poolToken.balanceOf(address(self)))
         );
 
     '''
@@ -96,7 +96,7 @@ class BNTPool(Vault):
      * @inheritdoc IBNTPool
     '''
     def burnFromVault(self, bntAmount):
-        self._masterVault.burn(self._bnt, bntAmount);
+        self._masterVault.burn(address(self._bnt), bntAmount);
 
     '''
      * @inheritdoc IBNTPool
@@ -200,10 +200,10 @@ class BNTPool(Vault):
         self._currentPoolFunding[pool] = newFunding;
 
         # mint pool tokens to the protocol
-        self._poolToken.mint(self, poolTokenAmount);
+        self._poolToken.mint(address(self), poolTokenAmount);
 
         # mint BNT to the vault
-        self._bntGovernance.mint(self._masterVault, bntAmount);
+        self._bntGovernance.mint(address(self._masterVault), bntAmount);
 
     '''
      * @inheritdoc IBNTPool
@@ -239,7 +239,7 @@ class BNTPool(Vault):
         self._poolToken.burn(poolTokenAmount);
 
         # burn all BNT from the master vault
-        self._masterVault.burn(self._bnt, bntAmount);
+        self._masterVault.burn(address(self._bnt), bntAmount);
 
     '''
      * @inheritdoc IBNTPool

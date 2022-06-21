@@ -1,4 +1,4 @@
-from Types import uint256
+from Types import uint128, uint256
 
 from Constants import PPM_RESOLUTION as M
 from MathEx import Sint256
@@ -97,11 +97,11 @@ def calculateWithdrawalAmounts(
     x = uint256(x)
 
     if (
-        a > 2 ** 128 - 1 or
-        b > 2 ** 128 - 1 or
-        c > 2 ** 128 - 1 or
-        e > 2 ** 128 - 1 or
-        w > 2 ** 128 - 1 or
+        a > uint128.max or
+        b > uint128.max or
+        c > uint128.max or
+        e > uint128.max or
+        w > uint128.max or
         m > M or
         n > M or
         x > e

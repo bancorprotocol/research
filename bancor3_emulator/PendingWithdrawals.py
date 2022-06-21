@@ -1,4 +1,4 @@
-from Solidity import uint, uint32, uint256, mapping
+from Solidity import uint, uint32, uint256, mapping, revert
 
 from Time import Time
 
@@ -117,7 +117,7 @@ class PendingWithdrawals(Time):
         request = self._withdrawalRequests[id];
 
         if (request.provider != provider):
-            assert False, "AccessDenied";
+            revert("AccessDenied");
 
         return self._cancelWithdrawal(request, id);
 
@@ -132,11 +132,11 @@ class PendingWithdrawals(Time):
         request = self._withdrawalRequests[id];
 
         if (provider != request.provider):
-            assert False, "AccessDenied";
+            revert("AccessDenied");
 
         currentTime = self._time();
         if (not self._canWithdrawAt(currentTime, request.createdAt)):
-            assert False, "WithdrawalNotAllowed";
+            revert("WithdrawalNotAllowed");
 
         # remove the withdrawal request and its id from the storage
         self._removeWithdrawalRequest(provider, id);
@@ -198,7 +198,7 @@ class PendingWithdrawals(Time):
         });
 
         if (not self._withdrawalRequestIdsByProvider[provider].add(id)):
-            assert False, "AlreadyExists";
+            revert("AlreadyExists");
 
         return id;
 
@@ -228,7 +228,7 @@ class PendingWithdrawals(Time):
     '''
     def _removeWithdrawalRequest(self, provider, id) -> None:
         if (not self._withdrawalRequestIdsByProvider[provider].remove(id)):
-            assert False, "DoesNotExist";
+            revert("DoesNotExist");
 
         del self._withdrawalRequests[id];
 

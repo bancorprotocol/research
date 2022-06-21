@@ -1,4 +1,4 @@
-from Solidity import uint112
+from Solidity import uint112, revert
 
 from Fraction import Fraction256, Fraction112
 from MathEx import MathEx
@@ -46,7 +46,7 @@ class FractionLibrary:
         invFraction = Fraction256({ 'n': fraction.d, 'd': fraction.n });
 
         if (not FractionLibrary.isValid(invFraction)):
-            assert False, "InvalidFraction";
+            revert("InvalidFraction");
 
         return invFraction;
 
@@ -57,7 +57,7 @@ class FractionLibrary:
         invFraction = Fraction112({ 'n': fraction.d, 'd': fraction.n });
 
         if (not FractionLibrary.isValid(invFraction)):
-            assert False, "InvalidFraction";
+            revert("InvalidFraction");
 
         return invFraction;
 

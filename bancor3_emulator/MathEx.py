@@ -1,4 +1,4 @@
-from Solidity import uint, uint256, mulmod
+from Solidity import uint, uint256, mulmod, revert
 
 from Math import Math
 from Fraction import Fraction256
@@ -53,7 +53,7 @@ def exp2(f: Fraction256) -> (Fraction256):
     n = uint256();
 
     if (x >= (ONE << 4)):
-        assert False, "Overflow";
+        revert("Overflow");
 
     z = y = x % (ONE >> 3); # get the input modulo 2^(-3)
     z = (z * y) / ONE;
@@ -122,7 +122,7 @@ def reducedFraction(fraction: Fraction256, max: int) -> (Fraction256):
     scale = Math.ceilDiv(Math.max(fraction.n, fraction.d), max);
     reduced = Fraction256({ 'n': fraction.n / scale, 'd': fraction.d / scale });
     if (reduced.d == 0):
-        assert False, "InvalidFraction";
+        revert("InvalidFraction");
 
     return reduced;
 
@@ -184,7 +184,7 @@ def mulDivF(
 
     # assert `x * y / z < 2 ^ 256`
     if (xy.hi >= z):
-        assert False, "Overflow";
+        revert("Overflow");
 
     m = _mulMod(x, y, z); # `m = x * y % z`
     n = _sub512(xy, m); # `n = x * y - m` hence `n / z = floor(x * y / z)`
@@ -211,7 +211,7 @@ def mulDivC(
     w = mulDivF(x, y, z);
     if (_mulMod(x, y, z) > 0):
         if (w >= uint256.max):
-            assert False, "Overflow";
+            revert("Overflow");
 
         return w + 1;
     return w;

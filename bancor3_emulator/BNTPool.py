@@ -1,4 +1,4 @@
-from Solidity import uint, uint256, mapping
+from Solidity import uint, uint256, mapping, revert
 
 from Math import Math
 from Constants import PPM_RESOLUTION
@@ -145,7 +145,7 @@ class BNTPool(Vault):
         # have been already deposited back from the network)
         underlyingAmount = self._poolTokenToUnderlying(poolTokenAmount);
         if (bntAmount > underlyingAmount):
-            assert False, "InvalidParam";
+            revert("InvalidParam");
 
         amounts = self._withdrawalAmounts(bntAmount);
 
@@ -177,7 +177,7 @@ class BNTPool(Vault):
 
         # verify that the new funding amount doesn't exceed the limit
         if (newFunding > fundingLimit):
-            assert False, "FundingLimitExceeded";
+            revert("FundingLimitExceeded");
 
         # calculate the pool token amount to mint
         currentStakedBalance = self._stakedBalance;
@@ -186,7 +186,7 @@ class BNTPool(Vault):
         if (poolTokenTotalSupply == 0):
             # if this is the initial liquidity provision - use a one-to-one pool token to BNT rate
             if (currentStakedBalance > 0):
-                assert False, "InvalidStakedBalance";
+                revert("InvalidStakedBalance");
 
             poolTokenAmount = bntAmount;
         else:

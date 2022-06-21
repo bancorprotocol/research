@@ -1,4 +1,4 @@
-from Solidity import uint128, uint256
+from Solidity import uint128, uint256, revert
 
 from Constants import PPM_RESOLUTION as M
 from MathEx import Sint256, Uint512, MathEx
@@ -107,7 +107,7 @@ def calculateWithdrawalAmounts(
         n > M or
         x > e
     ):
-        assert False, "PoolCollectionWithdrawalInputInvalid";
+        revert("PoolCollectionWithdrawalInputInvalid");
 
     y = (x * (M - n)) / M;
 

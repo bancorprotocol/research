@@ -1,5 +1,4 @@
-from collections import defaultdict
-from Solidity import uint, uint256
+from Solidity import uint, uint256, mapping
 
 from Math import Math
 from Constants import PPM_RESOLUTION
@@ -33,7 +32,7 @@ class BNTPool(Vault):
         self._masterVault = initMasterVault;
         self._poolToken = initBNTPoolToken;
         self._stakedBalance = uint256()
-        self._currentPoolFunding = defaultdict(lambda: uint256())
+        self._currentPoolFunding = mapping(lambda: uint256())
 
     '''
      * @inheritdoc IBNTPool

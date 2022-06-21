@@ -1,4 +1,4 @@
-from Solidit import uint256, uint112
+from solidity import uint256, uint112
 
 class Fraction:
     def __init__(self, cast, f) -> None:

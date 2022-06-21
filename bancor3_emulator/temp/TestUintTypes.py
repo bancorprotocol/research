@@ -3,11 +3,11 @@ import os
 
 sys.path.append(os.path.dirname(__file__) + '/..')
 
-from Solidit import uint
-from Solidit import uint32
-from Solidit import uint112
-from Solidit import uint128
-from Solidit import uint256
+from solidity import uint
+from solidity import uint32
+from solidity import uint112
+from solidity import uint128
+from solidity import uint256
 
 for n in [0, 2, 32, 112, 128, 256]:
     for k in [-1, 0, +1]:

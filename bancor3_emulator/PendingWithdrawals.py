@@ -1,4 +1,4 @@
-from Solidit import uint, uint32, uint256, mapping, revert
+from solidity import uint, uint32, uint256, mapping, revert
 
 from Time import Time
 

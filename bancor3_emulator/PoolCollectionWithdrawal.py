@@ -1,4 +1,4 @@
-from solidity import uint128, uint256, revert
+from solidity import uint128, uint256, revert, library
 
 from Constants import PPM_RESOLUTION as M
 from MathEx import Sint256, Uint512, MathEx
@@ -325,6 +325,4 @@ def mulSubMulDivF(
 ):
     return a * b - MathEx.mulDivF(x, y, z);
 
-for key in vars(PoolCollectionWithdrawal).keys():
-    if not key.startswith('__'):
-        setattr(PoolCollectionWithdrawal, key, eval(key))
+library(vars(), PoolCollectionWithdrawal)

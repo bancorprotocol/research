@@ -1,4 +1,4 @@
-from solidity import uint, uint256, mulmod, revert
+from solidity import uint, uint256, mulmod, revert, library
 
 from Math import Math
 from Fraction import Fraction256
@@ -324,6 +324,4 @@ def _mulMod(
 ) -> (uint):
     return mulmod(x, y, z);
 
-for key in vars(MathEx).keys():
-    if not key.startswith('__'):
-        setattr(MathEx, key, eval(key))
+library(vars(), MathEx)

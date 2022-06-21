@@ -1,4 +1,4 @@
-from solidity import uint112, revert
+from solidity import uint112, revert, library
 
 from Fraction import Fraction256, Fraction112
 from MathEx import MathEx
@@ -58,6 +58,4 @@ def toFraction112(fraction: Fraction256) -> (Fraction112):
 def fromFraction112(fraction: Fraction112) -> (Fraction256):
     return Fraction256({ 'n': fraction.n, 'd': fraction.d });
 
-for key in vars(FractionLibrary).keys():
-    if not key.startswith('__'):
-        setattr(FractionLibrary, key, eval(key))
+library(vars(), FractionLibrary)

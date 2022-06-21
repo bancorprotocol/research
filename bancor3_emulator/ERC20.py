@@ -1,4 +1,4 @@
-from Solidity import uint, uint8, uint256, mapping
+from Solidit import uint, uint8, uint256, mapping
 
 '''
  * @dev Implementation of the {IERC20} interface.

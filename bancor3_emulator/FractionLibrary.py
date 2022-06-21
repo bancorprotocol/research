@@ -1,4 +1,4 @@
-from Solidity import uint112, revert
+from Solidit import uint112, revert
 
 from Fraction import Fraction256, Fraction112
 from MathEx import MathEx

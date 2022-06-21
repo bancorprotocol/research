@@ -1,4 +1,4 @@
-from Solidity import uint, uint256, mapping, address, revert
+from Solidit import uint, uint256, mapping, address, revert
 
 from Math import Math
 from Constants import PPM_RESOLUTION

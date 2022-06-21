@@ -276,7 +276,7 @@ class ERC20:
         amount
     ):
         currentAllowance = self.allowance(owner, spender);
-        if (currentAllowance != 2 ** 256 - 1):
+        if (currentAllowance != uint256.max):
             assert currentAllowance >= amount, "ERC20: insufficient allowance";
             uint.UNCHECKED = True
             self._approve(owner, spender, currentAllowance - amount);

@@ -195,7 +195,7 @@ def mulDivC(
 
     w = mulDivF(x, y, z);
     if (_mulMod(x, y, z) > 0):
-        if (w >= 2 ** 256 - 1):
+        if (w >= uint256.max):
             assert False, "Overflow";
 
         return w + 1;
@@ -297,7 +297,7 @@ def _unsafeMul(x, y) -> (uint):
     * @dev returns `x * y % (2 ^ 256 - 1)`
 '''
 def _mulModMax(x, y) -> (uint):
-    return mulmod(x, y, 2 ** 256 - 1);
+    return mulmod(x, y, uint256.max);
 
 '''
     * @dev returns `x * y % z`

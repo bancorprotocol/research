@@ -177,9 +177,9 @@ class ERC20:
         owner = _msgSender;
         currentAllowance = self._allowances[owner][spender];
         assert currentAllowance >= subtractedValue, "ERC20: decreased allowance below zero";
-        uint.UNCHECKED = True
+        uint.unchecked = True
         self._approve(owner, spender, currentAllowance - subtractedValue);
-        uint.UNCHECKED = False
+        uint.unchecked = False
 
         return True;
 
@@ -204,9 +204,9 @@ class ERC20:
     ):
         fromBalance = self._balances[from_];
         assert fromBalance >= amount, "ERC20: transfer amount exceeds balance";
-        uint.UNCHECKED = True
+        uint.unchecked = True
         self._balances[from_] = fromBalance - amount;
-        uint.UNCHECKED = False
+        uint.unchecked = False
         self._balances[to] += amount;
 
     ''' @dev Creates `amount` tokens and assigns them to `account`, increasing
@@ -236,9 +236,9 @@ class ERC20:
     def _burn(self, account, amount):
         accountBalance = self._balances[account];
         assert accountBalance >= amount, "ERC20: burn amount exceeds balance";
-        uint.UNCHECKED = True
+        uint.unchecked = True
         self._balances[account] = accountBalance - amount;
-        uint.UNCHECKED = False
+        uint.unchecked = False
         self._totalSupply -= amount;
 
     '''
@@ -277,6 +277,6 @@ class ERC20:
         currentAllowance = self.allowance(owner, spender);
         if (currentAllowance != uint256.max):
             assert currentAllowance >= amount, "ERC20: insufficient allowance";
-            uint.UNCHECKED = True
+            uint.unchecked = True
             self._approve(owner, spender, currentAllowance - amount);
-            uint.UNCHECKED = False
+            uint.unchecked = False

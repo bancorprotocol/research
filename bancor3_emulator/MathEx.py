@@ -45,7 +45,7 @@ class MathEx:
     * - For example: e^5.521692859 = e^(4 + 1 + 0.5 + 0.021692859) = e^4 * e^1 * e^0.5 * e^0.021692859
 '''
 def exp2(f: Fraction256) -> (Fraction256):
-    uint.UNCHECKED = True
+    uint.unchecked = True
 
     x = mulDivF(LN2, f.n, f.d);
     y = uint256();
@@ -111,7 +111,7 @@ def exp2(f: Fraction256) -> (Fraction256):
     if ((x & (ONE << 3)) != 0):
         n = (n * 0x0002bf84208204f5977f9a8cf01fdc307) / 0x0000003c6ab775dd0b95b4cbee7e65d11; # multiply by e^(2^+3)
 
-    uint.UNCHECKED = False
+    uint.unchecked = False
 
     return Fraction256({ 'n': n, 'd': ONE });
 
@@ -285,27 +285,27 @@ def _inv256(d) -> (uint):
     * @dev returns `(x + y) % 2 ^ 256`
 '''
 def _unsafeAdd(x, y) -> (uint):
-    uint.UNCHECKED = True
+    uint.unchecked = True
     z = uint256(x) + uint256(y);
-    uint.UNCHECKED = False
+    uint.unchecked = False
     return z
 
 '''
     * @dev returns `(x - y) % 2 ^ 256`
 '''
 def _unsafeSub(x, y) -> (uint):
-    uint.UNCHECKED = True
+    uint.unchecked = True
     z = uint256(x) - uint256(y);
-    uint.UNCHECKED = False
+    uint.unchecked = False
     return z
 
 '''
     * @dev returns `(x * y) % 2 ^ 256`
 '''
 def _unsafeMul(x, y) -> (uint):
-    uint.UNCHECKED = True
+    uint.unchecked = True
     z = uint256(x) * uint256(y);
-    uint.UNCHECKED = False
+    uint.unchecked = False
     return z
 
 '''

@@ -110,7 +110,3 @@ class uint:
     @staticmethod
     def _size(other):
         return other.size if type(other) is uint else (len(hex(other)) - 1) // 2 * 8
-
-for size in uint.sizes:
-    exec('def uint{}(data = 0): return uint({}, data)'.format(size, size))
-    exec('uint{}.max = uint{}(2 ** {} - 1)'.format(size, size, size))

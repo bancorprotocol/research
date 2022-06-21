@@ -1,5 +1,5 @@
 from collections import defaultdict
-from Types import uint, uint8, uint256
+from Solidity import uint, uint8, uint256
 
 '''
  * @dev Implementation of the {IERC20} interface.

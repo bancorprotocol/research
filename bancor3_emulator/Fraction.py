@@ -1,4 +1,4 @@
-from Types import uint256, uint112
+from Solidity import uint256, uint112
 
 class Fraction:
     def __init__(self, cast, f) -> None:

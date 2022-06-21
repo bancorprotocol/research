@@ -1,4 +1,4 @@
-from Types import uint128, uint256
+from Solidity import uint128, uint256
 
 from Constants import PPM_RESOLUTION as M
 from MathEx import Sint256, Uint512, MathEx

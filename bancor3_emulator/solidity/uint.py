@@ -1,5 +1,5 @@
 class uint:
-    UNCHECKED = False
+    unchecked = False
 
     sizes = [(n + 1) * 8 for n in range(32)]
 
@@ -100,7 +100,7 @@ class uint:
     def _new(self, other, op):
         data = op(self.data, uint._data(other))
         size = max(self.size, uint._size(other))
-        assert uint.UNCHECKED or 0 <= data <= 2 ** size - 1
+        assert uint.unchecked or 0 <= data <= 2 ** size - 1
         return uint(size, data)
 
     @staticmethod

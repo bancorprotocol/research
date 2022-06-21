@@ -1,5 +1,5 @@
 from collections import defaultdict
-from Types import uint, uint32, uint256
+from Solidity import uint, uint32, uint256
 
 from Time import Time
 

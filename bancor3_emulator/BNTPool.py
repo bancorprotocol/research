@@ -1,5 +1,5 @@
 from collections import defaultdict
-from Types import uint, uint256
+from Solidity import uint, uint256
 
 from Math import Math
 from Constants import PPM_RESOLUTION

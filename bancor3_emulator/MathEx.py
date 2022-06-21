@@ -1,4 +1,4 @@
-from Types import uint, uint256, mulmod
+from Solidity import uint, uint256, mulmod
 
 from Math import Math
 from Fraction import Fraction256

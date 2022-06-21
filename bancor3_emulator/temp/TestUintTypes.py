@@ -64,7 +64,7 @@ for op in ops.keys():
                 assert not str(error)
                 assert not (0 <= ops[op](int(x), int(y)) <= 2 ** x.size - 1), 'logical error'
 
-uint.UNCHECKED = True
+uint.unchecked = True
 for op in ops.keys():
     print('Test unchecked {}:'.format(op))
     for x in [n for n in arr if type(n) is not int]:
@@ -72,7 +72,7 @@ for op in ops.keys():
             z = ops[op](x, y)
             Print(op, x, y, z)
             assert int(z) == ops[op](int(x), int(y)) % 2 ** max(uint._size(x), uint._size(y)), 'arithmetic error'
-uint.UNCHECKED = False
+uint.unchecked = False
 
 print('Test +=')
 for n in [0, 2, 32, 112, 128, 256]:
@@ -89,7 +89,7 @@ for n in [0, 2, 32, 112, 128, 256]:
                     assert not str(error)
                     assert x.size < max(rcast(m).size, len(bin(m + m)) - 2), 'logical error'
 
-uint.UNCHECKED = True
+uint.unchecked = True
 print('Test unchecked +=')
 for n in [0, 2, 32, 112, 128, 256]:
     for k in [-1, 0, +1]:
@@ -104,7 +104,7 @@ for n in [0, 2, 32, 112, 128, 256]:
                 except AssertionError as error:
                     assert not str(error)
                     assert x.size < max(rcast(m).size, len(bin(m + m)) - 2), 'logical error'
-uint.UNCHECKED = False
+uint.unchecked = False
 
 print('Test *=')
 for n in [0, 2, 32, 112, 128, 256]:
@@ -121,7 +121,7 @@ for n in [0, 2, 32, 112, 128, 256]:
                     assert not str(error)
                     assert x.size < max(rcast(m).size, len(bin(m * m)) - 2), 'logical error'
 
-uint.UNCHECKED = True
+uint.unchecked = True
 print('Test unchecked *=')
 for n in [0, 2, 32, 112, 128, 256]:
     for k in [-1, 0, +1]:
@@ -136,4 +136,4 @@ for n in [0, 2, 32, 112, 128, 256]:
                 except AssertionError as error:
                     assert not str(error)
                     assert x.size < max(rcast(m).size, len(bin(m * m)) - 2), 'logical error'
-uint.UNCHECKED = False
+uint.unchecked = False

@@ -1,11 +1,8 @@
 sizes = [(n + 1) * 8 for n in range(32)]
 
 for size in sizes:
-    exec('\n'.join([
-        'def uint{}(data = 0):'.format(size),
-        '    uint{}.max = 2 ** {} - 1'.format(size, size),
-        '    return uint({}, data)'.format(size)
-    ]))
+    exec('def uint{}(data = 0): return uint({}, data)'.format(size, size))
+    exec('uint{}.max = 2 ** {} - 1'.format(size, size))
 
 class uint:
     UNCHECKED = False

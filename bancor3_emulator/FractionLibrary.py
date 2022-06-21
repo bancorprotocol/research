@@ -1,7 +1,7 @@
 from Types import uint112
 
 from Fraction import Fraction256, Fraction112
-import MathEx
+from MathEx import MathEx
 
 # solhint-disable-next-line func-visibility
 def zeroFraction256() -> (Fraction256):

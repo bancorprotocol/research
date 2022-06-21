@@ -1,8 +1,7 @@
 from Types import uint128, uint256
 
 from Constants import PPM_RESOLUTION as M
-from MathEx import Sint256
-import MathEx
+from MathEx import Sint256, Uint512, MathEx
 
 '''
  * @dev This library implements the mathematics behind base-token withdrawal.
@@ -54,6 +53,8 @@ import MathEx
  * Note that for the sake of illustration, both `m` and `n` are assumed normalized (between 0 and 1).
  * During runtime, it is taken into account that they are given in PPM units (between 0 and 1000000).
 '''
+class PoolCollectionWithdrawal:
+    calculateWithdrawalAmounts = None
 
 class Output:
     def __init__(self):
@@ -157,8 +158,8 @@ def affordableDeficit(
     n, # <= M == 1000000
     x ## <  e*c/(b+c) <= e <= 2**128-1
 ) -> (bool):
-    lhs = MathEx.mul512(b * e, f * m + e * n);
-    rhs = MathEx.mul512(f * x, g * (M - m));
+    lhs: Uint512 = MathEx.mul512(b * e, f * m + e * n);
+    rhs: Uint512 = MathEx.mul512(f * x, g * (M - m));
     return MathEx.gt512(lhs, rhs);
 
 '''
@@ -172,8 +173,8 @@ def affordableSurplus(
     n, # <= M == 1000000
     x ## <  e*c/(b+c) <= e <= 2**128-1
 ) -> (bool):
-    lhs = MathEx.mul512(b * e, (f * m + e * n) * M);
-    rhs = MathEx.mul512(f * x, (f * M + e * n) * (M - m));
+    lhs: Uint512 = MathEx.mul512(b * e, (f * m + e * n) * M);
+    rhs: Uint512 = MathEx.mul512(f * x, (f * M + e * n) * (M - m));
     return MathEx.gt512(lhs, rhs); # `x < e*c/(b+c)` --> `f*x < e*c*(b+c-e)/(b+c) <= e*c <= 2**256-1`
 
 '''
@@ -323,3 +324,7 @@ def mulSubMulDivF(
     z
 ):
     return a * b - MathEx.mulDivF(x, y, z);
+
+for key in vars(PoolCollectionWithdrawal).keys():
+    if not key.startswith('__'):
+        setattr(PoolCollectionWithdrawal, key, eval(key))

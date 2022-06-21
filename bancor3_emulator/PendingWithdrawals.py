@@ -53,7 +53,7 @@ class PendingWithdrawals(Time):
         initBNT,
         initBNTPool
     ) -> None:
-        Time().__init__(block)
+        super().__init__(block)
         self._network = initNetwork;
         self._bnt = initBNT;
         self._bntPool = initBNTPool;

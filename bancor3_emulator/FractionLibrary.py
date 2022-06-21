@@ -15,62 +15,49 @@ def zeroFraction112() -> (Fraction112):
  * @dev this library provides a set of fraction operations
 '''
 class FractionLibrary:
-    '''
-     * @dev returns whether a standard fraction is valid
-    '''
-    def isValid(fraction: Fraction256) -> (bool):
-        return fraction.d != 0;
+    isValid = None
+    isPositive = None
+    inverse = None
+    toFraction112 = None
+    fromFraction112 = None
 
-    '''
-     * @dev returns whether a 112-bit fraction is valid
-    '''
-    def isValid(fraction: Fraction112) -> (bool):
-        return fraction.d != 0;
+'''
+    * @dev returns whether a given fraction is valid
+'''
+def isValid(fraction) -> (bool):
+    return fraction.d != 0;
 
-    '''
-     * @dev returns whether a standard fraction is positive
-    '''
-    def isPositive(fraction: Fraction256) -> (bool):
-        return FractionLibrary.isValid(fraction) and fraction.n != 0;
+'''
+    * @dev returns whether a given fraction is positive
+'''
+def isPositive(fraction) -> (bool):
+    return isValid(fraction) and fraction.n != 0;
 
-    '''
-     * @dev returns whether a 112-bit fraction is positive
-    '''
-    def isPositive(fraction: Fraction112) -> (bool):
-        return FractionLibrary.isValid(fraction) and fraction.n != 0;
+'''
+    * @dev returns the inverse of a given fraction
+'''
+def inverse(fraction):
+    invFraction = type(fraction)({ 'n': fraction.d, 'd': fraction.n });
 
-    '''
-     * @dev returns the inverse of a given fraction
-    '''
-    def inverse(fraction: Fraction256) -> (Fraction256):
-        invFraction = Fraction256({ 'n': fraction.d, 'd': fraction.n });
+    if (not isValid(invFraction)):
+        revert("InvalidFraction");
 
-        if (not FractionLibrary.isValid(invFraction)):
-            revert("InvalidFraction");
+    return invFraction;
 
-        return invFraction;
+'''
+    * @dev reduces a standard fraction to a 112-bit fraction
+'''
+def toFraction112(fraction: Fraction256) -> (Fraction112):
+    reducedFraction = MathEx.reducedFraction(fraction, uint112.max);
 
-    '''
-     * @dev returns the inverse of a given fraction
-    '''
-    def inverse(fraction: Fraction112) -> (Fraction112):
-        invFraction = Fraction112({ 'n': fraction.d, 'd': fraction.n });
+    return Fraction112({ 'n': uint112(reducedFraction.n), 'd': uint112(reducedFraction.d) });
 
-        if (not FractionLibrary.isValid(invFraction)):
-            revert("InvalidFraction");
+'''
+    * @dev expands a 112-bit fraction to a standard fraction
+'''
+def fromFraction112(fraction: Fraction112) -> (Fraction256):
+    return Fraction256({ 'n': fraction.n, 'd': fraction.d });
 
-        return invFraction;
-
-    '''
-     * @dev reduces a standard fraction to a 112-bit fraction
-    '''
-    def toFraction112(fraction: Fraction256) -> (Fraction112):
-        reducedFraction = MathEx.reducedFraction(fraction, uint112.max);
-
-        return Fraction112({ 'n': uint112(reducedFraction.n), 'd': uint112(reducedFraction.d) });
-
-    '''
-     * @dev expands a 112-bit fraction to a standard fraction
-    '''
-    def fromFraction112(fraction: Fraction112) -> (Fraction256):
-        return Fraction256({ 'n': fraction.n, 'd': fraction.d });
+for key in vars(FractionLibrary).keys():
+    if not key.startswith('__'):
+        setattr(FractionLibrary, key, eval(key))

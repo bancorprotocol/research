@@ -1,4 +1,4 @@
-from Solidit import uint, uint32
+from solidity import uint, uint32
 
 '''
  * @dev this contract abstracts the block timestamp in order to allow for more flexible control in tests

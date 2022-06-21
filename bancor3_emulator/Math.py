@@ -1,4 +1,4 @@
-from Solidit import uint256
+from solidity import uint256
 
 class Math:
     '''

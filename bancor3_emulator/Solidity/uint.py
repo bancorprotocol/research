@@ -1,14 +1,10 @@
-sizes = [(n + 1) * 8 for n in range(32)]
-
-for size in sizes:
-    exec('def uint{}(data = 0): return uint({}, data)'.format(size, size))
-    exec('uint{}.max = 2 ** {} - 1'.format(size, size))
-
 class uint:
     UNCHECKED = False
 
+    sizes = [(n + 1) * 8 for n in range(32)]
+
     def __init__(self, size, other):
-        assert size in sizes
+        assert size in uint.sizes
         self.size = size
         self.data = uint._data(other) % 2 ** size
 
@@ -114,3 +110,7 @@ class uint:
     @staticmethod
     def _size(other):
         return other.size if type(other) is uint else (len(hex(other)) - 1) // 2 * 8
+
+for size in uint.sizes:
+    exec('def uint{}(data = 0): return uint({}, data)'.format(size, size))
+    exec('uint{}.max = uint{}(2 ** {} - 1)'.format(size, size, size))

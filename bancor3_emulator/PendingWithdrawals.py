@@ -1,4 +1,4 @@
-from solidity import uint, uint32, uint256, mapping, revert
+from solidity import uint, uint32, uint256, mapping, days, revert
 
 from Time import Time
 
@@ -42,7 +42,7 @@ class CompletedWithdrawal:
  * @dev Pending Withdrawals contract
 '''
 class PendingWithdrawals(Time):
-    DEFAULT_LOCK_DURATION = uint32(7 * 24 * 60 * 60);
+    DEFAULT_LOCK_DURATION = uint32(7 * days);
 
     '''
      * @dev a "virtual" constructor that is only used to set immutable state variables

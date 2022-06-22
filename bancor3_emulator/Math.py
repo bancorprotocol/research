@@ -1,10 +1,9 @@
 from solidity import uint256
 
+'''
+* @dev Standard math utilities missing in the Solidity language.
+'''
 class Math:
-    '''
-    * @dev Standard math utilities missing in the Solidity language.
-    '''
-
     '''
         * @dev Returns the largest of two numbers.
     '''

@@ -290,4 +290,4 @@ class BNTPool(Vault):
 
         bntAmount -= withdrawalFeeAmount;
 
-        return BNTPool.InternalWithdrawalAmounts({ 'bntAmount': bntAmount, 'withdrawalFeeAmount': withdrawalFeeAmount });
+        return self.InternalWithdrawalAmounts({ 'bntAmount': bntAmount, 'withdrawalFeeAmount': withdrawalFeeAmount });

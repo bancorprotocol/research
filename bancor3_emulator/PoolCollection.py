@@ -1,6 +1,7 @@
 from solidity import uint, uint8, uint16, uint32, uint128, uint256, mapping, address, payable, revert
 
 from Math import Math
+from SafeCast import SafeCast
 from Constants import PPM_RESOLUTION
 from BlockNumber import BlockNumber
 from FractionLibrary import Fraction256, Fraction112, zeroFraction112
@@ -830,8 +831,8 @@ class PoolCollection(BlockNumber):
         );
 
         # trading liquidity is assumed to never exceed 128 bits (the cast below will revert("otherwise)
-        liquidity.baseTokenTradingLiquidity = uint128(amounts.newBaseTokenTradingLiquidity);
-        liquidity.bntTradingLiquidity = uint128(amounts.newBNTTradingLiquidity);
+        liquidity.baseTokenTradingLiquidity = SafeCast.toUint128(amounts.newBaseTokenTradingLiquidity);
+        liquidity.bntTradingLiquidity = SafeCast.toUint128(amounts.newBNTTradingLiquidity);
 
         if (amounts.bntProtocolHoldingsDelta.value > 0):
             assert(amounts.bntProtocolHoldingsDelta.isNeg); # currently no support for requesting funding here
@@ -1046,8 +1047,8 @@ class PoolCollection(BlockNumber):
 
         # trading liquidity is assumed to never exceed 128 bits (the cast below will revert("otherwise)
         newLiquidity = PoolLiquidity({
-            'bntTradingLiquidity': uint128(action.newBNTTradingLiquidity),
-            'baseTokenTradingLiquidity': uint128(action.newBaseTokenTradingLiquidity),
+            'bntTradingLiquidity': SafeCast.toUint128(action.newBNTTradingLiquidity),
+            'baseTokenTradingLiquidity': SafeCast.toUint128(action.newBaseTokenTradingLiquidity),
             'stakedBalance': liquidity.stakedBalance
         });
 
@@ -1303,8 +1304,8 @@ class PoolCollection(BlockNumber):
 
         # trading liquidity is assumed to never exceed 128 bits (the cast below will revert("otherwise)
         newLiquidity = PoolLiquidity({
-            'bntTradingLiquidity': uint128(result.sourceBalance if result.isSourceBNT else result.targetBalance),
-            'baseTokenTradingLiquidity': uint128(
+            'bntTradingLiquidity': SafeCast.toUint128(result.sourceBalance if result.isSourceBNT else result.targetBalance),
+            'baseTokenTradingLiquidity': SafeCast.toUint128(
                 result.targetBalance if result.isSourceBNT else result.sourceBalance
             ),
             'stakedBalance': result.stakedBalance

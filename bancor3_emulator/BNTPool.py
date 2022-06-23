@@ -4,7 +4,7 @@ from Math import Math
 from Constants import PPM_RESOLUTION
 from MathEx import MathEx
 from Vault import Vault
-from PoolToken import PoolToken
+from PoolToken import PoolToken as IPoolToken
 
 '''
  * @dev BNT Pool contract
@@ -37,7 +37,7 @@ class BNTPool(Vault):
     '''
      * @inheritdoc IBNTPool
     '''
-    def poolToken(self) -> (PoolToken):
+    def poolToken(self) -> (IPoolToken):
         return self._poolToken;
 
     '''

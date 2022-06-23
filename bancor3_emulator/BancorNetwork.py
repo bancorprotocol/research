@@ -4,7 +4,7 @@ from EnumerableSet import EnumerableSet
 from Constants import PPM_RESOLUTION
 from Time import Time
 from MathEx import MathEx
-from PoolCollection import PoolCollection
+from PoolCollection import PoolCollection as IPoolCollection
 
 '''
  * @dev Bancor Network contract
@@ -150,7 +150,7 @@ class BancorNetwork(Time):
     '''
      * @inheritdoc IBancorNetwork
     '''
-    def collectionByPool(self, pool) -> (PoolCollection):
+    def collectionByPool(self, pool) -> (IPoolCollection):
         return self._collectionByPool[pool];
 
     '''
@@ -709,7 +709,7 @@ class BancorNetwork(Time):
     '''
      * @dev verifies that the specified pool is managed by a valid pool collection and returns it
     '''
-    def _poolCollection(self, token) -> (PoolCollection):
+    def _poolCollection(self, token) -> (IPoolCollection):
         # verify that the pool is managed by a valid pool collection
         poolCollection = self._collectionByPool[token];
         if (address(poolCollection) == address(0)):
@@ -739,7 +739,7 @@ class BancorNetwork(Time):
     '''
      * @dev finds a pool collection with the given type and version
     '''
-    def _findPoolCollection(self, poolType, poolVersion) -> (PoolCollection):
+    def _findPoolCollection(self, poolType, poolVersion) -> (IPoolCollection):
         # note that there's no risk of using an unbounded loop here since the list of all the active pool collections
         # is always going to remain sufficiently small
         length = self._poolCollections.length();

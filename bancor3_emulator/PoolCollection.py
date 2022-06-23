@@ -7,7 +7,7 @@ from Constants import PPM_RESOLUTION
 from BlockNumber import BlockNumber
 from FractionLibrary import Fraction256, Fraction112, zeroFraction112
 from MathEx import Sint256, MathEx
-from PoolToken import PoolToken
+from PoolToken import PoolToken as IPoolToken
 from PoolCollectionWithdrawal import PoolCollectionWithdrawal
 
 class PoolLiquidity:
@@ -304,7 +304,7 @@ class PoolCollection(BlockNumber):
     '''
      * @inheritdoc IPoolCollection
     '''
-    def poolToken(self, pool) -> (PoolToken):
+    def poolToken(self, pool) -> (IPoolToken):
         return self._poolData[pool].poolToken;
 
     '''

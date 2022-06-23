@@ -1,5 +1,6 @@
 from solidity import uint, uint32, uint256, mapping, days, revert
 
+from EnumerableSet import EnumerableSet
 from Time import Time
 
 '''
@@ -58,7 +59,7 @@ class PendingWithdrawals(Time):
         self._bntPool = initBNTPool;
         self._lockDuration = uint32()
         self._nextWithdrawalRequestId = uint256()
-        self._withdrawalRequestIdsByProvider = mapping(lambda: set(uint));
+        self._withdrawalRequestIdsByProvider = mapping(lambda: EnumerableSet());
         self._withdrawalRequests = mapping(lambda: WithdrawalRequest());
         self._setLockDuration(PendingWithdrawals.DEFAULT_LOCK_DURATION);
 
@@ -85,13 +86,13 @@ class PendingWithdrawals(Time):
     '''
      * @inheritdoc IPendingWithdrawals
     '''
-    def withdrawalRequestCount(self, provider) -> (uint):
+    def withdrawalRequestCount(self, provider) -> (int):
         return self._withdrawalRequestIdsByProvider[provider].length();
 
     '''
      * @inheritdoc IPendingWithdrawals
     '''
-    def withdrawalRequestIds(self, provider) -> (list(uint)):
+    def withdrawalRequestIds(self, provider) -> (list):
         return self._withdrawalRequestIdsByProvider[provider].values();
 
     '''

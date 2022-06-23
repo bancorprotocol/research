@@ -1,5 +1,6 @@
 from solidity import uint, uint8, uint16, uint32, uint128, uint256, mapping, address, payable, revert
 
+from EnumerableSet import EnumerableSet
 from Math import Math
 from SafeCast import SafeCast
 from Constants import PPM_RESOLUTION
@@ -214,7 +215,7 @@ class PoolCollection(BlockNumber):
         self._poolData = mapping(lambda: object);
 
         # the set of all pools which are managed by this pool collection
-        self._pools = set();
+        self._pools = EnumerableSet();
 
         # the default trading fee (in units of PPM)
         self._defaultTradingFeePPM = uint32();
@@ -236,14 +237,14 @@ class PoolCollection(BlockNumber):
     '''
      * @inheritdoc IPoolCollection
     '''
-    def pools(self) -> (set):
-        return self._pools;
+    def pools(self) -> (list):
+        return self._pools.values();
 
     '''
      * @inheritdoc IPoolCollection
     '''
-    def poolCount(self) -> (uint):
-        return len(self._pools);
+    def poolCount(self) -> (int):
+        return self._pools.length();
 
     '''
      * @dev sets the default trading fee (in units of PPM)

@@ -61,7 +61,7 @@ class PendingWithdrawals(Time):
         self._nextWithdrawalRequestId = uint256()
         self._withdrawalRequestIdsByProvider = mapping(lambda: EnumerableSet());
         self._withdrawalRequests = mapping(lambda: WithdrawalRequest());
-        self._setLockDuration(PendingWithdrawals.DEFAULT_LOCK_DURATION);
+        self._setLockDuration(self.DEFAULT_LOCK_DURATION);
 
     '''
      * @inheritdoc IPendingWithdrawals

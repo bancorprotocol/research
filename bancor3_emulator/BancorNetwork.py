@@ -1,5 +1,6 @@
 from solidity import uint, uint256, mapping, address, payable, revert
 
+from EnumerableSet import EnumerableSet
 from Constants import PPM_RESOLUTION
 from Time import Time
 from MathEx import MathEx
@@ -84,10 +85,10 @@ class BancorNetwork(Time):
         self._poolMigrator = initPoolMigrator;
 
         # the set of all valid pool collections
-        self._poolCollections = set();
+        self._poolCollections = EnumerableSet();
 
         # the set of all pools
-        self._liquidityPools = set();
+        self._liquidityPools = EnumerableSet();
 
         # a mapping between pools and their respective pool collections
         self._collectionByPool = mapping(lambda: address());
@@ -137,14 +138,14 @@ class BancorNetwork(Time):
     '''
      * @inheritdoc IBancorNetwork
     '''
-    def poolCollections(self) -> (set):
-        return self._poolCollections;
+    def poolCollections(self) -> (list):
+        return self._poolCollections.values();
 
     '''
      * @inheritdoc IBancorNetwork
     '''
-    def liquidityPools(self) -> (set):
-        return self._liquidityPools;
+    def liquidityPools(self) -> (list):
+        return self._liquidityPools.values();
 
     '''
      * @inheritdoc IBancorNetwork
@@ -741,7 +742,7 @@ class BancorNetwork(Time):
     def _findPoolCollection(self, poolType, poolVersion) -> (PoolCollection):
         # note that there's no risk of using an unbounded loop here since the list of all the active pool collections
         # is always going to remain sufficiently small
-        length = len(self._poolCollections.length);
+        length = self._poolCollections.length();
         for i in range(length):
             poolCollection = self._poolCollections.at(i);
             if ((poolCollection.poolType() == poolType and poolCollection.version() == poolVersion)):

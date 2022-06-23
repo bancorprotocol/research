@@ -99,7 +99,7 @@ class BancorNetwork(Time):
     '''
      * @dev returns the pending network fee amount to be burned by the vortex
     '''
-    def pendingNetworkFeeAmount(self) -> (uint256):
+    def pendingNetworkFeeAmount(self) -> (uint):
         return self._pendingNetworkFeeAmount;
 
     '''
@@ -208,31 +208,31 @@ class BancorNetwork(Time):
         provider,
         pool,
         tokenAmount
-    ) -> (uint256):
+    ) -> (uint):
         return self._depositFor(provider, pool, tokenAmount, msg_sender);
 
     '''
      * @inheritdoc IBancorNetwork
     '''
-    def deposit(self, msg_sender, pool, tokenAmount) -> (uint256):
+    def deposit(self, msg_sender, pool, tokenAmount) -> (uint):
         return self._depositFor(msg_sender, pool, tokenAmount, msg_sender);
 
     '''
      * @inheritdoc IBancorNetwork
     '''
-    def initWithdrawal(self, msg_sender, poolToken, poolTokenAmount) -> (uint256):
+    def initWithdrawal(self, msg_sender, poolToken, poolTokenAmount) -> (uint):
         return self._initWithdrawal(msg_sender, poolToken, poolTokenAmount);
 
     '''
      * @inheritdoc IBancorNetwork
     '''
-    def cancelWithdrawal(self, msg_sender, id) -> (uint256):
+    def cancelWithdrawal(self, msg_sender, id) -> (uint):
         return self._pendingWithdrawals.cancelWithdrawal(msg_sender, id);
 
     '''
      * @inheritdoc IBancorNetwork
     '''
-    def withdraw(self, msg_sender, id) -> (uint256):
+    def withdraw(self, msg_sender, id) -> (uint):
         provider = msg_sender;
         contextId = self._withdrawContextId(id, provider);
 
@@ -254,7 +254,7 @@ class BancorNetwork(Time):
         minReturnAmount,
         deadline,
         beneficiary
-    ) -> (uint256):
+    ) -> (uint):
         self._verifyTradeParams(sourceToken, targetToken, sourceAmount, minReturnAmount, deadline);
 
         return \
@@ -275,7 +275,7 @@ class BancorNetwork(Time):
         maxSourceAmount,
         deadline,
         beneficiary
-    ) -> (uint256):
+    ) -> (uint):
         self._verifyTradeParams(sourceToken, targetToken, targetAmount, maxSourceAmount, deadline);
 
         return \
@@ -350,7 +350,7 @@ class BancorNetwork(Time):
     '''
      * @inheritdoc IBancorNetwork
     '''
-    def withdrawNetworkFees(self, recipient) -> (uint256):
+    def withdrawNetworkFees(self, recipient) -> (uint):
         currentPendingNetworkFeeAmount = self._pendingNetworkFeeAmount;
         if (currentPendingNetworkFeeAmount == 0):
             return 0;
@@ -390,7 +390,7 @@ class BancorNetwork(Time):
         pool,
         tokenAmount,
         caller
-    ) -> (uint256):
+    ) -> (uint):
         contextId = self._depositContextId(provider, pool, tokenAmount, caller);
 
         if (pool is (self._bnt)):
@@ -412,7 +412,7 @@ class BancorNetwork(Time):
         caller,
         isMigrating,
         originalAmount
-    ) -> (uint256):
+    ) -> (uint):
         cachedBNTPool = self._bntPool;
 
         # transfer the tokens from the caller to the BNT pool
@@ -435,7 +435,7 @@ class BancorNetwork(Time):
          tokenAmount,
          caller,
          availableAmount
-    ) -> (uint256):
+    ) -> (uint):
         # transfer the tokens from the sender to the vault
         self._depositToMasterVault(pool, caller, availableAmount);
 
@@ -452,7 +452,7 @@ class BancorNetwork(Time):
         contextId,
         provider,
         completedRequest
-    ) -> (uint256):
+    ) -> (uint):
         cachedBNTPool = self._bntPool;
 
         # transfer the pool tokens to from the pending withdrawals contract to the BNT pool
@@ -481,7 +481,7 @@ class BancorNetwork(Time):
         contextId,
         provider,
         completedRequest
-    ) -> (uint256):
+    ) -> (uint):
         pool = completedRequest.poolToken.reserveToken();
 
         # get the pool collection that manages this pool
@@ -544,7 +544,7 @@ class BancorNetwork(Time):
         params,
         traderInfo,
         deadline
-    ) -> (uint256):
+    ) -> (uint):
         # ensure the beneficiary is set
         if (traderInfo.beneficiary == address(0)):
             traderInfo.beneficiary = traderInfo.trader;
@@ -724,7 +724,7 @@ class BancorNetwork(Time):
         provider,
         poolToken,
         poolTokenAmount
-    ) -> (uint256):
+    ) -> (uint):
         if (poolToken != self._bntPoolToken):
             reserveToken = poolToken.reserveToken();
             if (self._poolCollection(reserveToken).poolToken(reserveToken) != poolToken):

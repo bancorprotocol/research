@@ -1,4 +1,5 @@
-from solidity import uint, uint256, mulmod, revert, library
+from solidity import uint, uint256, mulmod, revert
+from utils import library
 
 from Math import Math
 from Fraction import Fraction256

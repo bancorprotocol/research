@@ -24,7 +24,7 @@ class TokenGovernance(account):
     # @param amount Amount to decrease the supply by.
     #
     def burn(self, amount):
-        self._token.destroy(self._msg_sender, amount);
+        self._token.destroy(self.msg_sender(), amount);
 
     def token(self):
         return self._token;

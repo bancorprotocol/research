@@ -235,6 +235,12 @@ class PoolCollection(account, BlockNumber):
         self._setDefaultTradingFeePPM(PoolCollection.DEFAULT_TRADING_FEE_PPM);
 
     '''
+     * @inheritdoc Upgradeable
+    '''
+    def version(self) -> (uint):
+        return uint16(5);
+
+    '''
      * @inheritdoc IPoolCollection
     '''
     def poolType(self) -> (uint):

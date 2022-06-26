@@ -9,18 +9,6 @@ class Vault:
         self._vbnt = initVBNTGovernance.token();
 
     '''
-     * @dev initializes the contract and its parents
-    '''
-    def __Vault_init(self) -> None:
-        self.__Vault_init_unchained();
-
-    '''
-     * @dev performs contract-specific initialization
-    '''
-    def __Vault_init_unchained(self) -> None:
-        pass
-
-    '''
      * @inheritdoc IVault
     '''
     def withdrawFunds(self, sender, token, target, amount) -> None:

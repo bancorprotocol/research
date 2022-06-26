@@ -1,4 +1,5 @@
 from solidity import uint, uint8, uint256, mapping
+from utils import account
 
 '''
  * @dev Implementation of the {IERC20} interface.
@@ -24,7 +25,7 @@ from solidity import uint, uint8, uint256, mapping
  * Finally, the non-standard {decreaseAllowance} and {increaseAllowance * functions have been added to mitigate the well-known issues around setting
  * allowances. See {IERC20-approve}.
 '''
-class ERC20:
+class ERC20(account):
     '''
      * @dev Sets the values for {name} and {symbol}.
      *
@@ -35,6 +36,8 @@ class ERC20:
      * construction.
     '''
     def __init__(self, name_: str, symbol_: str) -> None:
+        account.__init__(self)
+
         self._name = name_;
         self._symbol = symbol_;
         self._balances = mapping(lambda: uint256());
@@ -90,8 +93,8 @@ class ERC20:
      * - `to` cannot be the zero address.
      * - the caller must have a balance of at least `amount`.
     '''
-    def transfer(self, _msgSender, to, amount) -> (bool):
-        owner = _msgSender;
+    def transfer(self, to, amount) -> (bool):
+        owner = self._msg_sender;
         self._transfer(owner, to, amount);
         return True;
 
@@ -111,8 +114,8 @@ class ERC20:
      *
      * - `spender` cannot be the zero address.
     '''
-    def approve(self, _msgSender, spender, amount) -> (bool):
-        owner = _msgSender;
+    def approve(self, spender, amount) -> (bool):
+        owner = self._msg_sender;
         self._approve(owner, spender, amount);
         return True;
 
@@ -132,12 +135,12 @@ class ERC20:
      * - the caller must have allowance for ``from``'s tokens of at least
      * `amount`.
     '''
-    def transferFrom(self, _msgSender,
+    def transferFrom(self,
         from_,
         to,
         amount
     ) -> (bool):
-        spender = _msgSender;
+        spender = self._msg_sender;
         self._spendAllowance(from_, spender, amount);
         self._transfer(from_, to, amount);
         return True;
@@ -154,8 +157,8 @@ class ERC20:
      *
      * - `spender` cannot be the zero address.
     '''
-    def increaseAllowance(self, _msgSender, spender, addedValue) -> (bool):
-        owner = _msgSender;
+    def increaseAllowance(self, spender, addedValue) -> (bool):
+        owner = self._msg_sender;
         self._approve(owner, spender, self._allowances[owner][spender] + addedValue);
         return True;
 
@@ -173,8 +176,8 @@ class ERC20:
      * - `spender` must have allowance for the caller of at least
      * `subtractedValue`.
     '''
-    def decreaseAllowance(self, _msgSender, spender, subtractedValue) -> (bool):
-        owner = _msgSender;
+    def decreaseAllowance(self, spender, subtractedValue) -> (bool):
+        owner = self._msg_sender;
         currentAllowance = self._allowances[owner][spender];
         assert currentAllowance >= subtractedValue, "ERC20: decreased allowance below zero";
         uint.unchecked = True

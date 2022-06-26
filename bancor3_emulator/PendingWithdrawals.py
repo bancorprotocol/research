@@ -1,4 +1,5 @@
 from solidity import uint, uint32, uint256, mapping, days, revert
+from utils import account
 
 from EnumerableSet import EnumerableSet
 from Time import Time
@@ -42,7 +43,7 @@ class CompletedWithdrawal:
 '''
  * @dev Pending Withdrawals contract
 '''
-class PendingWithdrawals(Time):
+class PendingWithdrawals(account, Time):
     DEFAULT_LOCK_DURATION = uint32(7 * days);
 
     '''
@@ -53,7 +54,9 @@ class PendingWithdrawals(Time):
         initBNT,
         initBNTPool
     ) -> None:
-        super().__init__()
+        account.__init__(self)
+        Time.__init__(self)
+
         self._network = initNetwork;
         self._bnt = initBNT;
         self._bntPool = initBNTPool;
@@ -150,7 +153,7 @@ class PendingWithdrawals(Time):
     '''
      * @inheritdoc IPendingWithdrawals
     '''
-    def completeWithdrawal(self, _msgSender,
+    def completeWithdrawal(self,
         contextId,
         provider,
         id
@@ -168,7 +171,7 @@ class PendingWithdrawals(Time):
         self._removeWithdrawalRequest(provider, id);
 
         # approve the caller to transfer the locked pool tokens
-        request.poolToken.approve(_msgSender, request.poolTokenAmount);
+        request.poolToken.approve(self._msg_sender, request.poolTokenAmount);
 
         return CompletedWithdrawal({
             'poolToken': request.poolToken,

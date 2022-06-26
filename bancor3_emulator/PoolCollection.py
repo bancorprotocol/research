@@ -1,4 +1,5 @@
 from solidity import uint, uint8, uint16, uint32, uint128, uint256, mapping, address, payable, revert
+from utils import account
 
 from EnumerableSet import EnumerableSet
 from Math import Math
@@ -143,7 +144,7 @@ class PoolRateState:
  *
  * - the address of reserve token serves as the pool unique ID in both contract functions and events
 '''
-class PoolCollection(BlockNumber):
+class PoolCollection(account, BlockNumber):
     POOL_TYPE = uint16(1);
     LIQUIDITY_GROWTH_FACTOR = uint256(2);
     BOOTSTRAPPING_LIQUIDITY_BUFFER_FACTOR = uint256(2);
@@ -210,7 +211,9 @@ class PoolCollection(BlockNumber):
         initPoolTokenFactory,
         initPoolMigrator
     ) -> None:
-        super().__init__()
+        account.__init__(self)
+        BlockNumber.__init__(self)
+
         self._network = initNetwork;
         self._bnt = initBNT;
         self._networkSettings = initNetworkSettings;

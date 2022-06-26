@@ -1,10 +1,14 @@
+from utils import account
+
 # @title The Token Governance contract is used to govern a mintable ERC20 token by restricting its launch-time initial
 # administrative privileges.
-class TokenGovernance:
+class TokenGovernance(account):
     # @dev Initializes the contract.
     #
     # @param mintableToken The address of the mintable ERC20 token.
     def __init__(self, mintableToken):
+        account.__init__(self)
+
         self._token = mintableToken;
 
     # @dev Mints new tokens. Only allowed by the MINTER role.
@@ -19,8 +23,8 @@ class TokenGovernance:
     #
     # @param amount Amount to decrease the supply by.
     #
-    def burn(self, _msgSender, amount):
-        self._token.destroy(_msgSender, amount);
+    def burn(self, amount):
+        self._token.destroy(self._msg_sender, amount);
 
     def token(self):
         return self._token;

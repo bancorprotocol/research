@@ -1,9 +1,10 @@
 from ERC20 import ERC20
+from Owned import Owned
 
 '''
  * @dev Pool Token contract
 '''
-class PoolToken(ERC20):
+class PoolToken(ERC20, Owned):
     '''
      * @dev initializes a new PoolToken contract
     '''
@@ -14,6 +15,7 @@ class PoolToken(ERC20):
         initReserveToken
     ) -> None:
         ERC20.__init__(self, name, symbol)
+        Owned.__init__(self)
 
         self._decimals = initDecimals;
         self._reserveToken = initReserveToken;

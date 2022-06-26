@@ -82,9 +82,12 @@ class PoolTokenFactory(account):
         customDecimals = self._tokenDecimalsOverrides[token];
         tokenDecimals = customDecimals if customDecimals != 0 else token.decimals();
 
-        symbol = "".join(self.POOL_TOKEN_SYMBOL_PREFIX, tokenSymbol);
-        name = "".join(self.POOL_TOKEN_NAME_PREFIX, " ", tokenSymbol, " ", self.POOL_TOKEN_NAME_SUFFIX);
+        symbol = "".join([self.POOL_TOKEN_SYMBOL_PREFIX, tokenSymbol]);
+        name = "".join([self.POOL_TOKEN_NAME_PREFIX, " ", tokenSymbol, " ", self.POOL_TOKEN_NAME_SUFFIX]);
 
         newPoolToken = PoolToken(name, symbol, tokenDecimals, token);
+
+        # make sure to transfer the ownership to the caller
+        newPoolToken.transferOwnership(self.msg_sender);
 
         return newPoolToken;

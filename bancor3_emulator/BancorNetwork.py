@@ -65,10 +65,7 @@ class BancorNetwork(Time):
         initNetworkSettings,
         initMasterVault,
         initExternalProtectionVault,
-        initBNTPoolToken,
-        initBNTPool,
-        initPendingWithdrawals,
-        initPoolMigrator
+        initBNTPoolToken
     ) -> None:
         self._bntGovernance = initBNTGovernance;
         self._bnt = initBNTGovernance.token();
@@ -79,6 +76,40 @@ class BancorNetwork(Time):
         self._masterVault = initMasterVault;
         self._externalProtectionVault = initExternalProtectionVault;
         self._bntPoolToken = initBNTPoolToken;
+
+    '''
+     * @dev fully initializes the contract and its parents
+    '''
+    def initialize(self,
+         initBNTPool,
+         initPendingWithdrawals,
+         initPoolMigrator
+    ) -> None:
+        self.__BancorNetwork_init(initBNTPool, initPendingWithdrawals, initPoolMigrator);
+
+    # solhint-disable func-name-mixedcase
+
+    '''
+     * @dev initializes the contract and its parents
+    '''
+    def __BancorNetwork_init(self,
+         initBNTPool,
+         initPendingWithdrawals,
+         initPoolMigrator
+    ) -> None:
+        self.__BancorNetwork_init_unchained(initBNTPool, initPendingWithdrawals, initPoolMigrator);
+
+    '''
+     * @dev performs contract-specific initialization
+    '''
+    def __BancorNetwork_init_unchained(self,
+         initBNTPool,
+         initPendingWithdrawals,
+         initPoolMigrator
+    ) -> None:
+        self._bntPool = initBNTPool;
+        self._pendingWithdrawals = initPendingWithdrawals;
+        self._poolMigrator = initPoolMigrator;
 
         self._bntPool = initBNTPool;
         self._pendingWithdrawals = initPendingWithdrawals;
@@ -95,6 +126,8 @@ class BancorNetwork(Time):
 
         # the pending network fee amount to be burned by the vortex
         self._pendingNetworkFeeAmount = uint256();
+
+    # solhint-enable func-name-mixedcase
 
     '''
      * @dev returns the pending network fee amount to be burned by the vortex

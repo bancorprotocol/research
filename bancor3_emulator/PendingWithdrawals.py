@@ -57,11 +57,36 @@ class PendingWithdrawals(Time):
         self._network = initNetwork;
         self._bnt = initBNT;
         self._bntPool = initBNTPool;
+
+    '''
+     * @dev fully initializes the contract and its parents
+    '''
+    def initialize(self) -> None:
+        self.__PendingWithdrawals_init();
+
+    # solhint-disable func-name-mixedcase
+
+    '''
+     * @dev initializes the contract and its parents
+    '''
+    def __PendingWithdrawals_init(self) -> None:
+        self.__PendingWithdrawals_init_unchained();
+
+    '''
+     * @dev performs contract-specific initialization
+    '''
+    def __PendingWithdrawals_init_unchained(self) -> None:
+        self._setLockDuration(self.DEFAULT_LOCK_DURATION);
+
+        # the lock duration
         self._lockDuration = uint32()
+
+        # a mapping between accounts and their pending withdrawal requests
         self._nextWithdrawalRequestId = uint256()
         self._withdrawalRequestIdsByProvider = mapping(lambda: EnumerableSet());
         self._withdrawalRequests = mapping(lambda: WithdrawalRequest());
-        self._setLockDuration(self.DEFAULT_LOCK_DURATION);
+
+    # solhint-enable func-name-mixedcase
 
     '''
      * @inheritdoc IPendingWithdrawals

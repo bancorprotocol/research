@@ -18,7 +18,8 @@ class ReserveToken(ERC20):
         _symbol,
         _decimals
     ) -> None:
-        super().__init__(_name, _symbol)
+        ERC20.__init__(self, _name, _symbol)
+
         self._decimals = _decimals;
 
     '''
@@ -29,7 +30,7 @@ class ReserveToken(ERC20):
      * @param _amount  amount to increase the supply by
     '''
     def issue(self, _to, _amount):
-        self._mint(_to, _amount)
+        self._mint(_to, _amount);
 
     '''
      * @dev removes tokens from the given account and decreases the token supply
@@ -39,7 +40,7 @@ class ReserveToken(ERC20):
      * @param _amount  amount to decrease the supply by
     '''
     def destroy(self, _from, _amount):
-        self._burn(_from, _amount)
+        self._burn(_from, _amount);
 
     def decimals(self):
         return self._decimals;

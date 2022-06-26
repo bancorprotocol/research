@@ -1,8 +1,12 @@
-class Vault:
+from utils import account
+
+class Vault(account):
     '''
      * @dev a "virtual" constructor that is only used to set immutable state variables
     '''
     def __init__(self, initBNTGovernance, initVBNTGovernance) -> None:
+        account.__init__(self)
+
         self._bntGovernance = initBNTGovernance;
         self._bnt = initBNTGovernance.token();
         self._vbntGovernance = initVBNTGovernance;

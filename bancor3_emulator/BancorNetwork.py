@@ -1,4 +1,5 @@
 from solidity import uint, uint256, mapping, address, payable, revert
+from utils import account
 
 from EnumerableSet import EnumerableSet
 from Constants import PPM_RESOLUTION
@@ -9,7 +10,7 @@ from PoolCollection import PoolCollection as IPoolCollection
 '''
  * @dev Bancor Network contract
 '''
-class BancorNetwork(Time):
+class BancorNetwork(account, Time):
     class TradeParams:
         def __init__(self,
             x = {
@@ -67,6 +68,9 @@ class BancorNetwork(Time):
         initExternalProtectionVault,
         initBNTPoolToken
     ) -> None:
+        account.__init__(self)
+        Time.__init__(self)
+
         self._bntGovernance = initBNTGovernance;
         self._bnt = initBNTGovernance.token();
         self._vbntGovernance = initVBNTGovernance;
@@ -237,36 +241,36 @@ class BancorNetwork(Time):
     '''
      * @inheritdoc IBancorNetwork
     '''
-    def depositFor(self, msg_sender,
+    def depositFor(self,
         provider,
         pool,
         tokenAmount
     ) -> (uint):
-        return self._depositFor(provider, pool, tokenAmount, msg_sender);
+        return self._depositFor(provider, pool, tokenAmount, self._msg_sender);
 
     '''
      * @inheritdoc IBancorNetwork
     '''
-    def deposit(self, msg_sender, pool, tokenAmount) -> (uint):
-        return self._depositFor(msg_sender, pool, tokenAmount, msg_sender);
+    def deposit(self, pool, tokenAmount) -> (uint):
+        return self._depositFor(self._msg_sender, pool, tokenAmount, self._msg_sender);
 
     '''
      * @inheritdoc IBancorNetwork
     '''
-    def initWithdrawal(self, msg_sender, poolToken, poolTokenAmount) -> (uint):
-        return self._initWithdrawal(msg_sender, poolToken, poolTokenAmount);
+    def initWithdrawal(self, poolToken, poolTokenAmount) -> (uint):
+        return self._initWithdrawal(self._msg_sender, poolToken, poolTokenAmount);
 
     '''
      * @inheritdoc IBancorNetwork
     '''
-    def cancelWithdrawal(self, msg_sender, id) -> (uint):
-        return self._pendingWithdrawals.cancelWithdrawal(msg_sender, id);
+    def cancelWithdrawal(self, id) -> (uint):
+        return self._pendingWithdrawals.cancelWithdrawal(self._msg_sender, id);
 
     '''
      * @inheritdoc IBancorNetwork
     '''
-    def withdraw(self, msg_sender, id) -> (uint):
-        provider = msg_sender;
+    def withdraw(self, id) -> (uint):
+        provider = self._msg_sender;
         contextId = self._withdrawContextId(id, provider);
 
         # complete the withdrawal and claim the locked pool tokens
@@ -280,7 +284,7 @@ class BancorNetwork(Time):
     '''
      * @inheritdoc IBancorNetwork
     '''
-    def tradeBySourceAmount(self, msg_sender,
+    def tradeBySourceAmount(self,
         sourceToken,
         targetToken,
         sourceAmount,
@@ -294,14 +298,14 @@ class BancorNetwork(Time):
             self._trade(
                 self.TradeTokens({ 'sourceToken': sourceToken, 'targetToken': targetToken }),
                 self.TradeParams({ 'bySourceAmount': True, 'amount': sourceAmount, 'limit': minReturnAmount }),
-                self.TraderInfo({ 'trader': msg_sender, 'beneficiary': beneficiary }),
+                self.TraderInfo({ 'trader': self._msg_sender, 'beneficiary': beneficiary }),
                 deadline
             );
 
     '''
      * @inheritdoc IBancorNetwork
     '''
-    def tradeByTargetAmount(self, msg_sender,
+    def tradeByTargetAmount(self,
         sourceToken,
         targetToken,
         targetAmount,
@@ -315,14 +319,14 @@ class BancorNetwork(Time):
             self._trade(
                 self.TradeTokens({ 'sourceToken': sourceToken, 'targetToken': targetToken }),
                 self.TradeParams({ 'bySourceAmount': False, 'amount': targetAmount, 'limit': maxSourceAmount }),
-                self.TraderInfo({ 'trader': msg_sender, 'beneficiary': beneficiary }),
+                self.TraderInfo({ 'trader': self._msg_sender, 'beneficiary': beneficiary }),
                 deadline
             );
 
     '''
      * @inheritdoc IBancorNetwork
     '''
-    def flashLoan(self, msg_sender,
+    def flashLoan(self,
         token,
         amount,
         recipient,
@@ -340,7 +344,7 @@ class BancorNetwork(Time):
         self._masterVault.withdrawFunds(token, payable(address(recipient)), amount);
 
         # invoke the recipient's callback
-        recipient.onFlashLoan(msg_sender, token.toIERC20(), amount, feeAmount, data);
+        recipient.onFlashLoan(self._msg_sender, token.toIERC20(), amount, feeAmount, data);
 
         # ensure that the tokens + fee have been deposited back to the network
         returnedAmount = token.balanceOf(address(self)) - prevBalance;
@@ -366,7 +370,7 @@ class BancorNetwork(Time):
     '''
      * @inheritdoc IBancorNetwork
     '''
-    def migrateLiquidity(self, msg_sender,
+    def migrateLiquidity(self,
         token,
         provider,
         amount,
@@ -376,9 +380,9 @@ class BancorNetwork(Time):
         contextId = uint256(0);
 
         if (token is (self._bnt)):
-            self._depositBNTFor(contextId, provider, amount, msg_sender, True, originalAmount);
+            self._depositBNTFor(contextId, provider, amount, True, originalAmount);
         else:
-            self._depositBaseTokenFor(contextId, provider, token, amount, msg_sender, availableAmount);
+            self._depositBaseTokenFor(contextId, provider, token, amount, availableAmount);
 
     '''
      * @inheritdoc IBancorNetwork

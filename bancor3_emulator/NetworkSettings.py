@@ -1,11 +1,12 @@
 from solidity import uint, uint32, uint256, mapping, address, revert
+from utils import account
 
 from EnumerableSet import EnumerableSet
 
 '''
  * @dev Network Settings contract
 '''
-class NetworkSettings:
+class NetworkSettings(account):
     DEFAULT_FLASH_LOAN_FEE_PPM = uint32(0); # 0%
 
     class FlashLoanFee:
@@ -19,6 +20,8 @@ class NetworkSettings:
             self.feePPM = uint32(x['feePPM']);
 
     def __init__(self, initBnt) -> None:
+        account.__init__(self)
+
         self._bnt = initBnt;
 
     '''

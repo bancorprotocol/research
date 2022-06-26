@@ -13,7 +13,8 @@ class PoolToken(ERC20):
         initDecimals,
         initReserveToken
     ) -> None:
-        super().__init__(name, symbol)
+        ERC20.__init__(self, name, symbol)
+
         self._decimals = initDecimals;
         self._reserveToken = initReserveToken;
 

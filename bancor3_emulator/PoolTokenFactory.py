@@ -1,14 +1,18 @@
 from solidity import uint, uint8, mapping
+from utils import account
 
 from PoolToken import PoolToken
 
 '''
  * @dev Pool Token Factory contract
 '''
-class PoolTokenFactory:
+class PoolTokenFactory(account):
     POOL_TOKEN_SYMBOL_PREFIX = "bn";
     POOL_TOKEN_NAME_PREFIX = "Bancor";
     POOL_TOKEN_NAME_SUFFIX = "Pool Token";
+
+    def __init__(self) -> None:
+        account.__init__(self)
 
     '''
      * @dev fully initializes the contract and its parents

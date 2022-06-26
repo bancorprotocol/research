@@ -41,8 +41,16 @@ class Pool:
             'tradingFeePPM': 0,
             'tradingEnabled': False,
             'depositingEnabled': False,
-            'averageRates': 0,
-            'liquidity': 0
+            'averageRates': {
+                'blockNumber': 0,
+                'rate': {'n': 0, 'd': 0},
+                'invRate': {'n': 0, 'd': 0}
+            },
+            'liquidity': {
+                'bntTradingLiquidity': 0,
+                'baseTokenTradingLiquidity': 0,
+                'stakedBalance': 0
+            }
         }
     ) -> None:
         self.poolToken = x['poolToken']; # the pool token of the pool
@@ -213,7 +221,7 @@ class PoolCollection(BlockNumber):
         self._poolMigrator = initPoolMigrator;
 
         # a mapping between tokens and their pools
-        self._poolData = mapping(lambda: object);
+        self._poolData = mapping(lambda: Pool());
 
         # the set of all pools which are managed by this pool collection
         self._pools = EnumerableSet();

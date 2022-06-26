@@ -39,8 +39,6 @@ class NetworkSettings:
      * @dev performs contract-specific initialization
     '''
     def __NetworkSettings_init_unchained(self) -> None:
-        self._setDefaultFlashLoanFeePPM(self.DEFAULT_FLASH_LOAN_FEE_PPM);
-
         # a set of tokens which are eligible for protection
         self._protectedTokenWhitelist = EnumerableSet();
 
@@ -61,6 +59,8 @@ class NetworkSettings:
 
         # a mapping between pools and their flash-loan fees
         self._flashLoanFees = mapping(lambda: self.FlashLoanFee());
+
+        self._setDefaultFlashLoanFeePPM(self.DEFAULT_FLASH_LOAN_FEE_PPM);
 
     # solhint-enable func-name-mixedcase
 

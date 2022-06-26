@@ -76,8 +76,6 @@ class PendingWithdrawals(Time):
      * @dev performs contract-specific initialization
     '''
     def __PendingWithdrawals_init_unchained(self) -> None:
-        self._setLockDuration(self.DEFAULT_LOCK_DURATION);
-
         # the lock duration
         self._lockDuration = uint32()
 
@@ -85,6 +83,8 @@ class PendingWithdrawals(Time):
         self._nextWithdrawalRequestId = uint256()
         self._withdrawalRequestIdsByProvider = mapping(lambda: EnumerableSet());
         self._withdrawalRequests = mapping(lambda: WithdrawalRequest());
+
+        self._setLockDuration(self.DEFAULT_LOCK_DURATION);
 
     # solhint-enable func-name-mixedcase
 

@@ -44,8 +44,6 @@ class BNTPool(Vault):
      * @dev initializes the contract and its parents
     '''
     def __BNTPool_init(self) -> None:
-        self.__Vault_init();
-
         self.__BNTPool_init_unchained();
 
     '''

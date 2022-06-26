@@ -202,6 +202,7 @@ class PoolCollection(BlockNumber):
         initPoolTokenFactory,
         initPoolMigrator
     ) -> None:
+        super().__init__()
         self._network = initNetwork;
         self._bnt = initBNT;
         self._networkSettings = initNetworkSettings;

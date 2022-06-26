@@ -21,6 +21,26 @@ class NetworkSettings:
     def __init__(self, initBnt) -> None:
         self._bnt = initBnt;
 
+    '''
+     * @dev fully initializes the contract and its parents
+    '''
+    def initialize(self) -> None:
+        self.__NetworkSettings_init();
+
+    # solhint-disable func-name-mixedcase
+
+    '''
+     * @dev initializes the contract and its parents
+    '''
+    def __NetworkSettings_init(self) -> None:
+        self.__NetworkSettings_init_unchained();
+
+    '''
+     * @dev performs contract-specific initialization
+    '''
+    def __NetworkSettings_init_unchained(self) -> None:
+        self._setDefaultFlashLoanFeePPM(self.DEFAULT_FLASH_LOAN_FEE_PPM);
+
         # a set of tokens which are eligible for protection
         self._protectedTokenWhitelist = EnumerableSet();
 
@@ -42,7 +62,7 @@ class NetworkSettings:
         # a mapping between pools and their flash-loan fees
         self._flashLoanFees = mapping(lambda: self.FlashLoanFee());
 
-        self._setDefaultFlashLoanFeePPM(self.DEFAULT_FLASH_LOAN_FEE_PPM);
+    # solhint-enable func-name-mixedcase
 
     '''
      * @inheritdoc INetworkSettings

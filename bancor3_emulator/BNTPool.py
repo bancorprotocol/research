@@ -31,8 +31,31 @@ class BNTPool(Vault):
         self._networkSettings = initNetworkSettings;
         self._masterVault = initMasterVault;
         self._poolToken = initBNTPoolToken;
+
+    '''
+     * @dev fully initializes the contract and its parents
+    '''
+    def initialize(self) -> None:
+        self.__BNTPool_init();
+
+    # solhint-disable func-name-mixedcase
+
+    '''
+     * @dev initializes the contract and its parents
+    '''
+    def __BNTPool_init(self) -> None:
+        self.__Vault_init();
+
+        self.__BNTPool_init_unchained();
+
+    '''
+     * @dev performs contract-specific initialization
+    '''
+    def __BNTPool_init_unchained(self) -> None:
         self._stakedBalance = uint256()
         self._currentPoolFunding = mapping(lambda: uint256())
+
+    # solhint-enable func-name-mixedcase
 
     '''
      * @inheritdoc IBNTPool

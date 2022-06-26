@@ -48,12 +48,12 @@ class PendingWithdrawals(Time):
     '''
      * @dev a "virtual" constructor that is only used to set immutable state variables
     '''
-    def __init__(self, block,
+    def __init__(self,
         initNetwork,
         initBNT,
         initBNTPool
     ) -> None:
-        super().__init__(block)
+        super().__init__()
         self._network = initNetwork;
         self._bnt = initBNT;
         self._bntPool = initBNTPool;

@@ -352,10 +352,7 @@ class BancorNetwork(account, Time):
             revert("InsufficientFlashLoanReturn");
 
         # transfer the amount and the fee back to the vault
-        if (token.isNative()):
-            payable(address(self._masterVault)).sendValue(returnedAmount);
-        else:
-            token.safeTransfer(payable(address(self._masterVault)), returnedAmount);
+        token.safeTransfer(payable(address(self._masterVault)), returnedAmount);
 
         # notify the pool of accrued fees
         if (token is (self._bnt)):

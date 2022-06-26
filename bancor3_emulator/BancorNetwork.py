@@ -246,31 +246,31 @@ class BancorNetwork(account, Time):
         pool,
         tokenAmount
     ) -> (uint):
-        return self._depositFor(provider, pool, tokenAmount, self.msg_sender());
+        return self._depositFor(provider, pool, tokenAmount, self.msg_sender);
 
     '''
      * @inheritdoc IBancorNetwork
     '''
     def deposit(self, pool, tokenAmount) -> (uint):
-        return self._depositFor(self.msg_sender(), pool, tokenAmount, self.msg_sender());
+        return self._depositFor(self.msg_sender, pool, tokenAmount, self.msg_sender);
 
     '''
      * @inheritdoc IBancorNetwork
     '''
     def initWithdrawal(self, poolToken, poolTokenAmount) -> (uint):
-        return self._initWithdrawal(self.msg_sender(), poolToken, poolTokenAmount);
+        return self._initWithdrawal(self.msg_sender, poolToken, poolTokenAmount);
 
     '''
      * @inheritdoc IBancorNetwork
     '''
     def cancelWithdrawal(self, id) -> (uint):
-        return self._pendingWithdrawals.cancelWithdrawal(self.msg_sender(), id);
+        return self._pendingWithdrawals.cancelWithdrawal(self.msg_sender, id);
 
     '''
      * @inheritdoc IBancorNetwork
     '''
     def withdraw(self, id) -> (uint):
-        provider = self.msg_sender();
+        provider = self.msg_sender;
         contextId = self._withdrawContextId(id, provider);
 
         # complete the withdrawal and claim the locked pool tokens
@@ -298,7 +298,7 @@ class BancorNetwork(account, Time):
             self._trade(
                 self.TradeTokens({ 'sourceToken': sourceToken, 'targetToken': targetToken }),
                 self.TradeParams({ 'bySourceAmount': True, 'amount': sourceAmount, 'limit': minReturnAmount }),
-                self.TraderInfo({ 'trader': self.msg_sender(), 'beneficiary': beneficiary }),
+                self.TraderInfo({ 'trader': self.msg_sender, 'beneficiary': beneficiary }),
                 deadline
             );
 
@@ -319,7 +319,7 @@ class BancorNetwork(account, Time):
             self._trade(
                 self.TradeTokens({ 'sourceToken': sourceToken, 'targetToken': targetToken }),
                 self.TradeParams({ 'bySourceAmount': False, 'amount': targetAmount, 'limit': maxSourceAmount }),
-                self.TraderInfo({ 'trader': self.msg_sender(), 'beneficiary': beneficiary }),
+                self.TraderInfo({ 'trader': self.msg_sender, 'beneficiary': beneficiary }),
                 deadline
             );
 
@@ -344,7 +344,7 @@ class BancorNetwork(account, Time):
         self._masterVault.withdrawFunds(token, payable(address(recipient)), amount);
 
         # invoke the recipient's callback
-        recipient.onFlashLoan(self.msg_sender(), token.toIERC20(), amount, feeAmount, data);
+        recipient.onFlashLoan(self.msg_sender, token.toIERC20(), amount, feeAmount, data);
 
         # ensure that the tokens + fee have been deposited back to the network
         returnedAmount = token.balanceOf(address(self)) - prevBalance;

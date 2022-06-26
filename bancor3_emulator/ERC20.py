@@ -94,7 +94,7 @@ class ERC20(account):
      * - the caller must have a balance of at least `amount`.
     '''
     def transfer(self, to, amount) -> (bool):
-        owner = self.msg_sender();
+        owner = self.msg_sender;
         self._transfer(owner, to, amount);
         return True;
 
@@ -115,7 +115,7 @@ class ERC20(account):
      * - `spender` cannot be the zero address.
     '''
     def approve(self, spender, amount) -> (bool):
-        owner = self.msg_sender();
+        owner = self.msg_sender;
         self._approve(owner, spender, amount);
         return True;
 
@@ -140,7 +140,7 @@ class ERC20(account):
         to,
         amount
     ) -> (bool):
-        spender = self.msg_sender();
+        spender = self.msg_sender;
         self._spendAllowance(from_, spender, amount);
         self._transfer(from_, to, amount);
         return True;
@@ -158,7 +158,7 @@ class ERC20(account):
      * - `spender` cannot be the zero address.
     '''
     def increaseAllowance(self, spender, addedValue) -> (bool):
-        owner = self.msg_sender();
+        owner = self.msg_sender;
         self._approve(owner, spender, self._allowances[owner][spender] + addedValue);
         return True;
 
@@ -177,7 +177,7 @@ class ERC20(account):
      * `subtractedValue`.
     '''
     def decreaseAllowance(self, spender, subtractedValue) -> (bool):
-        owner = self.msg_sender();
+        owner = self.msg_sender;
         currentAllowance = self._allowances[owner][spender];
         assert currentAllowance >= subtractedValue, "ERC20: decreased allowance below zero";
         uint.unchecked = True

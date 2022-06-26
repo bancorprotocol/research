@@ -13,6 +13,7 @@ class account:
         self._msg_sender = _msg_sender
         return self
 
+    @property
     def msg_sender(self):
         f_locals = currentframe().f_back.f_back.f_locals
         return f_locals['self'] if 'self' in f_locals else self._msg_sender

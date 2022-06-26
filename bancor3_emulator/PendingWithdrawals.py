@@ -171,7 +171,7 @@ class PendingWithdrawals(account, Time):
         self._removeWithdrawalRequest(provider, id);
 
         # approve the caller to transfer the locked pool tokens
-        request.poolToken.approve(self.msg_sender(), request.poolTokenAmount);
+        request.poolToken.approve(self.msg_sender, request.poolTokenAmount);
 
         return CompletedWithdrawal({
             'poolToken': request.poolToken,

@@ -205,8 +205,6 @@ class BancorNetwork(account, Time):
      * @dev creates a new pool
     '''
     def _createPool(self, token, poolCollection) -> None:
-        self._validAddress(address(token));
-
         if (token is (self._bnt)):
             revert("InvalidToken");
 
@@ -548,9 +546,6 @@ class BancorNetwork(account, Time):
         limit,
         deadline
     ) -> None:
-        self._validAddress(address(sourceToken));
-        self._validAddress(address(targetToken));
-
         if (sourceToken == targetToken):
             revert("InvalidToken");
 

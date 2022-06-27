@@ -213,7 +213,7 @@ class BNTPool(Vault):
 
             poolTokenAmount = bntAmount;
         else:
-            poolTokenAmount = self._underlyingToPoolToken(bntAmount, poolTokenTotalSupply, currentStakedBalance);
+            poolTokenAmount = self._underlyingToPoolToken_(bntAmount, poolTokenTotalSupply, currentStakedBalance);
 
         # update the staked balance
         newStakedBalance = currentStakedBalance + bntAmount;
@@ -244,7 +244,7 @@ class BNTPool(Vault):
 
         # calculate the pool token amount to burn
         poolTokenTotalSupply = self._poolToken.totalSupply();
-        poolTokenAmount = self._underlyingToPoolToken(
+        poolTokenAmount = self._underlyingToPoolToken_(
             reduceFundingAmount,
             poolTokenTotalSupply,
             currentStakedBalance
@@ -292,12 +292,12 @@ class BNTPool(Vault):
      * @dev converts the specified underlying BNT amount to pool token amount
     '''
     def _underlyingToPoolToken(self, bntAmount) -> (uint):
-        return self._underlyingToPoolToken(bntAmount, self._poolToken.totalSupply(), self._stakedBalance);
+        return self._underlyingToPoolToken_(bntAmount, self._poolToken.totalSupply(), self._stakedBalance);
 
     '''
      * @dev converts the specified underlying BNT amount to pool token amount
     '''
-    def _underlyingToPoolToken(self,
+    def _underlyingToPoolToken_(self,
         bntAmount,
         poolTokenTotalSupply,
         currentStakedBalance

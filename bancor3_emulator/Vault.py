@@ -15,13 +15,23 @@ class Vault(account):
     '''
      * @inheritdoc IVault
     '''
-    def withdrawFunds(self, sender, token, target, amount) -> None:
-        token.transfer(sender, target, amount);
+    def withdrawFunds(self,
+        token,
+        target,
+        amount
+    ) -> None:
+        if (amount == 0):
+            return;
+
+        token.transfer(target, amount);
 
     '''
      * @inheritdoc IVault
     '''
     def burn(self, token, amount) -> None:
+        if (amount == 0):
+            return;
+
         if (token is (self._bnt)):
             self._bntGovernance.burn(amount);
         elif (token is (self._vbnt)):

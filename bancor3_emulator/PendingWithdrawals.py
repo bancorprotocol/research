@@ -233,7 +233,7 @@ class PendingWithdrawals(account, Time):
         self._removeWithdrawalRequest(request.provider, id);
 
         # transfer the locked pool tokens back to the provider
-        request.poolToken.safeTransfer(request.provider, request.poolTokenAmount);
+        request.poolToken.transfer(request.provider, request.poolTokenAmount);
 
         return request.poolTokenAmount;
 

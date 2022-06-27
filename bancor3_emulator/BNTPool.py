@@ -1,4 +1,5 @@
 from solidity import uint, uint256, mapping, address, revert
+from utils import parse
 
 from Math import Math
 from Constants import PPM_RESOLUTION
@@ -11,9 +12,9 @@ from PoolToken import PoolToken as IPoolToken
 '''
 class BNTPool(Vault):
     class InternalWithdrawalAmounts:
-        def __init__(self, x = {'bntAmount': 0, 'withdrawalFeeAmount': 0}) -> None:
-            self.bntAmount = uint256(x['bntAmount'])
-            self.withdrawalFeeAmount = uint256(x['withdrawalFeeAmount'])
+        def __init__(self, x = None) -> None:
+            self.bntAmount = parse(uint256, x, 'bntAmount');
+            self.withdrawalFeeAmount = parse(uint256, x, 'withdrawalFeeAmount');
 
     '''
      * @dev a "virtual" constructor that is only used to set immutable state variables

@@ -1,5 +1,5 @@
 from solidity import uint, uint256, mapping, address, payable, revert
-from utils import account
+from utils import account, parse
 
 from EnumerableSet import EnumerableSet
 from Constants import PPM_RESOLUTION
@@ -12,50 +12,27 @@ from PoolCollection import PoolCollection as IPoolCollection
 '''
 class BancorNetwork(account, Time):
     class TradeParams:
-        def __init__(self,
-            x = {
-                'amount': 0,
-                'limit': 0,
-                'bySourceAmount': False
-            }
-        ) -> None:
-            self.amount = uint256(x['amount']);
-            self.limit = uint256(x['limit']);
-            self.bySourceAmount = bool(x['bySourceAmount']);
+        def __init__(self, x = None) -> None:
+            self.amount = parse(uint256, x, 'amount');
+            self.limit = parse(uint256, x, 'limit');
+            self.bySourceAmount = parse(bool, x, 'bySourceAmount');
 
     class TradeResult:
-        def __init__(self,
-            x = {
-                'sourceAmount': 0,
-                'targetAmount': 0,
-                'tradingFeeAmount': 0,
-                'networkFeeAmount': 0
-            }
-        ) -> None:
-            self.sourceAmount = uint256(x['sourceAmount']);
-            self.targetAmount = uint256(x['targetAmount']);
-            self.tradingFeeAmount = uint256(x['tradingFeeAmount']);
-            self.networkFeeAmount = uint256(x['networkFeeAmount']);
+        def __init__(self, x = None) -> None:
+            self.sourceAmount = parse(uint256, x, 'sourceAmount');
+            self.targetAmount = parse(uint256, x, 'targetAmount');
+            self.tradingFeeAmount = parse(uint256, x, 'tradingFeeAmount');
+            self.networkFeeAmount = parse(uint256, x, 'networkFeeAmount');
 
     class TradeTokens:
-        def __init__(self,
-            x = {
-                'sourceToken': None,
-                'targetToken': None
-            }
-        ) -> None:
-            self.sourceToken = x['sourceToken'];
-            self.targetToken = x['targetToken'];
+        def __init__(self, x = None) -> None:
+            self.sourceToken = parse(address, x, 'sourceToken');
+            self.targetToken = parse(address, x, 'targetToken');
 
     class TraderInfo:
-        def __init__(self,
-            x = {
-                'trader': None,
-                'beneficiary': None
-            }
-        ) -> None:
-            self.trader = x['trader'];
-            self.beneficiary = x['beneficiary'];
+        def __init__(self, x = None) -> None:
+            self.trader = parse(address, x, 'trader');
+            self.beneficiary = parse(address, x, 'beneficiary');
 
     '''
      * @dev a "virtual" constructor that is only used to set immutable state variables

@@ -1,5 +1,5 @@
-from solidity import uint, uint32, uint256, mapping, days, revert
-from utils import account
+from solidity import uint, uint32, uint256, address, mapping, days, revert
+from utils import account, parse
 
 from EnumerableSet import EnumerableSet
 from Time import Time
@@ -8,37 +8,22 @@ from Time import Time
  * @dev the data struct representing a pending withdrawal request
 '''
 class WithdrawalRequest:
-    def __init__(self,
-        x = {
-            'provider': None,
-            'poolToken': None,
-            'reserveToken': None,
-            'createdAt': 0,
-            'poolTokenAmount': 0,
-            'reserveTokenAmount': 0
-        }
-    ) -> None:
-        self.provider = x['provider']; # the liquidity provider
-        self.poolToken = x['poolToken']; # the locked pool token
-        self.reserveToken = x['reserveToken']; # the reserve token to withdraw
-        self.createdAt = uint32(x['createdAt']); # the time when the request was created (Unix timestamp)
-        self.poolTokenAmount = uint256(x['poolTokenAmount']); # the locked pool token amount
-        self.reserveTokenAmount = uint256(x['reserveTokenAmount']); # the expected reserve token amount to withdraw
+    def __init__(self, x = None) -> None:
+        self.provider = parse(address, x, 'provider'); # the liquidity provider
+        self.poolToken = parse(address, x, 'poolToken'); # the locked pool token
+        self.reserveToken = parse(address, x, 'reserveToken'); # the reserve token to withdraw
+        self.createdAt = parse(uint32, x, 'createdAt'); # the time when the request was created (Unix timestamp)
+        self.poolTokenAmount = parse(uint256, x, 'poolTokenAmount'); # the locked pool token amount
+        self.reserveTokenAmount = parse(uint256, x, 'reserveTokenAmount'); # the expected reserve token amount to withdraw
 
 '''
  * @dev the data struct representing a completed withdrawal request
 '''
 class CompletedWithdrawal:
-    def __init__(self,
-        x = {
-            'poolToken': None,
-            'poolTokenAmount': 0,
-            'reserveTokenAmount': 0
-        }
-    ) -> None:
-        self.poolToken = x['poolToken']; # the withdraw pool token
-        self.poolTokenAmount = uint256(x['poolTokenAmount']); # the original pool token amount in the withdrawal request
-        self.reserveTokenAmount = uint256(x['reserveTokenAmount']); # the original reserve token amount at the time of the withdrawal init request
+    def __init__(self, x = None) -> None:
+        self.poolToken = parse(address, x, 'poolToken'); # the withdraw pool token
+        self.poolTokenAmount = parse(uint256, x, 'poolTokenAmount'); # the original pool token amount in the withdrawal request
+        self.reserveTokenAmount = parse(uint256, x, 'reserveTokenAmount'); # the original reserve token amount at the time of the withdrawal init request
 
 '''
  * @dev Pending Withdrawals contract

@@ -1,5 +1,5 @@
 from solidity import uint, uint256, mulmod, revert
-from utils import library
+from utils import library, parse
 
 from Math import Math
 from Fraction import Fraction256
@@ -9,14 +9,14 @@ ONE = 0x80000000000000000000000000000000;
 LN2 = 0x58b90bfbe8e7bcd5e4f1d9cc01f97b57;
 
 class Uint512:
-    def __init__(self, x = {'hi': 0, 'lo': 0}) -> None:
-        self.hi = uint256(x['hi']); # 256 most significant bits
-        self.lo = uint256(x['lo']); # 256 least significant bits
+    def __init__(self, x = None) -> None:
+        self.hi = parse(uint256, x, 'hi'); # 256 most significant bits
+        self.lo = parse(uint256, x, 'lo'); # 256 least significant bits
 
 class Sint256:
-    def __init__(self, x = {'value': 0, 'isNeg': False}) -> None:
-        self.value = uint256(x['value']);
-        self.isNeg = x['isNeg'];
+    def __init__(self, x = None) -> None:
+        self.value = parse(uint256, x, 'value');
+        self.isNeg = parse(bool, x, 'isNeg');
 
 '''
  * @dev this library provides a set of complex math operations

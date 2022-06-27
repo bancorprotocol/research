@@ -810,7 +810,7 @@ class PoolCollection(account, BlockNumber):
 
         # if the new BNT trading liquidity is below the minimum liquidity for trading - reset the liquidity
         if (amounts.newBNTTradingLiquidity < self._networkSettings.minLiquidityForTrading()):
-            self._resetTradingLiquidity(
+            self._resetTradingLiquidity_(
                 contextId,
                 pool,
                 data,
@@ -997,7 +997,7 @@ class PoolCollection(account, BlockNumber):
 
         self._dispatchTradingLiquidityEvents(contextId, pool, data.poolToken.totalSupply(), liquidity, newLiquidity);
 
-    def _dispatchTradingLiquidityEvents(self,
+    def _dispatchTradingLiquidityEvents_(self,
         contextId,
         pool,
         prevLiquidity,
@@ -1016,7 +1016,7 @@ class PoolCollection(account, BlockNumber):
         prevLiquidity,
         newLiquidity
     ) -> None:
-        self._dispatchTradingLiquidityEvents(contextId, pool, prevLiquidity, newLiquidity);
+        self._dispatchTradingLiquidityEvents_(contextId, pool, prevLiquidity, newLiquidity);
 
         if (newLiquidity.stakedBalance != prevLiquidity.stakedBalance):
             pass
@@ -1030,12 +1030,12 @@ class PoolCollection(account, BlockNumber):
         data,
         reason
     ) -> None:
-        self._resetTradingLiquidity(contextId, pool, data, data.liquidity.bntTradingLiquidity, reason);
+        self._resetTradingLiquidity_(contextId, pool, data, data.liquidity.bntTradingLiquidity, reason);
 
     '''
      * @dev resets trading liquidity and renounces any remaining BNT funding
     '''
-    def _resetTradingLiquidity(self,
+    def _resetTradingLiquidity_(self,
         contextId,
         pool,
         data,
@@ -1251,7 +1251,7 @@ class PoolCollection(account, BlockNumber):
             'stakedBalance': result.stakedBalance
         });
 
-        self._dispatchTradingLiquidityEvents(result.contextId, result.pool, prevLiquidity, newLiquidity);
+        self._dispatchTradingLiquidityEvents_(result.contextId, result.pool, prevLiquidity, newLiquidity);
 
         # update the liquidity data of the pool
         data.liquidity = newLiquidity;

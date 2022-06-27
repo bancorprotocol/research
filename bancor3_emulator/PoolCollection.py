@@ -69,7 +69,8 @@ class InternalWithdrawalAmounts:
 class TradingLiquidityAction:
     def __init__(self, x = None) -> None:
         self.update = parse(bool, x, 'update');
-        self.newAmount = parse(uint256, x, 'newAmount');
+        self.newBNTTradingLiquidity = parse(uint256, x, 'newBNTTradingLiquidity');
+        self.newBaseTokenTradingLiquidity = parse(uint256, x, 'newBaseTokenTradingLiquidity');
 
 class PoolRateState:
     Uninitialized = 0

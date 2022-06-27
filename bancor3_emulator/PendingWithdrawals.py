@@ -170,7 +170,7 @@ class PendingWithdrawals(account, Time):
     def isReadyForWithdrawal(self, id) -> (bool):
         request = self._withdrawalRequests[id];
 
-        return self._canWithdrawAt(self._time(), request.createdAt);
+        return request.provider != address(0) and self._canWithdrawAt(self._time(), request.createdAt);
 
     '''
      * @dev sets the lock duration

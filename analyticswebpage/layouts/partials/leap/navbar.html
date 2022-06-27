@@ -1,0 +1,82 @@
+<div class="navbar-container ">
+
+    <nav class="navbar navbar-expand-lg bg-white navbar-light" data-sticky="top">
+
+      <div class="container">
+
+        <!-- ========== Logo ========== -->
+        <a class="navbar-brand fade-page" href="/">
+          <img style="width: 40px;" src="/bancorlogo.png" alt="Bancor Dashboard" > Bancor Dashboard</a>
+
+        {{ if (isset .Params "draft") | and (.Params.draft)}}
+        <span class="lcl-draft">DRAFT</span>
+        {{ end }}
+
+        <!-- ========== Hamburger ========== -->
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+          <img class="icon navbar-toggler-open" src="/pages/assets/img/icons/interface/menu.svg" alt="menu interface icon" data-inject-svg />
+          <img class="icon navbar-toggler-close" src="/pages/assets/img/icons/interface/cross.svg" alt="cross interface icon" data-inject-svg />
+        </button>
+
+        <!-- ========== Menu Bar ========== -->
+        <div class="collapse navbar-collapse justify-content-end">
+          <div class="py-2 py-lg-0">
+            <ul class="navbar-nav">
+
+              
+              <!-- ========== Menu "Notes" ========== -->
+              <li class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown-grid" aria-expanded="false" aria-haspopup="true">
+                  Notes</a>
+                <div class="dropdown-menu row">
+                  <div class="col-auto" data-dropdown-content>
+                    <div class="dropdown-grid-menu">
+                      <a href="/note" class="dropdown-item fade-page">Notes</a>
+                    </div>
+                  </div>
+                </div>
+              </li>
+
+              <!-- ========== Menu "Dashboards" ========== -->
+              <li class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown-grid" aria-expanded="false" aria-haspopup="true">
+                  Dashboards</a>
+                <div class="dropdown-menu row">
+                  <div class="col-auto" data-dropdown-content>
+                    <div class="dropdown-grid-menu">
+                      <a href="/dashboard" class="dropdown-item fade-page">Dashboards</a>
+                    </div>
+                  </div>
+                </div>
+              </li>
+              
+              <!-- ========== Menu "Pages" ========== -->
+              <li class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown-grid" aria-expanded="false" aria-haspopup="true">
+                  Pages</a>
+                <div class="dropdown-menu row">
+                  <div class="col-auto" data-dropdown-content>
+                    <div class="dropdown-grid-menu">
+                      <a href="/pagex" class="dropdown-item fade-page">Pages</a>
+                    </div>
+                  </div>
+                </div>
+              </li>
+
+
+
+
+              
+
+            </ul>
+
+          </div>
+            
+
+
+        </div>
+      </div>
+    
+    </nav>
+
+</div>

@@ -1,0 +1,4 @@
+<!-- inline_html -->
+{{ $html := $.Page.Resources.GetMatch (.Get 0)}}
+{{ $html.Content | safeHTML }}
+<!-- END inline_html -->

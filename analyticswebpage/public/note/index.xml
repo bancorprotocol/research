@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Notes on Bancor Dashboard</title>
+    <link>https://gallant-poincare-1a2f56.netlify.app/note/</link>
+    <description>Recent content in Notes on Bancor Dashboard</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 30 Jul 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://gallant-poincare-1a2f56.netlify.app/note/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Econ Meeting</title>
+      <link>https://gallant-poincare-1a2f56.netlify.app/note/2022/03/01/econ-meeting/</link>
+      <pubDate>Tue, 01 Mar 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gallant-poincare-1a2f56.netlify.app/note/2022/03/01/econ-meeting/</guid>
+      <description>Agenda  Volume and Fee Revenue Breakdown by Token Category Monthly Fee Revenue by TKN ETH Fee Change Considerations Fee Breakdown by Traders  Trade Analysis by Category We evaluated trade data on Bancor in the date range 2021-01-01 to 2022-02-28.
+Tokens were divided into the following categories:
+ STABLE: USDC, USDT, DAI ETH: ETH, WETH BTC: WBTC, renBTC ALT: All others (including BNT)  Complete dataset (i.e. All-legs) The ETH-ALT category is our largest volume comprising ~46% and generates 40% of our fees.</description>
+    </item>
+    
+    <item>
+      <title>Econ Meeting [ERROR]</title>
+      <link>https://gallant-poincare-1a2f56.netlify.app/note/2022/02/15/econ-meeting-error/</link>
+      <pubDate>Tue, 15 Feb 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gallant-poincare-1a2f56.netlify.app/note/2022/02/15/econ-meeting-error/</guid>
+      <description>Trade Analysis by Category We evaluated trade data on Bancor in the date range 2021-01-01 to 2022-02-13.
+Tokens were divided into the following categories:
+ STABLE: USDC, USDT, DAI ETH: ETH, WETH BTC: WBTC, renBTC ALT: All others (including BNT)  Complete dataset (i.e. All-legs) Unsurprisingly, ALT-ALT category comprises ~50% of volume due to 2-hops going through BNT. The next biggest categories are ETH-ALT which makes 30%, and STABLE-ALT 14%. The proportion of fees is very similar with the notable differences being the ALT-ALT and STABLE-ALT have higher Fee/Vol then ETH-ALT and so account for proportionately more fees.</description>
+    </item>
+    
+    <item>
+      <title>TRAC Volume</title>
+      <link>https://gallant-poincare-1a2f56.netlify.app/note/2022/01/24/trac-volume/</link>
+      <pubDate>Mon, 24 Jan 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gallant-poincare-1a2f56.netlify.app/note/2022/01/24/trac-volume/</guid>
+      <description>Example implementing Dune queries into iframes
+</description>
+    </item>
+    
+    <item>
+      <title>Gallery Magic</title>
+      <link>https://gallant-poincare-1a2f56.netlify.app/note/2022/01/17/gallery-magic/</link>
+      <pubDate>Mon, 17 Jan 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gallant-poincare-1a2f56.netlify.app/note/2022/01/17/gallery-magic/</guid>
+      <description>Example blog demonstrating gallery magic details in note/single.html</description>
+    </item>
+    
+    <item>
+      <title>The AMM Book production setup</title>
+      <link>https://gallant-poincare-1a2f56.netlify.app/note/2022/01/14/the-amm-book-production-setup/</link>
+      <pubDate>Fri, 14 Jan 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gallant-poincare-1a2f56.netlify.app/note/2022/01/14/the-amm-book-production-setup/</guid>
+      <description>This is the 3rd book I am writing &amp;ndash; the first one was part of the PRMIA Handbook and the second one was my book on financial regulations, and every time I decided about 2 seconds after I started writing that writing in Word is not and option. For the PRMIA Handbook this was a no-brainer &amp;ndash; I had to include a lot of formulas, and the old formula editor sucked even more than the current one, so it was clear that something like LaTeX was the only option.</description>
+    </item>
+    
+    <item>
+      <title>Econ Meeting TEMPLATE</title>
+      <link>https://gallant-poincare-1a2f56.netlify.app/note/2000/01/01/econ-meeting-template/</link>
+      <pubDate>Sat, 01 Jan 2000 00:00:00 +0000</pubDate>
+      
+      <guid>https://gallant-poincare-1a2f56.netlify.app/note/2000/01/01/econ-meeting-template/</guid>
+      <description>Template for next meeting </description>
+    </item>
+    
+    <item>
+      <title>TEMPLATE</title>
+      <link>https://gallant-poincare-1a2f56.netlify.app/note/2000/01/01/template/</link>
+      <pubDate>Sat, 01 Jan 2000 00:00:00 +0000</pubDate>
+      
+      <guid>https://gallant-poincare-1a2f56.netlify.app/note/2000/01/01/template/</guid>
+      <description>orem ipsum dolor sit amet, consectetur adipiscing elit. Donec luctus elit a ligula imperdiet, non bibendum libero viverra. Maecenas fermentum ullamcorper orci at mattis.
+  Vestibulum elit odio, semper sit amet varius nec, elementum sed eros. Suspendisse magna tortor, eleifend nec volutpat nec, lacinia id risus. Mauris imperdiet ligula sit amet euismod lacinia. Praesent sed venenatis nulla, eu mattis velit.
+  Proin ut sodales sapien. Cras posuere tortor ante, euismod tincidunt turpis volutpat sollicitudin.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -422,7 +422,7 @@ class PoolCollection(account, BlockNumber):
         # staked balance
         prevPoolTokenTotalSupply = data.poolToken.totalSupply();
         if (prevPoolTokenTotalSupply == 0 and currentStakedBalance != 0):
-            currentStakedBalance = 0;
+            currentStakedBalance = uint256(0);
 
             self._resetTradingLiquidity(contextId, pool, data, TRADING_STATUS_UPDATE_INVALID_STATE);
 
@@ -1043,8 +1043,8 @@ class PoolCollection(account, BlockNumber):
         reason
     ) -> None:
         # reset the network and base token trading liquidities
-        data.liquidity.bntTradingLiquidity = 0;
-        data.liquidity.baseTokenTradingLiquidity = 0;
+        data.liquidity.bntTradingLiquidity = uint128(0);
+        data.liquidity.baseTokenTradingLiquidity = uint128(0);
 
         # reset the recent average rage
         data.averageRates = AverageRates({ 'blockNumber': 0, 'rate': zeroFraction112(), 'invRate': zeroFraction112() });

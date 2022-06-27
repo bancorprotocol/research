@@ -1,10 +1,11 @@
 from ERC20 import ERC20
+from ERC20Burnable import ERC20Burnable
 from Owned import Owned
 
 '''
  * @dev Pool Token contract
 '''
-class PoolToken(ERC20, Owned):
+class PoolToken(ERC20Burnable, Owned):
     '''
      * @dev initializes a new PoolToken contract
     '''

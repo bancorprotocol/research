@@ -1,0 +1,159 @@
+---
+title: Prototype Dashboard
+herosubtitle: Prototype Dashboard
+pgtopline: 
+pgtitle: 
+pgsubtitle: 
+date: 2022-01-31
+draft: false
+
+htmlPre: |
+  <div>(htmlpre)</div>
+
+htmlPost: |
+  <div>(htmlpost)</div>
+
+description: |
+    This is our intitial dashboard design for high level stats.
+---
+
+<table>
+  <th>Token Stats<th>
+  <tr>
+    <td rowspan = "3">
+      <iframe width="660" height="710" title="BNT Price"
+        src="https://dune.xyz/embeds/365558/696458/2682dd28-1c05-40c8-9959-480b60aa45b5"
+        allowfullscreen></iframe>
+    </td>
+    <td>
+      <iframe width="660" height="230" title="Unique BNT Buyers"
+        src="https://dune.xyz/embeds/278717/525857/4621ebbc-be04-49c7-befc-31bab07f7385"
+        allowfullscreen></iframe>
+    </td>
+  </tr>
+  
+  <tr>
+    <td>
+      <iframe width="660" height="230" title='BNT Token Volume (BNT)'
+        src="https://dune.xyz/embeds/278735/525888/878b5312-d46a-4d5a-a3d9-df4e11acf20a"
+        allowfullscreen></iframe>
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <iframe width="660" height="230" title='BNT Volume (USD)'
+        src="https://dune.xyz/embeds/278720/525861/db3ce489-e679-4d2b-b653-846999accccb"
+        allowfullscreen></iframe>
+    </td>
+  </tr>
+
+</table>
+
+<br>
+<table>
+  <tr>
+    <th>Trade Stats</th>
+    <th>LP Stats</th>
+  </tr>
+  <tr>
+    <td>
+      <iframe width="660" height="230" title='Unique Bancor Traders (trader_a)'
+        src="https://dune.xyz/embeds/278723/525865/2cd960f3-ea3d-424d-b984-9aa1c51cf103"
+        allowfullscreen></iframe>
+    </td>
+    <td>
+      <iframe width="660" height="230" title='New LP Events'
+        src="https://dune.xyz/embeds/285645/539815/8d237ac3-9b6e-44ac-877f-400bc6afb02d"
+        allowfullscreen></iframe>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <iframe width="660" height="230" title='Unique Bancor Traders (tx_from)'
+        src="https://dune.xyz/embeds/278723/726474/14ec351b-8477-495f-8035-098301ed65fb"
+        allowfullscreen></iframe>
+    </td>
+    <td>
+      <iframe width="660" height="230" title='Net Change LP Events'
+        src="https://dune.xyz/embeds/285645/539817/0e84df37-fd1e-4734-a6ef-ca3b9ef02f7a"
+        allowfullscreen></iframe>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <iframe width="660" height="330" title='trader_a vs tx_from'
+        src="https://dune.xyz/embeds/278723/525919/88623a5e-9916-4512-9aba-2c35105d74e4" allowfullscreen></iframe>
+    </td>
+    <td>
+      <iframe width="660" height="330" title='Big Stakes'
+        src="https://dune.xyz/embeds/21872/45118/7019c00f-c04f-4ba5-96b5-9a2c6a6dcf34" allowfullscreen></iframe>
+    </td>
+  </tr>
+  
+  <tr>
+      <th>TKN Specific Trades (case sensitive):
+      <input type="text" id="TRADETKN" onKeyDown="if(event.keyCode==13) redirect();" value="">
+      <button type="submit" value="Submit" onclick="redirect()">Search</button> </th>
+
+      <th>TKN Specific LP (case sensitive):
+      <input type="text" id="TKN" onKeyDown="if(event.keyCode==13) redirect2();" value="">
+      <button type="submit" value="Submit" onclick="redirect2()">Search</button> </th>
+
+  </tr>
+  <tr>
+    <td>
+      <iframe width="660" height="330" id='Big Trades'
+        src="https://dune.xyz/embeds/389004/741624/266254d9-db83-4d30-86eb-05508f4ecc30" allowfullscreen></iframe>
+      <script>
+        function redirect() {
+          var url = "https://dune.xyz/embeds/389004/741624/266254d9-db83-4d30-86eb-05508f4ecc30?TKN=" + document.getElementById('TRADETKN').value;
+          document.getElementById('Big Trades').src = url;
+        }
+      </script>
+    </td>
+    <td>
+      <iframe width="660" height="330" id='Big Stakes'
+        src="https://dune.xyz/embeds/380819/726484/6692966c-0e37-4b96-b67b-617e5a3b630f" allowfullscreen></iframe>
+        <script>
+        function redirect2() {
+            var url = "https://dune.xyz/embeds/380819/726484/6692966c-0e37-4b96-b67b-617e5a3b630f?TKN=" + document.getElementById('TKN').value;
+            document.getElementById('Big Stakes').src = url;
+          }
+        </script>
+    </td>
+  </tr>
+</table>
+
+<br>
+<table>
+  <tr>
+    <th>Market Share <a><img src="/green.png" style="width:30px;height:30px;"></a> Bancor <a><img src="/green.png" style="width:30px;height:30px;"></a></th>
+  </tr>
+  <tr>
+    <td>
+      <iframe width="660" height="700" title='Unique Bancor Traders'
+        src="https://dune.xyz/embeds/299055/571162/e2199e00-a88d-4bc6-8ee2-caf34152d304"
+        allowfullscreen></iframe>
+    </td>
+  </tr>
+</table>
+
+<br>
+<table>
+  <tr>
+      <th>CryptoFees Daily and 7d Avg</th>
+      <th>CryptoFees 2021 Stats</th>
+  </tr>
+
+  <tr>
+    <td>
+      <iframe src="https://cryptofees.info/" height="700" width="500">
+      </iframe>
+    </td>
+    <td>
+      <iframe src="https://cryptofees.info/2021" height="700" width="500">
+      </iframe>
+    </td>
+  </tr>
+</table>

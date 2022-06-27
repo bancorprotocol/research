@@ -1,0 +1,41 @@
+{{ define "main" }}
+
+
+
+<!-- ========== HERO TITLE IMAGE (1920x1080)========== --> 
+<section class="has-divider text-light jarallax bg-dark" data-jarallax data-speed="0.5" data-overlay>
+    <img src="/assets/img/penandbook-1920x1280.jpg" alt="" class="jarallax-img opacity-50">
+    <div class="container">
+        <div class="row">
+        <div class="col-xl-5 col-lg-6 col-md-8">
+            <h1 class="display-4">Notes</h1>
+            <p class="lead mb-0">{{.Params.HeroSubTitle}}</p>
+        </div>
+        </div>
+    </div>
+    <div class="divider">
+        <img src="/pages/assets/img/dividers/divider-2.svg" alt="graphical divider" data-inject-svg />
+    </div>
+</section>
+
+
+<section>
+    <div class="container">
+        <div class="row mb-4">
+
+            {{/* Iterate only over pages of the same type as this section. */}}
+            {{ $paginator := .Paginate (where .Data.Pages "Type" .Type) }}
+            {{ range  (where $paginator.Pages ".Params.unlisted" "!=" "true")}}
+                
+                {{ partial "note/summary_d.html" . }}
+
+            {{ end }}
+            {{ partial "note/pagination.html" . }}
+        </div>
+    </div>
+</section>
+
+
+<div hidden class='keyval keyval-templatename'><span class='key'>layout</span>:<span class='value'>note/list</span></div>
+<div hidden class='keyval keyval-templatename'><span class='key'>type</span>:<span class='value'>{{.Type}}</span></div>
+{{ end }}

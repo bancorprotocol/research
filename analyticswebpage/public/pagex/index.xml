@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>page on Bancor Dashboard</title>
+    <link>https://gallant-poincare-1a2f56.netlify.app/pagex/</link>
+    <description>Recent content in page on Bancor Dashboard</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language><atom:link href="https://gallant-poincare-1a2f56.netlify.app/pagex/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>test</title>
+      <link>https://gallant-poincare-1a2f56.netlify.app/pagex/test/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://gallant-poincare-1a2f56.netlify.app/pagex/test/</guid>
+      <description>lorem [Hertzog18]</description>
+    </item>
+    
+  </channel>
+</rss>

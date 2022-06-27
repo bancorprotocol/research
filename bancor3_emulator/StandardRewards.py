@@ -50,7 +50,7 @@ class StandardRewards(account, Time):
     # since we will be dividing by the total amount of protected tokens in units of wei, we can encounter cases
     # where the total amount in the denominator is higher than the product of the rewards rate and staking duration. In
     # order to avoid this imprecision, we will amplify the reward rate by the units amount.
-    REWARD_RATE_FACTOR = uint256(1e18);
+    REWARD_RATE_FACTOR = uint256(10 ** 18);
 
     INITIAL_PROGRAM_ID = uint256(1);
 

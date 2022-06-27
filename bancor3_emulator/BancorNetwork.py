@@ -327,7 +327,7 @@ class BancorNetwork(account, Time):
             revert("InsufficientFlashLoanReturn");
 
         # transfer the amount and the fee back to the vault
-        token.safeTransfer(payable(address(self._masterVault)), returnedAmount);
+        token.transfer(payable(address(self._masterVault)), returnedAmount);
 
         # notify the pool of accrued fees
         if (token is (self._bnt)):
@@ -738,7 +738,7 @@ class BancorNetwork(account, Time):
 
         # transfer the pool tokens from the provider. Note, that the provider should have either previously approved
         # the pool token amount or provided a EIP712 typed signature for an EIP2612 permit request
-        poolToken.safeTransferFrom(provider, address(self._pendingWithdrawals), poolTokenAmount);
+        poolToken.transferFrom(provider, address(self._pendingWithdrawals), poolTokenAmount);
 
         return self._pendingWithdrawals.initWithdrawal(provider, poolToken, poolTokenAmount);
 

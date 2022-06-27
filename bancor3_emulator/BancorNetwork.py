@@ -526,9 +526,6 @@ class BancorNetwork(account, Time):
         if (sourceToken == targetToken):
             revert("InvalidToken");
 
-        self._greaterThanZero(amount);
-        self._greaterThanZero(limit);
-
         if (deadline < self._time()):
             revert("DeadlineExpired");
 

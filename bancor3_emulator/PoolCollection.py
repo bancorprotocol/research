@@ -1,77 +1,42 @@
 from solidity import uint, uint8, uint16, uint32, uint128, uint256, mapping, address, payable, revert
-from utils import account
+from utils import account, using, parse
 
 from EnumerableSet import EnumerableSet
 from Math import Math
 from SafeCast import SafeCast
 from Constants import PPM_RESOLUTION
 from BlockNumber import BlockNumber
-from FractionLibrary import Fraction256, Fraction112, zeroFraction112
+from FractionLibrary import Fraction256, Fraction112, FractionLibrary, zeroFraction112
 from MathEx import Sint256, MathEx
 from PoolToken import PoolToken as IPoolToken
 from PoolCollectionWithdrawal import PoolCollectionWithdrawal
 
 class PoolLiquidity:
-    def __init__(self,
-        x = {
-            'bntTradingLiquidity': 0,
-            'baseTokenTradingLiquidity': 0,
-            'stakedBalance': 0
-        }
-    ) -> None:
-        self.bntTradingLiquidity = uint128(x['bntTradingLiquidity']); # the BNT trading liquidity
-        self.baseTokenTradingLiquidity = uint128(x['baseTokenTradingLiquidity']); # the base token trading liquidity
-        self.stakedBalance = uint256(x['stakedBalance']); # the staked balance
+    def __init__(self, x = None) -> None:
+        self.bntTradingLiquidity = parse(uint128, x, 'bntTradingLiquidity'); # the BNT trading liquidity
+        self.baseTokenTradingLiquidity = parse(uint128, x, 'baseTokenTradingLiquidity'); # the base token trading liquidity
+        self.stakedBalance = parse(uint256, x, 'stakedBalance'); # the staked balance
 
 class AverageRates:
-    def __init__(self,
-        x = {
-            'blockNumber': 0,
-            'rate': {'n': 0, 'd': 0},
-            'invRate': {'n': 0, 'd': 0}
-        }
-    ) -> None:
-        self.blockNumber = uint32(x['blockNumber']);
-        self.rate = Fraction112(x['rate']);
-        self.invRate = Fraction112(x['invRate']);
+    def __init__(self, x = None) -> None:
+        self.blockNumber = parse(uint32, x, 'blockNumber');
+        self.rate = parse(Fraction112, x, 'rate');
+        self.invRate = parse(Fraction112, x, 'invRate');
 
 class Pool:
-    def __init__(self,
-        x = {
-            'poolToken': None,
-            'tradingFeePPM': 0,
-            'tradingEnabled': False,
-            'depositingEnabled': False,
-            'averageRates': {
-                'blockNumber': 0,
-                'rate': {'n': 0, 'd': 0},
-                'invRate': {'n': 0, 'd': 0}
-            },
-            'liquidity': {
-                'bntTradingLiquidity': 0,
-                'baseTokenTradingLiquidity': 0,
-                'stakedBalance': 0
-            }
-        }
-    ) -> None:
-        self.poolToken = x['poolToken']; # the pool token of the pool
-        self.tradingFeePPM = uint32(x['tradingFeePPM']); # the trading fee (in units of PPM)
-        self.tradingEnabled = bool(x['tradingEnabled']); # whether trading is enabled
-        self.depositingEnabled = bool(x['depositingEnabled']); # whether depositing is enabled
-        self.averageRates = AverageRates(x['averageRates']); # the recent average rates
-        self.liquidity = PoolLiquidity(x['liquidity']); # the overall liquidity in the pool
+    def __init__(self, x = None) -> None:
+        self.poolToken = parse(address, x, 'poolToken'); # the pool token of the pool
+        self.tradingFeePPM = parse(uint32, x, 'tradingFeePPM'); # the trading fee (in units of PPM)
+        self.tradingEnabled = parse(bool, x, 'tradingEnabled'); # whether trading is enabled
+        self.depositingEnabled = parse(bool, x, 'depositingEnabled'); # whether depositing is enabled
+        self.averageRates = parse(AverageRates, x, 'averageRates'); # the recent average rates
+        self.liquidity = parse(PoolLiquidity, x, 'liquidity'); # the overall liquidity in the pool
 
 class WithdrawalAmounts:
-    def __init__(self,
-        x = {
-            'totalAmount': 0,
-            'baseTokenAmount': 0,
-            'bntAmount': 0
-        }
-    ) -> None:
-        self.totalAmount = uint256(x['totalAmount']);
-        self.baseTokenAmount = uint256(x['baseTokenAmount']);
-        self.bntAmount = uint256(x['bntAmount']);
+    def __init__(self, x = None) -> None:
+        self.totalAmount = parse(uint256, x, 'totalAmount');
+        self.baseTokenAmount = parse(uint256, x, 'baseTokenAmount');
+        self.bntAmount = parse(uint256, x, 'bntAmount');
 
 # trading enabling/disabling reasons
 TRADING_STATUS_UPDATE_DEFAULT = uint8(0);
@@ -80,57 +45,31 @@ TRADING_STATUS_UPDATE_MIN_LIQUIDITY = uint8(2);
 TRADING_STATUS_UPDATE_INVALID_STATE = uint8(3);
 
 class TradeAmountAndFee:
-    def __init__(self,
-        x = {
-            'amount': 0,
-            'tradingFeeAmount': 0,
-            'networkFeeAmount': 0
-        }
-    ) -> None:
-        self.amount = uint256(x['amount']); # the source/target amount (depending on the context) resulting from the trade
-        self.tradingFeeAmount = uint256(x['tradingFeeAmount']); # the trading fee amount
-        self.networkFeeAmount = uint256(x['networkFeeAmount']); # the network fee amount (always in units of BNT)
+    def __init__(self, x = None) -> None:
+        self.amount = parse(uint256, x, 'amount'); # the source/target amount (depending on the context) resulting from the trade
+        self.tradingFeeAmount = parse(uint256, x, 'tradingFeeAmount'); # the trading fee amount
+        self.networkFeeAmount = parse(uint256, x, 'networkFeeAmount'); # the network fee amount (always in units of BNT)
 
 # base token withdrawal output amounts
 class InternalWithdrawalAmounts:
-    def __init__(self,
-        x = {
-            'baseTokensToTransferFromMasterVault': 0,
-            'bntToMintForProvider': 0,
-            'baseTokensToTransferFromEPV': 0,
-            'baseTokensTradingLiquidityDelta': {'value': 0, 'isNeg': False},
-            'bntTradingLiquidityDelta': {'value': 0, 'isNeg': False},
-            'bntProtocolHoldingsDelta': {'value': 0, 'isNeg': False},
-            'baseTokensWithdrawalFee': 0,
-            'baseTokensWithdrawalAmount': 0,
-            'poolTokenAmount': 0,
-            'poolTokenTotalSupply': 0,
-            'newBaseTokenTradingLiquidity': 0,
-            'newBNTTradingLiquidity': 0
-        }
-    ) -> None:
-        self.baseTokensToTransferFromMasterVault = uint256(x['baseTokensToTransferFromMasterVault']); # base token amount to transfer from the master vault to the provider
-        self.bntToMintForProvider = uint256(x['bntToMintForProvider']); # BNT amount to mint directly for the provider
-        self.baseTokensToTransferFromEPV = uint256(x['baseTokensToTransferFromEPV']); # base token amount to transfer from the external protection vault to the provider
-        self.baseTokensTradingLiquidityDelta = Sint256(x['baseTokensTradingLiquidityDelta']); # base token amount to add to the trading liquidity
-        self.bntTradingLiquidityDelta = Sint256(x['bntTradingLiquidityDelta']); # BNT amount to add to the trading liquidity and to the master vault
-        self.bntProtocolHoldingsDelta = Sint256(x['bntProtocolHoldingsDelta']); # BNT amount add to the protocol equity
-        self.baseTokensWithdrawalFee = uint256(x['baseTokensWithdrawalFee']); # base token amount to keep in the pool as a withdrawal fee
-        self.baseTokensWithdrawalAmount = uint256(x['baseTokensWithdrawalAmount']); # base token amount equivalent to the base pool token's withdrawal amount
-        self.poolTokenAmount = uint256(x['poolTokenAmount']); # base pool token
-        self.poolTokenTotalSupply = uint256(x['poolTokenTotalSupply']); # base pool token's total supply
-        self.newBaseTokenTradingLiquidity = uint256(x['newBaseTokenTradingLiquidity']); # new base token trading liquidity
-        self.newBNTTradingLiquidity = uint256(x['newBNTTradingLiquidity']); # new BNT trading liquidity
+    def __init__(self, x = None) -> None:
+        self.baseTokensToTransferFromMasterVault = parse(uint256, x, 'baseTokensToTransferFromMasterVault'); # base token amount to transfer from the master vault to the provider
+        self.bntToMintForProvider = parse(uint256, x, 'bntToMintForProvider'); # BNT amount to mint directly for the provider
+        self.baseTokensToTransferFromEPV = parse(uint256, x, 'baseTokensToTransferFromEPV'); # base token amount to transfer from the external protection vault to the provider
+        self.baseTokensTradingLiquidityDelta = parse(Sint256, x, 'baseTokensTradingLiquidityDelta'); # base token amount to add to the trading liquidity
+        self.bntTradingLiquidityDelta = parse(Sint256, x, 'bntTradingLiquidityDelta'); # BNT amount to add to the trading liquidity and to the master vault
+        self.bntProtocolHoldingsDelta = parse(Sint256, x, 'bntProtocolHoldingsDelta'); # BNT amount add to the protocol equity
+        self.baseTokensWithdrawalFee = parse(uint256, x, 'baseTokensWithdrawalFee'); # base token amount to keep in the pool as a withdrawal fee
+        self.baseTokensWithdrawalAmount = parse(uint256, x, 'baseTokensWithdrawalAmount'); # base token amount equivalent to the base pool token's withdrawal amount
+        self.poolTokenAmount = parse(uint256, x, 'poolTokenAmount'); # base pool token
+        self.poolTokenTotalSupply = parse(uint256, x, 'poolTokenTotalSupply'); # base pool token's total supply
+        self.newBaseTokenTradingLiquidity = parse(uint256, x, 'newBaseTokenTradingLiquidity'); # new base token trading liquidity
+        self.newBNTTradingLiquidity = parse(uint256, x, 'newBNTTradingLiquidity'); # new BNT trading liquidity
 
 class TradingLiquidityAction:
-    def __init__(self,
-        x = {
-            'update': False,
-            'newAmount': 0
-        }
-    ) -> None:
-        self.update = bool(x['update']);
-        self.newAmount = uint256(x['newAmount']);
+    def __init__(self, x = None) -> None:
+        self.update = parse(bool, x, 'update');
+        self.newAmount = parse(uint256, x, 'newAmount');
 
 class PoolRateState:
     Uninitialized = 0
@@ -145,6 +84,9 @@ class PoolRateState:
  * - the address of reserve token serves as the pool unique ID in both contract functions and events
 '''
 class PoolCollection(account, BlockNumber):
+    using(FractionLibrary, Fraction256);
+    using(FractionLibrary, Fraction112);
+
     POOL_TYPE = uint16(1);
     LIQUIDITY_GROWTH_FACTOR = uint256(2);
     BOOTSTRAPPING_LIQUIDITY_BUFFER_FACTOR = uint256(2);
@@ -157,46 +99,25 @@ class PoolCollection(account, BlockNumber):
     EMA_SPOT_RATE_WEIGHT = uint256(1);
 
     class TradeIntermediateResult:
-        def __init__(self,
-            x = {
-                'sourceAmount': 0,
-                'targetAmount': 0,
-                'limit': 0,
-                'tradingFeeAmount': 0,
-                'networkFeeAmount': 0,
-                'sourceBalance': 0,
-                'targetBalance': 0,
-                'stakedBalance': 0,
-                'pool': None,
-                'isSourceBNT': False,
-                'bySourceAmount': False,
-                'tradingFeePPM': 0,
-                'contextId': 0
-            }
-        ) -> None:
-            self.sourceAmount = uint256(x['sourceAmount']);
-            self.targetAmount = uint256(x['targetAmount']);
-            self.limit = uint256(x['limit']);
-            self.tradingFeeAmount = uint256(x['tradingFeeAmount']);
-            self.networkFeeAmount = uint256(x['networkFeeAmount']);
-            self.sourceBalance = uint256(x['sourceBalance']);
-            self.targetBalance = uint256(x['targetBalance']);
-            self.stakedBalance = uint256(x['stakedBalance']);
-            self.pool = x['pool'];
-            self.isSourceBNT = bool(x['isSourceBNT']);
-            self.bySourceAmount = bool(x['bySourceAmount']);
-            self.tradingFeePPM = uint32(x['stakedBalance']);
-            self.contextId = uint256(x['sourceAmount']);
+        def __init__(self, x = None) -> None:
+            self.sourceAmount = parse(uint256, x, 'sourceAmount');
+            self.targetAmount = parse(uint256, x, 'targetAmount');
+            self.limit = parse(uint256, x, 'limit');
+            self.tradingFeeAmount = parse(uint256, x, 'tradingFeeAmount');
+            self.networkFeeAmount = parse(uint256, x, 'networkFeeAmount');
+            self.sourceBalance = parse(uint256, x, 'sourceBalance');
+            self.targetBalance = parse(uint256, x, 'targetBalance');
+            self.stakedBalance = parse(uint256, x, 'stakedBalance');
+            self.pool = parse(address, x, 'pool');
+            self.isSourceBNT = parse(bool, x, 'isSourceBNT');
+            self.bySourceAmount = parse(bool, x, 'bySourceAmount');
+            self.tradingFeePPM = parse(uint32, x, 'stakedBalance');
+            self.contextId = parse(uint256, x, 'sourceAmount');
 
     class TradeAmountAndTradingFee:
-        def __init__(self,
-            x = {
-                'amount': 0,
-                'tradingFeeAmount': 0
-            }
-        ) -> None:
-            self.amount = uint256(x['amount']);
-            self.tradingFeeAmount = uint256(x['tradingFeeAmount']);
+        def __init__(self, x = None) -> None:
+            self.amount = parse(uint256, x, 'amount');
+            self.tradingFeeAmount = parse(uint256, x, 'tradingFeeAmount');
 
     '''
      * @dev initializes a new PoolCollection contract

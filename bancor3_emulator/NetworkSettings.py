@@ -1,5 +1,5 @@
 from solidity import uint, uint32, uint256, mapping, address, revert
-from utils import account
+from utils import account, parse
 
 from EnumerableSet import EnumerableSet
 
@@ -10,14 +10,9 @@ class NetworkSettings(account):
     DEFAULT_FLASH_LOAN_FEE_PPM = uint32(0); # 0%
 
     class FlashLoanFee:
-        def __init__(self,
-            x = {
-                'initialized': False,
-                'feePPM': 0
-            }
-        ) -> None:
-            self.initialized = bool(x['initialized']);
-            self.feePPM = uint32(x['feePPM']);
+        def __init__(self, x = None) -> None:
+            self.initialized = parse(bool, x, 'initialized');
+            self.feePPM = parse(uint32, x, 'feePPM');
 
     def __init__(self, initBnt) -> None:
         account.__init__(self)

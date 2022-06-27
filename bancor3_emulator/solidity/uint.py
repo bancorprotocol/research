@@ -92,6 +92,9 @@ class uint:
     def __str__(self):
         return str(self.data)
 
+    def __hash__(self):
+        return hash(self.data)
+
     def _set(self, other):
         assert self.size >= other.size
         self.data = other.data

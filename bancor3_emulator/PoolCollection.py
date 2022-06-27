@@ -1104,11 +1104,11 @@ class PoolCollection(account, BlockNumber):
 
         liquidity = data.liquidity;
         if (result.isSourceBNT):
-            result.sourceBalance = liquidity.bntTradingLiquidity;
-            result.targetBalance = liquidity.baseTokenTradingLiquidity;
+            result.sourceBalance = uint256(liquidity.bntTradingLiquidity);
+            result.targetBalance = uint256(liquidity.baseTokenTradingLiquidity);
         else:
-            result.sourceBalance = liquidity.baseTokenTradingLiquidity;
-            result.targetBalance = liquidity.bntTradingLiquidity;
+            result.sourceBalance = uint256(liquidity.baseTokenTradingLiquidity);
+            result.targetBalance = uint256(liquidity.bntTradingLiquidity);
 
         result.stakedBalance = liquidity.stakedBalance;
 

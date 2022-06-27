@@ -213,7 +213,7 @@ class StandardRewards(account, Time):
             if (rewardsToken.balanceOf(address(self._externalRewardsVault)) < unclaimedRewards + totalRewards):
                 revert("InsufficientFunds");
 
-        id = self._nextProgramId; self._nextProgramId += 1;
+        id = uint256(self._nextProgramId); self._nextProgramId += 1;
         rewardRate = totalRewards / (endTime - startTime);
 
         self._programs[id] = ProgramData({
@@ -478,7 +478,7 @@ class StandardRewards(account, Time):
             if (p.rewardsToken != rewardData.rewardsToken):
                 revert("RewardsTokenMismatch");
 
-            claimData = self._claimRewards(provider, p);
+            claimData = self._claimRewards_(provider, p);
 
             if (claimData.reward > 0):
                 remainingRewards = p.remainingRewards;
@@ -506,7 +506,7 @@ class StandardRewards(account, Time):
     '''
      * @dev claims rewards and returns the received and the pending reward amounts
     '''
-    def _claimRewards(self, provider, p) -> (ClaimData):
+    def _claimRewards_(self, provider, p) -> (ClaimData):
         providerRewardsData = self._snapshotRewards(p, provider);
 
         reward = providerRewardsData.pendingRewards;

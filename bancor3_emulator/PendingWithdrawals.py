@@ -196,8 +196,7 @@ class PendingWithdrawals(account, Time):
         poolTokenAmount
     ) -> (uint):
         # record the current withdrawal request alongside previous pending withdrawal requests
-        id = self._nextWithdrawalRequestId;
-        self._nextWithdrawalRequestId += 1;
+        id = self._nextWithdrawalRequestId; self._nextWithdrawalRequestId += 1;
 
         # get the pool token value in reserve/pool tokens
         pool = poolToken.reserveToken();

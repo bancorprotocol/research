@@ -204,7 +204,7 @@ class BNTPool(Vault):
 
         # calculate the pool token amount to mint
         currentStakedBalance = self._stakedBalance;
-        poolTokenAmount;
+        poolTokenAmount = uint256();
         poolTokenTotalSupply = self._poolToken.totalSupply();
         if (poolTokenTotalSupply == 0):
             # if this is the initial liquidity provision - use a one-to-one pool token to BNT rate

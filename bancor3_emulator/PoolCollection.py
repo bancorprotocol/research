@@ -159,13 +159,13 @@ class PoolCollection(account, BlockNumber):
 
         self._protectionEnabled = True;
 
-        self._setDefaultTradingFeePPM(PoolCollection.DEFAULT_TRADING_FEE_PPM);
+        self._setDefaultTradingFeePPM(self.DEFAULT_TRADING_FEE_PPM);
 
     '''
-     * @inheritdoc Upgradeable
+     * @inheritdoc IVersioned
     '''
-    def version(self) -> (uint):
-        return uint16(5);
+    def version(self) -> (int):
+        return 6;
 
     '''
      * @inheritdoc IPoolCollection

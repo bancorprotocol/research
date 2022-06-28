@@ -62,7 +62,7 @@ class NetworkSettings(account):
     '''
      * @inheritdoc Upgradeable
     '''
-    def version(self)-> (int):
+    def version(self) -> (int):
         return 3;
 
     '''

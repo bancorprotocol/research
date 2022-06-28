@@ -1,5 +1,5 @@
-from solidity import uint128, uint256, revert
-from utils import library
+from solidity import uint, uint128, uint256, revert
+from utils import library, using
 
 from Constants import PPM_RESOLUTION as M
 from MathEx import Sint256, Uint512, MathEx
@@ -55,6 +55,7 @@ from MathEx import Sint256, Uint512, MathEx
  * During runtime, it is taken into account that they are given in PPM units (between 0 and 1000000).
 '''
 class PoolCollectionWithdrawal:
+    using(MathEx, uint)
     calculateWithdrawalAmounts = None
 
 class Output:
@@ -197,8 +198,8 @@ def arbitrageDeficit(
     output = Output()
     i = f * (M - m);
     j = mulSubMulDivF(b, e * M, x, i, 1);
-    output.p = MathEx.toPos256(MathEx.mulDivF(a * x, i, j));
-    output.r = MathEx.toNeg256(MathEx.mulDivF(x, f, e));
+    output.p = MathEx.mulDivF(a * x, i, j).toPos256();
+    output.r = MathEx.mulDivF(x, f, e).toNeg256();
     output.s = y;
     return output
 
@@ -222,8 +223,8 @@ def arbitrageSurplus(
     output = Output()
     i = f * M + e * n;
     j = mulAddMulDivF(b, e * (M - m), x, i * (M - m), M);
-    output.p = MathEx.toNeg256(MathEx.mulDivF(a * x, i, j));
-    output.r = MathEx.toPos256(MathEx.mulDivF(x, i, e * M));
+    output.p = MathEx.mulDivF(a * x, i, j).toNeg256();
+    output.r = MathEx.mulDivF(x, i, e * M).toPos256();
     output.s = y;
     return output
 
@@ -243,9 +244,9 @@ def defaultDeficit(
 ) -> (Output):
     output = Output()
     z = MathEx.subMax0(y * b, c * (e - y));
-    output.p = MathEx.toNeg256(MathEx.mulDivF(a, z, b * e));
+    output.p = MathEx.mulDivF(a, z, b * e).toNeg256();
     output.q = output.p;
-    output.r = MathEx.toNeg256((z / e));
+    output.r = (z / e).toNeg256();
     output.s = MathEx.mulDivF(y, b + c, e);
     return output
 
@@ -264,9 +265,9 @@ def defaultSurplus(
 ) -> (Output):
     output = Output()
     z = MathEx.subMax0(y, c);
-    output.p = MathEx.toNeg256(MathEx.mulDivF(a, z, b));
+    output.p = MathEx.mulDivF(a, z, b).toNeg256();
     output.q = output.p;
-    output.r = MathEx.toNeg256(z);
+    output.r = z.toNeg256();
     output.s = y;
     return output
 

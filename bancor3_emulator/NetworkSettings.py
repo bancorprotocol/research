@@ -60,6 +60,12 @@ class NetworkSettings(account):
     # solhint-enable func-name-mixedcase
 
     '''
+     * @inheritdoc Upgradeable
+    '''
+    def version(self)-> (int):
+        return 3;
+
+    '''
      * @inheritdoc INetworkSettings
     '''
     def protectedTokenWhitelist(self) -> (list):

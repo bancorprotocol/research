@@ -58,6 +58,12 @@ class BNTPool(Vault):
     # solhint-enable func-name-mixedcase
 
     '''
+     * @inheritdoc Upgradeable
+    '''
+    def version(self) -> (int):
+        return 2;
+
+    '''
      * @inheritdoc IBNTPool
     '''
     def poolToken(self) -> (IPoolToken):

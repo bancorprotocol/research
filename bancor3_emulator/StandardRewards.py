@@ -120,6 +120,12 @@ class StandardRewards(account, Time):
     # solhint-enable func-name-mixedcase
 
     '''
+     * @inheritdoc Upgradeable
+    '''
+    def version(self) -> (int):
+        return 4;
+
+    '''
      * @inheritdoc IStandardRewards
     '''
     def programIds(self) -> (list):

@@ -107,6 +107,12 @@ class BancorNetwork(account, Time):
     # solhint-enable func-name-mixedcase
 
     '''
+     * @inheritdoc Upgradeable
+    '''
+    def version(self) -> (int):
+        return 7;
+
+    '''
      * @dev returns the pending network fee amount to be burned by the vortex
     '''
     def pendingNetworkFeeAmount(self) -> (uint):

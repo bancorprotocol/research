@@ -77,6 +77,12 @@ class PendingWithdrawals(account, Time):
     # solhint-enable func-name-mixedcase
 
     '''
+     * @inheritdoc Upgradeable
+    '''
+    def version(self) -> (int):
+        return 4;
+
+    '''
      * @inheritdoc IPendingWithdrawals
     '''
     def lockDuration(self) -> (uint):

@@ -41,6 +41,12 @@ class PoolTokenFactory(account):
     # solhint-enable func-name-mixedcase
 
     '''
+     * @inheritdoc Upgradeable
+    '''
+    def version(self) -> (int):
+        return 1;
+
+    '''
      * @inheritdoc IPoolTokenFactory
     '''
     def tokenSymbolOverride(self, token) -> (str):

@@ -22,6 +22,12 @@ class PoolToken(ERC20Burnable, Owned):
         self._reserveToken = initReserveToken;
 
     '''
+     * @inheritdoc IVersioned
+    '''
+    def version(self) -> (int):
+        return 1;
+
+    '''
      * @dev returns the number of decimals used to get its user representation
     '''
     def decimals(self):

@@ -6,7 +6,7 @@
 ######################## default configuration ####################
 
 # NOTE: title is displayed on the page; htmlTitle is in the html 
-baseURL = "https://gallant-poincare-1a2f56.netlify.app/"
+baseURL = "https://tourmaline-cheesecake-e287a3.netlify.app/"
 languageCode = "en-us"
 title = "Bancor Dashboard"
 

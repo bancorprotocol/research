@@ -92,10 +92,6 @@ class BancorNetwork(account, Time):
         self._pendingWithdrawals = initPendingWithdrawals;
         self._poolMigrator = initPoolMigrator;
 
-        self._bntPool = initBNTPool;
-        self._pendingWithdrawals = initPendingWithdrawals;
-        self._poolMigrator = initPoolMigrator;
-
         # the set of all valid pool collections
         self._poolCollections = EnumerableSet();
 

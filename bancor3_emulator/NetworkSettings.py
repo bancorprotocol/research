@@ -46,9 +46,6 @@ class NetworkSettings(account):
         # below that amount, trading is disabled and co-investments use the initial rate
         self._minLiquidityForTrading = uint256();
 
-        # the fee (in units of PPM)
-        self._networkFeePPM = uint32();
-
         # the withdrawal fee (in units of PPM)
         self._withdrawalFeePPM = uint32();
 
@@ -192,26 +189,6 @@ class NetworkSettings(account):
             return;
 
         self._minLiquidityForTrading = amount;
-
-    '''
-     * @inheritdoc INetworkSettings
-    '''
-    def networkFeePPM(self) -> (uint):
-        return self._networkFeePPM;
-
-    '''
-     * @dev sets the network fee (in units of PPM)
-     *
-     * requirements:
-     *
-     * - the caller must be the admin of the contract
-    '''
-    def setNetworkFeePPM(self, newNetworkFeePPM) -> None:
-        prevNetworkFeePPM = self._networkFeePPM;
-        if (prevNetworkFeePPM == newNetworkFeePPM):
-            return;
-
-        self._networkFeePPM = newNetworkFeePPM;
 
     '''
      * @inheritdoc INetworkSettings

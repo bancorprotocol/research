@@ -139,7 +139,7 @@ def execute(fileName):
     pendingWithdrawals = PendingWithdrawals(network, bnt, bntPool)
     poolTokenFactory   = PoolTokenFactory()
     poolMigrator       = None
-    poolCollection     = PoolCollection(network, bnt, networkSettings, masterVault, bntPool, epVault, poolTokenFactory, poolMigrator)
+    poolCollection     = PoolCollection(network, bnt, networkSettings, masterVault, bntPool, epVault, poolTokenFactory, poolMigrator, toPPM(flow.networkFee))
     standardRewards    = StandardRewards(network, networkSettings, bntGovernance, vbnt, bntPool, erVault);
 
     networkSettings.initialize()
@@ -150,7 +150,6 @@ def execute(fileName):
     standardRewards.initialize()
 
     networkSettings.addTokenToWhitelist(tkn);
-    networkSettings.setNetworkFeePPM(toPPM(flow.networkFee));
     networkSettings.setWithdrawalFeePPM(toPPM(flow.withdrawalFee));
     networkSettings.setMinLiquidityForTrading(decimalToInteger(flow.bntMinLiquidity, bntDecimals));
     networkSettings.setFundingLimit(tkn, decimalToInteger(flow.bntFundingLimit, bntDecimals));

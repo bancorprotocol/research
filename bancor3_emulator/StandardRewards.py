@@ -522,7 +522,7 @@ class StandardRewards(account, Time):
         currTime = self._time();
 
         return \
-            self._doesProgramExist(p) and \
+            self._programExists(p) and \
             p.startTime <= currTime and \
             currTime <= p.endTime and \
             self._latestProgramIdByPool[p.pool] == p.id;
@@ -536,14 +536,14 @@ class StandardRewards(account, Time):
     '''
      * @dev returns whether or not a given program exists
     '''
-    def _doesProgramExist(self, p) -> (bool):
+    def _programExists(self, p) -> (bool):
         return address(p.pool) != address(0);
 
     '''
      * @dev verifies that a program exists
     '''
     def _verifyProgramExists(self, p) -> None:
-        if (not self._doesProgramExist(p)):
+        if (not self._programExists(p)):
             revert("DoesNotExist");
 
     '''

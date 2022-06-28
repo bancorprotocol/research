@@ -87,6 +87,7 @@ class PoolRateState:
 class PoolCollection(account, BlockNumber):
     using(FractionLibrary, Fraction256);
     using(FractionLibrary, Fraction112);
+    using(SafeCast, uint);
 
     POOL_TYPE = uint16(1);
     LIQUIDITY_GROWTH_FACTOR = uint256(2);
@@ -131,7 +132,8 @@ class PoolCollection(account, BlockNumber):
         initBNTPool,
         initExternalProtectionVault,
         initPoolTokenFactory,
-        initPoolMigrator
+        initPoolMigrator,
+        initNetworkFeePPM
     ) -> None:
         account.__init__(self)
         BlockNumber.__init__(self)
@@ -144,6 +146,7 @@ class PoolCollection(account, BlockNumber):
         self._externalProtectionVault = initExternalProtectionVault;
         self._poolTokenFactory = initPoolTokenFactory;
         self._poolMigrator = initPoolMigrator;
+        self._networkFeePPM = uint32(initNetworkFeePPM);
 
         # a mapping between tokens and their pools
         self._poolData = mapping(lambda: Pool());
@@ -153,6 +156,8 @@ class PoolCollection(account, BlockNumber):
 
         # the default trading fee (in units of PPM)
         self._defaultTradingFeePPM = uint32();
+
+        self._protectionEnabled = True;
 
         self._setDefaultTradingFeePPM(PoolCollection.DEFAULT_TRADING_FEE_PPM);
 
@@ -177,6 +182,12 @@ class PoolCollection(account, BlockNumber):
     '''
      * @inheritdoc IPoolCollection
     '''
+    def networkFeePPM(self) -> (uint):
+        return self._networkFeePPM;
+
+    '''
+     * @inheritdoc IPoolCollection
+    '''
     def pools(self) -> (list):
         return self._pools.values();
 
@@ -195,6 +206,25 @@ class PoolCollection(account, BlockNumber):
     '''
     def setDefaultTradingFeePPM(self, newDefaultTradingFeePPM) -> None:
         self._setDefaultTradingFeePPM(newDefaultTradingFeePPM);
+
+    '''
+     * @dev enables/disables protection
+     *
+     * requirements:
+     *
+     * - the caller must be the owner of the contract
+    '''
+    def enableProtection(self, status) -> None:
+        if (self._protectionEnabled == status):
+            return;
+
+        self._protectionEnabled = status;
+
+    '''
+     * @dev returns the status of the protection
+    '''
+    def protectionEnabled(self) -> (bool):
+        return self._protectionEnabled;
 
     '''
      * @inheritdoc IPoolCollection
@@ -333,7 +363,8 @@ class PoolCollection(account, BlockNumber):
      * trading liquidity
      *
      * please note that the virtual balances should be derived from token prices, normalized to the smallest unit of
-     * tokens. For example:
+     * tokens. In other words, the ratio between BNT and TKN virtual balances should be the ratio between the $ value
+     * of 1 wei of TKN and 1 wei of BNT, taking both of their decimals into account. For example:
      *
      * - if the price of one (10**18 wei) BNT is $X and the price of one (10**18 wei) TKN is $Y, then the virtual balances
      *   should represent a ratio of X to Y
@@ -538,7 +569,7 @@ class PoolCollection(account, BlockNumber):
             WithdrawalAmounts({
                 'totalAmount': amounts.baseTokensWithdrawalAmount - amounts.baseTokensWithdrawalFee,
                 'baseTokenAmount': amounts.baseTokensToTransferFromMasterVault + amounts.baseTokensToTransferFromEPV,
-                'bntAmount': amounts.bntToMintForProvider
+                'bntAmount': amounts.bntToMintForProvider if self._protectionEnabled else 0
             });
 
     '''
@@ -772,8 +803,8 @@ class PoolCollection(account, BlockNumber):
         );
 
         # trading liquidity is assumed to never exceed 128 bits (the cast below will revert("otherwise)
-        liquidity.baseTokenTradingLiquidity = SafeCast.toUint128(amounts.newBaseTokenTradingLiquidity);
-        liquidity.bntTradingLiquidity = SafeCast.toUint128(amounts.newBNTTradingLiquidity);
+        liquidity.baseTokenTradingLiquidity = amounts.newBaseTokenTradingLiquidity.toUint128();
+        liquidity.bntTradingLiquidity = amounts.newBNTTradingLiquidity.toUint128();
 
         if (amounts.bntProtocolHoldingsDelta.value > 0):
             assert(amounts.bntProtocolHoldingsDelta.isNeg); # currently no support for requesting funding here
@@ -786,7 +817,8 @@ class PoolCollection(account, BlockNumber):
                 self._bntPool.mint(address(self._masterVault), amounts.bntTradingLiquidityDelta.value);
 
         # if the provider should receive some BNT - ask the BNT pool to mint BNT to the provider
-        if (amounts.bntToMintForProvider > 0):
+        isProtectionEnabled = self._protectionEnabled;
+        if (amounts.bntToMintForProvider > 0 and isProtectionEnabled):
             self._bntPool.mint(address(provider), amounts.bntToMintForProvider);
 
         # if the provider should receive some base tokens from the external protection vault - remove the tokens from
@@ -988,8 +1020,8 @@ class PoolCollection(account, BlockNumber):
 
         # trading liquidity is assumed to never exceed 128 bits (the cast below will revert("otherwise)
         newLiquidity = PoolLiquidity({
-            'bntTradingLiquidity': SafeCast.toUint128(action.newBNTTradingLiquidity),
-            'baseTokenTradingLiquidity': SafeCast.toUint128(action.newBaseTokenTradingLiquidity),
+            'bntTradingLiquidity': action.newBNTTradingLiquidity.toUint128(),
+            'baseTokenTradingLiquidity': action.newBaseTokenTradingLiquidity.toUint128(),
             'stakedBalance': liquidity.stakedBalance
         });
 
@@ -1199,12 +1231,11 @@ class PoolCollection(account, BlockNumber):
      * @dev processes the network fee and updates the in-memory intermediate result
     '''
     def _processNetworkFee(self, result) -> None:
-        networkFeePPM = self._networkSettings.networkFeePPM();
-        if (networkFeePPM == 0):
+        if (self._networkFeePPM == 0):
             return;
 
         # calculate the target network fee amount
-        targetNetworkFeeAmount = MathEx.mulDivF(result.tradingFeeAmount, networkFeePPM, PPM_RESOLUTION);
+        targetNetworkFeeAmount = MathEx.mulDivF(result.tradingFeeAmount, self._networkFeePPM, PPM_RESOLUTION);
 
         # update the target balance (but don't deduct it from the full trading fee amount)
         result.targetBalance -= targetNetworkFeeAmount;
@@ -1245,10 +1276,8 @@ class PoolCollection(account, BlockNumber):
 
         # trading liquidity is assumed to never exceed 128 bits (the cast below will revert("otherwise)
         newLiquidity = PoolLiquidity({
-            'bntTradingLiquidity': SafeCast.toUint128(result.sourceBalance if result.isSourceBNT else result.targetBalance),
-            'baseTokenTradingLiquidity': SafeCast.toUint128(
-                result.targetBalance if result.isSourceBNT else result.sourceBalance
-            ),
+            'bntTradingLiquidity': (result.sourceBalance if result.isSourceBNT else result.targetBalance).toUint128(),
+            'baseTokenTradingLiquidity': (result.targetBalance if result.isSourceBNT else result.sourceBalance).toUint128(),
             'stakedBalance': result.stakedBalance
         });
 

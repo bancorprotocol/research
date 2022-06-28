@@ -729,8 +729,8 @@ class BancorNetwork(account, Time):
             if (self._poolCollection(reserveToken).poolToken(reserveToken) != poolToken):
                 revert("InvalidPool");
 
-        # transfer the pool tokens from the provider. Note, that the provider should have either previously approved
-        # the pool token amount or provided a EIP712 typed signature for an EIP2612 permit request
+        # transfer the pool tokens from the provider (we aren't using safeTransferFrom, since the PoolToken is a fully
+        # compliant ERC20 token contract)
         poolToken.transferFrom(provider, address(self._pendingWithdrawals), poolTokenAmount);
 
         return self._pendingWithdrawals.initWithdrawal(provider, poolToken, poolTokenAmount);

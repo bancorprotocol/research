@@ -39,7 +39,5 @@ i
 9jupyterbook/chapters/02/11/1/4/tkn-surplus-examples.ipynb,1/f/1f7abe1f12836a9c5c4098eb34846ac21b17f68d
 `
 0jupyterbook/chapters/03/simulation-example.ipynb,5/2/52f0fd3d0a6e030f79c7753b9334254bb730554e
-H
-simulation-example.ipynb,0/1/01b3e953e167c11c9233138665e784562924e90f
 \
 ,bancor3_simulator/protocol/utils/security.py,6/e/6e49c1824698a7e322e0f8a00405e17ef42b5180

@@ -131,4 +131,4 @@ class unchecked:
 
     @staticmethod
     def _depth():
-        return sum(frame.filename != __file__ for frame in inspect.stack(0))
+        return sum(frame_info.filename != __file__ for frame_info in inspect.stack(0))

@@ -1,4 +1,4 @@
-from inspect import currentframe, getouterframes
+import inspect
 
 class uint:
     sizes = [(n + 1) * 8 for n in range(32)]
@@ -131,4 +131,4 @@ class unchecked:
 
     @staticmethod
     def _depth():
-        return sum(frame.filename != __file__ for frame in getouterframes(currentframe(), 0))
+        return sum(frame.filename != __file__ for frame in inspect.stack(0))

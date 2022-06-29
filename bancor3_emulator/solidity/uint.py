@@ -1,6 +1,6 @@
-class uint:
-    unchecked = False
+from inspect import currentframe, getouterframes
 
+class uint:
     sizes = [(n + 1) * 8 for n in range(32)]
 
     def __init__(self, size, other):
@@ -103,7 +103,7 @@ class uint:
     def _new(self, other, op):
         data = op(self.data, uint._data(other))
         size = max(self.size, uint._size(other))
-        assert uint.unchecked or 0 <= data <= 2 ** size - 1
+        assert unchecked.state() or 0 <= data <= 2 ** size - 1
         return uint(size, data)
 
     @staticmethod
@@ -113,3 +113,22 @@ class uint:
     @staticmethod
     def _size(other):
         return other.size if type(other) is uint else (len(hex(other)) - 1) // 2 * 8
+
+class unchecked:
+    stack = []
+
+    @staticmethod
+    def begin():
+        unchecked.stack.append(unchecked._depth())
+
+    @staticmethod
+    def end():
+        unchecked.stack.pop()
+
+    @staticmethod
+    def state():
+        return len(unchecked.stack) > 0 and unchecked.stack[-1] == unchecked._depth()
+
+    @staticmethod
+    def _depth():
+        return sum(frame.filename != __file__ for frame in getouterframes(currentframe(), 0))

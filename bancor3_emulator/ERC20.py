@@ -1,4 +1,4 @@
-from solidity import uint, uint8, uint256, mapping
+from solidity import uint, uint8, uint256, unchecked, mapping
 from utils import account
 
 '''
@@ -180,9 +180,9 @@ class ERC20(account):
         owner = self.msg_sender;
         currentAllowance = self._allowances[owner][spender];
         assert currentAllowance >= subtractedValue, "ERC20: decreased allowance below zero";
-        uint.unchecked = True
+        unchecked.begin()
         self._approve(owner, spender, currentAllowance - subtractedValue);
-        uint.unchecked = False
+        unchecked.end()
 
         return True;
 
@@ -207,9 +207,9 @@ class ERC20(account):
     ):
         fromBalance = self._balances[from_];
         assert fromBalance >= amount, "ERC20: transfer amount exceeds balance";
-        uint.unchecked = True
+        unchecked.begin()
         self._balances[from_] = fromBalance - amount;
-        uint.unchecked = False
+        unchecked.end()
         self._balances[to] += amount;
 
     ''' @dev Creates `amount` tokens and assigns them to `account`, increasing
@@ -239,9 +239,9 @@ class ERC20(account):
     def _burn(self, account, amount):
         accountBalance = self._balances[account];
         assert accountBalance >= amount, "ERC20: burn amount exceeds balance";
-        uint.unchecked = True
+        unchecked.begin()
         self._balances[account] = accountBalance - amount;
-        uint.unchecked = False
+        unchecked.end()
         self._totalSupply -= amount;
 
     '''
@@ -280,6 +280,6 @@ class ERC20(account):
         currentAllowance = self.allowance(owner, spender);
         if (currentAllowance != uint256.max):
             assert currentAllowance >= amount, "ERC20: insufficient allowance";
-            uint.unchecked = True
+            unchecked.begin()
             self._approve(owner, spender, currentAllowance - amount);
-            uint.unchecked = False
+            unchecked.end()

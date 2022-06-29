@@ -103,7 +103,7 @@ class uint:
     def _new(self, other, op):
         data = op(self.data, uint._data(other))
         size = max(self.size, uint._size(other))
-        assert unchecked.state() or 0 <= data <= 2 ** size - 1
+        assert unchecked.scope() or 0 <= data <= 2 ** size - 1
         return uint(size, data)
 
     @staticmethod
@@ -126,7 +126,7 @@ class unchecked:
         unchecked.stack.pop()
 
     @staticmethod
-    def state():
+    def scope():
         return len(unchecked.stack) > 0 and unchecked.stack[-1] == unchecked._depth()
 
     @staticmethod

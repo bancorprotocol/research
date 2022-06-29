@@ -1,4 +1,4 @@
-from solidity import uint, uint256, mulmod, revert
+from solidity import uint, uint256, unchecked, mulmod, revert
 from utils import library, parse
 
 from Math import Math
@@ -46,7 +46,7 @@ class MathEx:
     * - For example: e^5.521692859 = e^(4 + 1 + 0.5 + 0.021692859) = e^4 * e^1 * e^0.5 * e^0.021692859
 '''
 def exp2(f: Fraction256) -> (Fraction256):
-    uint.unchecked = True
+    unchecked.begin()
 
     x = mulDivF(LN2, f.n, f.d);
     y = uint256();
@@ -112,7 +112,7 @@ def exp2(f: Fraction256) -> (Fraction256):
     if ((x & (ONE << 3)) != 0):
         n = (n * 0x0002bf84208204f5977f9a8cf01fdc307) / 0x0000003c6ab775dd0b95b4cbee7e65d11; # multiply by e^(2^+3)
 
-    uint.unchecked = False
+    unchecked.end()
 
     return Fraction256({ 'n': n, 'd': ONE });
 
@@ -286,27 +286,27 @@ def _inv256(d) -> (uint):
     * @dev returns `(x + y) % 2 ^ 256`
 '''
 def _unsafeAdd(x, y) -> (uint):
-    uint.unchecked = True
+    unchecked.begin()
     z = uint256(x) + uint256(y);
-    uint.unchecked = False
+    unchecked.end()
     return z
 
 '''
     * @dev returns `(x - y) % 2 ^ 256`
 '''
 def _unsafeSub(x, y) -> (uint):
-    uint.unchecked = True
+    unchecked.begin()
     z = uint256(x) - uint256(y);
-    uint.unchecked = False
+    unchecked.end()
     return z
 
 '''
     * @dev returns `(x * y) % 2 ^ 256`
 '''
 def _unsafeMul(x, y) -> (uint):
-    uint.unchecked = True
+    unchecked.begin()
     z = uint256(x) * uint256(y);
-    uint.unchecked = False
+    unchecked.end()
     return z
 
 '''

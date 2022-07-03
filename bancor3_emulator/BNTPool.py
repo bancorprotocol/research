@@ -73,13 +73,13 @@ class BNTPool(Vault):
      * @inheritdoc IBNTPool
     '''
     def stakedBalance(self) -> (uint):
-        return self._stakedBalance;
+        return self._stakedBalance.clone();
 
     '''
      * @inheritdoc IBNTPool
     '''
     def currentPoolFunding(self, pool) -> (uint):
-        return self._currentPoolFunding[pool];
+        return self._currentPoolFunding[pool].clone();
 
     '''
      * @inheritdoc IBNTPool

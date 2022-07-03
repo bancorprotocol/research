@@ -171,19 +171,19 @@ class PoolCollection(account, BlockNumber):
      * @inheritdoc IPoolCollection
     '''
     def poolType(self) -> (uint):
-        return self.POOL_TYPE;
+        return self.POOL_TYPE.clone();
 
     '''
      * @inheritdoc IPoolCollection
     '''
     def defaultTradingFeePPM(self) -> (uint):
-        return self._defaultTradingFeePPM;
+        return self._defaultTradingFeePPM.clone();
 
     '''
      * @inheritdoc IPoolCollection
     '''
     def networkFeePPM(self) -> (uint):
-        return self._networkFeePPM;
+        return self._networkFeePPM.clone();
 
     '''
      * @inheritdoc IPoolCollection
@@ -281,7 +281,7 @@ class PoolCollection(account, BlockNumber):
      * @inheritdoc IPoolCollection
     '''
     def tradingFeePPM(self, pool) -> (uint):
-        return self._poolData[pool].tradingFeePPM;
+        return self._poolData[pool].tradingFeePPM.clone();
 
     '''
      * @inheritdoc IPoolCollection
@@ -356,7 +356,7 @@ class PoolCollection(account, BlockNumber):
         if (prevTradingFeePPM == newTradingFeePPM):
             return;
 
-        data.tradingFeePPM = newTradingFeePPM;
+        data.tradingFeePPM = uint32(newTradingFeePPM);
 
     '''
      * @dev enables trading in a given pool, by providing the funding rate as two virtual balances, and updates its

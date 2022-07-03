@@ -77,13 +77,13 @@ class ERC20(account):
      * @dev See {IERC20-totalSupply}.
     '''
     def totalSupply(self) -> (uint):
-        return uint256(self._totalSupply);
+        return self._totalSupply.clone();
 
     '''
      * @dev See {IERC20-balanceOf}.
     '''
     def balanceOf(self, account) -> (uint):
-        return uint256(self._balances[account]);
+        return self._balances[account].clone();
 
     '''
      * @dev See {IERC20-transfer}.
@@ -102,7 +102,7 @@ class ERC20(account):
      * @dev See {IERC20-allowance}.
     '''
     def allowance(self, owner, spender) -> (uint):
-        return uint256(self._allowances[owner][spender]);
+        return self._allowances[owner][spender].clone();
 
     '''
      * @dev See {IERC20-approve}.

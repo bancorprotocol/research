@@ -161,13 +161,13 @@ class StandardRewards(account, Time):
      * @inheritdoc IStandardRewards
     '''
     def programStake(self, id) -> (uint):
-        return self._programStakes[id];
+        return self._programStakes[id].clone();
 
     '''
      * @inheritdoc IStandardRewards
     '''
     def providerStake(self, provider, id) -> (uint):
-        return self._providerRewards[provider][id].stakedAmount;
+        return self._providerRewards[provider][id].stakedAmount.clone();
 
     '''
      * @inheritdoc IStandardRewards
@@ -185,7 +185,7 @@ class StandardRewards(account, Time):
      * @inheritdoc IStandardRewards
     '''
     def latestProgramId(self, pool) -> (uint):
-        return self._latestProgramIdByPool[pool];
+        return self._latestProgramIdByPool[pool].clone();
 
     '''
      * @inheritdoc IStandardRewards
@@ -219,7 +219,7 @@ class StandardRewards(account, Time):
             if (rewardsToken.balanceOf(address(self._externalRewardsVault)) < unclaimedRewards + totalRewards):
                 revert("InsufficientFunds");
 
-        id = uint256(self._nextProgramId); self._nextProgramId += 1;
+        id = self._nextProgramId.clone(); self._nextProgramId += 1;
         rewardRate = totalRewards / (endTime - startTime);
 
         self._programs[id] = ProgramData({

@@ -86,7 +86,7 @@ class PendingWithdrawals(account, Time):
      * @inheritdoc IPendingWithdrawals
     '''
     def lockDuration(self) -> (uint):
-        return self._lockDuration;
+        return self._lockDuration.clone();
 
     '''
      * @dev sets the lock duration
@@ -202,7 +202,7 @@ class PendingWithdrawals(account, Time):
         poolTokenAmount
     ) -> (uint):
         # record the current withdrawal request alongside previous pending withdrawal requests
-        id = uint256(self._nextWithdrawalRequestId); self._nextWithdrawalRequestId += 1;
+        id = self._nextWithdrawalRequestId.clone(); self._nextWithdrawalRequestId += 1;
 
         # get the pool token value in reserve/pool tokens
         pool = poolToken.reserveToken();

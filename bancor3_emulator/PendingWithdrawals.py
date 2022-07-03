@@ -191,7 +191,7 @@ class PendingWithdrawals(account, Time):
         if (prevLockDuration == newLockDuration):
             return;
 
-        self._lockDuration = newLockDuration;
+        self._lockDuration = uint32(newLockDuration);
 
     '''
      * @dev initiates liquidity withdrawal

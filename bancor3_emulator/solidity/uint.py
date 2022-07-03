@@ -108,7 +108,7 @@ class uint:
 
     @staticmethod
     def _data(other):
-        return other.data if type(other) is uint else other
+        return other.data if type(other) is uint else int(other)
 
     @staticmethod
     def _size(other):

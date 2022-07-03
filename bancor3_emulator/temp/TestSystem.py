@@ -94,16 +94,16 @@ class Flow:
         self.operations         = [Operation(operation) for operation in data['operations'.strip()]]
 
 def toPPM(percentStr):
-    return uint32(int(Decimal(percentStr[:-1]) / 100 * int(PPM_RESOLUTION))) 
+    return uint32(Decimal(percentStr[:-1]) / 100 * int(PPM_RESOLUTION))
 
 def decimalToInteger(value, decimals: int):
-    return uint256(int(Decimal(value) * 10 ** decimals))
+    return uint256(Decimal(value) * 10 ** decimals)
 
 def integerToDecimal(value, decimals: int):
-    return Decimal(int(value)) / 10 ** decimals;
+    return Decimal(int(value)) / 10 ** decimals
 
 def integerToDecimalToStr(value, decimals: int):
-    return str(Decimal(int(value)) / 10 ** decimals);
+    return str(integerToDecimal(value, decimals))
 
 def execute(fileName):
     print(fileName)
@@ -123,9 +123,9 @@ def execute(fileName):
     tknAmount = sum([decimalToInteger(user.tknBalance, tknDecimals) for user in flow.users], uint256()) + tknRewardsAmount + epVaultBalance
     bntAmount = sum([decimalToInteger(user.bntBalance, bntDecimals) for user in flow.users], uint256()) + bntRewardsAmount
 
-    bnt   = ReserveToken('BNT'  , 'BNT'  , bntDecimals  )
-    vbnt  = ReserveToken('VBNT' , 'VBNT' , bntDecimals  )
-    tkn   = ReserveToken('TKN'  , 'TKN'  , tknDecimals  )
+    bnt   = ReserveToken('BNT'  , 'BNT'  , bntDecimals)
+    vbnt  = ReserveToken('VBNT' , 'VBNT' , bntDecimals)
+    tkn   = ReserveToken('TKN'  , 'TKN'  , tknDecimals)
     bnbnt = PoolToken   ('bnBNT', 'bnBNT', bnbntDecimals, bnt)
 
     bntGovernance      = TokenGovernance(bnt)

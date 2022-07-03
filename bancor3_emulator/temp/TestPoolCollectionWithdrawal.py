@@ -4,6 +4,7 @@ import os
 sys.path.append(os.path.dirname(__file__) + '/..')
 
 from PoolCollectionWithdrawal import PoolCollectionWithdrawal
+
 import json
 
 from decimal import Decimal
@@ -115,16 +116,16 @@ for fileName in maxErrors:
     table = json.loads(file.read());
     file.close()
     for row in table:
-        a, b, c, e, w, m, n, x = [int(row[z]) for z in 'a, b, c, e, w, m, n, x'.split(', ')]
-        p, q, r, s, t, u, v = [Decimal(row[z]) for z in 'p, q, r, s, t, u, v'.split(', ')]
+        a, b, c, e, w, m, n, x = [row[z] for z in 'a, b, c, e, w, m, n, x'.split(', ')]
+        p, q, r, s, t, u, v = [row[z] for z in 'p, q, r, s, t, u, v'.split(', ')]
         actual = PoolCollectionWithdrawal.calculateWithdrawalAmounts(a, b, c, e, w, m, n, x);
-        actual.p = int(actual.p.value) * (-1 if actual.p.isNeg else 1);
-        actual.q = int(actual.q.value) * (-1 if actual.q.isNeg else 1);
-        actual.r = int(actual.r.value) * (-1 if actual.r.isNeg else 1);
-        actual.s = int(actual.s);
-        actual.t = int(actual.t);
-        actual.u = int(actual.u);
-        actual.v = int(actual.v);
+        actual.p = actual.p.value.data * (-1 if actual.p.isNeg else 1);
+        actual.q = actual.q.value.data * (-1 if actual.q.isNeg else 1);
+        actual.r = actual.r.value.data * (-1 if actual.r.isNeg else 1);
+        actual.s = actual.s.data;
+        actual.t = actual.t.data;
+        actual.u = actual.u.data;
+        actual.v = actual.v.data;
         print(
             fileName + ':',
             actual.p,

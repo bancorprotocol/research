@@ -4,56 +4,89 @@
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-# Bancor Protocol Contracts v3.0 (Dawn Release)
+# Bancor Simulator
 
 [![PyPI](https://vsrm.dev.azure.com/gcode-ai/_apis/public/Release/badge/52109c77-be71-4849-9d35-4fc861db41a6/1/1)](https://vsrm.dev.azure.com/gcode-ai/_apis/public/Release/badge/52109c77-be71-4849-9d35-4fc861db41a6/1/1)
 [![bancorml-0.1.0-py3-none-any.whl package in bancorml@Release feed in Azure Artifacts](https://feeds.dev.azure.com/gcode-ai/52109c77-be71-4849-9d35-4fc861db41a6/_apis/public/Packaging/Feeds/bancorml@Release/Packages/0926c7d3-1ac4-4316-a132-cf9867850696/Badge)](https://dev.azure.com/gcode-ai/BancorML/_artifacts/feed/bancorml@Release/UPack/bancorml-0.1.0-py3-none-any.whl/0.0.16)
 [![PyPI version](https://badge.fury.io/py/bancorml.svg)](https://badge.fury.io/py/bancorml)
 [![Documentation Status](https://readthedocs.com/projects/gcodeai-bancorml/badge/?version=latest&token=55e06511a714e5d89e1eea25f71fe67e6a96aa5d3b813aa09547303f31b088e4)](https://gcodeai-bancorml.readthedocs-hosted.com/en/latest/?badge=latest)
 
-## Overview
 
-Bancor is a decentralized trading and yield protocol. Its network of on-chain automated market makers (AMMs) supports instant token-to-token trades, as well as single-sided liquidity provision, auto-compounding staking rewards and 100% [impermanent loss](https://www.youtube.com/watch?v=_m6Mowq3Ptk) protection for any listed asset.
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 
-The Dawn release includes the following features:
+**Bancor Simulator** is an open-source python package developed by the **Bancor Research Team**. It aims to assist the design, testing, and validation of Bancor v3 tokenomics.
 
-- Token to token trades
-- Instant IL protection
-- Single-sided Liquidity Provision
-- Omnipool
-- Infinity Pools
-- Auto-compounding Rewards
-- Dual Rewards
-- Third Party IL Protection
-- Composable PoolState Tokens
-- Tokenomics Redesign
-- Flash Loans
+See [official documentation](https://simulator.bancor.network/chapters/bancor-simulator.html) for complete details.
 
-**Bancor3 Simulation** is a library built for designing, testing, validating, and optimizing Bancor v3 tokenomics and performance.
+**Warning**: The docs are a work in progress with potentially broken links, unfinished sections, and a non-exhuastive overview of commands and example usage. Moreover, the entirety of the codebase and documentation is subject to change without warning.
 
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-### Project setup
+## Introduction
+
+All state transition functions and accompanying data structures described in the product specification [BIP15: Proposing Bancor 3](https://docs.google.com/document/d/11UeMYaI_1CWdf_Nu6veUO-vNB5uX-FcVRqTSU-ziDRk/edit?usp=sharing) are the core system level operations of this library. 
+
+## Organization
+
+This is the project directory structure:
+
+```
+bancor_analytics/            <------- Tableau Dashboard Project
+bancor_emulator/             <------- Solidity Emulation Project
+bancor_simulator/            <------- ** Spec & Simulation Project **
+├── v3/                      <------- Current Version
+│   └── simulation/          <------- Agent-based simulation module
+│   │     └── agents.py      <------- Mesa Agent-based implementations of the Bancor protocol.
+│   │     └── batch_run.py   <------- Script used to perform a parameter sweep.
+│   │     └── model.py       <------- Main Bancor Simulation module interface.
+│   │     └── random_walk.py <------- Generalized behavior for random walking
+│   │     └── run.py         <------- Runs the simulation server with browser-based UI
+│   │     └── server.py      <------- Configures the browser-based interface.
+│   │     └── utils.py       <------- Misc utility functions
+│   │ 
+│   └── spec/                <------- State transition functions and data structures described in BIP15.
+│         └── actions.py     <------- Deposit, trade, & withdrawal algorithm logic.
+│         └── emulation.py   <------- Verifies solidity result parity.
+│         └── network.py     <------- Main BancorNetwork application interface.
+│         └── rewards.py     <------- Autocompounding and standard rewards logic.
+│         └── state.py       <------- State variables, constants, data structures, and CRUD interfaces.
+│         └── utils.py       <------- Misc utility functions
+│ 
+└── main.py                  <------- Application
+
+** These docs apply.
+```
+
+## Notation
+
+Code snippets appearing in `this style` are to be interpreted as Python 3 code.
+
+## Formatting & Style
+
+Code is formatted according to [PEP8](https://peps.python.org/pep-0008/), which is the official Python style guide. In order to overcome the burden on the developers to fix formatting, we use [Black](https://black.readthedocs.io/en/stable/) which reports on format errors and automatically fixes them.
+
+## Project setup
 
 If you don't already have one, create a virtualenv
 using [these instructions](https://docs.python.org/3/library/venv.html)
 
-# Install
+## Install
 
 **Bancor3 Simulation** is available for Python 3.6+
 
 To install using [pypi](https://pypi.org/project/bancor-simulation/), run this command:
 
 ````{tab} PyPI
-$ pip install bancor3-simulation
+$ pip install bancor-simulator
 ````
 
-# Bancor v3 Simulation Documentation
+## Documentation
 
 In addition to the codebase, this repository holds the Jupyter Book source for Bancor v3 Simulation: A hands-on demo of
 features described
 in [BIP15: Proposing Bancor 3](https://docs.google.com/document/d/11UeMYaI_1CWdf_Nu6veUO-vNB5uX-FcVRqTSU-ziDRk/).
 
-## To make a change to the jupyter book and update:
+### To make a change to the jupyter book and update:
 
 1. Get your copy of this repository:
 
@@ -61,7 +94,7 @@ in [BIP15: Proposing Bancor 3](https://docs.google.com/document/d/11UeMYaI_1CWdf
    git clone https://github.com/bancorprotocol/simulator-v3
    ```
 
-## Build and preview the jupyter-book text locally
+### Build and preview the jupyter-book text locally
 
 To build locally, `pip install -r requirements.txt` and then `jupyter-book build .`
 

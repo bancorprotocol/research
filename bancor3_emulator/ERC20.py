@@ -1,4 +1,4 @@
-from solidity import uint, uint8, uint256, unchecked, mapping
+from solidity import uint, uint256, unchecked, mapping
 from utils import account
 
 '''
@@ -70,8 +70,8 @@ class ERC20(account):
      * no way affects any of the arithmetic of the contract, including
      * {IERC20-balanceOf} and {IERC20-transfer}.
     '''
-    def decimals(self) -> (uint):
-        return uint8(18);
+    def decimals(self) -> (int):
+        return 18;
 
     '''
      * @dev See {IERC20-totalSupply}.

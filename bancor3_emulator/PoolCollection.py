@@ -861,7 +861,7 @@ class PoolCollection(account, BlockNumber):
         if (prevDefaultTradingFeePPM == newDefaultTradingFeePPM):
             return;
 
-        self._defaultTradingFeePPM = newDefaultTradingFeePPM;
+        self._defaultTradingFeePPM = uint32(newDefaultTradingFeePPM);
 
     '''
      * @dev returns a storage reference to pool data

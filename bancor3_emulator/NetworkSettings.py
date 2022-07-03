@@ -162,7 +162,7 @@ class NetworkSettings(account):
         if (prevPoolFundingLimit == amount):
             return;
 
-        self._poolFundingLimits[pool] = amount;
+        self._poolFundingLimits[pool] = uint256(amount);
 
     '''
      * @dev adds a token to the protected tokens whitelist,
@@ -194,7 +194,7 @@ class NetworkSettings(account):
         if (self._minLiquidityForTrading == amount):
             return;
 
-        self._minLiquidityForTrading = amount;
+        self._minLiquidityForTrading = uint256(amount);
 
     '''
      * @inheritdoc INetworkSettings
@@ -214,7 +214,7 @@ class NetworkSettings(account):
         if (prevWithdrawalFeePPM == newWithdrawalFeePPM):
             return;
 
-        self._withdrawalFeePPM = newWithdrawalFeePPM;
+        self._withdrawalFeePPM = uint32(newWithdrawalFeePPM);
 
     '''
      * @inheritdoc INetworkSettings
@@ -272,4 +272,4 @@ class NetworkSettings(account):
         if (prevDefaultFlashLoanFeePPM == newDefaultFlashLoanFeePPM):
             return;
 
-        self._defaultFlashLoanFeePPM = newDefaultFlashLoanFeePPM;
+        self._defaultFlashLoanFeePPM = uint32(newDefaultFlashLoanFeePPM);

@@ -77,13 +77,13 @@ class ERC20(account):
      * @dev See {IERC20-totalSupply}.
     '''
     def totalSupply(self) -> (uint):
-        return self._totalSupply;
+        return uint256(self._totalSupply);
 
     '''
      * @dev See {IERC20-balanceOf}.
     '''
     def balanceOf(self, account) -> (uint):
-        return self._balances[account];
+        return uint256(self._balances[account]);
 
     '''
      * @dev See {IERC20-transfer}.
@@ -102,7 +102,7 @@ class ERC20(account):
      * @dev See {IERC20-allowance}.
     '''
     def allowance(self, owner, spender) -> (uint):
-        return self._allowances[owner][spender];
+        return uint256(self._allowances[owner][spender]);
 
     '''
      * @dev See {IERC20-approve}.
@@ -262,7 +262,7 @@ class ERC20(account):
         spender,
         amount
     ):
-        self._allowances[owner][spender] = amount;
+        self._allowances[owner][spender] = uint256(amount);
 
     '''
      * @dev Spend `amount` form the allowance of `owner` toward `spender`.

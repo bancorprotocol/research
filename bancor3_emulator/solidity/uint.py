@@ -8,6 +8,9 @@ class uint:
         self.size = size
         self.data = uint._data(other) % 2 ** size
 
+    def clone(self):
+        return uint(self.size, self.data)
+
     def __add__(self, other):
         return self._new(other, int.__add__)
 

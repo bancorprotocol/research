@@ -116,7 +116,7 @@ class BancorNetwork(account, Time):
      * @dev returns the pending network fee amount to be burned by the vortex
     '''
     def pendingNetworkFeeAmount(self) -> (uint):
-        return self._pendingNetworkFeeAmount;
+        return self._pendingNetworkFeeAmount.clone();
 
     '''
      * @dev registers new pool collection with the network

@@ -122,7 +122,7 @@ class NetworkSettings(account):
      * @inheritdoc INetworkSettings
     '''
     def poolFundingLimit(self, pool) -> (uint):
-        return self._poolFundingLimits[pool];
+        return self._poolFundingLimits[pool].clone();
 
     '''
      * @dev updates the amount of BNT that the protocol can provide as funding for a specific pool
@@ -180,7 +180,7 @@ class NetworkSettings(account):
      * @inheritdoc INetworkSettings
     '''
     def minLiquidityForTrading(self) -> (uint):
-        return self._minLiquidityForTrading;
+        return self._minLiquidityForTrading.clone();
 
     '''
      * @dev updates the minimum liquidity for trading amount
@@ -200,7 +200,7 @@ class NetworkSettings(account):
      * @inheritdoc INetworkSettings
     '''
     def withdrawalFeePPM(self) -> (uint):
-        return self._withdrawalFeePPM;
+        return self._withdrawalFeePPM.clone();
 
     '''
      * @dev sets the withdrawal fee (in units of PPM)
@@ -220,7 +220,7 @@ class NetworkSettings(account):
      * @inheritdoc INetworkSettings
     '''
     def defaultFlashLoanFeePPM(self) -> (uint):
-        return self._defaultFlashLoanFeePPM;
+        return self._defaultFlashLoanFeePPM.clone();
 
     '''
      * @dev sets the default flash-loan fee (in units of PPM)
@@ -238,7 +238,7 @@ class NetworkSettings(account):
     def flashLoanFeePPM(self, pool) -> (uint):
         flashLoanFee = self._flashLoanFees[pool];
 
-        return flashLoanFee.feePPM if flashLoanFee.initialized else self._defaultFlashLoanFeePPM;
+        return (flashLoanFee.feePPM if flashLoanFee.initialized else self._defaultFlashLoanFeePPM).clone();
 
     '''
      * @dev sets the flash-loan fee of a given pool

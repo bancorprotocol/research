@@ -42,40 +42,40 @@ def toUint512(x):
     return Uint512({'hi': x >> 256, 'lo': x & MAX_UINT256})
 
 def testExp(f):
-    print('exp2({} / {})'.format(int(f.n), int(f.d)));
+    print('exp2({} / {})'.format(f.n, f.d));
     try:
         actual = MathEx.exp2(f);
-        print('{} / {}'.format(int(actual.n), int(actual.d)));
+        print('{} / {}'.format(actual.n, actual.d));
     except AssertionError as error:
         assert str(error) == 'Overflow'
         print('Overflow');
 
 def testReducedFraction(f, max):
-    print('reducedFraction({} / {}, {})'.format(int(f.n), int(f.d), int(max)));
+    print('reducedFraction({} / {}, {})'.format(f.n, f.d, max));
     try:
         actual = MathEx.reducedFraction(f, max);
-        print('{} / {}'.format(int(actual.n), int(actual.d)));
+        print('{} / {}'.format(actual.n, actual.d));
     except AssertionError as error:
         assert str(error) == 'InvalidFraction'
         print('InvalidFraction');
 
 def testWeightedAverage(f1, f2, w1, w2):
-    print('weightedAverage({} / {}, {} / {}, {}, {})'.format(int(f1.n), int(f1.d), int(f2.n), int(f2.d), int(w1), int(w2)));
+    print('weightedAverage({} / {}, {} / {}, {}, {})'.format(f1.n, f1.d, f2.n, f2.d, w1, w2));
     actual = MathEx.weightedAverage(f1, f2, w1, w2);
-    print('{} / {}'.format(int(actual.n), int(actual.d)));
+    print('{} / {}'.format(actual.n, actual.d));
 
 def testIsInRange(f1, f2, maxDeviation):
-    print('isInRange({} / {}, {} / {}, {}%)'.format(int(f1.n), int(f1.d), int(f2.n), int(f2.d), int(maxDeviation)));
+    print('isInRange({} / {}, {} / {}, {}%)'.format(f1.n, f1.d, f2.n, f2.d, maxDeviation));
     actual = MathEx.isInRange(f1, f2, maxDeviation * 10000);
     print('true' if actual else 'false');
 
 def testMulDiv(x, y, z):
     for funcName in mulDivFuncs.keys():
-        print('{}({}, {}, {})'.format(funcName, int(x), int(y), int(z)));
+        print('{}({}, {}, {})'.format(funcName, x, y, z));
         expected = mulDivFuncs[funcName]['expected'](x, y, z);
         if (expected <= MAX_UINT256):
             actual = mulDivFuncs[funcName]['actual'](x, y, z);
-            print(int(actual));
+            print(actual);
         else:
             try:
                 actual = mulDivFuncs[funcName]['actual'](x, y, z);
@@ -85,20 +85,20 @@ def testMulDiv(x, y, z):
                 print('Overflow');
 
 def testSubMax0(x, y):
-    print('subMax0({}, {})'.format(int(x), int(y)));
+    print('subMax0({}, {})'.format(x, y));
     actual = MathEx.subMax0(x, y);
-    print(int(actual));
+    print(actual);
 
 def testMul512(x, y):
-    print('mul512({}, {})'.format(int(x), int(y)));
+    print('mul512({}, {})'.format(x, y));
     actual = MathEx.mul512(x, y);
-    print('{},{}'.format(int(actual.hi), int(actual.lo)));
+    print('{},{}'.format(actual.hi, actual.lo));
 
 def testComp512(a, b):
     for x in [a, (a + 1) * b]:
         for y in [b, (b + 1) * a]:
             for funcName in comp512Funcs.keys():
-                print('{}({}, {})'.format(funcName, int(x), int(y)));
+                print('{}({}, {})'.format(funcName, x, y));
                 actual = comp512Funcs[funcName](toUint512(x), toUint512(y));
                 print('true' if actual else 'false');
 

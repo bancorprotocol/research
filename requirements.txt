@@ -2,7 +2,9 @@ pandas
 numpy
 networkx
 cloudpickle
-woodwork
-tabulate
 pyarrow
 fastparquet
+mesa
+pydantic
+click
+black

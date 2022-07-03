@@ -364,9 +364,9 @@ class BancorNetwork(account, Time):
     def withdrawNetworkFees(self, recipient) -> (uint):
         currentPendingNetworkFeeAmount = self._pendingNetworkFeeAmount;
         if (currentPendingNetworkFeeAmount == 0):
-            return 0;
+            return uint256(0);
 
-        self._pendingNetworkFeeAmount = 0;
+        self._pendingNetworkFeeAmount = uint256(0);
 
         self._masterVault.withdrawFunds(address(self._bnt), payable(recipient), currentPendingNetworkFeeAmount);
 

@@ -15,7 +15,7 @@ for n in [0, 2, 32, 112, 128, 256]:
         x = 2 ** n + k
         for cast in [uint32, uint112, uint128, uint256]:
             y = cast(x)
-            print('{}({}) = {}'.format(cast.__name__, x, int(y)))
+            print('{}({}) = {}'.format(cast.__name__, x, y))
             assert y.size == int(cast.__name__[4:])
             assert int(y) == x & (2 ** y.size - 1)
             assert y == cast(y) == uint256(y)

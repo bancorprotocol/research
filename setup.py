@@ -1,4 +1,11 @@
+import re
+
 from setuptools import find_packages, setup
+
+with open("bancor_simulator/__init__.py") as fd:
+    version = re.search(
+        r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', fd.read(), re.MULTILINE
+    ).group(1)
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
@@ -7,11 +14,13 @@ extras_require = {}
 extras_require['complete'] = sorted(set(sum(extras_require.values(), [])))
 
 setup(
-    name='bancor3_simulator',
-    version='1.0.02',
+    name='bancor_simulator',
+    version=version,
     author='Bancor Network',
     author_email='mike@bancor.network',
-    description='Bancor3 Simulator is an open-source python package developed by the Bancor Research Team. It’s meant to assist designing, testing, and validating Bancor v3 behavior.',
+    description='Bancor v3 python spec and simulation library. '
+                'This is an open-source python package developed by the Bancor Research Team.'
+                'It is meant to assist in the design, testing, and validating of Bancor v3 behavior.',
     long_description=long_description,
     long_description_content_type="text/markdown",
     url='https://github.com/bancorprotocol/simulator-v3',
@@ -22,12 +31,12 @@ setup(
     include_package_data=True,
     entry_points={
         'console_scripts': [
-          'bancor3_simulator = bancor3_simulator.__main__:cli'
+          'bancor_simulator = bancor_simulator.__main__:cli'
         ]
     },
     data_files=[
-        ('bancor3_simulator/tests/data', [
-                                'bancor3_simulator/tests/data/scenarios_2.json'
+        ('bancor_simulator/tests/data', [
+                                'bancor_simulator/tests/data/scenarios.json'
                               ])
                 ],
 )

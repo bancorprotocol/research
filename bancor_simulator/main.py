@@ -2,7 +2,7 @@
 """CLI commands."""
 import click
 
-from bancor_simulator.archive.utils.logging_utils import print_info
+from bancor_simulator.v3.cli_utils import print_info
 
 
 @click.group()

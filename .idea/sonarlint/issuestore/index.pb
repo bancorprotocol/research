@@ -1,14 +1,10 @@
 
-R
-"bancor3_simulator/core/__init__.py,c/c/cc3561117b38938e1ec49180fb708873bb9ccf2a
 X
 (jupyterbook/_build/html/_static/book.css,e/7/e77f75fcbe52a0d85ae67762130f553f22dfba18
 L
 jupyterbook/_static/book.css,9/4/94afd9f0dae2a83b51bb242ee4d52a2f02875b56
 Y
 )jupyterbook/chapters/bancor3-simulator.md,7/b/7be083ff893391a4d9cac4def220ef15fcfb43de
-M
-bancor3_simulator/__init__.py,2/d/2d30eaa4cb5915e2440e269b3caa008214b24134
 L
 jupyterbook/requirements.txt,0/d/0d4dd5e85ab12450ac7d2d7968d08fade1546e3a
 D
@@ -21,8 +17,6 @@ U
 %examples/bootstrapping-behavior.ipynb,0/0/00ff543d2fa11daddcdde183f4b0f751c90ec6bd
 J
 examples/staking-tkn.ipynb,1/b/1b2293cf6caa2659646b96fd5c25d30d6bbeb3b8
-8
-setup.py,8/e/8e2edce0d507e1297474f25c00cae94258db38d8
 f
 6jupyterbook/chapters/02/7/bootstrapping-behavior.ipynb,4/2/4246a13069181e2333707ab4e1bf2f23836233c4
 `
@@ -39,5 +33,3 @@ i
 9jupyterbook/chapters/02/11/1/4/tkn-surplus-examples.ipynb,1/f/1f7abe1f12836a9c5c4098eb34846ac21b17f68d
 `
 0jupyterbook/chapters/03/simulation-example.ipynb,5/2/52f0fd3d0a6e030f79c7753b9334254bb730554e
-\
-,bancor3_simulator/protocol/utils/security.py,6/e/6e49c1824698a7e322e0f8a00405e17ef42b5180

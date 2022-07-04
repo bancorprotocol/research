@@ -94,7 +94,7 @@ class StandardRewards(account, Time):
      * @dev performs contract-specific initialization
     '''
     def __StandardRewards_init_unchained(self) -> None:
-        self._nextProgramId = self.INITIAL_PROGRAM_ID;
+        self._nextProgramId = self.INITIAL_PROGRAM_ID.clone();
 
         # a mapping between providers and the program IDs of the program they are participating in
         self._programIdsByProvider = mapping(lambda: EnumerableSet());

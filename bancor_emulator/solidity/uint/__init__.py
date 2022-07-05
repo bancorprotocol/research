@@ -1,1 +1,3 @@
-from . fixed import *
+from config import mode
+
+exec('from . {} import *'.format(mode))

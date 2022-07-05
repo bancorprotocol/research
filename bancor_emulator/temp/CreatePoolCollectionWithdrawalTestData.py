@@ -14,6 +14,7 @@ for fileName in ['PoolCollectionWithdrawalCoverage{}'.format(n + 1) for n in ran
     file = open(os.path.dirname(__file__) + '/project/tests/data/' + fileName + '.json')
     table = json.loads(file.read());
     file.close()
+
     for row in table:
         a, b, c, e, w, m, n, x = [row[z] for z in 'a, b, c, e, w, m, n, x'.split(', ')]
         actual = PoolCollectionWithdrawal.calculateWithdrawalAmounts(a, b, c, e, w, m, n, x);
@@ -24,7 +25,9 @@ for fileName in ['PoolCollectionWithdrawalCoverage{}'.format(n + 1) for n in ran
         row['t'] = '{:.12f}'.format(actual.t.data);
         row['u'] = '{:.12f}'.format(actual.u.data);
         row['v'] = '{:.12f}'.format(actual.v.data);
+
     file = open(os.path.dirname(__file__) + '/project/tests/data/' + fileName + '.json', "w")
     file.write(json.dumps(table, indent = 2));
     file.close()
+
     print(fileName)

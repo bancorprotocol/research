@@ -19,7 +19,7 @@ maxErrors = {
         'q': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.0000002') },
         'r': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0') },
         's': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0'), 'relation': Relation.LesserOrEqual },
-        't': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.0000000003') },
+        't': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.00000008') },
         'u': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.0000000003') },
         'v': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0'), 'relation': Relation.GreaterOrEqual }
     },
@@ -29,7 +29,7 @@ maxErrors = {
         'q': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.00000000000000002') },
         'r': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0') },
         's': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0'), 'relation': Relation.LesserOrEqual },
-        't': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.00000000000000000003') },
+        't': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.000000000000000008') },
         'u': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.00000000000000000003') },
         'v': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0'), 'relation': Relation.GreaterOrEqual }
     },
@@ -39,8 +39,8 @@ maxErrors = {
         'q': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.00000000000000000000000006') },
         'r': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0') },
         's': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0'), 'relation': Relation.LesserOrEqual },
-        't': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.0000000000000000000004') },
-        'u': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.0000000000000000000004') },
+        't': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.0000000000000000002') },
+        'u': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.0000000000000000002') },
         'v': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0'), 'relation': Relation.GreaterOrEqual }
     },
 
@@ -59,8 +59,8 @@ maxErrors = {
         'q': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.000000000002') },
         'r': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0') },
         's': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0'), 'relation': Relation.LesserOrEqual },
-        't': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.000000007') },
-        'u': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.000000007') },
+        't': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.0000004') },
+        'u': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.0000004') },
         'v': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0'), 'relation': Relation.GreaterOrEqual }
     },
 
@@ -79,8 +79,8 @@ maxErrors = {
         'q': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.0000000006') },
         'r': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.000000000000000000000000000005') },
         's': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.00000003'), 'relation': Relation.LesserOrEqual },
-        't': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.000000002') },
-        'u': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.000000002') },
+        't': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.003') },
+        'u': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.003') },
         'v': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0'), 'relation': Relation.GreaterOrEqual }
     },
 
@@ -112,6 +112,7 @@ for fileName in maxErrors:
     file = open(os.path.dirname(__file__) + '/project/tests/data/' + fileName + '.json')
     table = json.loads(file.read());
     file.close()
+
     for row in table:
         a, b, c, e, w, m, n, x = [row[z] for z in 'a, b, c, e, w, m, n, x'.split(', ')]
         p, q, r, s, t, u, v = [row[z] for z in 'p, q, r, s, t, u, v'.split(', ')]

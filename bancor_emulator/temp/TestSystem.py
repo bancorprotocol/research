@@ -5,10 +5,7 @@ sys.path.append(os.path.dirname(__file__) + '/..')
 
 import json
 
-from decimal import Decimal
-from decimal import getcontext
-
-getcontext().prec = 155
+from solidity.uint.float import Decimal
 
 from solidity import uint32, uint256, block
 

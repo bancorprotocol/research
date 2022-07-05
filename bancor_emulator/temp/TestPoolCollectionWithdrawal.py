@@ -3,14 +3,11 @@ import os
 
 sys.path.append(os.path.dirname(__file__) + '/..')
 
-from PoolCollectionWithdrawal import PoolCollectionWithdrawal
-
 import json
 
-from decimal import Decimal
-from decimal import getcontext
+from solidity.uint.float import Decimal
 
-getcontext().prec = 155
+from PoolCollectionWithdrawal import PoolCollectionWithdrawal
 
 class Relation:
     LesserOrEqual = 1

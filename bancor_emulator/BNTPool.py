@@ -149,7 +149,7 @@ class BNTPool(Vault):
         poolTokenBalance = self._poolToken.balanceOf(address(self));
         if (poolTokenAmount > poolTokenBalance):
             newPoolTokenAmount = poolTokenAmount - poolTokenBalance;
-            increaseStakedBalanceAmount = self._poolTokenToUnderlying(
+            increaseStakedBalanceAmount = self._poolTokenToUnderlying_(
                 newPoolTokenAmount,
                 currentStakedBalance,
                 poolTokenTotalSupply
@@ -277,7 +277,7 @@ class BNTPool(Vault):
         poolTokenAmount = Math.min(poolTokenAmount, self._poolToken.balanceOf(address(self)));
 
         # calculate the final amount to deduct from the staked balance
-        reduceStakedBalanceAmount = self._poolTokenToUnderlying(
+        reduceStakedBalanceAmount = self._poolTokenToUnderlying_(
             poolTokenAmount,
             currentStakedBalance,
             poolTokenTotalSupply
@@ -319,12 +319,12 @@ class BNTPool(Vault):
      * @dev converts the specified pool token amount to the underlying BNT amount
     '''
     def _poolTokenToUnderlying(self, poolTokenAmount) -> (uint):
-        return self._poolTokenToUnderlying(poolTokenAmount, self._stakedBalance, self._poolToken.totalSupply());
+        return self._poolTokenToUnderlying_(poolTokenAmount, self._stakedBalance, self._poolToken.totalSupply());
 
     '''
      * @dev converts the specified pool token amount to the underlying BNT amount
     '''
-    def _poolTokenToUnderlying(self,
+    def _poolTokenToUnderlying_(self,
         poolTokenAmount,
         currentStakedBalance,
         poolTokenTotalSupply

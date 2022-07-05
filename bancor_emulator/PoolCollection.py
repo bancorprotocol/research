@@ -94,6 +94,7 @@ class PoolCollection(account, BlockNumber):
     BOOTSTRAPPING_LIQUIDITY_BUFFER_FACTOR = uint256(2);
     DEFAULT_TRADING_FEE_PPM = uint32(2_000); # 0.2%
     RATE_MAX_DEVIATION_PPM = uint32(10_000); # %1
+    RATE_RESET_BLOCK_THRESHOLD = uint32(100);
 
     # the average rate is recalculated based on the ratio between the weights of the rates the smaller the weights are,
     # the larger the supported range of each one of the rates is
@@ -165,7 +166,7 @@ class PoolCollection(account, BlockNumber):
      * @inheritdoc IVersioned
     '''
     def version(self) -> (int):
-        return 6;
+        return 7;
 
     '''
      * @inheritdoc IPoolCollection
@@ -320,7 +321,7 @@ class PoolCollection(account, BlockNumber):
         protocolPoolTokenAmount
     ) -> (uint):
         if (baseTokenAmountToDistribute == 0):
-            return 0;
+            return uint256(0);
 
         data = self._poolData[pool];
 
@@ -340,7 +341,7 @@ class PoolCollection(account, BlockNumber):
     def isPoolStable(self, pool) -> (bool):
         data = self._poolData[pool];
 
-        return self._poolRateState(data.liquidity, data.averageRates) == PoolRateState.Stable;
+        return self._poolRateState(data) == PoolRateState.Stable;
 
     '''
      * @dev sets the trading fee of a given pool
@@ -450,13 +451,24 @@ class PoolCollection(account, BlockNumber):
         prevLiquidity = data.liquidity;
         currentStakedBalance = prevLiquidity.stakedBalance;
 
-        # if there are no pool tokens available to support the staked balance - reset the trading liquidity and the
-        # staked balance
+        # if there are no pool tokens available to support the staked balance - reset the
+        # trading liquidity and the staked balance
+        # in addition, get the effective average rates
         prevPoolTokenTotalSupply = data.poolToken.totalSupply();
         if (prevPoolTokenTotalSupply == 0 and currentStakedBalance != 0):
             currentStakedBalance = uint256(0);
 
             self._resetTradingLiquidity(contextId, pool, data, TRADING_STATUS_UPDATE_INVALID_STATE);
+            effectiveAverageRates = AverageRates({
+                'blockNumber': 0,
+                'rate': zeroFraction112(),
+                'invRate': zeroFraction112()
+            });
+        else:
+            effectiveAverageRates = self._effectiveAverageRates(
+                data.averageRates,
+                Fraction256({ 'n': prevLiquidity.bntTradingLiquidity, 'd': prevLiquidity.baseTokenTradingLiquidity })
+            );
 
         # calculate the pool token amount to mint
         poolTokenAmount = self._underlyingToPoolToken(
@@ -476,7 +488,7 @@ class PoolCollection(account, BlockNumber):
             contextId,
             pool,
             data,
-            data.averageRates.rate.fromFraction112(),
+            effectiveAverageRates.rate.fromFraction112(),
             self._networkSettings.minLiquidityForTrading()
         );
 
@@ -519,6 +531,9 @@ class PoolCollection(account, BlockNumber):
 
         if (baseTokenAmount > underlyingAmount):
             revert("InvalidParam");
+
+        if (self._poolRateState(data) == PoolRateState.Unstable):
+            revert("RateUnstable");
 
         # obtain the withdrawal amounts
         amounts = self._poolWithdrawalAmounts(
@@ -787,10 +802,6 @@ class PoolCollection(account, BlockNumber):
     ) -> None:
         liquidity = data.liquidity;
         prevLiquidity = liquidity;
-        averageRates = data.averageRates;
-
-        if (self._poolRateState(prevLiquidity, averageRates) == PoolRateState.Unstable):
-            revert("RateUnstable");
 
         data.poolToken.burn(amounts.poolTokenAmount);
 
@@ -988,7 +999,7 @@ class PoolCollection(account, BlockNumber):
 
         liquidity = data.liquidity;
 
-        if (self._poolRateState(liquidity, data.averageRates) == PoolRateState.Unstable):
+        if (self._poolRateState(data) == PoolRateState.Unstable):
             return;
 
         if (not fundingRate.isPositive()):
@@ -1289,30 +1300,27 @@ class PoolCollection(account, BlockNumber):
     '''
      * @dev returns the state of a pool's rate
     '''
-    def _poolRateState(self, liquidity, averageRates) -> (PoolRateState):
+    def _poolRateState(self, data) -> (PoolRateState):
         spotRate = Fraction256({
-            'n': liquidity.bntTradingLiquidity,
-            'd': liquidity.baseTokenTradingLiquidity
+            'n': data.liquidity.bntTradingLiquidity,
+            'd': data.liquidity.baseTokenTradingLiquidity
         });
 
+        averageRates = data.averageRates;
         rate = averageRates.rate;
-
         if (not spotRate.isPositive() or not rate.isPositive()):
             return PoolRateState.Uninitialized;
 
         invSpotRate = spotRate.inverse();
         invRate = averageRates.invRate;
-
         if (not invSpotRate.isPositive() or not invRate.isPositive()):
             return PoolRateState.Uninitialized;
 
-        if (averageRates.blockNumber != self._blockNumber()):
-            rate = self._calcAverageRate(rate, spotRate);
-            invRate = self._calcAverageRate(invRate, invSpotRate);
+        effectiveAverageRates = self._effectiveAverageRates(averageRates, spotRate);
 
         if (
-            MathEx.isInRange(rate.fromFraction112(), spotRate, self.RATE_MAX_DEVIATION_PPM) and
-            MathEx.isInRange(invRate.fromFraction112(), invSpotRate, self.RATE_MAX_DEVIATION_PPM)
+            MathEx.isInRange(effectiveAverageRates.rate.fromFraction112(), spotRate, self.RATE_MAX_DEVIATION_PPM) and
+            MathEx.isInRange(effectiveAverageRates.invRate.fromFraction112(), invSpotRate, self.RATE_MAX_DEVIATION_PPM)
         ):
             return PoolRateState.Stable;
 
@@ -1322,13 +1330,41 @@ class PoolCollection(account, BlockNumber):
      * @dev updates the average rates
     '''
     def _updateAverageRates(self, data, spotRate) -> None:
+        data.averageRates = self._effectiveAverageRates(data.averageRates, spotRate);
+
+    '''
+     * @dev returns the effective average rates
+    '''
+    def _effectiveAverageRates(self, averageRates, spotRate) -> (AverageRates):
         blockNumber = self._blockNumber();
 
-        if (data.averageRates.blockNumber != blockNumber):
-            data.averageRates = AverageRates({
+        # can only be updated once in a single block
+        prevUpdateBlock = averageRates.blockNumber;
+        if (prevUpdateBlock == blockNumber):
+            return averageRates;
+
+        # if sufficient blocks have passed, or if one of the rates isn't positive,
+        # reset the average rates
+        if (
+            blockNumber - prevUpdateBlock >= self.RATE_RESET_BLOCK_THRESHOLD or
+            not averageRates.rate.isPositive() or
+            not averageRates.invRate.isPositive()
+        ):
+            if (spotRate.isPositive()):
+                return \
+                    AverageRates({
+                        'blockNumber': blockNumber,
+                        'rate': spotRate.toFraction112(),
+                        'invRate': spotRate.inverse().toFraction112()
+                    });
+
+            return AverageRates({ 'blockNumber': 0, 'rate': zeroFraction112(), 'invRate': zeroFraction112() });
+
+        return \
+            AverageRates({
                 'blockNumber': blockNumber,
-                'rate': self._calcAverageRate(data.averageRates.rate, spotRate),
-                'invRate': self._calcAverageRate(data.averageRates.invRate, spotRate.inverse())
+                'rate': self._calcAverageRate(averageRates.rate, spotRate),
+                'invRate': self._calcAverageRate(averageRates.invRate, spotRate.inverse())
             });
 
     '''

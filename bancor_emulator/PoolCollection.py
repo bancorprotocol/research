@@ -321,7 +321,7 @@ class PoolCollection(account, BlockNumber):
         protocolPoolTokenAmount
     ) -> (uint):
         if (baseTokenAmountToDistribute == 0):
-            return 0;
+            return uint256(0);
 
         data = self._poolData[pool];
 
@@ -456,7 +456,7 @@ class PoolCollection(account, BlockNumber):
         # in addition, get the effective average rates
         prevPoolTokenTotalSupply = data.poolToken.totalSupply();
         if (prevPoolTokenTotalSupply == 0 and currentStakedBalance != 0):
-            currentStakedBalance = 0;
+            currentStakedBalance = uint256(0);
 
             self._resetTradingLiquidity(contextId, pool, data, TRADING_STATUS_UPDATE_INVALID_STATE);
             effectiveAverageRates = AverageRates({

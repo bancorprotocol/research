@@ -143,7 +143,7 @@ class BNTPool(Vault):
         if (poolTokenTotalSupply == 0 and currentStakedBalance > 0):
             revert("InvalidStakedBalance");
 
-        poolTokenAmount = self._underlyingToPoolToken(bntAmount, poolTokenTotalSupply, currentStakedBalance);
+        poolTokenAmount = self._underlyingToPoolToken_(bntAmount, poolTokenTotalSupply, currentStakedBalance);
 
         # if the protocol doesn't have enough pool tokens, mint new ones
         poolTokenBalance = self._poolToken.balanceOf(address(self));
@@ -235,7 +235,7 @@ class BNTPool(Vault):
         if (poolTokenTotalSupply == 0 and currentStakedBalance > 0):
             revert("InvalidStakedBalance");
 
-        poolTokenAmount = self._underlyingToPoolToken(bntAmount, poolTokenTotalSupply, currentStakedBalance);
+        poolTokenAmount = self._underlyingToPoolToken_(bntAmount, poolTokenTotalSupply, currentStakedBalance);
 
         # update the staked balance
         newStakedBalance = currentStakedBalance + bntAmount;
@@ -267,7 +267,7 @@ class BNTPool(Vault):
         # calculate the amount of pool tokens to burn
         # note that the given amount can exceed the total available but the request shouldn't fail
         poolTokenTotalSupply = self._poolToken.totalSupply();
-        poolTokenAmount = self._underlyingToPoolToken(
+        poolTokenAmount = self._underlyingToPoolToken_(
             reduceFundingAmount,
             poolTokenTotalSupply,
             currentStakedBalance

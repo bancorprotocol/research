@@ -61,7 +61,7 @@ class BNTPool(Vault):
      * @inheritdoc Upgradeable
     '''
     def version(self) -> (int):
-        return 2;
+        return 3;
 
     '''
      * @inheritdoc IBNTPool
@@ -137,11 +137,31 @@ class BNTPool(Vault):
         isMigrating,
         originalVBNTAmount
     ):
-        # calculate the pool token amount to transfer
-        poolTokenAmount = self._underlyingToPoolToken(bntAmount);
+        # calculate the required pool token amount
+        currentStakedBalance = self._stakedBalance;
+        poolTokenTotalSupply = self._poolToken.totalSupply();
+        if (poolTokenTotalSupply == 0 and currentStakedBalance > 0):
+            revert("InvalidStakedBalance");
 
-        # transfer pool tokens from the protocol to the provider. Please note that it's not possible to deposit
-        # liquidity requiring the protocol to transfer the provider more protocol tokens than it holds
+        poolTokenAmount = self._underlyingToPoolToken_(bntAmount, poolTokenTotalSupply, currentStakedBalance);
+
+        # if the protocol doesn't have enough pool tokens, mint new ones
+        poolTokenBalance = self._poolToken.balanceOf(address(self));
+        if (poolTokenAmount > poolTokenBalance):
+            newPoolTokenAmount = poolTokenAmount - poolTokenBalance;
+            increaseStakedBalanceAmount = self._poolTokenToUnderlying(
+                newPoolTokenAmount,
+                currentStakedBalance,
+                poolTokenTotalSupply
+            );
+
+            # update the staked balance
+            self._stakedBalance = currentStakedBalance + increaseStakedBalanceAmount;
+
+            # mint pool tokens to the protocol
+            self._poolToken.mint(address(self), newPoolTokenAmount);
+
+        # transfer pool tokens from the protocol to the provider
         self._poolToken.transfer(provider, poolTokenAmount);
 
         # burn the previously received BNT
@@ -170,8 +190,8 @@ class BNTPool(Vault):
         poolTokenAmount,
         bntAmount
     ):
-        # ensure that the provided amounts correspond to the state of the pool (please note the pool tokens should
-        # have been already deposited back from the network)
+        # ensure that the provided amounts correspond to the state of the pool. Note the pool tokens should
+        # have been already deposited back from the network
         underlyingAmount = self._poolTokenToUnderlying(poolTokenAmount);
         if (bntAmount > underlyingAmount):
             revert("InvalidParam");
@@ -212,14 +232,10 @@ class BNTPool(Vault):
         currentStakedBalance = self._stakedBalance;
         poolTokenAmount = uint256();
         poolTokenTotalSupply = self._poolToken.totalSupply();
-        if (poolTokenTotalSupply == 0):
-            # if this is the initial liquidity provision - use a one-to-one pool token to BNT rate
-            if (currentStakedBalance > 0):
-                revert("InvalidStakedBalance");
+        if (poolTokenTotalSupply == 0 and currentStakedBalance > 0):
+            revert("InvalidStakedBalance");
 
-            poolTokenAmount = bntAmount;
-        else:
-            poolTokenAmount = self._underlyingToPoolToken_(bntAmount, poolTokenTotalSupply, currentStakedBalance);
+        poolTokenAmount = self._underlyingToPoolToken_(bntAmount, poolTokenTotalSupply, currentStakedBalance);
 
         # update the staked balance
         newStakedBalance = currentStakedBalance + bntAmount;
@@ -244,11 +260,12 @@ class BNTPool(Vault):
     ):
         currentStakedBalance = self._stakedBalance;
 
-        # calculate the renounced amount to deduct from both the staked balance and current pool funding
+        # calculate the final amount to deduct from the current pool funding
         currentFunding = self._currentPoolFunding[pool];
         reduceFundingAmount = Math.min(currentFunding, bntAmount);
 
-        # calculate the pool token amount to burn
+        # calculate the amount of pool tokens to burn
+        # note that the given amount can exceed the total available but the request shouldn't fail
         poolTokenTotalSupply = self._poolToken.totalSupply();
         poolTokenAmount = self._underlyingToPoolToken_(
             reduceFundingAmount,
@@ -256,12 +273,22 @@ class BNTPool(Vault):
             currentStakedBalance
         );
 
-        # update the current pool funding. Note that the given amount can be higher than the funding amount but the
+        # ensure the amount of pool tokens doesn't exceed the total available
+        poolTokenAmount = Math.min(poolTokenAmount, self._poolToken.balanceOf(address(self)));
+
+        # calculate the final amount to deduct from the staked balance
+        reduceStakedBalanceAmount = self._poolTokenToUnderlying(
+            poolTokenAmount,
+            currentStakedBalance,
+            poolTokenTotalSupply
+        );
+
+        # update the current pool funding. Note that the given amount can exceed the funding amount but the
         # request shouldn't fail (and the funding amount cannot get negative)
         self._currentPoolFunding[pool] = currentFunding - reduceFundingAmount;
 
         # update the staked balance
-        newStakedBalance = currentStakedBalance - reduceFundingAmount;
+        newStakedBalance = currentStakedBalance - reduceStakedBalanceAmount;
         self._stakedBalance = newStakedBalance;
 
         # burn pool tokens from the protocol
@@ -292,7 +319,21 @@ class BNTPool(Vault):
      * @dev converts the specified pool token amount to the underlying BNT amount
     '''
     def _poolTokenToUnderlying(self, poolTokenAmount) -> (uint):
-        return MathEx.mulDivF(poolTokenAmount, self._stakedBalance, self._poolToken.totalSupply());
+        return self._poolTokenToUnderlying(poolTokenAmount, self._stakedBalance, self._poolToken.totalSupply());
+
+    '''
+     * @dev converts the specified pool token amount to the underlying BNT amount
+    '''
+    def _poolTokenToUnderlying(self,
+        poolTokenAmount,
+        currentStakedBalance,
+        poolTokenTotalSupply
+    ) -> (uint):
+        # if no pool token supply exists yet, use a one-to-one pool token to BNT rate
+        if (poolTokenTotalSupply == 0):
+            return poolTokenAmount;
+
+        return MathEx.mulDivF(poolTokenAmount, currentStakedBalance, poolTokenTotalSupply);
 
     '''
      * @dev converts the specified underlying BNT amount to pool token amount
@@ -308,6 +349,10 @@ class BNTPool(Vault):
         poolTokenTotalSupply,
         currentStakedBalance
     ) -> (uint):
+        # if no pool token supply exists yet, use a one-to-one pool token to BNT rate
+        if (poolTokenTotalSupply == 0):
+            return bntAmount;
+
         return MathEx.mulDivC(bntAmount, poolTokenTotalSupply, currentStakedBalance);
 
     '''

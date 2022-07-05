@@ -325,4 +325,22 @@ def _mulMod(
 ) -> (uint):
     return mulmod(x, y, z);
 
+from config import mode
+
+if mode == 'float':
+    def exp2(f: Fraction256) -> (Fraction256):
+        return Fraction256({ 'n': uint256(2) ** (f.n / f.d), 'd': 1 });
+    def reducedFraction(fraction: Fraction256, max: int) -> (Fraction256):
+        return fraction;
+    def mulDivF(x, y, z) -> (uint):
+        return uint256(x) * y / z 
+    def mulDivC(x, y, z) -> (uint):
+        return uint256(x) * y / z 
+    def gt512(x: Uint512, y: Uint512) -> (bool):
+        return x.lo > y.lo;
+    def lt512(x: Uint512, y: Uint512) -> (bool):
+        return x.lo < y.lo;
+    def mul512(x, y) -> (Uint512):
+        return Uint512({ 'hi': 0, 'lo': uint256(x) * y });
+
 library(vars(), MathEx)

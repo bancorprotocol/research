@@ -160,9 +160,11 @@ def affordableDeficit(
     n, # <= M == 1000000
     x ## <  e*c/(b+c) <= e <= 2**128-1
 ) -> (bool):
-    lhs: Uint512 = MathEx.mul512(b * e, f * m + e * n);
-    rhs: Uint512 = MathEx.mul512(f * x, g * (M - m));
-    return MathEx.gt512(lhs, rhs);
+    # temporarily disabled
+    #Uint512 memory lhs = MathEx.mul512(b * e, f * m + e * n);
+    #Uint512 memory rhs = MathEx.mul512(f * x, g * (M - m));
+    #return MathEx.gt512(lhs, rhs);
+    return False;
 
 '''
     * @dev returns `b*e*((b+c-e)*m+e*n) > (b+c-e)*x*(b+c-e*(1-n))*(1-m)`

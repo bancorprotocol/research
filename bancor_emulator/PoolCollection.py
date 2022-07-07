@@ -166,7 +166,7 @@ class PoolCollection(account, BlockNumber):
      * @inheritdoc IVersioned
     '''
     def version(self) -> (int):
-        return 7;
+        return 8;
 
     '''
      * @inheritdoc IPoolCollection
@@ -418,6 +418,35 @@ class PoolCollection(account, BlockNumber):
         data = self._poolStorage(pool);
 
         self._resetTradingLiquidity(uint256(0), pool, data, TRADING_STATUS_UPDATE_ADMIN);
+
+    '''
+     * @dev adjusts the trading liquidity in the given pool based on the base token
+     * vault balance/funding limit
+     *
+     * requirements:
+     *
+     * - the caller must be the owner of the contract
+    '''
+    def updateTradingLiquidity(self, pool) -> None:
+        data = self._poolStorage(pool);
+        liquidity = data.liquidity;
+
+        contextId = uint256(0);
+
+        effectiveAverageRates = self._effectiveAverageRates(
+            data.averageRates,
+            Fraction256({ 'n': liquidity.bntTradingLiquidity, 'd': liquidity.baseTokenTradingLiquidity })
+        );
+        minLiquidityForTrading = self._networkSettings.minLiquidityForTrading();
+        self._updateTradingLiquidity(
+            contextId,
+            pool,
+            data,
+            effectiveAverageRates.rate.fromFraction112(),
+            minLiquidityForTrading
+        );
+
+        self._dispatchTradingLiquidityEvents(contextId, pool, data.poolToken.totalSupply(), liquidity, data.liquidity);
 
     '''
      * @dev enables/disables depositing into a given pool

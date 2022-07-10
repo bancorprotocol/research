@@ -1,7 +1,7 @@
 const PoolToken = artifacts.require("PoolToken");
 const ERC20 = artifacts.require("ERC20");
 
-contract.only('PoolToken', () => {
+contract('PoolToken', () => {
     const POOL_TOKEN_NAME = 'Pool Token';
     const POOL_TOKEN_SYMBOL = 'POOL';
     const POOL_TOKEN_DECIMALS = 10;

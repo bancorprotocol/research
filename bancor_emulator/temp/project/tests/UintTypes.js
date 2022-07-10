@@ -136,6 +136,44 @@ contract("UintTypes", () => {
             }
         }
 
+        console.log('Test -=')
+        for (const n of [0, 2, 32, 112, 128, 256]) {
+            for (const k of [-1, 0, +1]) {
+                const m = new BN(1).shln(n).addn(k);
+                for (const lcast of [32, 112, 128, 256]) {
+                    for (const rcast of [32, 112, 128, 256]) {
+                        console.log(`    uint${lcast}(${m}) -= uint${rcast}(${m})`);
+                        try {
+                            const x = await uintTypes[`isub_${lcast}_${rcast}`](m.maskn(lcast), m.maskn(rcast));
+                            assert(x.eq(m.maskn(lcast).sub(m.maskn(rcast))), 'arithmetic error');
+                        }
+                        catch (error) {
+                            assert(error.message.includes(lcast >= rcast ? 'reverted with panic code' : 'is not a function'), error.message);
+                        }
+                    }
+                }
+            }
+        }
+
+        console.log('Test unchecked -=')
+        for (const n of [0, 2, 32, 112, 128, 256]) {
+            for (const k of [-1, 0, +1]) {
+                const m = new BN(1).shln(n).addn(k);
+                for (const lcast of [32, 112, 128, 256]) {
+                    for (const rcast of [32, 112, 128, 256]) {
+                        console.log(`    uint${lcast}(${m}) -= uint${rcast}(${m})`);
+                        try {
+                            const x = await uintTypes[`unchecked_isub_${lcast}_${rcast}`](m.maskn(lcast), m.maskn(rcast));
+                            assert(x.eq(m.maskn(lcast).sub(m.maskn(rcast)).maskn(lcast)), 'arithmetic error');
+                        }
+                        catch (error) {
+                            assert(error.message.includes(lcast >= rcast ? 'reverted with panic code' : 'is not a function'), error.message);
+                        }
+                    }
+                }
+            }
+        }
+
         console.log('Test *=')
         for (const n of [0, 2, 32, 112, 128, 256]) {
             for (const k of [-1, 0, +1]) {

@@ -119,6 +119,38 @@ for n in [0, 2, 32, 112, 128, 256]:
                     assert x.size < max(rcast(m).size, len(bin(m + m)) - 2), 'logical error'
 unchecked.end()
 
+print('Test -=')
+for n in [0, 2, 32, 112, 128, 256]:
+    for k in [-1, 0, +1]:
+        m = 2 ** n + k
+        for lcast in [uint32, uint112, uint128, uint256]:
+            for rcast in [uint32, uint112, uint128, uint256]:
+                print('    {}({}) -= {}({})'.format(lcast.__name__, m, rcast.__name__, m))
+                x = lcast(m)
+                try:
+                    x -= rcast(m)
+                    assert x == int(lcast(m)) - int(rcast(m)), 'arithmetic error'
+                except AssertionError as error:
+                    assert not str(error)
+                    assert x.size < max(rcast(m).size, len(bin(m + m)) - 2), 'logical error'
+
+unchecked.begin()
+print('Test unchecked -=')
+for n in [0, 2, 32, 112, 128, 256]:
+    for k in [-1, 0, +1]:
+        m = 2 ** n + k
+        for lcast in [uint32, uint112, uint128, uint256]:
+            for rcast in [uint32, uint112, uint128, uint256]:
+                print('    {}({}) -= {}({})'.format(lcast.__name__, m, rcast.__name__, m))
+                x = lcast(m)
+                try:
+                    x -= rcast(m)
+                    assert x == (int(lcast(m)) - int(rcast(m))) % 2 ** x.size, 'arithmetic error'
+                except AssertionError as error:
+                    assert not str(error)
+                    assert x.size < max(rcast(m).size, len(bin(m + m)) - 2), 'logical error'
+unchecked.end()
+
 print('Test *=')
 for n in [0, 2, 32, 112, 128, 256]:
     for k in [-1, 0, +1]:

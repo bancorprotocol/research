@@ -62,7 +62,7 @@ class BancorNetwork:
         self.poolTokenFactory   = Emulator.PoolTokenFactory()
         self.poolMigrator       = None
         self.poolCollection     = Emulator.PoolCollection(self.network, self.bnt, self.networkSettings, self.masterVault, self.bntPool, self.epVault, self.poolTokenFactory, self.poolMigrator, toPPM(network_fee))
-        self.standardRewards    = Emulator.StandardRewards(self.network, self.networkSettings, self.bntGovernance, self.vbnt, self.bntPool, self.erVault);
+        self.standardRewards    = Emulator.StandardRewards(self.network, self.networkSettings, self.bntGovernance, self.vbnt, self.bntPool, self.erVault)
 
         self.networkSettings.initialize()
         self.network.initialize(self.bntPool, self.pendingWithdrawals, self.poolMigrator)
@@ -71,10 +71,10 @@ class BancorNetwork:
         self.poolTokenFactory.initialize()
         self.standardRewards.initialize()
 
-        self.networkSettings.setWithdrawalFeePPM(toPPM(withdrawal_fee));
-        self.networkSettings.setMinLiquidityForTrading(toWei(bnt_min_liquidity, DEFAULT_DECIMALS));
+        self.networkSettings.setWithdrawalFeePPM(toPPM(withdrawal_fee))
+        self.networkSettings.setMinLiquidityForTrading(toWei(bnt_min_liquidity, DEFAULT_DECIMALS))
 
-        self.pendingWithdrawals.setLockDuration(cooldown_time);
+        self.pendingWithdrawals.setLockDuration(cooldown_time)
 
         self.network.registerPoolCollection(self.poolCollection)
 
@@ -82,10 +82,10 @@ class BancorNetwork:
         self.poolTokens = {'bnbnt': self.bnbnt}
         for tkn_name in whitelisted_tokens:
             tkn = Emulator.ReserveToken(tkn_name, tkn_name, DEFAULT_DECIMALS) # TODO: support decimals per reserve token
-            self.networkSettings.addTokenToWhitelist(tkn);
-            self.networkSettings.setFundingLimit(tkn, toWei(bnt_funding_limit, DEFAULT_DECIMALS));
+            self.networkSettings.addTokenToWhitelist(tkn)
+            self.networkSettings.setFundingLimit(tkn, toWei(bnt_funding_limit, DEFAULT_DECIMALS))
             self.network.createPools([tkn], self.poolCollection)
-            self.poolCollection.setTradingFeePPM(tkn, toPPM(trading_fee));
+            self.poolCollection.setTradingFeePPM(tkn, toPPM(trading_fee))
             self.reserveTokens[tkn_name] = tkn
             self.poolTokens[tkn_name] = self.network.collectionByPool(tkn).poolToken(tkn)
 
@@ -99,7 +99,7 @@ class BancorNetwork:
         action_name="deposit",
     ):
         tkn = self.reserveTokens[tkn_name]
-        return self.network.connect(user_name).deposit(tkn, toWei(tkn_amt, tkn.decimals()));
+        return self.network.connect(user_name).deposit(tkn, toWei(tkn_amt, tkn.decimals()))
 
     def trade(
         self,
@@ -112,7 +112,7 @@ class BancorNetwork:
     ):
         src_tkn = self.reserveTokens[source_token]
         trg_tkn = self.reserveTokens[target_token]
-        return self.network.connect(user_name).tradeBySourceAmount(src_tkn, trg_tkn, toWei(tkn_amt, src_tkn.decimals()), 1, uint256.max, user_name);
+        return self.network.connect(user_name).tradeBySourceAmount(src_tkn, trg_tkn, toWei(tkn_amt, src_tkn.decimals()), 1, uint256.max, user_name)
 
     def begin_cooldown(
         self,
@@ -123,7 +123,7 @@ class BancorNetwork:
         action_name: str = "begin cooldown",
     ):
         tkn = self.poolTokens[tkn_name]
-        return self.network.connect(user_name).initWithdrawal(tkn, toWei(tkn_amt, tkn.decimals()));
+        return self.network.connect(user_name).initWithdrawal(tkn, toWei(tkn_amt, tkn.decimals()))
 
     def withdraw(
         self,
@@ -134,7 +134,7 @@ class BancorNetwork:
         tkn_amt: Decimal = None,
         transaction_type: str = "withdraw",
     ):
-        return self.network.connect(user_name).withdraw(id_number);
+        return self.network.connect(user_name).withdraw(id_number)
 
     def burn(
         self,
@@ -145,7 +145,7 @@ class BancorNetwork:
         transaction_type: str = "burnPoolTokenTKN",
     ):
         tkn = self.poolTokens[tkn_name]
-        tkn.connect(user_name).burn(toWei(tkn_amt, tkn.decimals()));
+        tkn.connect(user_name).burn(toWei(tkn_amt, tkn.decimals()))
 
     def claim_standard_rewards(
         self,
@@ -156,7 +156,7 @@ class BancorNetwork:
         transaction_type: str = "claim_standard_rewards",
         timestamp: int = None,
     ):
-        return self.standardRewards.connect(user_name).claimRewards(rewards_ids);
+        return self.standardRewards.connect(user_name).claimRewards(rewards_ids)
 
     def join_standard_rewards(
         self,
@@ -167,7 +167,7 @@ class BancorNetwork:
         transaction_type="join_standard_rewards",
     ):
         tkn = self.poolTokens[tkn_name]
-        return self.standardRewards.connect(user_name).join(tknProgramId, toWei(tkn_amt, tkn.decimals()));
+        return self.standardRewards.connect(user_name).join(tknProgramId, toWei(tkn_amt, tkn.decimals()))
 
     def leave_standard_rewards(
         self,
@@ -179,7 +179,7 @@ class BancorNetwork:
         transaction_type="leave_standard_rewards",
     ):
         tkn = self.poolTokens[tkn_name]
-        return self.standardRewards.connect(user_name).leave(tknProgramId, toWei(tkn_amt, tkn.decimals()));
+        return self.standardRewards.connect(user_name).leave(tknProgramId, toWei(tkn_amt, tkn.decimals()))
 
     def set_user_balance(
         self,
@@ -191,7 +191,7 @@ class BancorNetwork:
     ):
         tkn = self.reserveTokens[tkn_name]
         func = self.bntGovernance.mint if tkn == self.bnt else tkn.issue
-        func(user_name, toWei(tkn_amt, tkn.decimals()));
+        func(user_name, toWei(tkn_amt, tkn.decimals()))
 
     def set_trading_fee(
         self,
@@ -201,7 +201,7 @@ class BancorNetwork:
         transaction_type: str = "set trading fee",
         user_name: str = "protocol",
     ):
-        self.poolCollection.setTradingFeePPM(self.reserveTokens[tkn_name], toPPM(value));
+        self.poolCollection.setTradingFeePPM(self.reserveTokens[tkn_name], toPPM(value))
 
     def set_network_fee(
         self,
@@ -211,7 +211,7 @@ class BancorNetwork:
         transaction_type: str = "set network fee",
         user_name: str = "protocol",
     ):
-        self.poolCollection.setNetworkFeePPM(toPPM(value));
+        self.poolCollection.setNetworkFeePPM(toPPM(value))
 
     def set_withdrawal_fee(
         self,
@@ -221,7 +221,7 @@ class BancorNetwork:
         transaction_type: str = "set withdrawal fee",
         user_name: str = "protocol",
     ):
-        self.networkSettings.setWithdrawalFeePPM(toPPM(value));
+        self.networkSettings.setWithdrawalFeePPM(toPPM(value))
 
     def set_bnt_funding_limit(
         self,
@@ -232,4 +232,4 @@ class BancorNetwork:
         user_name: str = "protocol",
     ):
         tkn = self.reserveTokens[tkn_name]
-        self.networkSettings.setFundingLimit(tkn, toWei(value, self.bnt.decimals()));
+        self.networkSettings.setFundingLimit(tkn, toWei(value, self.bnt.decimals()))

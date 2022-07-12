@@ -2,7 +2,7 @@ import re
 
 from setuptools import find_packages, setup
 
-with open("bancor_simulator/__init__.py") as fd:
+with open("bancor_research/__init__.py") as fd:
     version = re.search(
         r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', fd.read(), re.MULTILINE
     ).group(1)
@@ -14,7 +14,7 @@ extras_require = {}
 extras_require['complete'] = sorted(set(sum(extras_require.values(), [])))
 
 setup(
-    name='bancor_simulator',
+    name='bancor_research',
     version=version,
     author='Bancor Network',
     author_email='mike@bancor.network',
@@ -31,12 +31,12 @@ setup(
     include_package_data=True,
     entry_points={
         'console_scripts': [
-          'bancor_simulator = bancor_simulator.__main__:cli'
+          'bancor_simulator = bancor_research.bancor_simulator.__main__:cli'
         ]
     },
     data_files=[
-        ('bancor_simulator/tests/data', [
-                                'bancor_simulator/tests/data/scenarios.json'
+        ('bancor_research/bancor_simulator/tests/data', [
+                                'bancor_research/bancor_simulator/tests/data/scenarios.json'
                               ])
                 ],
 )

@@ -16,27 +16,42 @@ const data = [{ name: 'Mon', a: 590, b: 1400 },
   { name: 'Sat', a: 1520, b: 1100 },
   { name: 'Sun', a: 1400, b: 1700 }];
 
+
+
 const ABTestingAnalytics = ({ dir, themeName }) => {
   const { t } = useTranslation('common');
 
   return (
-    <Panel md={12} lg={12} xl={12} title={t('online_marketing_dashboard.ab_testing')}>
-      <div dir="ltr">
-        <ResponsiveContainer height={250} className="dashboard__area">
-          <AreaChart data={data} margin={{ top: 20, left: -15, bottom: 20 }}>
-            <XAxis dataKey="name" tickLine={false} reversed={dir === 'rtl'} />
-            <YAxis tickLine={false} orientation={dir === 'rtl' ? 'right' : 'left'} />
-            <Tooltip {...getTooltipStyles(themeName, 'defaultItems')} />
-            <Legend />
-            <CartesianGrid />
-            <Area name="Site A" type="monotone" dataKey="a" fill="#4ce1b6" stroke="#4ce1b6" fillOpacity={0.2} />
-            <Area name="Site B" type="monotone" dataKey="b" fill="#70bbfd" stroke="#70bbfd" fillOpacity={0.2} />
-          </AreaChart>
-        </ResponsiveContainer>
-      </div>
+    <Panel lg={12} title={t('finance_dashboard.top_cryptocurrencies')}>
+      {/* eslint-disable-next-line max-len */}
+      <iframe src="https://public.tableau.com/views/UI-test/MainDashboard?:showVizHome=no&:embed=true&:toolbar=no" height="680" width="100%" frameBorder="0" scrolling="yes" title="test" />
     </Panel>
   );
 };
+
+
+// // original code
+// const ABTestingAnalytics = ({ dir, themeName }) => {
+//   const { t } = useTranslation('common');
+//
+//   return (
+//     <Panel md={12} lg={12} xl={12} title={t('online_marketing_dashboard.ab_testing')}>
+//       <div dir="ltr">
+//         <ResponsiveContainer height={250} className="dashboard__area">
+//           <AreaChart data={data} margin={{ top: 20, left: -15, bottom: 20 }}>
+//             <XAxis dataKey="name" tickLine={false} reversed={dir === 'rtl'} />
+//             <YAxis tickLine={false} orientation={dir === 'rtl' ? 'right' : 'left'} />
+//             <Tooltip {...getTooltipStyles(themeName, 'defaultItems')} />
+//             <Legend />
+//             <CartesianGrid />
+//             <Area name="Site A" type="monotone" dataKey="a" fill="#4ce1b6" stroke="#4ce1b6" fillOpacity={0.2} />
+//             <Area name="Site B" type="monotone" dataKey="b" fill="#70bbfd" stroke="#70bbfd" fillOpacity={0.2} />
+//           </AreaChart>
+//         </ResponsiveContainer>
+//       </div>
+//     </Panel>
+//   );
+// };
 
 ABTestingAnalytics.propTypes = {
   dir: PropTypes.string.isRequired,

@@ -11883,11 +11883,6 @@
   dependencies:
     "@babel/runtime" "^7.12.1"
 
-"react-ga@^3.3.0":
-  "integrity" "sha512-o8RScHj6Lb8cwy3GMrVH6NJvL+y0zpJvKtc0+wmH7Bt23rszJmnqEQxRbyrqUzk9DTJIHoP42bfO5rswC9SWBQ=="
-  "resolved" "https://registry.npmjs.org/react-ga/-/react-ga-3.3.0.tgz"
-  "version" "3.3.0"
-
 "react-google-login@^5.1.25":
   "integrity" "sha512-JUngfvaSMcOuV0lFff7+SzJ2qviuNMQdqlsDJkUM145xkGPVIfqWXq9Ui+2Dr6jdJWH5KYdynz9+4CzKjI5u6g=="
   "resolved" "https://registry.npmjs.org/react-google-login/-/react-google-login-5.2.2.tgz"
@@ -12234,11 +12229,6 @@
     "hoek" "4.2.1"
     "prop-types" "^15.5.8"
     "react-motion" "^0.5.2"
-
-"react-yandex-metrika@^2.6.0":
-  "integrity" "sha512-8K4wExsNZtY3DTxh1G8a+zWH9Pg8fw23MJcoJ4I/562qrHRnh7L5nteq3lnNL58dnNQbuuHIRoGgMjIo+r1GjA=="
-  "resolved" "https://registry.npmjs.org/react-yandex-metrika/-/react-yandex-metrika-2.6.0.tgz"
-  "version" "2.6.0"
 
 "react@^15.0.0 || ^16.0.0 || ^17.0.0", "react@^16.0.0 || ^17.0.0", "react@^16.3.0 || ^17.0.0", "react@^16.6.1 || ^17", "react@^16.8.0 || ^17", "react@^16.8.0 || ^17.0.0", "react@^17.0.1", "react@>=15.0.0", "react@>=16.3.0", "react@>=16.8.0":
   "integrity" "sha512-lG9c9UuMHdcAexXtigOZLX8exLWkW0Ku29qPRU8uhF2R9BN96dLCt0psvzPLlHc5OWkgymP3qwTRgbnw5BKx3w=="

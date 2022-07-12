@@ -1,9 +1,3 @@
-import sys
-import os
-
-sys.path.append(os.path.dirname(__file__) + '/../..')
-sys.path.append(os.path.dirname(__file__) + '/../../..')
-
 from bancor_research import bancor_emulator as Emulator
 from bancor_research.bancor_emulator.solidity.uint.float import Decimal
 from bancor_research.bancor_emulator.solidity import uint32, uint256, time
@@ -233,3 +227,6 @@ class BancorNetwork:
     ):
         tkn = self.reserveTokens[tkn_name]
         self.networkSettings.setFundingLimit(tkn, toWei(value, self.bnt.decimals()))
+
+# whitelisted_tokens: list = ['bnt', 'eth', 'wbtc', 'link']
+# v3 = BancorNetwork(whitelisted_tokens=whitelisted_tokens)

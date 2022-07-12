@@ -93,7 +93,9 @@ class BancorNetwork:
         action_name="deposit",
     ):
         tkn = self.reserveTokens[tkn_name]
-        return self.network.connect(user_name).deposit(tkn, toWei(tkn_amt, tkn.decimals()))
+        amt = toWei(tkn_amt, tkn.decimals())
+        tkn.connect(user_name).approve(self.network, amt)
+        return self.network.connect(user_name).deposit(tkn, amt)
 
     def trade(
         self,
@@ -106,7 +108,9 @@ class BancorNetwork:
     ):
         src_tkn = self.reserveTokens[source_token]
         trg_tkn = self.reserveTokens[target_token]
-        return self.network.connect(user_name).tradeBySourceAmount(src_tkn, trg_tkn, toWei(tkn_amt, src_tkn.decimals()), 1, uint256.max, user_name)
+        src_amt = toWei(tkn_amt, src_tkn.decimals())
+        src_tkn.connect(user_name).approve(self.network, src_amt)
+        return self.network.connect(user_name).tradeBySourceAmount(src_tkn, trg_tkn, src_amt, 1, uint256.max, user_name)
 
     def begin_cooldown(
         self,
@@ -117,7 +121,9 @@ class BancorNetwork:
         action_name: str = "begin cooldown",
     ):
         tkn = self.poolTokens[tkn_name]
-        return self.network.connect(user_name).initWithdrawal(tkn, toWei(tkn_amt, tkn.decimals()))
+        amt = toWei(tkn_amt, tkn.decimals())
+        tkn.connect(user_name).approve(self.network, amt)
+        return self.network.connect(user_name).initWithdrawal(tkn, amt)
 
     def withdraw(
         self,
@@ -139,7 +145,8 @@ class BancorNetwork:
         transaction_type: str = "burnPoolTokenTKN",
     ):
         tkn = self.poolTokens[tkn_name]
-        tkn.connect(user_name).burn(toWei(tkn_amt, tkn.decimals()))
+        amt = toWei(tkn_amt, tkn.decimals())
+        tkn.connect(user_name).burn(amt)
 
     def claim_standard_rewards(
         self,
@@ -161,7 +168,9 @@ class BancorNetwork:
         transaction_type="join_standard_rewards",
     ):
         tkn = self.poolTokens[tkn_name]
-        return self.standardRewards.connect(user_name).join(tknProgramId, toWei(tkn_amt, tkn.decimals()))
+        amt = toWei(tkn_amt, tkn.decimals())
+        tkn.connect(user_name).approve(self.standardRewards, amt)
+        return self.standardRewards.connect(user_name).join(tknProgramId, amt)
 
     def leave_standard_rewards(
         self,
@@ -173,7 +182,8 @@ class BancorNetwork:
         transaction_type="leave_standard_rewards",
     ):
         tkn = self.poolTokens[tkn_name]
-        return self.standardRewards.connect(user_name).leave(tknProgramId, toWei(tkn_amt, tkn.decimals()))
+        amt = toWei(tkn_amt, tkn.decimals())
+        return self.standardRewards.connect(user_name).leave(tknProgramId, amt)
 
     def set_user_balance(
         self,
@@ -184,8 +194,9 @@ class BancorNetwork:
         transaction_type: str = "set user balance",
     ):
         tkn = self.reserveTokens[tkn_name]
+        amt = toWei(tkn_amt, tkn.decimals())
         func = self.bntGovernance.mint if tkn == self.bnt else tkn.issue
-        func(user_name, toWei(tkn_amt, tkn.decimals()))
+        func(user_name, amt)
 
     def set_trading_fee(
         self,
@@ -226,7 +237,8 @@ class BancorNetwork:
         user_name: str = "protocol",
     ):
         tkn = self.reserveTokens[tkn_name]
-        self.networkSettings.setFundingLimit(tkn, toWei(value, self.bnt.decimals()))
+        amt = toWei(value, self.bnt.decimals())
+        self.networkSettings.setFundingLimit(tkn, amt)
 
 # whitelisted_tokens: list = ['bnt', 'eth', 'wbtc', 'link']
 # v3 = BancorNetwork(whitelisted_tokens=whitelisted_tokens)

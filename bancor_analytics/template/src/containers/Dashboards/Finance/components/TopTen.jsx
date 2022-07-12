@@ -154,59 +154,71 @@ DropDownMore.propTypes = {
   handleDeleteRow: PropTypes.func.isRequired,
 };
 
+
 const TopTen = ({ cryptoTable, onDeleteCryptoTableData }) => {
   const { t } = useTranslation('common');
 
   return (
     <Panel lg={12} title={t('finance_dashboard.top_cryptocurrencies')}>
-      <Table responsive className="table--bordered dashboard__table-crypto">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Name</th>
-            <th>Market Cap</th>
-            <th>Price</th>
-            <th>Volume</th>
-            <th>Circulating Supply</th>
-            <th>Change</th>
-            <th dir="ltr">Graph (7 days)</th>
-            <th aria-label="data" />
-          </tr>
-        </thead>
-        <tbody>
-          {cryptoTable.map((crypto, index) => (
-            <tr key={crypto.id}>
-              <td>{index + 1}</td>
-              <td>{crypto.name}</td>
-              <td dir="ltr">{crypto.market_cap}</td>
-              <td dir="ltr">{crypto.price}</td>
-              <td dir="ltr">{crypto.volume}</td>
-              <td dir="ltr">{crypto.supply} {crypto.chart}</td>
-              <td>{crypto.change}</td>
-              <td className="dashboard__table-crypto-chart">
-                <ResponsiveContainer height={36}>
-                  <AreaChart data={data} margin={{ top: 0, left: 0, bottom: 0 }}>
-                    <Tooltip content={<CustomTooltip />} />
-                    <Area
-                      type="monotone"
-                      dataKey={crypto.chart}
-                      fill="#4ce1b6"
-                      stroke="#4ce1b6"
-                      fillOpacity={0.2}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </td>
-              <td>
-                <DropDownMore index={index} handleDeleteRow={e => onDeleteCryptoTableData(index, e)} />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+      {/* eslint-disable-next-line max-len */}
+      <iframe src="https://public.tableau.com/views/Bancor3PublicDashboard/MainDashboard?:showVizHome=no&:embed=true&:toolbar=no" height="480" width="100%" frameBorder="0" scrolling="no" title="test2" />
     </Panel>
   );
 };
+
+// const TopTen = ({ cryptoTable, onDeleteCryptoTableData }) => {
+//   const { t } = useTranslation('common');
+//
+//   return (
+//     <Panel lg={12} title={t('finance_dashboard.top_cryptocurrencies')}>
+//       <Table responsive className="table--bordered dashboard__table-crypto">
+//         <thead>
+//           <tr>
+//             <th>#</th>
+//             <th>Name</th>
+//             <th>Market Cap</th>
+//             <th>Price</th>
+//             <th>Volume</th>
+//             <th>Circulating Supply</th>
+//             <th>Change</th>
+//             <th dir="ltr">Graph (7 days)</th>
+//             <th aria-label="data" />
+//           </tr>
+//         </thead>
+//         <tbody>
+//           {cryptoTable.map((crypto, index) => (
+//             <tr key={crypto.id}>
+//               <td>{index + 1}</td>
+//               <td>{crypto.name}</td>
+//               <td dir="ltr">{crypto.market_cap}</td>
+//               <td dir="ltr">{crypto.price}</td>
+//               <td dir="ltr">{crypto.volume}</td>
+//               <td dir="ltr">{crypto.supply} {crypto.chart}</td>
+//               <td>{crypto.change}</td>
+//               <td className="dashboard__table-crypto-chart">
+//                 <ResponsiveContainer height={36}>
+//                   <AreaChart data={data} margin={{ top: 0, left: 0, bottom: 0 }}>
+//                     <Tooltip content={<CustomTooltip />} />
+//                     <Area
+//                       type="monotone"
+//                       dataKey={crypto.chart}
+//                       fill="#4ce1b6"
+//                       stroke="#4ce1b6"
+//                       fillOpacity={0.2}
+//                     />
+//                   </AreaChart>
+//                 </ResponsiveContainer>
+//               </td>
+//               <td>
+//                 <DropDownMore index={index} handleDeleteRow={e => onDeleteCryptoTableData(index, e)} />
+//               </td>
+//             </tr>
+//           ))}
+//         </tbody>
+//       </Table>
+//     </Panel>
+//   );
+// };
 
 TopTen.propTypes = {
   cryptoTable: CryptoTableProps.isRequired,

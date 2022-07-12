@@ -66,7 +66,7 @@ const Demos = ({ theme, changeToLight, changeToDark }) => (
           </Link>
         </Col>
         <Col lg={4} className="landing__demo-theme-toggle">
-          <p className="landing__demo-title">Online Marketing Dashboard</p>
+          <p className="landing__demo-title">Bancor Dashboard</p>
           <DemoThemeToggle theme={theme} changeToLight={changeToLight} changeToDark={changeToDark} />
         </Col>
       </Row>

@@ -1,10 +1,5 @@
-import sys
-import os
-
-sys.path.append(os.path.dirname(__file__) + '/..')
-
-from MathEx import MathEx, Uint512
-from Fraction import Fraction256
+from bancor_research.bancor_emulator.MathEx import MathEx, Uint512
+from bancor_research.bancor_emulator.Fraction import Fraction256
 
 MAX_UINT32 = 2 ** 32 - 1
 MAX_UINT64 = 2 ** 64 - 1

@@ -1,13 +1,8 @@
-import sys
 import os
-
-sys.path.append(os.path.dirname(__file__) + '/..')
-
 import json
 
-from solidity.uint.float import Decimal
-
-from PoolCollectionWithdrawal import PoolCollectionWithdrawal
+from bancor_research.bancor_emulator.solidity.uint.float import Decimal
+from bancor_research.bancor_emulator.PoolCollectionWithdrawal import PoolCollectionWithdrawal
 
 class Relation:
     LesserOrEqual = 1
@@ -109,7 +104,7 @@ def assertAlmostEqual(expected, actual, maxError):
         assert absoluteError <= maxError['maxAbsoluteError'] or relativeError <= maxError['maxRelativeError']
 
 for fileName in maxErrors:
-    file = open(os.path.dirname(__file__) + '/project/tests/data/' + fileName + '.json')
+    file = open('{}/project/tests/data/{}.json'.format(os.path.dirname(__file__), fileName)))
     table = json.loads(file.read());
     file.close()
 

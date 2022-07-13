@@ -22,6 +22,9 @@ PandasDataFrame = TypeVar("pandas.core.frame.DataFrame")
 
 logger = logging.getLogger(__name__)
 
+print('mike test')
+print('mike test 2')
+
 
 # Custom types
 class Epoch(int):
@@ -68,6 +71,7 @@ DEFAULT_PRICE_FEEDS = pd.DataFrame(
         "wbtc": (40000.00 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
     }
 )
+
 
 
 # Misc dependencies for `State`

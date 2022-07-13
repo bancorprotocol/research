@@ -1,7 +1,7 @@
 {
   "name": "easydev",
   "version": "3.7.0",
-  "private": false,
+  "private": true,
   "homepage": "https://analytics.bancor.network/easydev/bancor_dashboard",
   "scripts": {
     "start": "react-app-rewired start",

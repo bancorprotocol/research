@@ -100,7 +100,7 @@ def integerToDecimalToStr(value, decimals: int):
 def execute(fileName):
     print(fileName)
 
-    file = open('{}/project/tests/data/{}.json'.format(os.path.dirname(__file__), fileName)))
+    file = open('{}/project/tests/data/{}.json'.format(os.path.dirname(__file__), fileName))
     flow = Flow(json.loads(file.read()))
     file.close()
 

@@ -21,8 +21,8 @@ import MyTodos from './components/MyTodos';
 import Emails from './components/Emails';
 import SalesReport from './components/SalesReport';
 import ShortReminders from './components/ShortReminders';
-import { editTodoElement, fetchTodoListData } from '../../../Todo/redux/actions';
-import todoCard from '../../../Todo/types';
+import { editTodoElement, fetchTodoListData } from '../../Todo/redux/actions';
+import todoCard from '../../Todo/types';
 
 const onDeleteRow = (dispatch, newOrder) => (index) => {
   const arrayCopy = [...newOrder];

@@ -1,5 +1,5 @@
 from bancor_research.bancor_emulator.solidity import uint, uint32, uint256, address, mapping, days, revert
-from bancor_research.bancor_emulator.utils import account, parse
+from bancor_research.bancor_emulator.utils import contract, parse
 
 from bancor_research.bancor_emulator.EnumerableSet import EnumerableSet
 from bancor_research.bancor_emulator.Time import Time
@@ -28,7 +28,7 @@ class CompletedWithdrawal:
 '''
  * @dev Pending Withdrawals contract
 '''
-class PendingWithdrawals(account, Time):
+class PendingWithdrawals(contract, Time):
     DEFAULT_LOCK_DURATION = uint32(7 * days);
 
     '''
@@ -39,7 +39,7 @@ class PendingWithdrawals(account, Time):
         initBNT,
         initBNTPool
     ) -> None:
-        account.__init__(self)
+        contract.__init__(self)
         Time.__init__(self)
 
         self._network = initNetwork;

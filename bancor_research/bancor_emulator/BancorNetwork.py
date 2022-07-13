@@ -1,5 +1,5 @@
 from bancor_research.bancor_emulator.solidity import uint, uint256, mapping, address, payable, revert
-from bancor_research.bancor_emulator.utils import account, parse
+from bancor_research.bancor_emulator.utils import contract, parse
 
 from bancor_research.bancor_emulator.EnumerableSet import EnumerableSet
 from bancor_research.bancor_emulator.Constants import PPM_RESOLUTION
@@ -10,7 +10,7 @@ from bancor_research.bancor_emulator.PoolCollection import PoolCollection as IPo
 '''
  * @dev Bancor Network contract
 '''
-class BancorNetwork(account, Time):
+class BancorNetwork(contract, Time):
     class TradeParams:
         def __init__(self, x = None) -> None:
             self.amount = parse(uint256, x, 'amount');
@@ -45,7 +45,7 @@ class BancorNetwork(account, Time):
         initExternalProtectionVault,
         initBNTPoolToken
     ) -> None:
-        account.__init__(self)
+        contract.__init__(self)
         Time.__init__(self)
 
         self._bntGovernance = initBNTGovernance;

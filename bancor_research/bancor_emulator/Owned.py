@@ -1,15 +1,15 @@
 from bancor_research.bancor_emulator.solidity import address, revert
-from bancor_research.bancor_emulator.utils import account
+from bancor_research.bancor_emulator.utils import contract
 
 '''
  * @dev this contract provides support and utilities for contract ownership
 '''
-class Owned(account):
+class Owned(contract):
     '''
      * @dev initializes the contract
     '''
     def __init__(self) -> None:
-        account.__init__(self)
+        contract.__init__(self)
 
         self._owner = address(0);
         self._newOwner = address(0);

@@ -1,18 +1,18 @@
 from bancor_research.bancor_emulator.solidity import uint, uint8, mapping
-from bancor_research.bancor_emulator.utils import account
+from bancor_research.bancor_emulator.utils import contract
 
 from bancor_research.bancor_emulator.PoolToken import PoolToken
 
 '''
  * @dev Pool Token Factory contract
 '''
-class PoolTokenFactory(account):
+class PoolTokenFactory(contract):
     POOL_TOKEN_SYMBOL_PREFIX = "bn";
     POOL_TOKEN_NAME_PREFIX = "Bancor";
     POOL_TOKEN_NAME_SUFFIX = "Pool Token";
 
     def __init__(self) -> None:
-        account.__init__(self)
+        contract.__init__(self)
 
     '''
      * @dev fully initializes the contract and its parents

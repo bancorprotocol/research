@@ -19,7 +19,7 @@ def parse(cast, var, attr):
         return cast(var)
     return cast(0)
 
-class account:
+class contract:
     def __init__(self):
         self._msg_sender = None
 
@@ -30,4 +30,4 @@ class account:
     @property
     def msg_sender(self):
         f_locals = inspect.currentframe().f_back.f_back.f_locals
-        return f_locals['self'] if 'self' in f_locals and isinstance(f_locals['self'], account) else self._msg_sender
+        return f_locals['self'] if 'self' in f_locals and isinstance(f_locals['self'], contract) else self._msg_sender

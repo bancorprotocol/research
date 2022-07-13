@@ -7,7 +7,7 @@ bancor_research.bancor_emulator.config.mode = 'float'
 from PoolCollectionWithdrawal import PoolCollectionWithdrawal
 
 for fileName in ['PoolCollectionWithdrawalCoverage{}'.format(n + 1) for n in range(8)]:
-    file = open('{}/project/tests/data/{}.json'.format(os.path.dirname(__file__), fileName), 'r')
+    file = open(os.path.join(os.path.dirname(__file__), 'project', 'tests', 'data', fileName + '.json'), 'r')
     table = json.loads(file.read());
     file.close()
 
@@ -22,7 +22,7 @@ for fileName in ['PoolCollectionWithdrawalCoverage{}'.format(n + 1) for n in ran
         row['u'] = '{:.12f}'.format(actual.u.data);
         row['v'] = '{:.12f}'.format(actual.v.data);
 
-    file = open('{}/project/tests/data/{}.json'.format(os.path.dirname(__file__), fileName), 'w')
+    file = open(os.path.join(os.path.dirname(__file__), 'project', 'tests', 'data', fileName + '.json'), 'w')
     file.write(json.dumps(table, indent = 2));
     file.close()
 

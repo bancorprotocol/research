@@ -4,18 +4,19 @@ import { connect } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { Col, Container, Row } from 'reactstrap';
 import { RTLProps } from '@/shared/prop-types/ReducerProps';
-import Visits from './components/Visits';
-import TotalPageViews from './components/TotalPageViews';
-import NewUsers from './components/NewUsers';
-import BounceRate from './components/BounceRate';
-import ABTestingAnalytics from './components/ABTestingAnalytics';
-import BounceRateArea from './components/BounceRateArea';
-import VisitorsSessions from './components/VisitorsSessions';
+import SurplusStat from './components/SurplusStat';
+import PriorDayFees from './components/PriorDayFees';
+import ProtocolStakedBalance from './components/ProtocolStakedBalance';
+import ProtocolVaultBalance from './components/ProtocolVaultBalance';
+import SelectMetric from './components/SelectMetric';
+import BounceRateArea from './components/WithdrawalsRatio';
+import Withdrawals from './components/Withdrawals';
 import SalesStatistic from './components/SalesStatistic';
 import BudgetStatistic from './components/BudgetStatistic';
-import AudienceByCountry from './components/AudienceByCountry';
+import PoolInfo from './components/PoolInfo';
 import BestSellingRegions from './components/BestSellingRegions';
 import GoalsCompletion from './components/GoalsCompletion';
+
 
 const OnLineMarketingDashboard = ({ rtl }) => {
   const { t } = useTranslation('common');
@@ -28,18 +29,18 @@ const OnLineMarketingDashboard = ({ rtl }) => {
         </Col>
       </Row>
       <Row>
-        <Visits />
-        <TotalPageViews />
-        <NewUsers />
-        <BounceRate />
+        <SurplusStat />
+        <PriorDayFees />
+        <ProtocolStakedBalance />
+        <ProtocolVaultBalance />
       </Row>
       <Row>
-        <ABTestingAnalytics dir={rtl.direction} />
+        <SelectMetric dir={rtl.direction} />
         <BounceRateArea dir={rtl.direction} />
-        <VisitorsSessions dir={rtl.direction} />
+        <Withdrawals dir={rtl.direction} />
         <SalesStatistic />
         <BudgetStatistic />
-        <AudienceByCountry />
+        <PoolInfo />
         <BestSellingRegions />
         <GoalsCompletion />
       </Row>

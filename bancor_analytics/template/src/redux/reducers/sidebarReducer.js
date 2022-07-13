@@ -5,7 +5,7 @@ import {
 
 const initialState = {
   show: false,
-  collapse: false,
+  collapse: true,
 };
 
 const sidebarReducer = (state = initialState, action) => {

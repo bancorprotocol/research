@@ -55,7 +55,7 @@ const VisitorsSessions = ({ dir, themeName }) => {
       lg={6}
       xl={4}
       md={12}
-      title={t('online_marketing_dashboard.visitors_sessions')}
+      title={t('bancor_dashboard.visitors_sessions')}
       subhead="What browsers are most popular"
     >
       <div className="dashboard__visitors-chart">

@@ -25,7 +25,7 @@ const BounceRateArea = ({ dir, themeName }) => {
   const { t } = useTranslation('common');
 
   return (
-    <Panel xl={5} lg={6} md={12} title={t('online_marketing_dashboard.bounce_rate')}>
+    <Panel xl={5} lg={6} md={12} title={t('bancor_dashboard.bounce_rate')}>
       <p className="dashboard__bounce-percent">32%</p>
       <div dir="ltr">
         <ResponsiveContainer height={220} className="dashboard__area">

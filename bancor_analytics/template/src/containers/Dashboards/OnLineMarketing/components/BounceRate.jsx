@@ -34,7 +34,7 @@ const BounceRate = () => {
       <Card>
         <CardBody className="dashboard__card-widget">
           <div className="card__title">
-            <h5 className="bold-text">{t('online_marketing_dashboard.bounce_rate')}</h5>
+            <h5 className="bold-text">{t('bancor_dashboard.bounce_rate')}</h5>
           </div>
           <div className="dashboard__total">
             <TrendingUpIcon className="dashboard__trend-icon" />

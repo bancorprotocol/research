@@ -10,7 +10,7 @@ const BudgetStatistic = () => {
   const { t } = useTranslation('common');
 
   return (
-    <Panel md={12} lg={6} xl={4} title={t('online_marketing_dashboard.budget_statistic')}>
+    <Panel md={12} lg={6} xl={4} title={t('bancor_dashboard.budget_statistic')}>
       <div className="dashboard__stat dashboard__stat--budget">
         <div className="dashboard__stat-main">
           <p className="dashboard__stat-main-title">Total Budget</p>

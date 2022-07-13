@@ -26,7 +26,7 @@ const BestSellingRegions = () => {
   const { t } = useTranslation('common');
 
   return (
-    <Panel xs={12} md={12} lg={12} xl={8} title={t('online_marketing_dashboard.best_selling')}>
+    <Panel xs={12} md={12} lg={12} xl={8} title={t('bancor_dashboard.best_selling')}>
       <div dir="ltr">
         <GoogleMap
           id="bestSellingRegionsMap"

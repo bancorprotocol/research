@@ -68,7 +68,7 @@ const AudienceByCountry = () => {
   const { t } = useTranslation('common');
 
   return (
-    <Panel lg={12} xl={8} md={12} title={t('online_marketing_dashboard.audience_by_country')}>
+    <Panel lg={12} xl={8} md={12} title={t('bancor_dashboard.audience_by_country')}>
       <Table responsive className="table--bordered dashboard__audience-table">
         <thead>
           <tr>

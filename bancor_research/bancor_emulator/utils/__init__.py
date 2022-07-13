@@ -30,4 +30,4 @@ class account:
     @property
     def msg_sender(self):
         f_locals = inspect.currentframe().f_back.f_back.f_locals
-        return f_locals['self'] if 'self' in f_locals else self._msg_sender
+        return f_locals['self'] if 'self' in f_locals and isinstance(f_locals['self'], account) else self._msg_sender

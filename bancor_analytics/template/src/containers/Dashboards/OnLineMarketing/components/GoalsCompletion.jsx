@@ -21,7 +21,7 @@ const GoalsCompletion = () => {
       md={12}
       lg={12}
       xl={4}
-      title={t('online_marketing_dashboard.goals_completion')}
+      title={t('bancor_dashboard.goals_completion')}
       subhead="What's your progress"
     >
       {data.map(item => (

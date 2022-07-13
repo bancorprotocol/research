@@ -11,7 +11,7 @@ const SidebarContent = ({
       <SidebarLink
         title="Home"
         icon="home"
-        route="/online_marketing_dashboard"
+        route="/bancor_dashboard"
         onClick={onClick}
       />
     </ul>

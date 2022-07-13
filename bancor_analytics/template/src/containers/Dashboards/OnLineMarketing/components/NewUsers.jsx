@@ -34,7 +34,7 @@ const NewUsers = () => {
       <Card>
         <CardBody className="dashboard__card-widget">
           <div className="card__title">
-            <h5 className="bold-text">{t('online_marketing_dashboard.new_users')}</h5>
+            <h5 className="bold-text">{t('bancor_dashboard.new_users')}</h5>
           </div>
           <div className="dashboard__total">
             <TrendingDownIcon className="dashboard__trend-icon" />

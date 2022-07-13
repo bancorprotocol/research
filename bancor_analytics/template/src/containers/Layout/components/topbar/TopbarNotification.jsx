@@ -74,7 +74,7 @@ const TopbarNotification = () => {
             <p className="topbar__collapse-date">{notification.date}</p>
           </div>
         ))}
-        <Link className="topbar__collapse-link" to="/online_marketing_dashboard" onClick={collapseNotification}>
+        <Link className="topbar__collapse-link" to="/bancor_dashboard" onClick={collapseNotification}>
           See all notifications
         </Link>
       </Collapse>

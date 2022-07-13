@@ -17,7 +17,7 @@ const Topbar = ({
         onClickMobile={changeMobileSidebarVisibility}
         onClickDesktop={changeSidebarVisibility}
       />
-      <Link className="topbar__logo" to="/online_marketing_dashboard" />
+      <Link className="topbar__logo" to="/bancor_dashboard" />
     </div>
     <div className="topbar__right">
       <div className="topbar__right-search">

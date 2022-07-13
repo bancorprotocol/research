@@ -323,6 +323,7 @@ execute('BancorNetworkSimpleFinancialScenario2');
 execute('BancorNetworkSimpleFinancialScenario3');
 execute('BancorNetworkSimpleFinancialScenario4');
 execute('BancorNetworkSimpleFinancialScenario5');
+execute('BancorNetworkSimpleFinancialScenario6');
 execute('BancorNetworkComplexFinancialScenario1');
 execute('BancorNetworkComplexFinancialScenario2');
 execute('BancorNetworkRewardsFinancialScenario1');

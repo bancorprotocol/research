@@ -1,14 +1,9 @@
-import sys
-import os
-
-sys.path.append(os.path.dirname(__file__) + '/..')
-
-from solidity import uint
-from solidity import uint32
-from solidity import uint112
-from solidity import uint128
-from solidity import uint256
-from solidity import unchecked
+from bancor_research.bancor_emulator.solidity import uint
+from bancor_research.bancor_emulator.solidity import uint32
+from bancor_research.bancor_emulator.solidity import uint112
+from bancor_research.bancor_emulator.solidity import uint128
+from bancor_research.bancor_emulator.solidity import uint256
+from bancor_research.bancor_emulator.solidity import unchecked
 
 for n in [0, 2, 32, 112, 128, 256]:
     for k in [-1, 0, +1]:

@@ -37,17 +37,25 @@ setup(
     data_files=[
         (
             'bancor_research', [
-                                'bancor_research/bancor_emulator/tests/project/tests/data/BancorNetworkSimpleFinancialScenario1.json',
-                                'bancor_research/bancor_emulator/tests/project/tests/data/BancorNetworkSimpleFinancialScenario2.json',
-                                'bancor_research/bancor_emulator/tests/project/tests/data/BancorNetworkSimpleFinancialScenario3.json',
-                                'bancor_research/bancor_emulator/tests/project/tests/data/BancorNetworkSimpleFinancialScenario4.json',
-                                'bancor_research/bancor_emulator/tests/project/tests/data/BancorNetworkSimpleFinancialScenario5.json',
-                                'bancor_research/bancor_emulator/tests/project/tests/data/BancorNetworkComplexFinancialScenario1.json',
-                                'bancor_research/bancor_emulator/tests/project/tests/data/BancorNetworkComplexFinancialScenario2.json',
-                                'bancor_research/bancor_emulator/tests/project/tests/data/BancorNetworkRewardsFinancialScenario1.json',
-                                'bancor_research/bancor_emulator/tests/project/tests/data/BancorNetworkRewardsFinancialScenario2.json'
-
-                              ],
+                'bancor_research/bancor_emulator/tests/project/tests/data/BancorNetworkSimpleFinancialScenario1.json',
+                'bancor_research/bancor_emulator/tests/project/tests/data/BancorNetworkSimpleFinancialScenario2.json',
+                'bancor_research/bancor_emulator/tests/project/tests/data/BancorNetworkSimpleFinancialScenario3.json',
+                'bancor_research/bancor_emulator/tests/project/tests/data/BancorNetworkSimpleFinancialScenario4.json',
+                'bancor_research/bancor_emulator/tests/project/tests/data/BancorNetworkSimpleFinancialScenario5.json',
+                'bancor_research/bancor_emulator/tests/project/tests/data/BancorNetworkSimpleFinancialScenario6.json',
+                'bancor_research/bancor_emulator/tests/project/tests/data/BancorNetworkComplexFinancialScenario1.json',
+                'bancor_research/bancor_emulator/tests/project/tests/data/BancorNetworkComplexFinancialScenario2.json',
+                'bancor_research/bancor_emulator/tests/project/tests/data/BancorNetworkRewardsFinancialScenario1.json',
+                'bancor_research/bancor_emulator/tests/project/tests/data/BancorNetworkRewardsFinancialScenario2.json',
+                'bancor_research/bancor_emulator/tests/project/tests/data/PoolCollectionWithdrawalCoverage1.json',
+                'bancor_research/bancor_emulator/tests/project/tests/data/PoolCollectionWithdrawalCoverage2.json',
+                'bancor_research/bancor_emulator/tests/project/tests/data/PoolCollectionWithdrawalCoverage3.json',
+                'bancor_research/bancor_emulator/tests/project/tests/data/PoolCollectionWithdrawalCoverage4.json',
+                'bancor_research/bancor_emulator/tests/project/tests/data/PoolCollectionWithdrawalCoverage5.json',
+                'bancor_research/bancor_emulator/tests/project/tests/data/PoolCollectionWithdrawalCoverage6.json',
+                'bancor_research/bancor_emulator/tests/project/tests/data/PoolCollectionWithdrawalCoverage7.json',
+                'bancor_research/bancor_emulator/tests/project/tests/data/PoolCollectionWithdrawalCoverage8.json',
+            ],
         )
     ],
 )

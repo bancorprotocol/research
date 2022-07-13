@@ -1,10 +1,5 @@
-import sys
-import os
-
-sys.path.append(os.path.dirname(__file__) + '/..')
-
-from PoolToken import PoolToken
-from ERC20 import ERC20
+from bancor_research.bancor_emulator.PoolToken import PoolToken
+from bancor_research.bancor_emulator.ERC20 import ERC20
 
 POOL_TOKEN_NAME = 'Pool Token';
 POOL_TOKEN_SYMBOL = 'POOL';
@@ -14,7 +9,6 @@ RESERVE_TOKEN_NAME = 'Reserve Token';
 RESERVE_TOKEN_SYMBOL = 'Reserve';
 
 reserveToken = ERC20(RESERVE_TOKEN_NAME, RESERVE_TOKEN_SYMBOL);
-
 poolToken = PoolToken(POOL_TOKEN_NAME, POOL_TOKEN_SYMBOL, POOL_TOKEN_DECIMALS, reserveToken);
 
 assert poolToken.name() == POOL_TOKEN_NAME;

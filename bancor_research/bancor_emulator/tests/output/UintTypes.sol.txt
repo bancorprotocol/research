@@ -1,4 +1,4 @@
-(base) /Users/barakmanos/Desktop/Bancor/simulator-v3/bancor_emulator/temp > yarn test
+(base) /Users/barakmanos/Desktop/Bancor/simulator-v3/bancor_research/bancor_emulator/tests > yarn test
 yarn run v1.22.10
 warning package.json: No license field
 $ hardhat test --bail
@@ -9887,4 +9887,4 @@ Test unchecked *=
   1 passing (36s)
 
 ✨  Done in 39.99s.
-(base) /Users/barakmanos/Desktop/Bancor/simulator-v3/bancor_emulator/temp > 
+(base) /Users/barakmanos/Desktop/Bancor/simulator-v3/bancor_research/bancor_emulator/tests > 

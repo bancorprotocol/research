@@ -21,35 +21,30 @@ const data = [
   { name: '21.03', uv: 3490 },
 ];
 
-const BounceRateArea = ({ dir, themeName }) => {
+const WithdrawalsRatio = ({ dir, themeName }) => {
   const { t } = useTranslation('common');
 
   return (
-    <Panel xl={5} lg={6} md={12} title={t('bancor_dashboard.bounce_rate')}>
-      <p className="dashboard__bounce-percent">32%</p>
+    <Panel xl={5} lg={6} md={12} title="Canceled vs Initiated Withdrawals">
+      <p className="plyr__video-embed">
+        {/* eslint-disable-next-line max-len */}
+        <iframe src="https://public.tableau.com/views/UI-test/WithdrawalsRatio?:showVizHome=no&:embed=true&:toolbar=no" width="100%" frameBorder="0" scrolling="yes" title="WithdrawalsRatio" />
+      </p>
       <div dir="ltr">
         <ResponsiveContainer height={220} className="dashboard__area">
-          <AreaChart
-            data={data}
-            margin={{
-              top: 0, right: 0, left: -15, bottom: 0,
-            }}
-          >
-            <XAxis dataKey="name" tickLine={false} reversed={dir === 'rtl'} />
-            <YAxis tickLine={false} orientation={dir === 'rtl' ? 'right' : 'left'} />
-            <CartesianGrid vertical={false} />
-            <Tooltip {...getTooltipStyles(themeName, 'defaultItems')} />
-            <Area type="monotone" dataKey="uv" stroke="#24d6a3" fill="#4ce1b6" fillOpacity={0.2} />
-          </AreaChart>
+          <p className="plyr__video-embed">
+            {/* eslint-disable-next-line max-len */}
+            <iframe src="https://public.tableau.com/views/UI-test/WithdrawalsTrend?:showVizHome=no&:embed=true&:toolbar=no" width="100%" height={220} frameBorder="0" scrolling="yes" title="WithdrawalsTrend" />
+          </p>
         </ResponsiveContainer>
       </div>
     </Panel>
   );
 };
 
-BounceRateArea.propTypes = {
+WithdrawalsRatio.propTypes = {
   dir: PropTypes.string.isRequired,
   themeName: PropTypes.string.isRequired,
 };
 
-export default connect(state => ({ themeName: state.theme.className }))(BounceRateArea);
+export default connect(state => ({ themeName: state.theme.className }))(WithdrawalsRatio);

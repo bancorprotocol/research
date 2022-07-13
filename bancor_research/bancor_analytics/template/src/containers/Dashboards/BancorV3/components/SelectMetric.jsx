@@ -8,17 +8,7 @@ import {
 import Panel from '@/shared/components/Panel';
 import getTooltipStyles from '@/shared/helpers';
 
-const data = [{ name: 'Mon', a: 590, b: 1400 },
-  { name: 'Tue', a: 868, b: 1506 },
-  { name: 'Wed', a: 1397, b: 989 },
-  { name: 'Thu', a: 1480, b: 1228 },
-  { name: 'Fri', a: 1520, b: 1100 },
-  { name: 'Sat', a: 1520, b: 1100 },
-  { name: 'Sun', a: 1400, b: 1700 }];
-
-
-// original code
-const ABTestingAnalytics = ({ dir, themeName }) => {
+const SelectMetric = ({ dir, themeName }) => {
   const { t } = useTranslation('common');
 
   return (
@@ -34,9 +24,9 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
 };
 
 
-ABTestingAnalytics.propTypes = {
+SelectMetric.propTypes = {
   dir: PropTypes.string.isRequired,
   themeName: PropTypes.string.isRequired,
 };
 
-export default connect(state => ({ themeName: state.theme.className }))(ABTestingAnalytics);
+export default connect(state => ({ themeName: state.theme.className }))(SelectMetric);

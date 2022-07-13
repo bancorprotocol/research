@@ -37,17 +37,15 @@ setup(
     data_files=[
         (
             'bancor_research', [
-                                'bancor_research/bancor_simulator/tests/data/scenarios.json',
-                                'bancor_research/bancor_emulator/tests/data/package.json',
-                                'bancor_research/bancor_emulator/tests/data/BancorNetworkSimpleFinancialScenario1.json',
-                                'bancor_research/bancor_emulator/tests/data/BancorNetworkSimpleFinancialScenario2.json',
-                                'bancor_research/bancor_emulator/tests/data/BancorNetworkSimpleFinancialScenario3.json',
-                                'bancor_research/bancor_emulator/tests/data/BancorNetworkSimpleFinancialScenario4.json',
-                                'bancor_research/bancor_emulator/tests/data/BancorNetworkSimpleFinancialScenario5.json',
-                                'bancor_research/bancor_emulator/tests/data/BancorNetworkComplexFinancialScenario1.json',
-                                'bancor_research/bancor_emulator/tests/data/BancorNetworkComplexFinancialScenario2.json',
-                                'bancor_research/bancor_emulator/tests/data/BancorNetworkRewardsFinancialScenario1.json',
-                                'bancor_research/bancor_emulator/tests/data/BancorNetworkRewardsFinancialScenario2.json',
+                                'bancor_research/bancor_emulator/tests/project/tests/data/BancorNetworkSimpleFinancialScenario1.json',
+                                'bancor_research/bancor_emulator/tests/project/tests/data/BancorNetworkSimpleFinancialScenario2.json',
+                                'bancor_research/bancor_emulator/tests/project/tests/data/BancorNetworkSimpleFinancialScenario3.json',
+                                'bancor_research/bancor_emulator/tests/project/tests/data/BancorNetworkSimpleFinancialScenario4.json',
+                                'bancor_research/bancor_emulator/tests/project/tests/data/BancorNetworkSimpleFinancialScenario5.json',
+                                'bancor_research/bancor_emulator/tests/project/tests/data/BancorNetworkComplexFinancialScenario1.json',
+                                'bancor_research/bancor_emulator/tests/project/tests/data/BancorNetworkComplexFinancialScenario2.json',
+                                'bancor_research/bancor_emulator/tests/project/tests/data/BancorNetworkRewardsFinancialScenario1.json',
+                                'bancor_research/bancor_emulator/tests/project/tests/data/BancorNetworkRewardsFinancialScenario2.json'
 
                               ],
         )

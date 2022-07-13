@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 import Panel from '@/shared/components/Panel';
-import todoCard from '../../../Todo/types';
+import todoCard from '../../../../Todo/types';
 import ToDo from './ToDo';
 
 const editTodoElementData = ({ todoElements, editTodoElement }) => (e) => {

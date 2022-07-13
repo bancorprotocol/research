@@ -19,17 +19,6 @@ const Topbar = ({
       />
       <Link className="topbar__logo" to="/bancor_dashboard" />
     </div>
-    <div className="topbar__right">
-      <div className="topbar__right-search">
-        <TopbarSearch />
-      </div>
-      <div className="topbar__right-over">
-        <TopbarNotification />
-        <TopbarMail new />
-        <TopbarProfile />
-        <TopbarLanguage />
-      </div>
-    </div>
   </div>
 );
 

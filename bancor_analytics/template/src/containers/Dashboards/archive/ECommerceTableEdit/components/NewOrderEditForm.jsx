@@ -7,7 +7,7 @@ import {
   Button, ButtonToolbar, Card, CardBody, Col,
 } from 'reactstrap';
 import createNumberMask from 'text-mask-addons/dist/createNumberMask';
-import { renderMaskedField } from '../../../../shared/components/form/FormField';
+import { renderMaskedField } from '../../../../../shared/components/form/FormField';
 
 const moneyMask = createNumberMask({
   prefix: '$ ',

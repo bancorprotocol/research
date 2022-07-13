@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route, Switch } from 'react-router-dom';
-import ECommerceDashboard from '../../../Dashboards/ECommerce/index';
-import ECommerceDashboardEdit from '../../../Dashboards/ECommerceTableEdit/index';
+import ECommerceDashboard from '../../../Dashboards/archive/ECommerce/index';
+import ECommerceDashboardEdit from '../../../Dashboards/archive/ECommerceTableEdit/index';
 
 export default () => (
   <Switch>

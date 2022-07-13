@@ -104,7 +104,7 @@ def assertAlmostEqual(expected, actual, maxError):
         assert absoluteError <= maxError['maxAbsoluteError'] or relativeError <= maxError['maxRelativeError']
 
 for fileName in maxErrors:
-    file = open(os.path.join(os.path.dirname(__file__), 'project', 'tests', 'data', fileName + '.json'))
+    file = open(os.path.join(os.path.dirname(__file__), 'project', 'tests', 'data', fileName + '.json'), 'r')
     table = json.loads(file.read());
     file.close()
 

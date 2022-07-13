@@ -38,8 +38,9 @@ const Visits = () => {
           </div>
           <div className="dashboard__total">
             <TrendingUpIcon className="dashboard__trend-icon" />
-            <p className="dashboard__total-stat">
-              {activeItem.uv}
+            <p className="plyr__video-embed">
+              {/* eslint-disable-next-line max-len */}
+              <iframe src="https://public.tableau.com/views/UI-test/SurplusStat?:showVizHome=no&:embed=true&:toolbar=no" width="100%" frameBorder="0" scrolling="yes" title="test" />
             </p>
             <div className="dashboard__chart-container">
               <ResponsiveContainer height={50}>

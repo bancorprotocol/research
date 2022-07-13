@@ -1,0 +1,15 @@
+[build]
+publish = "build"
+command = "npm run build"
+
+
+#####################################################################
+### REDIRECTS
+#####################################################################
+## https://docs.netlify.com/routing/redirects/#syntax-for-the-netlify-configuration-file
+
+########################################################
+### General redirects
+[[redirects]]
+from = "/privacy"
+to = "/legal/privacy"

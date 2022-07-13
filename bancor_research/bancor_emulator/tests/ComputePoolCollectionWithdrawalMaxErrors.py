@@ -25,7 +25,7 @@ def getMaxErr(x, y, maxDiff, maxErr):
     return maxErr;
 
 for fileName in ['PoolCollectionWithdrawalCoverage{}'.format(n + 1) for n in range(8)]:
-    file = open(os.path.join(os.path.dirname(__file__), 'project', 'tests', 'data', fileName + '.json'))
+    file = open(os.path.join(os.path.dirname(__file__), 'project', 'tests', 'data', fileName + '.json'), 'r')
     table = json.loads(file.read());
     file.close()
 

@@ -1,0 +1,128 @@
+.table-data {
+	margin-bottom: 25px;
+}
+
+.table {
+	// text-align: center;
+
+	thead {
+		color: $heading-font-color;
+		
+		th {
+			font-size: 14px;
+			font-weight: 700;
+		}
+
+		.search-block th {
+			font-weight: 600;
+
+			input[type="search"] {
+			    border: none;
+			    border-radius: 50px;
+			    background-color: #eee;
+			    padding: 0 5px 0;
+			    margin-left: 5px;
+			    color: #99a2af;
+			}
+		}
+	}
+
+	tbody {
+		color: $para-font-color-1;
+
+		.change, .id, .last-trade {
+			font-size: 12px;
+			color: $para-font-color-2;
+		}
+
+		.success {
+			color: $success;
+		}
+
+		td.status, td.value, td.token {
+			color: $para-font-color-2;
+		}
+
+		td.amount, td.details {
+			color: $color-primary;
+		}
+	}
+
+	th, tr:not(:last-child) {
+		border-bottom: 1px solid #E5E5E5;
+	}
+}
+
+.marketcap-category-chart .card-header {
+    padding:  0;
+    border-bottom: 0;
+}
+
+.marketcap-category-chart table {
+    margin-bottom:  0;
+    border-bottom: 0;
+}
+
+.marketcap-category-chart {
+
+	.card {
+		margin-bottom: 15px;
+	}
+
+	td.coin-price {
+		color: $para-font-color-2;
+	}
+
+	th.data-name, td.coin-name {
+		width: 13%;
+		padding-left: 0;
+		padding-right: 0;
+	}
+
+	td.coin-name {
+		color: $color-primary;
+	}
+
+	th.data-value, td.coin-value {
+		width: 16%;
+		padding-left: 0;
+		padding-right: 0;
+	}
+
+	th.data-price, td.coin-price {
+		width: 9%;
+		padding-left: 0;
+		padding-right: 0;
+	}
+
+	th.data-serial, td.coin-serial {
+		width: 65px;
+	}
+
+	th.data-volume, td.coin-volume {
+		width: 12%;
+		padding-left: 0;
+		padding-right: 0;
+	}
+
+	th.data-supply, td.coin-supply {
+		width: 15%;
+		padding-left: 0;
+		padding-right: 0;
+	}
+
+	th.data-change, td.price-change {
+		width: 12%;
+		padding-left: 0;
+		padding-right: 0;
+	}
+
+	td.price-change {
+		color: $para-font-color-2;
+	}
+
+	th.data-graph, td.coin-graph {
+		padding-left: 0;
+		padding-right: 10px;
+	}
+}

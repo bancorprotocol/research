@@ -1,0 +1,38 @@
+.accordion__currency,
+.accordion__walet {
+  margin-bottom: 30px;
+}
+
+.accordion__angle--animated {
+  font-size: 15px;
+  height: 15px;
+  width: 15px;
+  border-radius: 50%;
+  -webkit-transition: .1s;
+  transition: .1s;
+  text-align: center;
+  cursor: pointer;
+  display: inline-block;
+  font-weight: 800;
+}
+
+.accordion__angle--animated:hover {
+  background-color: #eee;
+}
+
+.accordion [data-toggle="collapse"].collapsed .accordion__angle--animated {
+  position: relative;
+}
+
+.accordion [data-toggle="collapse"].collapsed .accordion__angle--animated:before {
+  content: "\f106";
+}
+
+.accordion [data-toggle="collapse"] .accordion__angle--animated {
+  position: relative;
+}
+
+.accordion [data-toggle="collapse"] .accordion__angle--animated:before {
+  content: "\f107";
+}
+/*# sourceMappingURL=accordion.css.map */

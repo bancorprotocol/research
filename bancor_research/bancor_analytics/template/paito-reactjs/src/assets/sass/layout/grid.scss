@@ -1,0 +1,13 @@
+.grid-col {
+    padding: 15px;
+    background: #fff;
+
+    @include respond('tab') {
+        margin-bottom: 20px;
+    }
+}
+
+.row.grid {
+    margin-bottom: 30px;
+    text-align: center;
+}

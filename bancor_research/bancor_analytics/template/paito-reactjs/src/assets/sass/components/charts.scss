@@ -1,0 +1,57 @@
+.ico-dist-chart-index {
+
+    ul {
+        margin-bottom: 0;
+        display: flex;
+        flex-wrap: wrap;
+
+        li {
+            flex-basis: 50%;
+            padding-left: 5px;
+            margin-bottom: 15px;
+            color: $heading-font-color;
+            position: relative;
+
+            &:after {
+                position: absolute;
+                content: "";
+                right: 100%;
+                height: 8px;
+                width: 8px;
+                border-radius: 50px;
+                border: 1px solid #000;
+                top: 30%;
+            }
+
+            &.project:after {
+                border-color: #394351;
+            }
+
+            &.advisor:after {
+                border-color: #F7931A;
+            }
+
+            &.master:after {
+                border-color: #1277A8;
+            }
+
+            &.team:after {
+                border-color: #FE0B0B;
+            }
+
+            &.pre-sale:after {
+                border-color: #929292;
+            }
+
+            &.program:after {
+                border-color: #B0B0B0;
+            }
+        }
+    }
+}
+
+@include respond('tab') {
+    .ico-pie-chart {
+        margin-bottom: 20px;
+    }
+}

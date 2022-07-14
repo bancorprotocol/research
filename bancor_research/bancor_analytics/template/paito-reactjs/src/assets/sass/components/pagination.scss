@@ -1,0 +1,107 @@
+//this is not nessecery
+.pagination-page nav {
+    margin-bottom: 30px;
+}
+////////////////////////
+
+.pagination {
+
+    .page-item {
+        text-align: center;
+    }
+
+    .page-item:first-child a.page-link,
+    .page-item:last-child a.page-link {
+        width: 90px;
+        text-align: center;
+    }
+
+    .page-item:not(:last-child) {
+        margin-right: 8px;
+
+        @include respond('tab') {
+            margin-right: 5px;
+        }
+    }
+
+    a.page-link {
+        font-size: 14px;
+        color: $para-font-color-1;
+        background-color: #EAEFF3;
+        border: 0;
+        height: 40px;
+        width: 40px;
+        text-align: center;
+        padding: 0;
+        line-height: 40px;
+        box-shadow: 0 1px 5px rgba($black, .2);
+
+        @include respond('tab') {
+            height: 30px;
+            width: 35px;
+            padding: 5px;
+            line-height: 15px;
+            font-size: 12px;
+        }
+    }
+
+    a.page-link.active {
+        background-color: $color-primary;
+        color: $white;
+        border: 0;
+    }
+
+    a.page-link:hover {
+        background-color: $color-primary;
+        color: $white;
+        border: 0;
+    }
+
+    &.pagination-flat {
+
+        a.page-link {
+            border: 0;
+        }
+
+        a.page-link.active {
+            border: 0;
+        }
+
+        a.page-link:hover {
+            border: 0;
+        }
+
+        .page-item:last-child .page-link {
+            border-radius: 0;
+        }
+
+        .page-item:first-child .page-link {
+            border-radius: 0;
+        }
+        
+    }
+
+    &.pagination-circular {
+        .page-item .page-link {
+            border-radius: 3px;
+        }
+    }
+
+    &.pagination-bordered {
+        .page-item .page-link {
+            border: 1px solid #E7E9EB;
+        }
+    }
+
+    &.pagination-rounded {
+        .page-item .page-link {
+            border-radius: 50px;
+        }
+    }
+}
+
+@include respond('phone') {
+    .pagination-area .pagination {
+        flex-wrap: wrap;
+    }
+}

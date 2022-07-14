@@ -66,7 +66,7 @@ const LogInForm = ({
             form === 'modal_login'
               ? <Button className="account__btn" type="submit" color="primary">Sign In</Button>
               : (
-                <NavLink className="account__btn btn btn-primary" to="/bancor_dashboard">
+                <NavLink className="account__btn btn btn-primary" to="/online_marketing_dashboard">
                   Sign In
                 </NavLink>
               )

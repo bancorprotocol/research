@@ -16,7 +16,7 @@ const AuthFacebookeBtn = ({ dispatch, history }) => {
     } else {
       dispatch(auth({ name: response.name, avatar: response.picture.data.url }));
       localStorage.setItem('easydev', response.accessToken);
-      history.push('/bancor_dashboard');
+      history.push('/online_marketing_dashboard');
     }
   };
 

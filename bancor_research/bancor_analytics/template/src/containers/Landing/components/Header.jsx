@@ -25,7 +25,7 @@ const Header = () => (
           <NavLink className="landing__btn landing__btn--header" to="/documentation/introduction" target="_blank">
             Check out the docs
           </NavLink>
-          <NavLink className="landing__btn landing__btn--header" to="/bancor_dashboard" target="_blank">
+          <NavLink className="landing__btn landing__btn--header" to="/online_marketing_dashboard" target="_blank">
             Live demo
           </NavLink>
           <h2 className="landing__header-title">Also available on</h2>

@@ -21,8 +21,8 @@ const AccountForm = () => (
             </div>
           </div>
         </div>
-        <NavLink className="btn btn-primary account__btn" to="/bancor_dashboard">Unlock</NavLink>
-        <NavLink className="btn btn-outline-danger account__btn" to="/bancor_dashboard">Logout</NavLink>
+        <NavLink className="btn btn-primary account__btn" to="/online_marketing_dashboard">Unlock</NavLink>
+        <NavLink className="btn btn-outline-danger account__btn" to="/online_marketing_dashboard">Logout</NavLink>
       </form>
     )}
   </Form>

@@ -1,5 +1,4 @@
-import os
-import json
+from common import read
 
 from bancor_research.bancor_emulator.solidity.uint.float import Decimal
 from bancor_research.bancor_emulator.PoolCollectionWithdrawal import PoolCollectionWithdrawal
@@ -104,9 +103,7 @@ def assertAlmostEqual(expected, actual, maxError):
         assert absoluteError <= maxError['maxAbsoluteError'] or relativeError <= maxError['maxRelativeError']
 
 for fileName in maxErrors:
-    file = open(os.path.join(os.path.dirname(__file__), 'project', 'tests', 'data', fileName + '.json'), 'r')
-    table = json.loads(file.read());
-    file.close()
+    table = read(fileName)
 
     for row in table:
         a, b, c, e, w, m, n, x = [row[z] for z in 'a, b, c, e, w, m, n, x'.split(', ')]

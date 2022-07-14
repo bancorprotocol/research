@@ -13,7 +13,7 @@ const Carousel = () => (
       </p>
       <CodeHighlither>
         {`import React from 'react';
-import Carousel from 'template/src/components/carousel/CarouselSingle'; // or CarouselMultiply
+import Carousel from 'template-real/src/components/carousel/CarouselSingle'; // or CarouselMultiply
 import Slide1 from 'imgs/img/booking_light.png';
 import Slide2 from 'imgs/img/app_light.png';
 

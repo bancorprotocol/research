@@ -1,7 +1,7 @@
 [build]
-publish = "build"
+publish = "public"
 command = "CI=false yarn build"
-
+targetPort = 3000
 
 #####################################################################
 ### REDIRECTS
@@ -10,6 +10,6 @@ command = "CI=false yarn build"
 
 ########################################################
 ### General redirects
-[[redirects]]
-from = "/privacy"
-to = "/legal/privacy"
+#[[redirects]]
+#from = "/privacy"
+#to = "/legal/privacy"

@@ -62,7 +62,7 @@ const LogInFormPhoto = ({
           {form === 'modal_login'
             ? <Button className="account__btn" submit="true" color="primary">Sign In</Button>
             : (
-              <NavLink className="account__btn btn btn-primary" to="/online_marketing_dashboard">
+              <NavLink className="account__btn btn btn-primary" to="/bancor_dashboard">
                 Sign In
               </NavLink>
             )}

@@ -59,14 +59,14 @@ const Demos = ({ theme, changeToLight, changeToDark }) => (
       </Row>
       <Row className="landing__demo-wrap">
         <Col lg={8}>
-          <Link className="landing__demo" target="_blank" to="/online_marketing_dashboard">
+          <Link className="landing__demo" target="_blank" to="/bancor_dashboard">
             <div className="landing__demo-img-wrap">
               <img src={theme.className === 'theme-dark' ? onlineMarketingDark : onlineMarketing} alt="" />
             </div>
           </Link>
         </Col>
         <Col lg={4} className="landing__demo-theme-toggle">
-          <p className="landing__demo-title">Online Marketing Dashboard</p>
+          <p className="landing__demo-title">Bancor Dashboard</p>
           <DemoThemeToggle theme={theme} changeToLight={changeToLight} changeToDark={changeToDark} />
         </Col>
       </Row>

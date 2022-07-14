@@ -98,7 +98,7 @@ These functions get the current state variable value.
 ### Example 
 
 ```
-v3 = BancorNetwork()
+v3 = BancorDapp()
 state = v3.get_state()
 
 user_name = "Alice"
@@ -161,7 +161,7 @@ The following methods provide an interface to modify `State`.
  ### Example 
 
 ```
-v3 = BancorNetwork()
+v3 = BancorDapp()
 state = v3.get_state()
 
 user_name = "Alice"
@@ -199,7 +199,7 @@ state.set_user_balance(user_name, pooltoken_name, value)
 ### Example 
 
 ```
-v3 = BancorNetwork()
+v3 = BancorDapp()
 state = v3.get_state()
 
 user_name = "Alice"
@@ -239,7 +239,7 @@ state.decrease_user_balance(user_name, pooltoken_name, value)
 ### Example 
 
 ```
-v3 = BancorNetwork()
+v3 = BancorDapp()
 state = v3.get_state()
 
 user_name = "Alice"

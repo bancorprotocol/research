@@ -99,7 +99,7 @@ def integerToDecimalToStr(value, decimals: int):
 def execute(fileName):
     print(fileName)
 
-    flow = read(fileName)
+    flow = Flow(read(fileName))
 
     tknDecimals   = flow.tknDecimals
     bntDecimals   = DEFAULT_DECIMALS

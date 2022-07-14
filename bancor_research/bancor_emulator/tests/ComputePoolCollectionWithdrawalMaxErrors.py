@@ -1,5 +1,4 @@
-import os
-import json
+from common import read
 
 from bancor_research.bancor_emulator.solidity.uint.float import Decimal
 from bancor_research.bancor_emulator.PoolCollectionWithdrawal import PoolCollectionWithdrawal
@@ -25,9 +24,7 @@ def getMaxErr(x, y, maxDiff, maxErr):
     return maxErr;
 
 for fileName in ['PoolCollectionWithdrawalCoverage{}'.format(n + 1) for n in range(8)]:
-    file = open(os.path.join(os.path.dirname(__file__), 'project', 'tests', 'data', fileName + '.json'), 'r')
-    table = json.loads(file.read());
-    file.close()
+    table = read(fileName)
 
     maxErrors[fileName] = {
         'p': '0',

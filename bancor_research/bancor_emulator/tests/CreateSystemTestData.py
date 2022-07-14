@@ -1,5 +1,4 @@
-import os
-import json
+from common import read, write
 
 from bancor_research.bancor_emulator.solidity.uint.float import Decimal
 from bancor_research.bancor_emulator.solidity import uint32, uint256, block
@@ -37,9 +36,7 @@ def integerToDecimalToStr(value, decimals: int):
 def execute(fileName):
     print(fileName)
 
-    file = open(os.path.join(os.path.dirname(__file__), 'project', 'tests', 'data', fileName + '.json'), 'r')
-    flow = json.loads(file.read())
-    file.close()
+    flow = read(fileName)
 
     tknDecimals   = flow['tknDecimals']
     bntDecimals   = DEFAULT_DECIMALS
@@ -314,9 +311,7 @@ def execute(fileName):
 
         raise Exception('unsupported operation `{}` encountered'.format(operation['type']));
 
-    file = open(os.path.join(os.path.dirname(__file__), 'project', 'tests', 'data', fileName + '.json'), 'w')
-    file.write(json.dumps(flow, indent = 2))
-    file.close()
+    write(fileName, flow)
 
 execute('BancorNetworkSimpleFinancialScenario1');
 execute('BancorNetworkSimpleFinancialScenario2');

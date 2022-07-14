@@ -2,7 +2,7 @@
   "name": "easydev",
   "version": "3.7.0",
   "private": true,
-  "homepage": "https://analytics.bancor.network/easydev",
+  "homepage": ".",
   "scripts": {
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",

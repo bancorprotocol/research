@@ -17,7 +17,7 @@ const MicrosoftAuthBtn = ({ dispatch, history }) => {
       });
       dispatch(auth({ name: username }));
       localStorage.setItem('easydev', accessToken);
-      history.push('/bancor_dashboard');
+      history.push('/online_marketing_dashboard');
     } catch (e) {
       dispatch(authError(e.message));
     }

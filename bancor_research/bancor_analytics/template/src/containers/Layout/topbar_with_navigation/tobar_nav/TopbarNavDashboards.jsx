@@ -12,7 +12,7 @@ const TopbarNavDashboards = () => (
     </DropdownToggle>
     <DropdownMenu className="topbar__nav-dropdown-menu dropdown__menu">
       <DropdownItem>
-        <TopbarNavLink title="Online Marketing Dashboard" icon="home" route="/bancor_dashboard" />
+        <TopbarNavLink title="Online Marketing Dashboard" icon="home" route="/online_marketing_dashboard" />
       </DropdownItem>
       <DropdownItem>
         <TopbarNavLink title="E-commerce Dashboard" icon="store" route="/e_commerce_dashboard" />

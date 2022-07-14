@@ -13,7 +13,7 @@ const AuthGoogleBtn = ({ dispatch, history }) => {
   const responseSuccess = (response) => {
     dispatch(auth({ name: response.profileObj.name, avatar: response.profileObj.imageUrl }));
     localStorage.setItem('easydev', response.accessToken);
-    history.push('/bancor_dashboard');
+    history.push('/online_marketing_dashboard');
   };
 
   const responseError = (response) => {

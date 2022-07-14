@@ -41,7 +41,7 @@ bancor_simulator/            <------- ** Spec & Simulation Project **
 │   └── spec/                <------- State transition functions and data structures described in BIP15.
 │         └── actions.py     <------- Deposit, trade, & withdrawal algorithm logic.
 │         └── emulation.py   <------- Verifies solidity result parity.
-│         └── network.py     <------- Main BancorNetwork application interface.
+│         └── network.py     <------- Main BancorDapp application interface.
 │         └── rewards.py     <------- Autocompounding and standard rewards logic.
 │         └── state.py       <------- State variables, constants, data structures, and CRUD interfaces.
 │         └── utils.py       <------- Misc utility functions
@@ -179,7 +179,7 @@ class Config:
 @dataclass(config=Config)
 class GlobalSettings:
     """
-    Represents the default global settings. These can be overridden by the BancorNetwork configuration upon instantiation.
+    Represents the default global settings. These can be overridden by the BancorDapp configuration upon instantiation.
     """
     timestamp: int = DEFAULT_TIMESTAMP
     model: str = MODEL
@@ -698,7 +698,7 @@ These functions get the current state variable value.
  ### Example 
 
 ```
-v3 = BancorNetwork()
+v3 = BancorDapp()
 state = v3.get_state()
 
 user_name = "Alice"
@@ -761,7 +761,7 @@ The following methods provide an interface to modify `State`.
  ### Example 
 
 ```
-v3 = BancorNetwork()
+v3 = BancorDapp()
 state = v3.get_state()
 
 user_name = "Alice"
@@ -799,7 +799,7 @@ state.set_user_balance(user_name, pooltoken_name, value)
 ### Example 
 
 ```
-v3 = BancorNetwork()
+v3 = BancorDapp()
 state = v3.get_state()
 
 user_name = "Alice"
@@ -839,7 +839,7 @@ state.decrease_user_balance(user_name, pooltoken_name, value)
 ### Example 
 
 ```
-v3 = BancorNetwork()
+v3 = BancorDapp()
 state = v3.get_state()
 
 user_name = "Alice"
@@ -862,7 +862,7 @@ state.increase_user_balance(user_name, pooltoken_name, value)
 
 ## Network
 
-The `BancorNetwork` class provides the top level interface through which the entire codebase is made to simulate real-world scenarios in a practical sense. An instance of this class is analogous to the **Environment** in common agent-oriented-programming jargon, and more practically, can be thought of like an instance of the **Bancor dApp** where Traders can perform trades, LPs can make deposits, withdraws, and participate in DAO votes which change the system's tuneable fee (and other) parameters. 
+The `BancorDapp` class provides the top level interface through which the entire codebase is made to simulate real-world scenarios in a practical sense. An instance of this class is analogous to the **Environment** in common agent-oriented-programming jargon, and more practically, can be thought of like an instance of the **Bancor dApp** where Traders can perform trades, LPs can make deposits, withdraws, and participate in DAO votes which change the system's tuneable fee (and other) parameters. 
 
  * `v3.begin_cooldown`
  * `v3.burn`
@@ -896,7 +896,7 @@ The `BancorNetwork` class provides the top level interface through which the ent
 ### Example 
 
 ```
-v3 = BancorNetwork()
+v3 = BancorDapp()
 
 tkn_name = 'wbtc'
 value = .005

@@ -2,7 +2,7 @@
 # --------------------------------------------------------------------------------------------------------------------
 # Licensed under the Bprotocol Foundation (Bancor) LICENSE. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------------------------------
-"""Main BancorNetwork class and simulator module interface."""
+"""Main BancorDapp class and simulator module interface."""
 
 import json
 import pickle
@@ -13,8 +13,8 @@ from bancor_research.bancor_simulator.v3.spec.rewards import *
 from bancor_research.bancor_simulator.v3.spec.state import *
 
 
-class BancorNetwork:
-    """Main BancorNetwork class and simulator module interface."""
+class BancorDapp:
+    """Main BancorDapp class and simulator module interface."""
 
     name = MODEL
     version = VERSION
@@ -63,7 +63,7 @@ class BancorNetwork:
         self.emulate_solidity_results = emulate_solidity_results
 
         if active_users is None:
-            active_users = BancorNetwork.global_settings.active_users
+            active_users = BancorDapp.global_settings.active_users
 
         if price_feeds is None:
             price_feeds = pd.read_parquet(price_feeds_path)
@@ -139,7 +139,7 @@ class BancorNetwork:
     @staticmethod
     def load_pickle(path):
         """
-        Loads a pickled BancorNetwork state from a file path.
+        Loads a pickled BancorDapp state from a file path.
         """
         print("Unpickling from", path)
         with open(path, "rb") as f:
@@ -148,7 +148,7 @@ class BancorNetwork:
     @staticmethod
     def save_pickle(x, path):
         """
-        Saves a pickled BancorNetwork state at file path.
+        Saves a pickled BancorDapp state at file path.
         """
         print("Pickling to", path)
         with open(path, "wb") as f:
@@ -157,7 +157,7 @@ class BancorNetwork:
     @staticmethod
     def load(file_path):
         """
-        Loads pickled BancorNetwork state at file path via cloudpickle.
+        Loads pickled BancorDapp state at file path via cloudpickle.
         """
         with open(file_path, "rb") as f:
             return cloudpickle.load(f)
@@ -229,7 +229,7 @@ class BancorNetwork:
         """
         Exports the auto-generated json scenarios file to a given path.
         """
-        BancorNetwork.save_json(self.global_state.json_export, path)
+        BancorDapp.save_json(self.global_state.json_export, path)
 
     def deposit(
         self,
@@ -465,7 +465,7 @@ class BancorNetwork:
         """
         tkn_name = tkn_name.lower()
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        json_data = BancorNetwork.load_json(path)
+        json_data = BancorDapp.load_json(path)
         state = setup_json_simulation(state, json_data, tkn_name)
         self.next_transaction(state)
 

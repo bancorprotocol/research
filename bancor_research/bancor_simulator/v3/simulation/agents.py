@@ -7,7 +7,7 @@
 import mesa
 
 from bancor_research.bancor_simulator.v3.spec.actions import unpack_withdrawal_cooldown, vortex_burner
-from bancor_research.bancor_simulator.v3.spec.network import BancorNetwork
+from bancor_research.bancor_simulator.v3.spec.network import BancorDapp
 from bancor_research.bancor_simulator.v3.simulation.random_walk import RandomWalker
 from bancor_research.bancor_simulator.v3.simulation.utils import (
     trade_tkn_to_ema,
@@ -62,7 +62,7 @@ class Trader(RandomWalker):
         self.ema_rate = None
         self.spot_rate = None
 
-        # all agents use a single BancorNetwork instance
+        # all agents use a single BancorDapp instance
         self.protocol = model.protocol
 
         # init agent attributes
@@ -965,7 +965,7 @@ class Protocol(mesa.Agent):
         super().__init__(unique_id, model)
 
         # set the dapp interface to Bancor v3
-        self.v3 = BancorNetwork(
+        self.v3 = BancorDapp(
             price_feeds=price_feeds,
             whitelisted_tokens=whitelisted_tokens,
             trading_fee=trading_fee,

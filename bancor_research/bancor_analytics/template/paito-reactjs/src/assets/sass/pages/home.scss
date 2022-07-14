@@ -1,0 +1,40 @@
+.currency-icons i {
+    font-size: 30px;
+    margin-right: 10px;
+}
+
+.currency-icons i:last-child {
+    border: 1px solid #989DAF;
+    border-radius: 50px;
+    font-size: 18px;
+    padding: 5px;
+    color: #989DAF;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    line-height: 20px;
+}
+
+.copyright {
+    margin-bottom: 0;
+    text-align: right;
+    font-size: 12px;
+}
+
+@include respond('tab') {
+    .walet-address-card {
+        margin-bottom: 30px;
+    }
+
+    .currency-card-rounded {
+        margin-bottom: 30px;
+    }
+
+    .currency-icons {
+        margin-bottom: 20px;
+    }
+
+    .crypto-price-card {
+        margin-bottom: 30px;
+    }
+}

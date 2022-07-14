@@ -1,0 +1,71 @@
+.accordion__currency,
+.accordion__walet {
+	margin-bottom: 30px;
+}	
+
+.accordion__angle--animated {
+	font-size: 15px;
+	height: 15px;
+	width: 15px;
+	border-radius: 50%;
+	transition: .1s;
+	text-align: center;
+	cursor: pointer;
+	display: inline-block;
+	font-weight: 800;
+
+	&:hover {
+		background-color: #eee;
+	}
+}
+
+.accordion [data-toggle="collapse"].collapsed .accordion__angle--animated {
+	position: relative;
+	
+	&:before {
+		content: "\f106";
+	}
+}
+
+.accordion [data-toggle="collapse"] .accordion__angle--animated {
+	position: relative;
+
+	&:before {
+		content: "\f107";
+	}
+}
+
+.accordion {
+	input[type="text"] {
+		min-height: 40px;
+	}
+
+	.input-group-addon {
+		padding: 0 10px;
+	}
+}
+.content-body {
+	.card-header {
+		h4 {
+			margin-bottom: 0;
+		}
+	}
+}
+.crypto-price-card {
+	.card-body {
+		padding: 0;
+	}
+}
+.qs-answer {
+	p {
+		margin-bottom: 0;
+		font-size: 1rem;
+	}
+}
+// .accordion.table-data .card-header {
+// 	padding: 0;
+// }
+
+// .accordion.table-data table {
+// 	margin-bottom: 0;
+// }

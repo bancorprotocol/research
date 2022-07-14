@@ -1,0 +1,63 @@
+.tab-container {
+	background-color: transparent;
+}
+
+.tab-container .nav-pills .nav-link {
+	border-radius: 0;
+	text-transform: uppercase;
+	color: #18212c;
+	transition: none;
+}
+
+.tab-container .nav-item {
+    width: 25%;
+    text-align: center;
+}
+
+.tab-default-1 a {
+	background-color: transparent;
+	border-bottom: 1px solid #E5E5E5;
+}
+
+.tab-default-1 .nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+	background-color: $color-primary;
+	color: $white;
+}
+
+.tab-default-2 a {
+	background-color: transparent;
+	border-bottom: 1px solid #E5E5E5;
+}
+
+.tab-default-2 .nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+	background-color: transparent;
+	color: $color-primary;
+	border: 1px solid #E5E5E5;
+	border-bottom: 0;
+	border-radius: 3px;
+}
+
+.borderd-tabs a {
+	background-color: transparent;
+	border-bottom: 3px solid transparent;
+}
+
+.borderd-tabs ul {
+	border-bottom: 1px solid #E5E5E5;
+}
+
+.borderd-tabs .nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+	background-color: transparent;
+	color: $color-primary;
+	border-bottom: 3px solid $color-primary;
+}
+
+.tab-left .tab-head {
+	background-color: $white;
+	text-align: center;
+}
+
+.tab-left .nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+	background-color: $color-primary;
+	color: $white;
+}

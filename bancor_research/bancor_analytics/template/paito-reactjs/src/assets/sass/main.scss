@@ -1,0 +1,57 @@
+/*
+Template Name: Paito
+Developer: NineKit
+Author: Saiful
+skype: sporsho9
+email: ninekit.net@gmail.com
+
+
+Table of Contents
+
+1. Global
+    1.1. variable.scss
+    1.2. fonts.scss
+    1.3. reset.scss
+
+
+*/
+
+////////////////////
+// Global
+////////////////////
+
+@import "abstracts/variables";
+@import "abstracts/mixins";
+
+@import "base/fonts";
+@import "base/reset";
+
+//Components
+@import "components/buttons";
+@import "./components/icons";
+@import "./components/form";
+@import "./components/pagination";
+@import "./components/promotion";
+@import "components/tabs";
+@import "components/tables";
+@import "components/cards";
+@import "components/accordion";
+@import "components/charts";
+
+
+//Layouts
+@import "./layout/login";
+@import "./layout/grid";
+
+//Menu
+@import "./menu/menu";
+@import "./menu/sidebar";
+@import "./menu/menu-customize";
+
+
+
+//Pages
+@import "./pages/home";
+@import "./pages/error";
+@import "./pages/currency-exchange";
+

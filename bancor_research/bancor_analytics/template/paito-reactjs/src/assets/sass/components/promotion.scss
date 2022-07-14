@@ -1,0 +1,21 @@
+.promotion-section {
+    h1 {
+        font-size: 48px;
+        line-height: 1.2;
+
+        @include respond('tab') {
+            font-size: 40px;
+        }
+
+        @include respond('phone') {
+            font-size: 22px;
+            margin-bottom: 20px !important;
+        }
+    }
+
+    p {
+        @include respond('phone') {
+            margin-bottom: 20px !important;
+        }
+    }
+}

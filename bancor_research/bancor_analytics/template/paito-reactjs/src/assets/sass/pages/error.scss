@@ -1,0 +1,33 @@
+.error-msg {
+    text-align: center;
+
+    h1 {
+        font-size: 200px;
+        line-height: 1;
+
+        @include media('992px', '1093px') {
+            font-size: 170px;
+        }
+
+        @include respond('phone') {
+            font-size: 100px;
+        }
+    }
+
+    h2 {
+        font-size: 48px;
+        margin-bottom: 60px;
+
+        @include media('992px', '1093px') {
+            font-size: 40px;
+        }
+
+        @include respond('phone') {
+            font-size: 25px;
+        }
+    }
+
+    .exc-icon {
+        color: $color-primary;
+    }
+}

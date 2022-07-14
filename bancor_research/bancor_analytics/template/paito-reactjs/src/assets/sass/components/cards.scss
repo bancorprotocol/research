@@ -1,0 +1,223 @@
+.card {
+	border: none;
+}
+
+.card-header {
+	background-color: $white;
+	border-bottom: 1px solid #EDEDED;
+}
+
+.currency-card {
+	border: none;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+
+	&--header {
+		background-color: $white;
+		border-bottom: 1px solid #F1F1F1;
+	}
+
+	&--icon {
+		font-size: 30px;
+		margin-right: 15px;
+    	line-height: 1.2;
+
+    	&.ETC-alt {
+    		color: $ethereum;
+    	}
+
+    	&.NEO-alt {
+			color: $neo;
+    	}
+	}
+
+	&--rates {
+		display: flex;
+		flex-wrap: wrap;
+	}
+
+	&--increment, &--change, &--price {
+		flex-basis: 50%;
+	}
+
+	&--change, &--price {
+		color: $para-font-color-2;
+	}
+}
+
+.currency-card-rounded {
+	
+	i.cc {
+		font-size: 60px;
+		color: rgba($color: $white, $alpha: .2)
+	}
+
+	.card-body {
+
+		.progress {
+			height: 6px;
+			background-color: rgba($white, .2);
+
+			.progress-bar {
+				background-color: $white;
+			}
+		}
+
+		h2, h4, p {
+			color: $body-bg;
+		}
+
+		&.bitcoin {
+			background-color: $bitcoin;
+		}
+
+		&.ethereum {
+			background-color: $ethereum;
+		}
+
+		&.ripple {
+			background-color: $ripple;
+		}
+
+		&.litecoin {
+			background-color: $litecoin;
+		}
+	}
+}
+
+.walet-info-card {
+	
+	.card-body {
+
+		.input-group-prepend .input-group-text {
+			background-color: #F7F7F7;
+		}
+
+		h6 {
+			font-size: 14px;
+			font-weight: 700;
+		}
+
+		input.walet-address {
+			    background-color: #fff;
+				border: 1px solid #e8e8e8;
+				font-size: 12px;
+		}
+		
+		.input-group-addon {
+			line-height: 2.5;
+			border: 1px solid #E8E8E8;
+			border-left: none;
+			border-top-right-radius: 3px;
+			border-bottom-right-radius: 3px;
+			cursor: pointer;		
+			transition: all .1s;
+			font-size: 12px;
+
+			&:hover {
+				background-color: #F7F7F7;
+			}
+		}
+	}
+
+	.walet-status li {
+		&:not(:last-child) {
+			margin-bottom: 15px;
+		}
+		
+		span {
+			color: $heading-font-color;
+		}
+	}
+}
+
+.crypto-price-card {
+
+	li {
+		padding: 10px 15px;
+		box-shadow: 0 1px 6px rgba($black, .4);
+		border-radius: 4px;
+
+		&:not(:last-child) {
+			margin-bottom: 10px;
+		}
+		
+		.currency-status {
+			color: $heading-font-color;
+
+			i {
+				margin-left: 5px;
+			}
+		}
+	}
+}
+
+.walet-address-card {
+
+	.card-body {
+
+		.input-group-prepend .input-group-text {
+			background-color: #F7F7F7;
+		}
+
+		input.walet-address {
+			    background-color: #fff;
+				border: 1px solid #e8e8e8;
+				font-size: 14px;
+		}
+		
+		.input-group-addon {
+			line-height: 2.5;
+			border: 1px solid #E8E8E8;
+			border-left: none;
+			border-top-right-radius: 3px;
+			border-bottom-right-radius: 3px;
+			cursor: pointer;		
+			transition: all .1s;
+			font-size: 14px;
+
+			&:hover {
+				background-color: #F7F7F7;
+			}
+		}
+	}
+
+	.walet-direction {
+		text-align: center;
+		border-top: 1px solid #E5E5E5;
+		// margin-top: 12px;
+
+		a {
+			font-weight: 700;
+			font-size: 14px;
+			display: inline-block;
+			padding: 7px 0;
+			text-transform: uppercase;
+			color: $color-primary;
+		}
+	}
+}
+
+.total-value {
+
+	h2 {
+		color: $color-primary;
+	}
+}
+
+.walet-direction {
+
+    a {
+        font-weight: 700;
+        font-size: 14px;
+        display: inline-block;
+        // padding: 7px 0;
+        text-transform: uppercase;
+        color: $color-primary;
+    }
+}
+
+.marketcap-currency {
+    @include respond('tab') {
+        margin-bottom: 20px;
+    }
+}

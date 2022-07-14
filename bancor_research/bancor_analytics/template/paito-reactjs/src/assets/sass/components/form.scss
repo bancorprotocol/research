@@ -1,0 +1,83 @@
+form {
+
+    input.form-control {
+        height: 40px;
+    }
+
+    input, .form-control, select, .custom-select {
+        font-size: 12px;
+    }
+
+    input, .form-control {
+        border: 1px solid #E7E7E7;
+    }
+
+    textarea {
+        height: 150px;
+    }
+
+    .custom-file, 
+    .custom-file-input, 
+    .custom-file-label,  
+    .custom-select {
+        height: calc(2.4rem + 2px);
+    }
+
+    .custom-file-label::after {
+        content: "UPLOAD";
+        height: calc(calc(2.5rem + 2px) - 1px * 2);
+        background-color: $color-primary;
+        color: $white;
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 30px;
+    }
+}
+
+.form-control:focus,
+.custom-select:focus {
+    box-shadow: none;
+    border-color: #E7E7E7;
+}
+
+.form-control[readonly] {
+    background-color: $white;
+}
+
+.input-dropdown select {
+    height: 38px;
+    border-left: none;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border: 1px solid #E7E7E7;
+    min-height: 40px;
+    padding: 0 5px;
+}
+
+.form-control {
+    border-color: #E7E7E7;
+}
+
+.buy-token-form {
+
+    .token {
+        display: inline-block;
+
+        label {
+            color: $heading-font-color;
+        }
+
+        &.ico-token,
+        &.balance.token {
+            width: 20%;
+        }
+
+        &.w-address {
+            width: 33%;
+        }
+
+        button {
+            height: 38px;
+        }
+    }
+}

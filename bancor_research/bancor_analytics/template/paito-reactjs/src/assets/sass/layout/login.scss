@@ -1,0 +1,49 @@
+.login-card {
+    background-color: $sidebar-headerbg;
+    padding: 10px 20px;
+    border-radius: 0;
+
+    h2 {
+        margin-bottom: 40px;
+        color: $white;
+    }
+
+    input, input.form-group {
+        font-size: 14px;
+    }
+
+    .custom-control.custom-checkbox {
+        display: inline-block;
+    }
+
+    .submit {
+        background-color: $color-primary;
+    }
+
+    [type="checkbox"]+label, a {
+        color: $white;
+    }
+
+    .register-btn {
+        text-transform: uppercase;
+    }
+
+    .register-btn i {
+        font-size: 14px;
+        margin-left: 5px;
+    }
+
+    .custom-control-input:checked~.custom-control-label::before {
+        color: #fff;
+        background-color: $color-primary;
+    }
+
+    .custom-control-input:focus~.custom-control-label::before {
+        box-shadow: none;
+    }
+}
+.textarea-wrapper {
+.rdw-editor-main {
+    min-height: 150px;
+}
+}

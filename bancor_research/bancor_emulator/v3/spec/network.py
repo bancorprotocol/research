@@ -1,6 +1,20 @@
-from bancor_research import bancor_emulator as Emulator
 from bancor_research.bancor_emulator.solidity.uint.float import Decimal
 from bancor_research.bancor_emulator.solidity import uint32, uint256, time
+
+# TODO: get rid of the `Emulator_` prefix after renaming class `BancorNetwork` to `BancorDapp`
+from bancor_research.bancor_emulator.BancorNetwork      import BancorNetwork      as Emulator_BancorNetwork     
+from bancor_research.bancor_emulator.BNTPool            import BNTPool            as Emulator_BNTPool           
+from bancor_research.bancor_emulator.Constants          import PPM_RESOLUTION     as Emulator_PPM_RESOLUTION         
+from bancor_research.bancor_emulator.ERC20              import ERC20              as Emulator_ERC20             
+from bancor_research.bancor_emulator.NetworkSettings    import NetworkSettings    as Emulator_NetworkSettings   
+from bancor_research.bancor_emulator.PendingWithdrawals import PendingWithdrawals as Emulator_PendingWithdrawals
+from bancor_research.bancor_emulator.PoolCollection     import PoolCollection     as Emulator_PoolCollection    
+from bancor_research.bancor_emulator.PoolToken          import PoolToken          as Emulator_PoolToken         
+from bancor_research.bancor_emulator.PoolTokenFactory   import PoolTokenFactory   as Emulator_PoolTokenFactory  
+from bancor_research.bancor_emulator.ReserveToken       import ReserveToken       as Emulator_ReserveToken      
+from bancor_research.bancor_emulator.StandardRewards    import StandardRewards    as Emulator_StandardRewards   
+from bancor_research.bancor_emulator.TokenGovernance    import TokenGovernance    as Emulator_TokenGovernance   
+from bancor_research.bancor_emulator.Vault              import Vault              as Emulator_Vault             
 
 DEFAULT_TIMESTAMP = 0
 DEFAULT_WHITELIST = ["dai", "eth", "link", "bnt", "tkn", "wbtc"]
@@ -16,7 +30,7 @@ DEFAULT_COOLDOWN_TIME = time.days * 7
 DEFAULT_ALPHA = Decimal("0.2").quantize(DEFAULT_QDECIMALS)
 
 def toPPM(value: Decimal):
-    return uint32(value * int(Emulator.PPM_RESOLUTION))
+    return uint32(value * int(Emulator_PPM_RESOLUTION))
 
 def toWei(value: Decimal, decimals: int):
     return uint256(value * 10 ** decimals)
@@ -40,23 +54,23 @@ class BancorNetwork:
         generate_json_tests: bool = False,
         emulate_solidity_results: bool = False,
     ):
-        self.bnt   = Emulator.ReserveToken('BNT'  , 'BNT'  , DEFAULT_DECIMALS)
-        self.vbnt  = Emulator.ReserveToken('VBNT' , 'VBNT' , DEFAULT_DECIMALS)
-        self.bnbnt = Emulator.PoolToken   ('bnBNT', 'bnBNT', DEFAULT_DECIMALS, self.bnt)
+        self.bnt   = Emulator_ReserveToken('BNT'  , 'BNT'  , DEFAULT_DECIMALS)
+        self.vbnt  = Emulator_ReserveToken('VBNT' , 'VBNT' , DEFAULT_DECIMALS)
+        self.bnbnt = Emulator_PoolToken   ('bnBNT', 'bnBNT', DEFAULT_DECIMALS, self.bnt)
 
-        self.bntGovernance      = Emulator.TokenGovernance(self.bnt)
-        self.vbntGovernance     = Emulator.TokenGovernance(self.vbnt)
-        self.networkSettings    = Emulator.NetworkSettings(self.bnt)
-        self.masterVault        = Emulator.Vault(self.bntGovernance, self.vbntGovernance)
-        self.erVault            = Emulator.Vault(self.bntGovernance, self.vbntGovernance)
-        self.epVault            = Emulator.Vault(self.bntGovernance, self.vbntGovernance)
-        self.network            = Emulator.BancorNetwork(self.bntGovernance, self.vbntGovernance, self.networkSettings, self.masterVault, self.epVault, self.bnbnt)
-        self.bntPool            = Emulator.BNTPool(self.network, self.bntGovernance, self.vbntGovernance, self.networkSettings, self.masterVault, self.bnbnt)
-        self.pendingWithdrawals = Emulator.PendingWithdrawals(self.network, self.bnt, self.bntPool)
-        self.poolTokenFactory   = Emulator.PoolTokenFactory()
+        self.bntGovernance      = Emulator_TokenGovernance(self.bnt)
+        self.vbntGovernance     = Emulator_TokenGovernance(self.vbnt)
+        self.networkSettings    = Emulator_NetworkSettings(self.bnt)
+        self.masterVault        = Emulator_Vault(self.bntGovernance, self.vbntGovernance)
+        self.erVault            = Emulator_Vault(self.bntGovernance, self.vbntGovernance)
+        self.epVault            = Emulator_Vault(self.bntGovernance, self.vbntGovernance)
+        self.network            = Emulator_BancorNetwork(self.bntGovernance, self.vbntGovernance, self.networkSettings, self.masterVault, self.epVault, self.bnbnt)
+        self.bntPool            = Emulator_BNTPool(self.network, self.bntGovernance, self.vbntGovernance, self.networkSettings, self.masterVault, self.bnbnt)
+        self.pendingWithdrawals = Emulator_PendingWithdrawals(self.network, self.bnt, self.bntPool)
+        self.poolTokenFactory   = Emulator_PoolTokenFactory()
         self.poolMigrator       = None
-        self.poolCollection     = Emulator.PoolCollection(self.network, self.bnt, self.networkSettings, self.masterVault, self.bntPool, self.epVault, self.poolTokenFactory, self.poolMigrator, toPPM(network_fee))
-        self.standardRewards    = Emulator.StandardRewards(self.network, self.networkSettings, self.bntGovernance, self.vbnt, self.bntPool, self.erVault)
+        self.poolCollection     = Emulator_PoolCollection(self.network, self.bnt, self.networkSettings, self.masterVault, self.bntPool, self.epVault, self.poolTokenFactory, self.poolMigrator, toPPM(network_fee))
+        self.standardRewards    = Emulator_StandardRewards(self.network, self.networkSettings, self.bntGovernance, self.vbnt, self.bntPool, self.erVault)
 
         self.networkSettings.initialize()
         self.network.initialize(self.bntPool, self.pendingWithdrawals, self.poolMigrator)
@@ -75,7 +89,7 @@ class BancorNetwork:
         self.reserveTokens = {'bnt': self.bnt}
         self.poolTokens = {'bnbnt': self.bnbnt}
         for tkn_name in whitelisted_tokens:
-            tkn = Emulator.ReserveToken(tkn_name, tkn_name, DEFAULT_DECIMALS) # TODO: support decimals per reserve token
+            tkn = Emulator_ReserveToken(tkn_name, tkn_name, DEFAULT_DECIMALS) # TODO: support decimals per reserve token
             self.networkSettings.addTokenToWhitelist(tkn)
             self.networkSettings.setFundingLimit(tkn, toWei(bnt_funding_limit, DEFAULT_DECIMALS))
             self.network.createPools([tkn], self.poolCollection)

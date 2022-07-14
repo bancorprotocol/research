@@ -4,7 +4,6 @@ from bancor_research.bancor_emulator.solidity import uint32, uint256, time
 from bancor_research.bancor_emulator.BancorNetwork      import BancorNetwork     
 from bancor_research.bancor_emulator.BNTPool            import BNTPool           
 from bancor_research.bancor_emulator.Constants          import PPM_RESOLUTION    
-from bancor_research.bancor_emulator.ERC20              import ERC20             
 from bancor_research.bancor_emulator.NetworkSettings    import NetworkSettings   
 from bancor_research.bancor_emulator.PendingWithdrawals import PendingWithdrawals
 from bancor_research.bancor_emulator.PoolCollection     import PoolCollection    

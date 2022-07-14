@@ -1,5 +1,5 @@
 [build]
-publish = "public"
+publish = "build"
 command = "CI=false yarn build"
 targetPort = 3000
 

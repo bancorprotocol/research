@@ -5,7 +5,6 @@ from decimal import ROUND_CEILING
 
 getcontext().prec = len(str(Decimal(2 ** 512 - 1)))
 
-
 class uint:
     sizes = [(n + 1) * 8 for n in range(32)]
 
@@ -100,7 +99,6 @@ class uint:
     @staticmethod
     def _size(other):
         return other.size if type(other) is uint else (len(hex(int(other))) - 1) // 2 * 8
-
 
 class unchecked:
 

@@ -11,5 +11,3 @@ from bancor_research.bancor_emulator.ReserveToken import ReserveToken
 from bancor_research.bancor_emulator.StandardRewards import StandardRewards
 from bancor_research.bancor_emulator.TokenGovernance import TokenGovernance
 from bancor_research.bancor_emulator.Vault import Vault
-from bancor_research.bancor_emulator.solidity import *
-from bancor_research.bancor_emulator.config import *

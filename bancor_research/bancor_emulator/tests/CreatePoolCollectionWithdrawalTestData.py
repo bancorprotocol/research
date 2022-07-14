@@ -1,10 +1,10 @@
 import os
 import json
 
-import bancor_research.bancor_emulator.config
-bancor_research.bancor_emulator.config.mode = 'float'
+from bancor_research.bancor_emulator import config
+config.mode = 'float'
 
-from PoolCollectionWithdrawal import PoolCollectionWithdrawal
+from bancor_research.bancor_emulator.PoolCollectionWithdrawal import PoolCollectionWithdrawal
 
 for fileName in ['PoolCollectionWithdrawalCoverage{}'.format(n + 1) for n in range(8)]:
     file = open(os.path.join(os.path.dirname(__file__), 'project', 'tests', 'data', fileName + '.json'), 'r')

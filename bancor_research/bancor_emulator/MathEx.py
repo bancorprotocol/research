@@ -325,9 +325,9 @@ def _mulMod(
 ) -> (uint):
     return mulmod(x, y, z);
 
-from bancor_research.bancor_emulator.config import mode
+from bancor_research.bancor_emulator import config
 
-if mode == 'float':
+if config.mode == 'float':
     def exp2(f: Fraction256) -> (Fraction256):
         return Fraction256({ 'n': uint256(2) ** (f.n / f.d), 'd': 1 });
     def reducedFraction(fraction: Fraction256, max: int) -> (Fraction256):

@@ -37,27 +37,22 @@ ThemeComponent.propTypes = {
 
 const ConnectedThemeComponent = connect(state => ({ themeName: state.theme.className }))(ThemeComponent);
 
-const App = () => {
-  useEffect(() => {
-    window.addEventListener('load', initAuth0);
-  }, []);
-  return (
-    <Provider store={store}>
-      <BrowserRouter basename="/easydev">
-        <I18nextProvider i18n={i18n}>
-          <LoadScript
-            googleMapsApiKey="" /* Paste your Google Maps Api Key here */
-          >
-            <ScrollToTop>
-              <ConnectedThemeComponent>
-                <Router />
-              </ConnectedThemeComponent>
-            </ScrollToTop>
-          </LoadScript>
-        </I18nextProvider>
-      </BrowserRouter>
-    </Provider>
-  );
-};
+const App = () => (
+  <Provider store={store}>
+    <BrowserRouter basename="/easydev">
+      <I18nextProvider i18n={i18n}>
+        <LoadScript
+          googleMapsApiKey="" /* Paste your Google Maps Api Key here */
+        >
+          <ScrollToTop>
+            <ConnectedThemeComponent>
+              <Router />
+            </ConnectedThemeComponent>
+          </ScrollToTop>
+        </LoadScript>
+      </I18nextProvider>
+    </BrowserRouter>
+  </Provider>
+);
 
 export default App;

@@ -135,3 +135,6 @@ dmypy.json
 node_modules
 cache
 artifacts
+
+# Local Netlify folder
+.netlify

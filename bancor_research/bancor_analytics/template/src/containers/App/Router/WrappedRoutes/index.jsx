@@ -3,7 +3,7 @@ import { Route } from 'react-router-dom';
 import Layout from '../../../Layout/index';
 import Commerce from './Commerce';
 import Finance from './Finance';
-import OnLineMarketingDashboard from '../../../Dashboards/OnLineMarketing/index';
+import OnLineMarketingDashboard from '../../../Dashboards/BancorV3/index';
 import AppDashboard from '../../../Dashboards/App/index';
 import BookingDashboard from '../../../Dashboards/Booking/index';
 import FitnessDashboard from '../../../Dashboards/Fitness/index';
@@ -25,7 +25,7 @@ export default () => (
     <Layout />
     <div className="container__wrap">
       <Route path="/e_commerce_dashboard" component={Commerce} />
-      <Route path="/online_marketing_dashboard" component={OnLineMarketingDashboard} />
+      <Route path="/bancor_dashboard" component={OnLineMarketingDashboard} />
       <Route exact path="/app_dashboard" component={AppDashboard} />
       <Route path="/booking_dashboard" component={BookingDashboard} />
       <Route path="/finance_dashboard" component={Finance} />

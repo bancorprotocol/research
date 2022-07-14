@@ -16,7 +16,7 @@ const TopbarWithNavigation = ({ changeMobileSidebarVisibility }) => (
         onClickMobile={changeMobileSidebarVisibility}
         onClickDesktop={changeMobileSidebarVisibility}
       />
-      <Link className="topbar__logo" to="/online_marketing_dashboard" />
+      <Link className="topbar__logo" to="/bancor_dashboard" />
     </div>
     <TopbarNav />
     <div className="topbar__right">

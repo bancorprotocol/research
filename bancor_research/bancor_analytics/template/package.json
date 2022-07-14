@@ -2,7 +2,7 @@
   "name": "easydev",
   "version": "3.7.0",
   "private": true,
-  "homepage": ".",
+  "homepage": "https://analytics.bancor.network/",
   "scripts": {
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
@@ -85,6 +85,7 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
+    "docker-compose": "^0.23.17",
     "eslint-config-airbnb": "^18.2.1",
     "eslint-import-resolver-alias": "^1.1.2",
     "eslint-import-resolver-node": "^0.3.4",

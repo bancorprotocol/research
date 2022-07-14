@@ -13,7 +13,7 @@ const RangeSliders = () => (
       </p>
       <CodeHighlither>
         {`import React from 'react';
-import Slider from 'template/src/components/range_slider/Slider'; // or Range
+import Slider from 'template-real/src/components/range_slider/Slider'; // or Range
 
 const Example = () => (
   <Slider

@@ -13,7 +13,7 @@ const Panel = () => (
       </p>
       <CodeHighlither>
         {`import React from 'react';
-import Panel from 'template/src/components/Panel';
+import Panel from 'template-real/src/components/Panel';
 
 const Example = () => (
   <Panel xs={12} md={12} lg={6} title='Default panel'>

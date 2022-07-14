@@ -12,7 +12,7 @@ const TimeLine = () => (
       <p>Timeline is placed in <b>template/src/components/TimeLineItem.js</b></p>
       <CodeHighlither>
         {`import React from 'react';
-import TimeLineItem from 'template/src/components/TimeLineItem';
+import TimeLineItem from 'template-real/src/components/TimeLineItem';
 import Ava1 from '../../../../img/14.png';
 import Ava2 from '../../../../img/15.png';
 

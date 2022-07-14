@@ -18,7 +18,7 @@ const EmailConfirmationCard = () => (
           <h3 className="email-confirmation__title">Your e-mail address has been successfully verified</h3>
           <p className="email-confirmation__sub">Thank you for choosing the EasyDev</p>
           <ButtonToolbar className="email-confirmation__buttons">
-            <Link className="btn btn-primary" to="/online_marketing_dashboard">Go to dashboard</Link>
+            <Link className="btn btn-primary" to="/bancor_dashboard">Go to dashboard</Link>
             <Link className="btn btn-primary" to="/account/profile">Go to profile</Link>
           </ButtonToolbar>
         </div>

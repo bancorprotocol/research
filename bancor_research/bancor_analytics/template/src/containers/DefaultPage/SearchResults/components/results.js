@@ -1,7 +1,7 @@
 export default [
   {
     id: 0,
-    title: 'Invoice template',
+    title: 'Invoice template-real',
     link: 'http://www.admin-easydev/invoice',
     preview: 'Breakfast agreeable incommode departure it an. By ignorant '
     + 'at on wondered relation. Enough at tastes '
@@ -12,14 +12,14 @@ export default [
   },
   {
     id: 1,
-    title: 'Open Invoice template',
+    title: 'Open Invoice template-real',
     link: 'http://www.admin-easydev/invoice_open',
     preview: 'View him she roof tell her case has sigh. Moreover '
     + 'is possible he admitted sociable concerns… ',
   },
   {
     id: 2,
-    title: 'Some … Invoice template',
+    title: 'Some … Invoice template-real',
     link: 'http://www.admin-easydev/invoice_open',
     preview: 'By ignorant at on wondered relation. Enough at tastes '
     + 'really so cousin am of. Extensive therefore '
@@ -29,7 +29,7 @@ export default [
   },
   {
     id: 3,
-    title: 'Invoice template',
+    title: 'Invoice template-real',
     link: 'http://www.admin-easydev/invoice',
     preview: 'Breakfast agreeable incommode departure it an. By ignorant '
     + 'at on wondered relation. Enough at tastes '
@@ -40,14 +40,14 @@ export default [
   },
   {
     id: 4,
-    title: 'Open Invoice template',
+    title: 'Open Invoice template-real',
     link: 'http://www.admin-easydev/invoice_open',
     preview: 'View him she roof tell her case has sigh. '
     + 'Moreover is possible he admitted sociable concerns… ',
   },
   {
     id: 5,
-    title: 'Some … Invoice template',
+    title: 'Some … Invoice template-real',
     link: 'http://www.admin-easydev/invoice_open',
     preview: 'By ignorant at on wondered relation. Enough at '
     + 'tastes really so cousin am of. Extensive therefore '
@@ -57,7 +57,7 @@ export default [
   },
   {
     id: 6,
-    title: 'Invoice template',
+    title: 'Invoice template-real',
     link: 'http://www.admin-easydev/invoice',
     preview: 'Breakfast agreeable incommode departure it an. '
     + 'By ignorant at on wondered relation. Enough at tastes '
@@ -68,14 +68,14 @@ export default [
   },
   {
     id: 7,
-    title: 'Open Invoice template',
+    title: 'Open Invoice template-real',
     link: 'http://www.admin-easydev/invoice_open',
     preview: 'View him she roof tell her case has sigh. '
     + 'Moreover is possible he admitted sociable concerns… ',
   },
   {
     id: 8,
-    title: 'Some … Invoice template',
+    title: 'Some … Invoice template-real',
     link: 'http://www.admin-easydev/invoice_open',
     preview: 'By ignorant at on wondered relation. Enough '
     + 'at tastes really so cousin am of. Extensive therefore '
@@ -85,7 +85,7 @@ export default [
   },
   {
     id: 9,
-    title: 'Invoice template',
+    title: 'Invoice template-real',
     link: 'http://www.admin-easydev/invoice',
     preview: 'Breakfast agreeable incommode departure it an. '
     + 'By ignorant at on wondered relation. Enough at tastes '
@@ -96,14 +96,14 @@ export default [
   },
   {
     id: 10,
-    title: 'Open Invoice template',
+    title: 'Open Invoice template-real',
     link: 'http://www.admin-easydev/invoice_open',
     preview: 'View him she roof tell her case has sigh. '
     + 'Moreover is possible he admitted sociable concerns… ',
   },
   {
     id: 11,
-    title: 'Some … Invoice template',
+    title: 'Some … Invoice template-real',
     link: 'http://www.admin-easydev/invoice_open',
     preview: 'By ignorant at on wondered relation. Enough at '
     + 'tastes really so cousin am of. Extensive therefore '
@@ -113,7 +113,7 @@ export default [
   },
   {
     id: 12,
-    title: 'Invoice template',
+    title: 'Invoice template-real',
     link: 'http://www.admin-easydev/invoice',
     preview: 'Breakfast agreeable incommode departure it an. '
     + 'By ignorant at on wondered relation. Enough at tastes '
@@ -124,14 +124,14 @@ export default [
   },
   {
     id: 13,
-    title: 'Open Invoice template',
+    title: 'Open Invoice template-real',
     link: 'http://www.admin-easydev/invoice_open',
     preview: 'View him she roof tell her case has sigh. '
       + 'Moreover is possible he admitted sociable concerns… ',
   },
   {
     id: 14,
-    title: 'Some … Invoice template',
+    title: 'Some … Invoice template-real',
     link: 'http://www.admin-easydev/invoice_open',
     preview: 'By ignorant at on wondered relation. '
     + 'Enough at tastes really so cousin am of. Extensive therefore '
@@ -141,7 +141,7 @@ export default [
   },
   {
     id: 15,
-    title: 'Invoice template',
+    title: 'Invoice template-real',
     link: 'http://www.admin-easydev/invoice',
     preview: 'Breakfast agreeable incommode departure it an. '
     + 'By ignorant at on wondered relation. Enough at tastes '
@@ -152,14 +152,14 @@ export default [
   },
   {
     id: 16,
-    title: 'Open Invoice template',
+    title: 'Open Invoice template-real',
     link: 'http://www.admin-easydev/invoice_open',
     preview: 'View him she roof tell her case has sigh. '
     + 'Moreover is possible he admitted sociable concerns… ',
   },
   {
     id: 17,
-    title: 'Some … Invoice template',
+    title: 'Some … Invoice template-real',
     link: 'http://www.admin-easydev/invoice_open',
     preview: 'By ignorant at on wondered relation. '
     + 'Enough at tastes really so cousin am of. Extensive therefore '

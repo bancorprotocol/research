@@ -21,7 +21,7 @@ const SearchHere = () => (
             </div>
           </div>
         </form>
-        <h4 className="typography-message">{'Search result for \'Invoice template\''}</h4>
+        <h4 className="typography-message">{'Search result for \'Invoice template-real\''}</h4>
         <h4 className="subhead typography-message">Found 18 results</h4>
         <div>
           {results.slice(0, 10).map(result => (

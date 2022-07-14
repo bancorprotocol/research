@@ -19,7 +19,7 @@ const center = {
 // Make your own map styles
 // https://mapstyle.withgoogle.com/
 
-// Styles in options will work only if you will add your googleMapsApiKey to template/src/containers/App/App.jsx
+// Styles in options will work only if you will add your googleMapsApiKey to template-real/src/containers/App/App.jsx
 const options = {
   disableDefaultUI: true,
   zoomControl: true,

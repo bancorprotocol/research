@@ -1,0 +1,11 @@
+[build]
+#base = "bancor_research/bancor_analytics/template/"
+publish = "build/"
+command = "yarn build"
+commandOrigin = "bancor_research/bancor_analytics/template/"
+targetPort = 3000
+
+[context.production]
+  publish = "build/"
+#  command = "make publish"
+      environment = { PUBLIC_URL = "" }

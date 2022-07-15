@@ -86,7 +86,7 @@ class BancorDapp:
 
         self.reserveTokens = {'bnt': self.bnt}
         self.poolTokens = {'bnbnt': self.bnbnt}
-        for tkn_name in whitelisted_tokens:
+        for tkn_name in [tkn_name for tkn_name in whitelisted_tokens if tkn_name != 'bnt']:
             tkn = ReserveToken(tkn_name, tkn_name, DEFAULT_DECIMALS) # TODO: support decimals per reserve token
             self.networkSettings.addTokenToWhitelist(tkn)
             self.networkSettings.setFundingLimit(tkn, toWei(bnt_funding_limit, DEFAULT_DECIMALS))
@@ -251,6 +251,17 @@ class BancorDapp:
         tkn = self.reserveTokens[tkn_name]
         amt = toWei(value, self.bnt.decimals())
         self.networkSettings.setFundingLimit(tkn, amt)
+
+    def dao_msig_init_pools(
+        self,
+        pools: list,
+        tkn_name: str = None,
+        timestamp: int = 0,
+        transaction_type: str = "enableTrading",
+        user_name: str = "protocol",
+    ) -> None:
+        for pool in [pool for pool in pools if self.reserveTokens[pool] != self.bnt]:
+            self.poolCollection.enableTrading(self.reserveTokens[pool], 1, 1)
 
 # whitelisted_tokens: list = ['bnt', 'eth', 'wbtc', 'link']
 # v3 = BancorDapp(whitelisted_tokens=whitelisted_tokens)

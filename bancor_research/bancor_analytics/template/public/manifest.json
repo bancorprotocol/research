@@ -1,15 +1,14 @@
 {
-  "short_name": "EasyDEV",
-  "name": "EasyDEV",
+  "short_name": "Bancor 3 Dashboard",
+  "name": "Bancor 3 Main Analytics Dashboard",
   "icons": [
     {
-      "src": "fav.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
+      "src": "https://app.bancor.network/favicon.ico",
+      "sizes": "64x64"
     }
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#4ce1b6",
+  "theme_color": "#000000",
   "background_color": "#ffffff"
 }

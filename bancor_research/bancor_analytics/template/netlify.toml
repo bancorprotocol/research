@@ -1,9 +1,11 @@
 [build]
+#base = "bancor_research/bancor_analytics/template/"
 publish = "build/"
-command = "npm run build"
-commandOrigin = "bancor_research/bancor_analytics/template/"
+command = "CI= npm run build"
+commandOrigin = "bancor_research/bancor_analytics/template-dashboard/"
 targetPort = 3000
 
 [context.production]
-publish = "build/"
-environment = { PUBLIC_URL="" }
+  publish = "build/"
+#  command = "make publish"
+#      environment = { PUBLIC_URL = "" }

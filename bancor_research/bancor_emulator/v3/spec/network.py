@@ -14,6 +14,13 @@ from bancor_research.bancor_emulator.StandardRewards    import StandardRewards
 from bancor_research.bancor_emulator.TokenGovernance    import TokenGovernance   
 from bancor_research.bancor_emulator.Vault              import Vault             
 
+import pandas as pd
+import warnings
+from pydantic.fields import TypeVar
+
+warnings.filterwarnings("ignore", category=RuntimeWarning)
+PandasDataFrame = TypeVar("pandas.core.frame.DataFrame")
+
 DEFAULT_TIMESTAMP = 0
 DEFAULT_WHITELIST = ["dai", "eth", "link", "bnt", "tkn", "wbtc"]
 DEFAULT_USERS = ["alice", "bob", "charlie", "trader", "user", "protocol"]
@@ -26,6 +33,22 @@ DEFAULT_BNT_FUNDING_LIMIT = Decimal("1000000")
 DEFAULT_BNT_MIN_LIQUIDITY = Decimal("10000")
 DEFAULT_COOLDOWN_TIME = time.days * 7
 DEFAULT_ALPHA = Decimal("0.2").quantize(DEFAULT_QDECIMALS)
+SECONDS_PER_DAY = 86400
+DEFAULT_NUM_TIMESTAMPS = SECONDS_PER_DAY * 30
+DEFAULT_PRICE_FEEDS_PATH = (
+    "https://bancorml.s3.us-east-2.amazonaws.com/price_feeds.parquet"
+)
+DEFAULT_PRICE_FEEDS = pd.DataFrame(
+    {
+        "INDX": (0 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
+        "vbnt": (1.0 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
+        "tkn": (2.5 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
+        "bnt": (2.5 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
+        "link": (15.00 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
+        "eth": (2500.00 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
+        "wbtc": (40000.00 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
+    }
+)
 
 def toPPM(value: Decimal):
     return uint32(value * int(PPM_RESOLUTION))
@@ -45,8 +68,8 @@ class BancorDapp:
         network_fee: Decimal = DEFAULT_NETWORK_FEE,
         trading_fee: Decimal = DEFAULT_TRADING_FEE,
         whitelisted_tokens=DEFAULT_WHITELIST,
-        price_feeds_path = None,
-        price_feeds = None,
+        price_feeds_path: str = DEFAULT_PRICE_FEEDS_PATH,
+        price_feeds: PandasDataFrame = DEFAULT_PRICE_FEEDS,
         active_users: list = DEFAULT_USERS,
         transaction_id: int = 0,
         generate_json_tests: bool = False,
@@ -78,7 +101,7 @@ class BancorDapp:
         self.standardRewards.initialize()
 
         self.networkSettings.setWithdrawalFeePPM(toPPM(withdrawal_fee))
-        self.networkSettings.setMinLiquidityForTrading(toWei(bnt_min_liquidity, DEFAULT_DECIMALS))
+        self.networkSettings.setMinLiquidityForTrading(toWei(bnt_min_liquidity * 2, DEFAULT_DECIMALS))
 
         self.pendingWithdrawals.setLockDuration(cooldown_time)
 
@@ -94,6 +117,11 @@ class BancorDapp:
             self.poolCollection.setTradingFeePPM(tkn, toPPM(trading_fee))
             self.reserveTokens[tkn_name] = tkn
             self.poolTokens[tkn_name] = self.network.collectionByPool(tkn).poolToken(tkn)
+
+        if price_feeds is None:
+            price_feeds = pd.read_parquet(price_feeds_path)
+            price_feeds.columns = [col.lower() for col in price_feeds.columns]
+        self.price_feeds = price_feeds
 
     def deposit(
         self,
@@ -261,7 +289,11 @@ class BancorDapp:
         user_name: str = "protocol",
     ) -> None:
         for pool in [pool for pool in pools if self.reserveTokens[pool] != self.bnt]:
-            self.poolCollection.enableTrading(self.reserveTokens[pool], 1, 1)
+            self.poolCollection.enableTrading(
+                self.reserveTokens[pool],
+                toWei(self.price_feeds.at[timestamp, "bnt"], self.bnt.decimals()),
+                toWei(self.price_feeds.at[timestamp, pool], self.reserveTokens[pool].decimals())
+            )
 
 # whitelisted_tokens: list = ['bnt', 'eth', 'wbtc', 'link']
 # v3 = BancorDapp(whitelisted_tokens=whitelisted_tokens)

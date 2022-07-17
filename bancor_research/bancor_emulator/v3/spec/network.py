@@ -314,11 +314,12 @@ class BancorDapp:
     ) -> None:
         updateBlock(timestamp)
         for pool in [pool for pool in pools if self.reserveTokens[pool] != self.bnt]:
-            self.poolCollection.enableTrading(
-                self.reserveTokens[pool],
-                toWei(self.price_feeds.at[timestamp, pool], self.reserveTokens[pool].decimals()),
-                toWei(self.price_feeds.at[timestamp, "bnt"], self.bnt.decimals())
-            )
+            tknPrice = self.price_feeds.at[timestamp, pool]
+            bntPrice = self.price_feeds.at[timestamp, "bnt"]
+            while tknPrice != int(tknPrice) or bntPrice != int(bntPrice):
+                tknPrice *= 10
+                bntPrice *= 10
+            self.poolCollection.enableTrading(self.reserveTokens[pool], tknPrice, bntPrice)
 
     def create_user(self, user_name: str, timestamp: int = 0):
         pass

@@ -162,7 +162,7 @@ class BancorDapp:
         with open(file_path, "rb") as f:
             return cloudpickle.load(f)
 
-    def copy_state(self, copy_type: str, state: State = None, timestamp: int = None):
+    def copy_state(self, copy_type: str, state: State = None, timestamp: int = 0):
         """
         Saves a backup of the current global state to revert_state back to if desired.
         """
@@ -194,7 +194,7 @@ class BancorDapp:
         self.transaction_id += 1
 
     def get_state(
-        self, copy_type: str = "initial", state: State = None, timestamp: int = None
+        self, copy_type: str = "initial", state: State = None, timestamp: int = 0
     ):
         """
         Creates a copy of the global state which will modified during a new action.
@@ -236,7 +236,7 @@ class BancorDapp:
         tkn_name: str,
         tkn_amt: Decimal,
         user_name: str,
-        timestamp: int = None,
+        timestamp: int = 0,
         bntkn: Decimal = Decimal("0"),
         action_name="deposit",
     ):
@@ -310,7 +310,7 @@ class BancorDapp:
         tkn_amt: Decimal,
         tkn_name: str,
         user_name: str,
-        timestamp: int = None,
+        timestamp: int = 0,
         action_name: str = "begin cooldown",
     ):
         """
@@ -333,7 +333,7 @@ class BancorDapp:
         self,
         user_name: str,
         id_number: int,
-        timestamp: int = None,
+        timestamp: int = 0,
         tkn_name: str = None,
         tkn_amt: Decimal = None,
         transaction_type: str = "withdraw",
@@ -408,7 +408,7 @@ class BancorDapp:
         """
         return pd.concat(self.global_state.history)
 
-    def whitelist_token(self, tkn_name: str, timestamp: int = None):
+    def whitelist_token(self, tkn_name: str, timestamp: int = 0):
         """
         Creates a new whitelisted token with initialized starting balances
         """
@@ -425,7 +425,7 @@ class BancorDapp:
             state,
         )
 
-    def create_user(self, user_name: str, timestamp: int = None):
+    def create_user(self, user_name: str, timestamp: int = 0):
         """
         Creates a new user with a valid wallet
         """
@@ -459,7 +459,7 @@ class BancorDapp:
             )
             self.global_state.json_export["operations"].append(json_operation)
 
-    def load_json_simulation(self, path, tkn_name="tkn", timestamp: int = None):
+    def load_json_simulation(self, path, tkn_name="tkn", timestamp: int = 0):
         """
         Loads a JSON file containing simulation modules to run and report on.
         """
@@ -584,7 +584,7 @@ class BancorDapp:
         user_name: str,
         rewards_ids: List[int],
         transaction_type: str = "claim_standard_rewards",
-        timestamp: int = None,
+        timestamp: int = 0,
     ):
         """
         Claim standard rewards for a given reward program and user.
@@ -609,7 +609,7 @@ class BancorDapp:
         tkn_name: str,
         tkn_amt: Decimal,
         user_name: str,
-        timestamp: int = None,
+        timestamp: int = 0,
         transaction_type="join_standard_rewards",
     ):
         """
@@ -642,7 +642,7 @@ class BancorDapp:
         tkn_amt: Decimal,
         user_name: str,
         id_number: int,
-        timestamp: int = None,
+        timestamp: int = 0,
         transaction_type="leave_standard_rewards",
     ):
         """
@@ -674,7 +674,7 @@ class BancorDapp:
         user_name: str,
         tkn_name: str,
         tkn_amt: Decimal,
-        timestamp: int = None,
+        timestamp: int = 0,
         transaction_type: str = "set user balance",
     ):
         """
@@ -704,7 +704,7 @@ class BancorDapp:
         self,
         tkn_name: str,
         value: Decimal,
-        timestamp: int = None,
+        timestamp: int = 0,
         transaction_type: str = "set trading fee",
         user_name: str = "protocol",
     ):
@@ -729,7 +729,7 @@ class BancorDapp:
         self,
         tkn_name: str,
         value: Decimal,
-        timestamp: int = None,
+        timestamp: int = 0,
         transaction_type: str = "set network fee",
         user_name: str = "protocol",
     ):
@@ -754,7 +754,7 @@ class BancorDapp:
         self,
         tkn_name: str,
         value: Decimal,
-        timestamp: int = None,
+        timestamp: int = 0,
         transaction_type: str = "set withdrawal fee",
         user_name: str = "protocol",
     ):
@@ -779,7 +779,7 @@ class BancorDapp:
         self,
         tkn_name: str,
         value: Decimal,
-        timestamp: int = None,
+        timestamp: int = 0,
         transaction_type: str = "set bnt funding limit",
         user_name: str = "protocol",
     ):

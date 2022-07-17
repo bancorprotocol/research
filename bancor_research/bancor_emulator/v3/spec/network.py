@@ -1,5 +1,5 @@
 from bancor_research.bancor_emulator.solidity.uint.float import Decimal
-from bancor_research.bancor_emulator.solidity import uint32, uint256, time
+from bancor_research.bancor_emulator.solidity import uint32, uint256, time, block
 
 from bancor_research.bancor_emulator.BancorNetwork      import BancorNetwork     
 from bancor_research.bancor_emulator.BNTPool            import BNTPool           
@@ -56,6 +56,13 @@ def toPPM(value: Decimal):
 def toWei(value: Decimal, decimals: int):
     return uint256(value * 10 ** decimals)
 
+def updateBlock(timestamp):
+    if block.timestamp < timestamp:
+        block.timestamp = timestamp
+        block.number += 1
+    else:
+        assert block.timestamp == timestamp
+
 class BancorDapp:
     def __init__(
         self,
@@ -75,6 +82,10 @@ class BancorDapp:
         generate_json_tests: bool = False,
         emulate_solidity_results: bool = False,
     ):
+        block.timestamp = 0
+        block.number = 0
+        updateBlock(timestamp)
+
         self.bnt   = ReserveToken('BNT'  , 'BNT'  , DEFAULT_DECIMALS)
         self.vbnt  = ReserveToken('VBNT' , 'VBNT' , DEFAULT_DECIMALS)
         self.bnbnt = PoolToken   ('bnBNT', 'bnBNT', DEFAULT_DECIMALS, self.bnt)
@@ -128,10 +139,11 @@ class BancorDapp:
         tkn_name: str,
         tkn_amt: Decimal,
         user_name: str,
-        timestamp: int = None,
+        timestamp: int = 0,
         bntkn: Decimal = Decimal("0"),
         action_name="deposit",
     ):
+        updateBlock(timestamp)
         tkn = self.reserveTokens[tkn_name]
         amt = toWei(tkn_amt, tkn.decimals())
         tkn.connect(user_name).approve(self.network, amt)
@@ -146,6 +158,7 @@ class BancorDapp:
         timestamp: int,
         transaction_type: str = "trade",
     ):
+        updateBlock(timestamp)
         src_tkn = self.reserveTokens[source_token]
         trg_tkn = self.reserveTokens[target_token]
         src_amt = toWei(tkn_amt, src_tkn.decimals())
@@ -157,9 +170,10 @@ class BancorDapp:
         tkn_amt: Decimal,
         tkn_name: str,
         user_name: str,
-        timestamp: int = None,
+        timestamp: int = 0,
         action_name: str = "begin cooldown",
     ):
+        updateBlock(timestamp)
         tkn = self.poolTokens[tkn_name]
         amt = toWei(tkn_amt, tkn.decimals())
         tkn.connect(user_name).approve(self.network, amt)
@@ -169,11 +183,12 @@ class BancorDapp:
         self,
         user_name: str,
         id_number: int,
-        timestamp: int = None,
+        timestamp: int = 0,
         tkn_name: str = None,
         tkn_amt: Decimal = None,
         transaction_type: str = "withdraw",
     ):
+        updateBlock(timestamp)
         return self.network.connect(user_name).withdraw(id_number)
 
     def burn(
@@ -184,6 +199,7 @@ class BancorDapp:
         timestamp: int = 0,
         transaction_type: str = "burnPoolTokenTKN",
     ):
+        updateBlock(timestamp)
         tkn = self.poolTokens[tkn_name]
         amt = toWei(tkn_amt, tkn.decimals())
         tkn.connect(user_name).burn(amt)
@@ -195,8 +211,9 @@ class BancorDapp:
         user_name: str,
         rewards_ids: list[int],
         transaction_type: str = "claim_standard_rewards",
-        timestamp: int = None,
+        timestamp: int = 0,
     ):
+        updateBlock(timestamp)
         return self.standardRewards.connect(user_name).claimRewards(rewards_ids)
 
     def join_standard_rewards(
@@ -204,9 +221,10 @@ class BancorDapp:
         tkn_name: str,
         tkn_amt: Decimal,
         user_name: str,
-        timestamp: int = None,
+        timestamp: int = 0,
         transaction_type="join_standard_rewards",
     ):
+        updateBlock(timestamp)
         tkn = self.poolTokens[tkn_name]
         amt = toWei(tkn_amt, tkn.decimals())
         tkn.connect(user_name).approve(self.standardRewards, amt)
@@ -218,9 +236,10 @@ class BancorDapp:
         tkn_amt: Decimal,
         user_name: str,
         id_number: int,
-        timestamp: int = None,
+        timestamp: int = 0,
         transaction_type="leave_standard_rewards",
     ):
+        updateBlock(timestamp)
         tkn = self.poolTokens[tkn_name]
         amt = toWei(tkn_amt, tkn.decimals())
         return self.standardRewards.connect(user_name).leave(tknProgramId, amt)
@@ -230,9 +249,10 @@ class BancorDapp:
         user_name: str,
         tkn_name: str,
         tkn_amt: Decimal,
-        timestamp: int = None,
+        timestamp: int = 0,
         transaction_type: str = "set user balance",
     ):
+        updateBlock(timestamp)
         tkn = self.reserveTokens[tkn_name]
         amt = toWei(tkn_amt, tkn.decimals())
         func = self.bntGovernance.mint if tkn == self.bnt else tkn.issue
@@ -242,40 +262,44 @@ class BancorDapp:
         self,
         tkn_name: str,
         value: Decimal,
-        timestamp: int = None,
+        timestamp: int = 0,
         transaction_type: str = "set trading fee",
         user_name: str = "protocol",
     ):
+        updateBlock(timestamp)
         self.poolCollection.setTradingFeePPM(self.reserveTokens[tkn_name], toPPM(value))
 
     def set_network_fee(
         self,
         tkn_name: str,
         value: Decimal,
-        timestamp: int = None,
+        timestamp: int = 0,
         transaction_type: str = "set network fee",
         user_name: str = "protocol",
     ):
+        updateBlock(timestamp)
         self.poolCollection.setNetworkFeePPM(toPPM(value))
 
     def set_withdrawal_fee(
         self,
         tkn_name: str,
         value: Decimal,
-        timestamp: int = None,
+        timestamp: int = 0,
         transaction_type: str = "set withdrawal fee",
         user_name: str = "protocol",
     ):
+        updateBlock(timestamp)
         self.networkSettings.setWithdrawalFeePPM(toPPM(value))
 
     def set_bnt_funding_limit(
         self,
         tkn_name: str,
         value: Decimal,
-        timestamp: int = None,
+        timestamp: int = 0,
         transaction_type: str = "set bnt funding limit",
         user_name: str = "protocol",
     ):
+        updateBlock(timestamp)
         tkn = self.reserveTokens[tkn_name]
         amt = toWei(value, self.bnt.decimals())
         self.networkSettings.setFundingLimit(tkn, amt)
@@ -288,6 +312,7 @@ class BancorDapp:
         transaction_type: str = "enableTrading",
         user_name: str = "protocol",
     ) -> None:
+        updateBlock(timestamp)
         for pool in [pool for pool in pools if self.reserveTokens[pool] != self.bnt]:
             self.poolCollection.enableTrading(
                 self.reserveTokens[pool],
@@ -295,7 +320,7 @@ class BancorDapp:
                 toWei(self.price_feeds.at[timestamp, "bnt"], self.bnt.decimals())
             )
 
-    def create_user(self, user_name: str, timestamp: int = None):
+    def create_user(self, user_name: str, timestamp: int = 0):
         pass
 
     def describe(self, rates: bool = False, decimals: int = 6):

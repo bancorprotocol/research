@@ -291,8 +291,8 @@ class BancorDapp:
         for pool in [pool for pool in pools if self.reserveTokens[pool] != self.bnt]:
             self.poolCollection.enableTrading(
                 self.reserveTokens[pool],
-                toWei(self.price_feeds.at[timestamp, "bnt"], self.bnt.decimals()),
-                toWei(self.price_feeds.at[timestamp, pool], self.reserveTokens[pool].decimals())
+                toWei(self.price_feeds.at[timestamp, pool], self.reserveTokens[pool].decimals()),
+                toWei(self.price_feeds.at[timestamp, "bnt"], self.bnt.decimals())
             )
 
 # whitelisted_tokens: list = ['bnt', 'eth', 'wbtc', 'link']

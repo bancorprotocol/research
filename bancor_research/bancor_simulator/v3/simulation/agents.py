@@ -735,7 +735,7 @@ class LP(RandomWalker):
         self,
         user_name: str,
         id_number: int,
-        timestamp: int = None,
+        timestamp: int = 0,
     ):
         """
         Main withdrawal logic based on the withdraw algorithm of the BIP15 spec.

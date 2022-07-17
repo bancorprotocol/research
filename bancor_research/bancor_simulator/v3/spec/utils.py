@@ -753,7 +753,7 @@ def validate_input(
     tkn_name: str,
     tkn_amt: Decimal,
     user_name: str,
-    timestamp: int = None,
+    timestamp: int = 0,
 ) -> Tuple[State, str, Decimal, str]:
     """
     Validates the input for all agent actions.

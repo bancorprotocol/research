@@ -295,5 +295,11 @@ class BancorDapp:
                 toWei(self.price_feeds.at[timestamp, "bnt"], self.bnt.decimals())
             )
 
+    def create_user(self, user_name: str, timestamp: int = None):
+        pass
+
+    def describe(self, rates: bool = False, decimals: int = 6):
+        pass
+
 # whitelisted_tokens: list = ['bnt', 'eth', 'wbtc', 'link']
 # v3 = BancorDapp(whitelisted_tokens=whitelisted_tokens)

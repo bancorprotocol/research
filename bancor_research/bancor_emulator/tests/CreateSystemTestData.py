@@ -1,27 +1,21 @@
-import sys
-import os
+from common import read, write
 
-sys.path.append(os.path.dirname(__file__) + '/..')
+from bancor_research.bancor_emulator.solidity.uint.float import Decimal
+from bancor_research.bancor_emulator.solidity import uint32, uint256, block
 
-import json
-
-from solidity.uint.float import Decimal
-
-from solidity import uint32, uint256, block
-
-from BancorNetwork import BancorNetwork
-from BNTPool import BNTPool
-from Constants import PPM_RESOLUTION
-from ERC20 import ERC20 as IERC20
-from NetworkSettings import NetworkSettings
-from PendingWithdrawals import PendingWithdrawals
-from PoolCollection import PoolCollection
-from PoolToken import PoolToken
-from PoolTokenFactory import PoolTokenFactory
-from ReserveToken import ReserveToken
-from StandardRewards import StandardRewards
-from TokenGovernance import TokenGovernance
-from Vault import Vault
+from bancor_research.bancor_emulator.BancorNetwork import BancorNetwork
+from bancor_research.bancor_emulator.BNTPool import BNTPool
+from bancor_research.bancor_emulator.Constants import PPM_RESOLUTION
+from bancor_research.bancor_emulator.ERC20 import ERC20 as IERC20
+from bancor_research.bancor_emulator.NetworkSettings import NetworkSettings
+from bancor_research.bancor_emulator.PendingWithdrawals import PendingWithdrawals
+from bancor_research.bancor_emulator.PoolCollection import PoolCollection
+from bancor_research.bancor_emulator.PoolToken import PoolToken
+from bancor_research.bancor_emulator.PoolTokenFactory import PoolTokenFactory
+from bancor_research.bancor_emulator.ReserveToken import ReserveToken
+from bancor_research.bancor_emulator.StandardRewards import StandardRewards
+from bancor_research.bancor_emulator.TokenGovernance import TokenGovernance
+from bancor_research.bancor_emulator.Vault import Vault
 
 DEPLOYER = 'DEPLOYER'
 DEFAULT_DECIMALS = 18
@@ -42,9 +36,7 @@ def integerToDecimalToStr(value, decimals: int):
 def execute(fileName):
     print(fileName)
 
-    file = open('project/tests/data/{}.json'.format(fileName), 'r')
-    flow = json.loads(file.read())
-    file.close()
+    flow = read(fileName)
 
     tknDecimals   = flow['tknDecimals']
     bntDecimals   = DEFAULT_DECIMALS
@@ -319,15 +311,14 @@ def execute(fileName):
 
         raise Exception('unsupported operation `{}` encountered'.format(operation['type']));
 
-    file = open('project/tests/data/{}.json'.format(fileName), 'w')
-    file.write(json.dumps(flow, indent = 2))
-    file.close()
+    write(fileName, flow)
 
 execute('BancorNetworkSimpleFinancialScenario1');
 execute('BancorNetworkSimpleFinancialScenario2');
 execute('BancorNetworkSimpleFinancialScenario3');
 execute('BancorNetworkSimpleFinancialScenario4');
 execute('BancorNetworkSimpleFinancialScenario5');
+execute('BancorNetworkSimpleFinancialScenario6');
 execute('BancorNetworkComplexFinancialScenario1');
 execute('BancorNetworkComplexFinancialScenario2');
 execute('BancorNetworkRewardsFinancialScenario1');

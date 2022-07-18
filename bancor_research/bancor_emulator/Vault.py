@@ -1,13 +1,13 @@
-from bancor_research.bancor_emulator.utils import account
+from bancor_research.bancor_emulator.utils import contract
 
 
-class Vault(account):
+class Vault(contract):
     '''
      * @dev a "virtual" constructor that is only used to set immutable state variables
     '''
 
     def __init__(self, initBNTGovernance, initVBNTGovernance) -> None:
-        account.__init__(self)
+        contract.__init__(self)
 
         self._bntGovernance = initBNTGovernance;
         self._bnt = initBNTGovernance.token();

@@ -22,9 +22,6 @@ PandasDataFrame = TypeVar("pandas.core.frame.DataFrame")
 
 logger = logging.getLogger(__name__)
 
-print('mike test')
-print('mike test 2')
-
 
 # Custom types
 class Epoch(int):
@@ -73,7 +70,6 @@ DEFAULT_PRICE_FEEDS = pd.DataFrame(
 )
 
 
-
 # Misc dependencies for `State`
 class Token(object):
     """
@@ -108,7 +104,7 @@ class Config:
 @dataclass(config=Config)
 class GlobalSettings:
     """
-    Represents the default global settings. These can be overridden by the BancorNetwork configuration upon instantiation.
+    Represents the default global settings. These can be overridden by the BancorDapp configuration upon instantiation.
     """
 
     timestamp: int = DEFAULT_TIMESTAMP

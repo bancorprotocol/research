@@ -1,5 +1,5 @@
 from bancor_research.bancor_emulator.solidity import uint, uint32, uint256, address, payable, mapping, revert
-from bancor_research.bancor_emulator.utils import account, parse
+from bancor_research.bancor_emulator.utils import contract, parse
 
 from bancor_research.bancor_emulator.EnumerableSet import EnumerableSet
 from bancor_research.bancor_emulator.Math import Math
@@ -36,7 +36,7 @@ class StakeAmounts:
 '''
  * @dev Standard Rewards contract
 '''
-class StandardRewards(account, Time):
+class StandardRewards(contract, Time):
     class RewardData:
         def __init__(self, x = None) -> None:
             self.rewardsToken = parse(address, x, 'rewardsToken');
@@ -65,7 +65,7 @@ class StandardRewards(account, Time):
         initBNTPool,
         initExternalRewardsVault
     ) -> None:
-        account.__init__(self)
+        contract.__init__(self)
         Time.__init__(self)
 
         self._network = initNetwork;

@@ -274,7 +274,7 @@ def process_withdrawal(
     state: State,
     user_name: str,
     id_number: int,
-    timestamp: int = None,
+    timestamp: int = 0,
     tkn_name: str = None,
     tkn_amt: Decimal = None,
 ):

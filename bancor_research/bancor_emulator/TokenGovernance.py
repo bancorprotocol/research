@@ -1,13 +1,13 @@
-from bancor_research.bancor_emulator.utils import account
+from bancor_research.bancor_emulator.utils import contract
 
 # @title The Token Governance contract is used to govern a mintable ERC20 token by restricting its launch-time initial
 # administrative privileges.
-class TokenGovernance(account):
+class TokenGovernance(contract):
     # @dev Initializes the contract.
     #
     # @param mintableToken The address of the mintable ERC20 token.
     def __init__(self, mintableToken):
-        account.__init__(self)
+        contract.__init__(self)
 
         self._token = mintableToken;
 

@@ -1,5 +1,5 @@
 from bancor_research.bancor_emulator.solidity import uint, uint256, unchecked, mapping
-from bancor_research.bancor_emulator.utils import account
+from bancor_research.bancor_emulator.utils import contract
 
 '''
  * @dev Implementation of the {IERC20} interface.
@@ -25,7 +25,7 @@ from bancor_research.bancor_emulator.utils import account
  * Finally, the non-standard {decreaseAllowance} and {increaseAllowance * functions have been added to mitigate the well-known issues around setting
  * allowances. See {IERC20-approve}.
 '''
-class ERC20(account):
+class ERC20(contract):
     '''
      * @dev Sets the values for {name} and {symbol}.
      *
@@ -36,7 +36,7 @@ class ERC20(account):
      * construction.
     '''
     def __init__(self, name_: str, symbol_: str) -> None:
-        account.__init__(self)
+        contract.__init__(self)
 
         self._name = name_;
         self._symbol = symbol_;

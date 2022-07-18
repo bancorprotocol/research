@@ -1,12 +1,12 @@
 from bancor_research.bancor_emulator.solidity import uint, uint32, uint256, mapping, address, revert
-from bancor_research.bancor_emulator.utils import account, parse
+from bancor_research.bancor_emulator.utils import contract, parse
 
 from bancor_research.bancor_emulator.EnumerableSet import EnumerableSet
 
 '''
  * @dev Network Settings contract
 '''
-class NetworkSettings(account):
+class NetworkSettings(contract):
     DEFAULT_FLASH_LOAN_FEE_PPM = uint32(0); # 0%
 
     class FlashLoanFee:
@@ -15,7 +15,7 @@ class NetworkSettings(account):
             self.feePPM = parse(uint32, x, 'feePPM');
 
     def __init__(self, initBnt) -> None:
-        account.__init__(self)
+        contract.__init__(self)
 
         self._bnt = initBnt;
 

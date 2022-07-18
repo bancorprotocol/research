@@ -39,7 +39,7 @@ def get_bnbnt_health(model):
 class BancorSimulation(mesa.Model):
     """
     This is a highly abstracted, simplified model of the Bancor v3 protocol, with only two
-    types of agents (Trader and LP) and a single BancorNetwork instance representing their environment and state space(s).
+    types of agents (Trader and LP) and a single BancorDapp instance representing their environment and state space(s).
     Note that the LPs perform those actions which are in reality only performed vy the DAO, such as changing fees, etc..
     """
 
@@ -74,7 +74,7 @@ class BancorSimulation(mesa.Model):
         if whitelisted_tokens is None:
             whitelisted_tokens = SIMULATION_WHITELISTED_TOKENS
 
-        # create a single BancorNetwork v3 instance for the model
+        # create a single BancorDapp v3 instance for the model
         self.protocol = Protocol(
             self.next_id(),
             self,

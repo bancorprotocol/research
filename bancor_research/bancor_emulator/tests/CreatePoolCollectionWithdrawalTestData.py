@@ -1,19 +1,12 @@
-import sys
-import os
+from common import read, write
 
-sys.path.append(os.path.dirname(__file__) + '/..')
-
-import json
-
-import config
+from bancor_research.bancor_emulator import config
 config.mode = 'float'
 
-from PoolCollectionWithdrawal import PoolCollectionWithdrawal
+from bancor_research.bancor_emulator.PoolCollectionWithdrawal import PoolCollectionWithdrawal
 
 for fileName in ['PoolCollectionWithdrawalCoverage{}'.format(n + 1) for n in range(8)]:
-    file = open(os.path.dirname(__file__) + '/project/tests/data/' + fileName + '.json')
-    table = json.loads(file.read());
-    file.close()
+    table = read(fileName)
 
     for row in table:
         a, b, c, e, w, m, n, x = [row[z] for z in 'a, b, c, e, w, m, n, x'.split(', ')]
@@ -26,8 +19,5 @@ for fileName in ['PoolCollectionWithdrawalCoverage{}'.format(n + 1) for n in ran
         row['u'] = '{:.12f}'.format(actual.u.data);
         row['v'] = '{:.12f}'.format(actual.v.data);
 
-    file = open(os.path.dirname(__file__) + '/project/tests/data/' + fileName + '.json', "w")
-    file.write(json.dumps(table, indent = 2));
-    file.close()
-
+    write(fileName, table)
     print(fileName)

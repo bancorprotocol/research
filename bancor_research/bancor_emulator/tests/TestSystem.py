@@ -1,12 +1,6 @@
-# import sys
-import os
-
-import json
-import pkgutil
-import io
+from common import read
 
 from bancor_research.bancor_emulator.solidity.uint.float import Decimal
-
 from bancor_research.bancor_emulator.solidity import uint32, uint256, block
 
 from bancor_research.bancor_emulator.BancorNetwork import BancorNetwork
@@ -26,8 +20,6 @@ from bancor_research.bancor_emulator.Vault import Vault
 DEPLOYER = 'DEPLOYER'
 DEFAULT_DECIMALS = 18
 MAX_UINT256 = 2 ** 256 - 1
-
-
 
 class User:
     def __init__(self, data):
@@ -106,9 +98,8 @@ def integerToDecimalToStr(value, decimals: int):
 
 def execute(fileName):
     print(fileName)
-    file = io.BytesIO(pkgutil.get_data('bancor_research', 'bancor_emulator/tests/data/{}.json'.format(fileName)))
-    flow = Flow(json.loads(file.read()))
-    file.close()
+
+    flow = Flow(read(fileName))
 
     tknDecimals   = flow.tknDecimals
     bntDecimals   = DEFAULT_DECIMALS
@@ -388,6 +379,7 @@ execute('BancorNetworkSimpleFinancialScenario2');
 execute('BancorNetworkSimpleFinancialScenario3');
 execute('BancorNetworkSimpleFinancialScenario4');
 execute('BancorNetworkSimpleFinancialScenario5');
+execute('BancorNetworkSimpleFinancialScenario6');
 execute('BancorNetworkComplexFinancialScenario1');
 execute('BancorNetworkComplexFinancialScenario2');
 execute('BancorNetworkRewardsFinancialScenario1');

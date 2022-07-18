@@ -1,5 +1,5 @@
 from bancor_research.bancor_emulator.solidity import uint, uint8, uint16, uint32, uint128, uint256, mapping, address, payable, revert
-from bancor_research.bancor_emulator.utils import account, using, parse
+from bancor_research.bancor_emulator.utils import contract, using, parse
 
 from bancor_research.bancor_emulator.EnumerableSet import EnumerableSet
 from bancor_research.bancor_emulator.Math import Math
@@ -84,7 +84,7 @@ class PoolRateState:
  *
  * - the address of reserve token serves as the pool unique ID in both contract functions and events
 '''
-class PoolCollection(account, BlockNumber):
+class PoolCollection(contract, BlockNumber):
     using(FractionLibrary, Fraction256);
     using(FractionLibrary, Fraction112);
     using(SafeCast, uint);
@@ -136,7 +136,7 @@ class PoolCollection(account, BlockNumber):
         initPoolMigrator,
         initNetworkFeePPM
     ) -> None:
-        account.__init__(self)
+        contract.__init__(self)
         BlockNumber.__init__(self)
 
         self._network = initNetwork;

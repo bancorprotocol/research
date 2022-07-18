@@ -62,7 +62,7 @@ def agent_portrayal(agent: mesa.Agent):
         grid_height, grid_width: Size of the grid to visualize, in cells.
         canvas_height, canvas_width: Size, in pixels, of the grid visualization
                                      to draw on the client.
-        template-real: "canvas_module.html" stores the module's HTML template-real.
+        template: "canvas_module.html" stores the module's HTML template.
 
     """
     if agent is None:

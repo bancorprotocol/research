@@ -1,0 +1,451 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en-US">
+    <head><meta charset="utf-8">
+<title>Bancor Dashboard | The AMM Book production setup </title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="DESCRIPTION">
+<meta name="keywords" content="KEYWORD">
+<meta name="author" content="AUTHOR">
+<link href="/pages/assets/css/loaders/loader-typing.css" rel="stylesheet" type="text/css" media="all" />
+<link href="/pages/assets/css/theme.css" rel="stylesheet" type="text/css" media="all" />
+<link rel="preload" as="font" href="/pages/assets/fonts/Inter-UI-upright.var.woff2" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" as="font" href="/pages/assets/fonts/Inter-UI.var.woff2" type="font/woff2" crossorigin="anonymous">
+
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff"><style>
+    .lcl-hl {color: yellow}
+    .lcl-hld {color: #cccc00}
+    .lcl-draft {
+        font-weight: bold; 
+        font-size: 150%;
+        color: tomato;
+        position: relative;
+        top: 0.1em;
+    }
+    img {
+        width: 100%;
+        height: 100%;
+    }
+    .fa {
+        padding: 10px;
+        font-size: 30px;
+        width: 40px;
+        text-align: center;
+        text-decoration: none;
+        margin: 5px 2px;
+    }
+    .fa:hover {
+        opacity: 0.7;
+    }
+    .fa-twitter {
+        background: #55ACEE;
+        color: white;
+    }
+    .fa-telegram {
+        background: #229ED9;
+        color: white;
+    }
+    table {
+        width: 80%;
+        height: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    iframe {
+        width: 95%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    th{
+        color: #10BBD5;
+        font-size: x-large;
+    }
+    object{
+
+        height:600px;
+        width:100%;
+    }
+    img[alt=pie] {
+        height: 80%;
+        width: 80%; 
+    }
+    img[alt=pie2] {
+        height: 50%;
+        width: 45%; 
+    }
+    h2{
+        padding-left: 10%;
+    }
+</style>
+        
+        
+    </head>
+    <body>
+
+        <div class="loader">
+            <div class="loading-animation"></div>
+        </div>
+
+
+        <div class="navbar-container ">
+
+    <nav class="navbar navbar-expand-lg bg-white navbar-light" data-sticky="top">
+
+      <div class="container">
+
+        
+        <a class="navbar-brand fade-page" href="/">
+          <img style="width: 40px;" src="/bancorlogo.png" alt="Bancor Dashboard" > Bancor Dashboard</a>
+
+        
+
+        
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+          <img class="icon navbar-toggler-open" src="/pages/assets/img/icons/interface/menu.svg" alt="menu interface icon" data-inject-svg />
+          <img class="icon navbar-toggler-close" src="/pages/assets/img/icons/interface/cross.svg" alt="cross interface icon" data-inject-svg />
+        </button>
+
+        
+        <div class="collapse navbar-collapse justify-content-end">
+          <div class="py-2 py-lg-0">
+            <ul class="navbar-nav">
+
+              
+              
+              <li class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown-grid" aria-expanded="false" aria-haspopup="true">
+                  Notes</a>
+                <div class="dropdown-menu row">
+                  <div class="col-auto" data-dropdown-content>
+                    <div class="dropdown-grid-menu">
+                      <a href="/note" class="dropdown-item fade-page">Notes</a>
+                    </div>
+                  </div>
+                </div>
+              </li>
+
+              
+              <li class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown-grid" aria-expanded="false" aria-haspopup="true">
+                  Dashboards</a>
+                <div class="dropdown-menu row">
+                  <div class="col-auto" data-dropdown-content>
+                    <div class="dropdown-grid-menu">
+                      <a href="/dashboard" class="dropdown-item fade-page">Dashboards</a>
+                    </div>
+                  </div>
+                </div>
+              </li>
+              
+              
+              <li class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown-grid" aria-expanded="false" aria-haspopup="true">
+                  Pages</a>
+                <div class="dropdown-menu row">
+                  <div class="col-auto" data-dropdown-content>
+                    <div class="dropdown-grid-menu">
+                      <a href="/pagex" class="dropdown-item fade-page">Pages</a>
+                    </div>
+                  </div>
+                </div>
+              </li>
+
+
+
+
+              
+
+            </ul>
+
+          </div>
+            
+
+
+        </div>
+      </div>
+    
+    </nav>
+
+</div>
+        
+
+        
+        <main id="content" role="main">
+
+<style>
+.article blockquote {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+article ol > li:not(:last-child) {
+    margin-bottom: 0.5rem;
+}
+.pgperma {
+    font-size: 90%;
+    font-style: italic;
+}
+</style>
+
+ 
+
+
+ 
+<section class="has-divider text-light jarallax bg-dark" data-jarallax data-speed="0.5" data-overlay>
+    <img src="/assets/img/penandbook-1920x1280.jpg" alt="" class="jarallax-img opacity-50">
+    <div class="container">
+        <div class="row">
+        <div class="col-xl-5 col-lg-6 col-md-8">
+            <h1 class="display-4">Blog</h1>
+            <p class="lead mb-0"></p>
+        </div>
+        </div>
+    </div>
+    <div class="divider">
+        <img src="/pages/assets/img/dividers/divider-2.svg" alt="graphical divider" data-inject-svg />
+    </div>
+</section>
+
+ 
+
+
+ 
+<section class="pt-0">
+    <div class="container">
+        <div class="row">
+
+            <div class="col">
+            <div class="row justify-content-center">
+            <div class="col-xl-12 col-lg-8">
+                
+
+                
+
+                
+                <h1 class="my-2">
+                    
+                        The AMM Book production setup
+                    
+                    </h1>
+                
+                
+
+                 
+                <article class="article">
+
+                
+
+                <p>This is the 3rd book I am writing &ndash; the first one was part of the <a href="https://prmia.org/Public/PRM/PRM_Exam_Preparation_Resources.aspx">PRMIA Handbook</a> and the second one was my <a href="https://thefinregbook.xyz/">book on financial regulations</a>, and every time I decided about 2 seconds after I started writing that writing in Word is <em>not</em> and option. For the PRMIA Handbook this was a no-brainer &ndash; I had to include a lot of formulas, and the old formula editor sucked even more than the current one, so it was clear that something like LaTeX was the only option. Of course LaTeX was not on option either, because c&rsquo;mon &ndash; LaTeX sucks as bad as Word, just in a different way. LaTeX / TeX really only works for formulas &ndash; but this has been ported to MathJax a while back, and the most serene way of writing not too complex stuff is really <strong>Markdown + MathJax</strong>.</p>
+<p>The question used to be which editor to use &ndash; I used TextMate and then Atom &ndash; but nowdays the question is pretty much sorted. It is extremely hard to beat Microsoft&rsquo;s <strong>VSCode</strong>. It is the Python of text editors, and it has a plugin for everything. In particular it has a plugin for Markdown that allows you to open a window that renders a preview &ndash; formatting, formulas, even images &ndash; and the preview scrolls together with the source. It also includes <strong>git</strong> integration, and even though I do prefer git from the command line (with my own shortcuts defined) this is actually quite neat. And of course git is extremely useful for keeping track of the history of the book.</p>
+<p>For papers one may get away with a single markdown file, but for a book this becomes a bit heavy. Also at least I generally like to move things around a bit and copying and pasting in a file with 100,000 lines becomes a bit tedious. Instead I am writing everything into <strong>numbered files</strong>, say <code>100_intro.md</code>, <code>200_stuff.md</code> etc. I then use <strong>Python</strong> to find those files, sort them alphabetically, and concatenate them. And when I say I use Python I really mean I use <strong>Jupyter Notebooks</strong> because what better way of writing Python? And when I say I use Jupyter Notebooks then I mean I use them with JupyText.</p>
+<p>So what is <strong>JupyText</strong>? That is a pretty neat Jupyter plugin (which for some weird reason is not part of <strong>Anaconda</strong>) that saves Jupyter Notebooks in multiple, synchronised formats at the same time. There are various options, but I am actually saving them as raw Python files. This has a number of advantages</p>
+<ul>
+<li>
+<p><strong>Source Control.</strong> Jupyter notebooks suck in git because of all the json output that completely screws up the diffs. If you exclude the .ipynb and only check the .py into git the diffs suddenly become meaningful.</p>
+</li>
+<li>
+<p><strong>Execution.</strong> The JupyText .py files are python executables, so rather than running nbconvert they can be run via python; so only thing that does not work is the bang execution of commands (eg <code>!ls</code>).</p>
+</li>
+<li>
+<p><strong>Editing.</strong> Sometimes you just want to edit your code in a proper editor, not the one provided by the Jupyter notebook, say if you want to do some multi cursor editing, or some advanced search and replace. JupyText allows for that &ndash; if you change the .py and reload the .ipynb it includes the changes.</p>
+</li>
+</ul>
+<p>Now admittedly I may go a bit overboard, but I am happy to spend a lot of time avoiding repetitive tasks and automate processes. So all my markdown files have <strong>YAML</strong> frontmatter, a bit like Hugo (I have done this before Hugo though). For the Finreg book this was pretty elaborate because in the second part of the book I have highly structured content, so I packed all of this into front matter (pro-tip: use <code>tag: |</code> for yaml text tags that allow multiline strings, and that allow you to in particular include markdown inside of yaml). Here it is a bit more pedestrian. I mostly use the front matter for tags. Eg here</p>
+<pre><code>tags: book, paper, papertex
+---
+
+# Key concepts
+
+There are a number of ways to formalize the response function. 
+</code></pre>
+<p>This means that this file is part of the book, part of the paper, and part of the paper that is being produced in TeX (see below). The Python code then chooses what to include.</p>
+<p>I also have pure yaml files. Those can be section or chapter headings (this has to do with the fact that heading levels are different for the book and the paper, and I want to use <code># Heading</code> in the markdown). More excitingly, yaml files also allow me to integrate other data sources. For example here</p>
+<pre><code>type: xlstable
+md_pre: |
+  ### General Glossary
+table: glossary.xlsx
+justify: left
+md_post: |
+  Lorem ipsum dolor
+  sit amet
+tags: book, paper
+</code></pre>
+<p>This is the glossary table. This is part of the book and the paper (but not the latex paper). Its source is the file glossary.xls, the table is left aligned, and there is markdown before and after the table (see the multiline syntax with the <code>|</code>). The <code>type: xlstable</code> is some generic table rendering code that reads the first page of the xlsx (using <code>pandas</code> of course) and renders it. I also have more specific routines. Eg <code>reftable</code> looks for specific column headings and renders the bibliography as nicely formatted list.</p>
+<p>Once I have my markdown, what then? There are multiple pathways, and most involve <strong>pandoc</strong>, plus <strong>pdflatex</strong> from <strong>TeX Live</strong> and <strong>Hugo</strong> for the website. Specifically</p>
+<ol>
+<li>convert markown to html using pandoc (or python)</li>
+<li>convert markdown (or html) to docx using pandoc</li>
+<li>convert markdown to latex using pandoc</li>
+<li>convert latex to pdf using pdflatex</li>
+<li>convert docx to pdf using Word</li>
+<li>convert markdown or html to web pages using Hugo</li>
+</ol>
+<p>Not all of those pathways are equal. 3+4 is nice as it goes straight into pdf without manual intervention. The downside is that it is ugly and that I did not get the tables to work (did I mention I hate LaTeX more than I hate Word?). So I am using this for the ugly paper.</p>
+<p>I am also producing a pretty version of the paper, the same way we produced the <a href="https://drive.google.com/file/d/1en044m2wchn85aQBcoVx2elmxEYd5kEA/view">Bancor v2.1</a> and <a href="https://arxiv.org/pdf/2111.09192">Uniswap IL</a> papers: the docx created by pandoc uses proper Word styles. If you paste it into a template document with appropriately defined styles it looks pretty neat. Also you can deal with things like the title page, the table of contents, header, footer and page numbers in Word.</p>
+<p>Also one thing that is pretty neat: pandoc allows you to include openxml into the md file (also html for that matter, but this is less useful). So for example to create a page break you can use that following formstring with <code>type=page</code></p>
+<pre><code>_BREAK = &quot;&quot;&quot;```{{=openxml}}
+&lt;w:p&gt;
+&lt;w:r&gt;
+    &lt;w:br w:type=&quot;{type}&quot;/&gt;
+&lt;/w:r&gt;
+&lt;/w:p&gt;
+```
+&quot;&quot;&quot;
+</code></pre>
+<p>And to render <code>text</code> in style <code>style</code> you can use the following format string:</p>
+<pre><code>_STYLEDTEXT = &quot;&quot;&quot;```{{=openxml}}
+&lt;w:p&gt;
+    &lt;w:pPr&gt;
+    &lt;w:pStyle w:val=&quot;{style}&quot; /&gt;
+    &lt;/w:pPr&gt;
+    &lt;w:r&gt;
+    &lt;w:t xml:space=&quot;preserve&quot;&gt;{text}&lt;/w:t&gt;
+    &lt;/w:r&gt;
+&lt;/w:p&gt;
+```
+&quot;&quot;&quot;.strip()
+</code></pre>
+<p>There is a lot more you can do; you can just look this up in the docx file after unzipping it (docx files are simply zip archives containing mostly xml files).</p>
+<p>I think that&rsquo;s it. May sound complex, but ultimately it saves a lot of time. And nuisance, because neither Word nor LaTeX are fit for serious writing in my view.</p>
+
+                </article>
+                 
+                
+                
+                 
+                
+                 
+
+            </div>
+            </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</section>
+
+ 
+
+
+
+<div hidden class='keyval keyval-templatename'><span class='key'>layout</span>:<span class='value'>note/single</span></div>
+
+        </main>
+        
+  
+
+
+        <footer class="pb-4 bg-primary-3 text-light" id="footer">
+    <div class="container">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+      
+      <div class="row mb-5">
+
+        
+        <div class="col-6 col-lg-3 col-xl-2">
+          <h5>Links</h5>
+          <tr>
+          <a href="https://bancor.network"><img src="/bancorlogo.png" style="width:40px;height:40px;"></a>
+          <a href="https://twitter.com/bancor" class="fa fa-twitter"></a>
+          <a href="https://t.me/bancor" class="fa fa-telegram"></a>
+          <a href="https://dune.xyz/Bancor"><img src="/dunelogo.jfif" style="width:40px;height:40px;"></a>
+          </tr>
+        </div>
+          
+
+         
+        
+
+
+      </div>
+
+      
+      
+
+      
+      <div class="row justify-content-center">
+        <div class="col col-md-auto text-center">
+          <small class="text-muted">&copy; Bancor 2022</small>
+        </div>
+      </div>
+
+    </div>
+  </footer>
+        
+        
+        <a href="#" class="btn back-to-top btn-primary btn-round" data-smooth-scroll data-aos="fade-up" data-aos-offset="2000" data-aos-mirror="true" data-aos-once="false">
+            <img class="icon" src="/pages/assets/img/icons/theme/navigation/arrow-up.svg" alt="arrow-up icon" data-inject-svg />
+        </a>
+
+        
+            
+    <script type="text/javascript" src="/pages/assets/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/pages/assets/js/popper.min.js"></script>
+    <script type="text/javascript" src="/pages/assets/js/bootstrap.js"></script>
+
+    
+
+    
+    <script type="text/javascript" src="/pages/assets/js/aos.js"></script>
+    
+    <script type="text/javascript" src="/pages/assets/js/clipboard.min.js"></script>
+    
+    <script type="text/javascript" src="/pages/assets/js/jquery.fancybox.min.js"></script>
+    
+    <script type="text/javascript" src="/pages/assets/js/flatpickr.min.js"></script>
+    
+    <script type="text/javascript" src="/pages/assets/js/flickity.pkgd.min.js"></script>
+    
+    <script type="text/javascript" src="/pages/assets/js/ion.rangeSlider.min.js"></script>
+    
+    <script type="text/javascript" src="/pages/assets/js/isotope.pkgd.min.js"></script>
+    
+    <script type="text/javascript" src="/pages/assets/js/jarallax.min.js"></script>
+    <script type="text/javascript" src="/pages/assets/js/jarallax-video.min.js"></script>
+    <script type="text/javascript" src="/pages/assets/js/jarallax-element.min.js"></script>
+    
+    <script type="text/javascript" src="/pages/assets/js/jquery.countdown.min.js"></script>
+    
+    <script type="text/javascript" src="/pages/assets/js/jquery.smartWizard.min.js"></script>
+    
+    <script type="text/javascript" src="/pages/assets/js/plyr.polyfilled.min.js"></script>
+    
+    <script type="text/javascript" src="/pages/assets/js/prism.js"></script>
+    
+    <script type="text/javascript" src="/pages/assets/js/scrollMonitor.js"></script>
+    
+    <script type="text/javascript" src="/pages/assets/js/smooth-scroll.polyfills.min.js"></script>
+    
+    <script type="text/javascript" src="/pages/assets/js/svg-injector.umd.production.js"></script>
+    
+    <script type="text/javascript" src="/pages/assets/js/twitterFetcher_min.js"></script>
+    
+    <script type="text/javascript" src="/pages/assets/js/typed.min.js"></script>
+    
+    <script type="text/javascript" src="/pages/assets/js/theme.js"></script>
+    
+    <script type="text/javascript">
+      window.addEventListener("load", function () {    document.querySelector('body').classList.add('loaded');  });
+    </script>
+        
+
+        
+        
+        
+
+    </body>
+</html>
+

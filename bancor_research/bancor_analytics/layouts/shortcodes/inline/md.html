@@ -1,0 +1,4 @@
+<!-- inline_md  -->
+{{ $html := $.Page.Resources.GetMatch (.Get 0)}}
+{{ $html.Content | markdownify }}
+<!-- END inline_md -->

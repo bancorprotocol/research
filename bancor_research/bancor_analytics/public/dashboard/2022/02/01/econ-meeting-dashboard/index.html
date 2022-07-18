@@ -1,0 +1,515 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en-US">
+    <head><meta charset="utf-8">
+<title>Bancor Dashboard | Econ Meeting Dashboard </title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="DESCRIPTION">
+<meta name="keywords" content="KEYWORD">
+<meta name="author" content="AUTHOR">
+<link href="/pages/assets/css/loaders/loader-typing.css" rel="stylesheet" type="text/css" media="all" />
+<link href="/pages/assets/css/theme.css" rel="stylesheet" type="text/css" media="all" />
+<link rel="preload" as="font" href="/pages/assets/fonts/Inter-UI-upright.var.woff2" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" as="font" href="/pages/assets/fonts/Inter-UI.var.woff2" type="font/woff2" crossorigin="anonymous">
+
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff"><style>
+    .lcl-hl {color: yellow}
+    .lcl-hld {color: #cccc00}
+    .lcl-draft {
+        font-weight: bold; 
+        font-size: 150%;
+        color: tomato;
+        position: relative;
+        top: 0.1em;
+    }
+    img {
+        width: 100%;
+        height: 100%;
+    }
+    .fa {
+        padding: 10px;
+        font-size: 30px;
+        width: 40px;
+        text-align: center;
+        text-decoration: none;
+        margin: 5px 2px;
+    }
+    .fa:hover {
+        opacity: 0.7;
+    }
+    .fa-twitter {
+        background: #55ACEE;
+        color: white;
+    }
+    .fa-telegram {
+        background: #229ED9;
+        color: white;
+    }
+    table {
+        width: 80%;
+        height: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    iframe {
+        width: 95%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    th{
+        color: #10BBD5;
+        font-size: x-large;
+    }
+    object{
+
+        height:600px;
+        width:100%;
+    }
+    img[alt=pie] {
+        height: 80%;
+        width: 80%; 
+    }
+    img[alt=pie2] {
+        height: 50%;
+        width: 45%; 
+    }
+    h2{
+        padding-left: 10%;
+    }
+</style>
+        
+        
+    </head>
+    <body>
+
+        <div class="loader">
+            <div class="loading-animation"></div>
+        </div>
+
+
+        <div class="navbar-container ">
+
+    <nav class="navbar navbar-expand-lg bg-white navbar-light" data-sticky="top">
+
+      <div class="container">
+
+        
+        <a class="navbar-brand fade-page" href="/">
+          <img style="width: 40px;" src="/bancorlogo.png" alt="Bancor Dashboard" > Bancor Dashboard</a>
+
+        
+
+        
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+          <img class="icon navbar-toggler-open" src="/pages/assets/img/icons/interface/menu.svg" alt="menu interface icon" data-inject-svg />
+          <img class="icon navbar-toggler-close" src="/pages/assets/img/icons/interface/cross.svg" alt="cross interface icon" data-inject-svg />
+        </button>
+
+        
+        <div class="collapse navbar-collapse justify-content-end">
+          <div class="py-2 py-lg-0">
+            <ul class="navbar-nav">
+
+              
+              
+              <li class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown-grid" aria-expanded="false" aria-haspopup="true">
+                  Notes</a>
+                <div class="dropdown-menu row">
+                  <div class="col-auto" data-dropdown-content>
+                    <div class="dropdown-grid-menu">
+                      <a href="/note" class="dropdown-item fade-page">Notes</a>
+                    </div>
+                  </div>
+                </div>
+              </li>
+
+              
+              <li class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown-grid" aria-expanded="false" aria-haspopup="true">
+                  Dashboards</a>
+                <div class="dropdown-menu row">
+                  <div class="col-auto" data-dropdown-content>
+                    <div class="dropdown-grid-menu">
+                      <a href="/dashboard" class="dropdown-item fade-page">Dashboards</a>
+                    </div>
+                  </div>
+                </div>
+              </li>
+              
+              
+              <li class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown-grid" aria-expanded="false" aria-haspopup="true">
+                  Pages</a>
+                <div class="dropdown-menu row">
+                  <div class="col-auto" data-dropdown-content>
+                    <div class="dropdown-grid-menu">
+                      <a href="/pagex" class="dropdown-item fade-page">Pages</a>
+                    </div>
+                  </div>
+                </div>
+              </li>
+
+
+
+
+              
+
+            </ul>
+
+          </div>
+            
+
+
+        </div>
+      </div>
+    
+    </nav>
+
+</div>
+        
+
+        
+        <main id="content" role="main">
+
+<style>
+.article blockquote {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+article ol > li:not(:last-child) {
+    margin-bottom: 0.5rem;
+}
+.pgperma {
+    font-size: 90%;
+    font-style: italic;
+}
+</style>
+
+
+ 
+<section class="has-divider text-light jarallax bg-dark" data-jarallax data-speed="0.5" data-overlay>
+    <img src="/assets/img/penandbook-1920x1280.jpg" alt="" class="jarallax-img opacity-50">
+    <div class="container">
+        <div class="row">
+        <div class="col-xl-5 col-lg-6 col-md-8">
+            <h1 class="display-4">Dashboard</h1>
+            <p class="lead mb-0"></p>
+        </div>
+        </div>
+    </div>
+    <div class="divider">
+        <img src="/pages/assets/img/dividers/divider-2.svg" alt="graphical divider" data-inject-svg />
+    </div>
+</section>
+
+ 
+
+
+ 
+<section class="pt-0">
+    <div class="container">
+        <div class="row">
+
+            <div class="col">
+            <div class="row justify-content-center">
+            <div class="col-xl-7 col-lg-8">
+                
+
+                
+
+                
+                <h1 class="my-2">
+                    
+                        Econ Meeting Dashboard
+                    
+                    </h1>
+                
+                
+
+                
+                
+                <div>This is our Econ Meeting Dashboard for key econ queries.</div>
+                
+            </div>
+            </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</section>
+
+ 
+<section>
+
+<table>
+  <tr>
+    <th>Market Share <a><img src="/green.png" style="width:30px;height:30px;"></a> Bancor <a><img src="/green.png"
+          style="width:30px;height:30px;"></a></th>
+  </tr>
+  <tr>
+    <td>
+      <iframe width="660" height="600" title='Market Share Project_Version'
+        src="https://dune.xyz/embeds/299055/571162/e2199e00-a88d-4bc6-8ee2-caf34152d304?frequency=week&ISO-MIN-TIME=2021-06-01" allowfullscreen></iframe>
+    </td>
+  </tr>
+</table>
+
+<br>
+
+<table>
+  <tr>
+    <th>Market Share STABLE-ETH <a><img src="/green.png" style="width:30px;height:30px;"></a> Bancor <a><img src="/green.png"
+          style="width:30px;height:30px;"></a></th>
+  </tr>
+  <tr>
+    <td>
+      <iframe width="660" height="450" title='Market Share Project_Version STABLE ETH'
+        src="https://dune.xyz/embeds/389222/742164/416ee8d0-5382-4f97-84c4-04b4405ac29e?frequency=week&ISO-MIN-TIME=2021-06-01" allowfullscreen></iframe>
+    </td>
+  </tr>
+</table>
+
+<br>
+
+<table>
+  <tr>
+    <th>Market Share STABLE-STABLE <a><img src="/red.png" style="width:30px;height:30px;"></a> Bancor <a><img src="/red.png"
+          style="width:30px;height:30px;"></a></th>
+  </tr>
+  <tr>
+    <td>
+      <iframe width="660" height="450" title='Market Share Project_Version STABLE STABLE'
+        src="https://dune.xyz/embeds/405111/773991/bc1d9e13-5438-4da0-82f1-bfda38d9b7a2?frequency=week&ISO-MIN-TIME=2021-06-01"
+        allowfullscreen></iframe>
+    </td>
+  </tr>
+</table>
+
+<br>
+
+
+<table>
+  <tr>
+    <th>Trade Stats</th>
+    <th>LP Stats</th>
+  </tr>
+  <tr>
+    <td>
+      <iframe width="660" height="230" title='Unique Bancor Traders (trader_a)'
+        src="https://dune.xyz/embeds/278723/525865/2cd960f3-ea3d-424d-b984-9aa1c51cf103"
+        allowfullscreen></iframe>
+    </td>
+    <td>
+      <iframe width="660" height="230" title='New LP Events'
+        src="https://dune.xyz/embeds/285645/539815/8d237ac3-9b6e-44ac-877f-400bc6afb02d"
+        allowfullscreen></iframe>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <iframe width="660" height="230" title='Unique Bancor Traders (tx_from)'
+        src="https://dune.xyz/embeds/278723/726474/14ec351b-8477-495f-8035-098301ed65fb"
+        allowfullscreen></iframe>
+    </td>
+    <td>
+      <iframe width="660" height="230" title='Net Change LP Events'
+        src="https://dune.xyz/embeds/285645/539817/0e84df37-fd1e-4734-a6ef-ca3b9ef02f7a"
+        allowfullscreen></iframe>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <iframe width="660" height="330" title='trader_a vs tx_from'
+        src="https://dune.xyz/embeds/278723/525919/88623a5e-9916-4512-9aba-2c35105d74e4" allowfullscreen></iframe>
+    </td>
+    <td>
+      <iframe width="660" height="330" title='Big Stakes'
+        src="https://dune.xyz/embeds/21872/45118/7019c00f-c04f-4ba5-96b5-9a2c6a6dcf34" allowfullscreen></iframe>
+    </td>
+  </tr>
+  
+  <tr>
+      <th>TKN Specific Trades (case sensitive):
+      <input type="text" id="TRADETKN" onKeyDown="if(event.keyCode==13) redirect();" value="">
+      <button type="submit" value="Submit" onclick="redirect()">Search</button> </th>
+
+      <th>TKN Specific LP (case sensitive):
+      <input type="text" id="TKN" onKeyDown="if(event.keyCode==13) redirect2();" value="">
+      <button type="submit" value="Submit" onclick="redirect2()">Search</button> </th>
+
+  </tr>
+  <tr>
+    <td>
+      <iframe width="660" height="330" id='Big Trades'
+        src="https://dune.xyz/embeds/389004/741624/266254d9-db83-4d30-86eb-05508f4ecc30" allowfullscreen></iframe>
+      <script>
+        function redirect() {
+          var url = "https://dune.xyz/embeds/389004/741624/266254d9-db83-4d30-86eb-05508f4ecc30?TKN=" + document.getElementById('TRADETKN').value;
+          document.getElementById('Big Trades').src = url;
+        }
+      </script>
+    </td>
+    <td>
+      <iframe width="660" height="330" id='Big Stakes'
+        src="https://dune.xyz/embeds/380819/726484/6692966c-0e37-4b96-b67b-617e5a3b630f" allowfullscreen></iframe>
+        <script>
+        function redirect2() {
+            var url = "https://dune.xyz/embeds/380819/726484/6692966c-0e37-4b96-b67b-617e5a3b630f?TKN=" + document.getElementById('TKN').value;
+            document.getElementById('Big Stakes').src = url;
+          }
+        </script>
+    </td>
+  </tr>
+</table>
+
+<br>
+
+
+<br>
+<table>
+  <tr>
+      <th>CryptoFees Daily and 7d Avg</th>
+      <th>CryptoFees 2021 Stats</th>
+  </tr>
+
+  <tr>
+    <td>
+      <iframe src="https://cryptofees.info/" height="700" width="500">
+      </iframe>
+    </td>
+    <td>
+      <iframe src="https://cryptofees.info/2021" height="700" width="500">
+      </iframe>
+    </td>
+  </tr>
+</table>
+
+</section>
+
+ 
+
+
+
+<div hidden class='keyval keyval-templatename'><span class='key'>layout</span>:<span class='value'>dashboard/single</span></div>
+
+        </main>
+        
+  
+
+
+        <footer class="pb-4 bg-primary-3 text-light" id="footer">
+    <div class="container">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+      
+      <div class="row mb-5">
+
+        
+        <div class="col-6 col-lg-3 col-xl-2">
+          <h5>Links</h5>
+          <tr>
+          <a href="https://bancor.network"><img src="/bancorlogo.png" style="width:40px;height:40px;"></a>
+          <a href="https://twitter.com/bancor" class="fa fa-twitter"></a>
+          <a href="https://t.me/bancor" class="fa fa-telegram"></a>
+          <a href="https://dune.xyz/Bancor"><img src="/dunelogo.jfif" style="width:40px;height:40px;"></a>
+          </tr>
+        </div>
+          
+
+         
+        
+
+
+      </div>
+
+      
+      
+
+      
+      <div class="row justify-content-center">
+        <div class="col col-md-auto text-center">
+          <small class="text-muted">&copy; Bancor 2022</small>
+        </div>
+      </div>
+
+    </div>
+  </footer>
+        
+        
+        <a href="#" class="btn back-to-top btn-primary btn-round" data-smooth-scroll data-aos="fade-up" data-aos-offset="2000" data-aos-mirror="true" data-aos-once="false">
+            <img class="icon" src="/pages/assets/img/icons/theme/navigation/arrow-up.svg" alt="arrow-up icon" data-inject-svg />
+        </a>
+
+        
+            
+    <script type="text/javascript" src="/pages/assets/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/pages/assets/js/popper.min.js"></script>
+    <script type="text/javascript" src="/pages/assets/js/bootstrap.js"></script>
+
+    
+
+    
+    <script type="text/javascript" src="/pages/assets/js/aos.js"></script>
+    
+    <script type="text/javascript" src="/pages/assets/js/clipboard.min.js"></script>
+    
+    <script type="text/javascript" src="/pages/assets/js/jquery.fancybox.min.js"></script>
+    
+    <script type="text/javascript" src="/pages/assets/js/flatpickr.min.js"></script>
+    
+    <script type="text/javascript" src="/pages/assets/js/flickity.pkgd.min.js"></script>
+    
+    <script type="text/javascript" src="/pages/assets/js/ion.rangeSlider.min.js"></script>
+    
+    <script type="text/javascript" src="/pages/assets/js/isotope.pkgd.min.js"></script>
+    
+    <script type="text/javascript" src="/pages/assets/js/jarallax.min.js"></script>
+    <script type="text/javascript" src="/pages/assets/js/jarallax-video.min.js"></script>
+    <script type="text/javascript" src="/pages/assets/js/jarallax-element.min.js"></script>
+    
+    <script type="text/javascript" src="/pages/assets/js/jquery.countdown.min.js"></script>
+    
+    <script type="text/javascript" src="/pages/assets/js/jquery.smartWizard.min.js"></script>
+    
+    <script type="text/javascript" src="/pages/assets/js/plyr.polyfilled.min.js"></script>
+    
+    <script type="text/javascript" src="/pages/assets/js/prism.js"></script>
+    
+    <script type="text/javascript" src="/pages/assets/js/scrollMonitor.js"></script>
+    
+    <script type="text/javascript" src="/pages/assets/js/smooth-scroll.polyfills.min.js"></script>
+    
+    <script type="text/javascript" src="/pages/assets/js/svg-injector.umd.production.js"></script>
+    
+    <script type="text/javascript" src="/pages/assets/js/twitterFetcher_min.js"></script>
+    
+    <script type="text/javascript" src="/pages/assets/js/typed.min.js"></script>
+    
+    <script type="text/javascript" src="/pages/assets/js/theme.js"></script>
+    
+    <script type="text/javascript">
+      window.addEventListener("load", function () {    document.querySelector('body').classList.add('loaded');  });
+    </script>
+        
+
+        
+        
+        
+
+    </body>
+</html>
+

@@ -1,0 +1,99 @@
+{{ define "main" }}
+
+<!-- ========== HTML PRE ========== --> 
+{{ .Params.htmlPre | safeHTML }}
+
+{{ if isset .Params "herotitle" }}
+<!-- ========== HERO TITLE IMAGE (1920x1080)========== --> 
+<section class="has-divider text-light jarallax bg-dark" data-jarallax data-speed="0.5" data-overlay>
+    <img src="{{ with .Params.HeroImg }}{{ . }}{{ end }}" alt="" class="jarallax-img opacity-50">
+    <div class="container">
+        <div class="row">
+        <div class="col-xl-5 col-lg-6 col-md-8">
+            <h1 class="display-4">{{.Params.HeroTitle}}</h1>
+            <p class="lead mb-0">{{.Params.HeroSubTitle}}</p>
+        </div>
+        </div>
+    </div>
+    <div class="divider">
+        <img src="/pages/assets/img/dividers/divider-2.svg" alt="graphical divider" data-inject-svg />
+    </div>
+</section>
+{{ end }}
+
+<!-- ========== HTML PRE2 ========== --> 
+{{ .Params.htmlPre2 | safeHTML }}
+
+<!-- ========== TEXT SECTION ========== --> 
+<section class="pt-0">
+    <div class="container">
+        <div class="row">
+
+            <div class="col">
+            <div class="row justify-content-center">
+            <div class="col-xl-7 col-lg-8">
+                
+
+                {{ with .Params.pgtopline }}
+                <!-- pgtopline -->
+                <span class="text-muted">{{ . | markdownify }}</span>
+                {{ end }}
+
+                <!-- pgtitle -->
+                <h1 class="my-2">
+                    {{ if .Params.pgtitle }}
+                        {{ .Params.pgtitle | markdownify}}
+                    {{ else }}
+                        {{ .Title }}
+                    {{ end }}
+                    </h1>
+                
+                {{ with .Params.pgsubtitle }}
+                <!-- pgsubtitle -->
+                <div>{{ . | markdownify }}</div>
+                {{ end }}
+
+                <!-- ==========  ARTICLE CONTENT ========== --> 
+                <article class="article">
+
+                {{ with .Params.pglead }}
+                <!-- pglead -->
+                <p class="lead">{{ . | markdownify }}</p>
+                {{ end }}
+
+                {{ .Content | safeHTML }}
+                </article>
+                <!-- ========== /ARTICLE CONTENT ========== --> 
+                
+                
+                {{if .Params.pgsharing }}
+                <!-- pgsharing -->
+                <hr/>
+                <span class="text-small mr-1">Share this article:</span>
+                <div class="d-flex mx-2">
+                    <a href="#" class="btn btn-round btn-primary mx-1">
+                    <img class="icon icon-sm" src="/pages/assets/img/icons/social/twitter.svg" alt="twitter social icon" data-inject-svg />
+                    </a>
+                    <a href="#" class="btn btn-round btn-primary mx-1">
+                    <img class="icon icon-sm" src="/pages/assets/img/icons/social/facebook.svg" alt="facebook social icon" data-inject-svg />
+                    </a>
+                    <a href="#" class="btn btn-round btn-primary mx-1">
+                    <img class="icon icon-sm" src="/pages/assets/img/icons/social/linkedin.svg" alt="linkedin social icon" data-inject-svg />
+                    </a>
+                </div>
+                <hr/>
+                {{ end }}
+            </div>
+            </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== HTML POST ========== --> 
+{{ .Params.htmlPost | safeHTML }}
+
+
+<div hidden class='keyval keyval-templatename'><span class='key'>layout</span>:<span class='value'>post</span></div>
+{{ end }}

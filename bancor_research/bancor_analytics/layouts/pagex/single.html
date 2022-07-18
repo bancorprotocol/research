@@ -1,0 +1,114 @@
+{{ define "main" }}
+
+<style>
+.article blockquote {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+article ol > li:not(:last-child) {
+    margin-bottom: 0.5rem;
+}
+.pgperma {
+    font-size: 90%;
+    font-style: italic;
+}
+</style>
+
+<!-- ========== HTML PRE ========== --> 
+{{ .Params.htmlPre | safeHTML }}
+
+<!-- ========== HERO TITLE IMAGE (1920x1080)========== --> 
+<section class="has-divider text-light jarallax bg-dark" data-jarallax data-speed="0.5" data-overlay>
+    <img src="/assets/img/penandbook-1920x1280.jpg" alt="" class="jarallax-img opacity-50">
+    <div class="container">
+        <div class="row">
+        <div class="col-xl-5 col-lg-6 col-md-8">
+            <h1 class="display-4">Blog</h1>
+            <p class="lead mb-0">{{.Params.HeroSubTitle}}</p>
+        </div>
+        </div>
+    </div>
+    <div class="divider">
+        <img src="/pages/assets/img/dividers/divider-2.svg" alt="graphical divider" data-inject-svg />
+    </div>
+</section>
+
+<!-- ========== HTML PRE2 ========== --> 
+{{ .Params.htmlPre2 | safeHTML }}
+
+<!-- ========== TEXT SECTION ========== --> 
+<section class="pt-0">
+    <div class="container">
+        <div class="row">
+
+            <div class="col">
+            <div class="row justify-content-center">
+            <div class="col-xl-7 col-lg-8">
+                
+
+                {{ with .Params.pgtopline }}
+                <!-- pgtopline -->
+                <span class="text-muted">{{ . | markdownify }}</span>
+                {{ end }}
+
+                <!-- pgtitle -->
+                <h1 class="my-2">
+                    {{ if .Params.pgtitle }}
+                        {{ .Params.pgtitle | markdownify}}
+                    {{ else }}
+                        {{ .Title }}
+                    {{ end }}
+                    </h1>
+                
+                {{ with .Params.pgsubtitle }}
+                <!-- pgsubtitle -->
+                <div>{{ . | markdownify }}</div>
+                {{ end }}
+
+                <!-- ==========  ARTICLE CONTENT ========== --> 
+                <article class="article">
+
+                {{ with .Params.pglead }}
+                <!-- pglead -->
+                <p class="lead">{{ . | markdownify }}</p>
+                {{ end }}
+
+                {{ .Content | safeHTML }}
+                </article>
+                <!-- ========== /ARTICLE CONTENT ========== --> 
+                
+                
+                <!-- ==========  SHOW ALL IMAGES ========== --> 
+                {{ if ((isset .Params "showimages") | and .Params.showimages) }}
+                <hr/>
+                <h2>Looping over all images in the blog</h2>
+
+                Note: this is in the file layouts/blogs/single.html 
+
+                {{ with .Page.Resources.ByType "image" }}
+                    <div class="Image">
+                    {{ range . }}
+                        <img src="{{ .RelPermalink }}">
+                    {{ end }}
+                    </div>
+                {{ end }}
+                {{ end }}
+                <!-- ========== /SHOW ALL IMAGES ========== --> 
+
+            </div>
+            </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== HTML POST ========== --> 
+{{ .Params.htmlPost | safeHTML }}
+
+
+<div hidden class='keyval keyval-templatename'><span class='key'>layout</span>:<span class='value'>blog/single</span></div>
+{{ end }}

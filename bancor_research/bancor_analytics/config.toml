@@ -1,0 +1,52 @@
+##
+## NOTE: this is _some_ of the page data here, but most of the data
+## is actually in data/homepage.yaml
+##
+
+######################## default configuration ####################
+
+# NOTE: title is displayed on the page; htmlTitle is in the html 
+baseURL = "https://tourmaline-cheesecake-e287a3.netlify.app/"
+languageCode = "en-us"
+title = "Bancor Dashboard"
+
+
+
+#theme = "Empty"
+
+
+
+#summaryLength = "10"
+#paginate = 6
+
+[permalinks]
+  # IMPORTANT -- THIS CHANGES HOW CERTAIN URLS ARE SET; ALSO USE SLUG!!!
+  dashboard = "/dashboard/:year/:month/:day/:title/"
+  note = "/note/:year/:month/:day/:title/"
+  #dashboard = "/news/:year/:month/:title/"
+  
+  
+
+[markup.goldmark.renderer]
+  unsafe = true
+  
+#################### site parameters ################################
+[params]
+
+metaDescription = "DESCRIPTION"
+metaKeywords = "KEYWORD"
+metaAuthor = "AUTHOR"
+
+# contact email
+contactemail = "TODO"
+
+# copyright notice in footer (copyright immediately thereafter)
+copyright = "Copyright &copy; Bancor 2022. All rights reserved."
+
+# disclaimenr (below copyright notice) in footer TODO
+disclaimer = ""
+
+# show a subscribe-to-mailing-list footer
+footer_subscribe = false
+
+

@@ -48,7 +48,7 @@ bancor_simulator/            <------- ** Spec & Simulation Project **
 │   └── spec/                <------- State transition functions and data structures described in BIP15.
 │         └── actions.py     <------- Deposit, trade, & withdrawal algorithm logic.
 │         └── emulation.py   <------- Verifies solidity result parity.
-│         └── network.py     <------- Main BancorNetwork application interface.
+│         └── network.py     <------- Main BancorDapp application interface.
 │         └── rewards.py     <------- Autocompounding and standard rewards logic.
 │         └── state.py       <------- State variables, constants, data structures, and CRUD interfaces.
 │         └── utils.py       <------- Misc utility functions

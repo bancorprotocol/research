@@ -1,0 +1,30 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="databricks" type="PythonConfigurationType" factoryName="Python">
+    <module name="research" />
+    <option name="INTERPRETER_OPTIONS" value="" />
+    <option name="PARENT_ENVS" value="true" />
+    <envs>
+      <env name="PYTHONUNBUFFERED" value="1" />
+      <env name="PYSPARK_PYTHON" value="python3" />
+      <env name="GOOGLE_SHEETS_CREDENTIALS" value="&quot;/dbfs/FileStore/tableau/bancor_research_e92ff2450ca7.json&quot;" />
+      <env name="ROBOT_EMAIL" value="&quot;bancor-research@bancor-research.iam.gserviceaccount.com&quot;" />
+      <env name="USER_EMAIL" value="&quot;bancor.research@gmail.com&quot;" />
+      <env name="DATABRICKS_TOKEN" value="dapice8cfd453238dac403facb2fa9d9ae4e" />
+      <env name="DATABRICKS_HOST" value="https://3974167210227564.4.gcp.databricks.com" />
+    </envs>
+    <option name="SDK_HOME" value="$USER_HOME$/miniforge3/envs/v3simulator/bin/python" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    <option name="IS_MODULE_SDK" value="false" />
+    <option name="ADD_CONTENT_ROOTS" value="true" />
+    <option name="ADD_SOURCE_ROOTS" value="true" />
+    <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+    <option name="SCRIPT_NAME" value="" />
+    <option name="PARAMETERS" value="" />
+    <option name="SHOW_COMMAND_LINE" value="false" />
+    <option name="EMULATE_TERMINAL" value="false" />
+    <option name="MODULE_MODE" value="false" />
+    <option name="REDIRECT_INPUT" value="false" />
+    <option name="INPUT_FILE" value="" />
+    <method v="2" />
+  </configuration>
+</component>

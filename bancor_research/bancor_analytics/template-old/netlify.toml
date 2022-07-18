@@ -1,9 +1,0 @@
-[build]
-publish = "build/"
-command = "npm run build"
-commandOrigin = "bancor_research/bancor_analytics/template/"
-targetPort = 3000
-
-[context.production]
-publish = "build/"
-environment = { PUBLIC_URL="" }

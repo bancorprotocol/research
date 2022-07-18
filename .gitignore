@@ -139,3 +139,5 @@ artifacts
 # Local Netlify folder
 .netlify
 .idea/sonarlint/issuestore/index.pb
+/.run/
+.run/

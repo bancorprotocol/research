@@ -1,65 +1,0 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>dashboards on Bancor Dashboard</title>
-    <link>https://gallant-poincare-1a2f56.netlify.app/dashboard/</link>
-    <description>Recent content in dashboards on Bancor Dashboard</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <language>en-us</language>
-    <lastBuildDate>Tue, 01 Mar 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gallant-poincare-1a2f56.netlify.app/dashboard/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>Calender Year Top Traders</title>
-      <link>https://gallant-poincare-1a2f56.netlify.app/dashboard/2022/03/01/calender-year-top-traders/</link>
-      <pubDate>Tue, 01 Mar 2022 00:00:00 +0000</pubDate>
-      
-      <guid>https://gallant-poincare-1a2f56.netlify.app/dashboard/2022/03/01/calender-year-top-traders/</guid>
-      <description>Top Traders Since 2022-01-01Trader 1 Token Volume Since 2022-01-01Trader 2 Token Volume Since 2022-01-01Trader 3 Token Volume Since 2022-01-01Trader 4 Token Volume Since 2022-01-01Trader 5 Token Volume Since 2022-01-01</description>
-    </item>
-    
-    <item>
-      <title>Econ Meeting Dashboard</title>
-      <link>https://gallant-poincare-1a2f56.netlify.app/dashboard/2022/02/01/econ-meeting-dashboard/</link>
-      <pubDate>Tue, 01 Feb 2022 00:00:00 +0000</pubDate>
-      
-      <guid>https://gallant-poincare-1a2f56.netlify.app/dashboard/2022/02/01/econ-meeting-dashboard/</guid>
-      <description>Market Share  Bancor Market Share STABLE-ETH  Bancor Market Share STABLE-STABLE  Bancor Trade StatsLP StatsTKN Specific Trades (case sensitive):Search TKN Specific LP (case sensitive):Search function redirect() {var url = &#34;</description>
-    </item>
-    
-    <item>
-      <title>Liquidity Distribution</title>
-      <link>https://gallant-poincare-1a2f56.netlify.app/dashboard/2022/02/01/liquidity-distribution/</link>
-      <pubDate>Tue, 01 Feb 2022 00:00:00 +0000</pubDate>
-      
-      <guid>https://gallant-poincare-1a2f56.netlify.app/dashboard/2022/02/01/liquidity-distribution/</guid>
-      <description>Liquidity DistributionBNTETHWBTCUSDCUSDTDAILINKSNXENJAMPwNXMBATICHIOCEANWOO</description>
-    </item>
-    
-    <item>
-      <title>Top Liquidity Providers</title>
-      <link>https://gallant-poincare-1a2f56.netlify.app/dashboard/2022/02/01/top-liquidity-providers/</link>
-      <pubDate>Tue, 01 Feb 2022 00:00:00 +0000</pubDate>
-      
-      <guid>https://gallant-poincare-1a2f56.netlify.app/dashboard/2022/02/01/top-liquidity-providers/</guid>
-      <description>Top Liquidity Providers Last 30 DaysTop Liquidity Providers by TokenTKN Specific LP (case sensitive):SearchSince (YYYY-MM-DD):Searchfunction redirect3() {var url = &#34;https://dune.xyz/embeds/458301/870479/a74c79e7-dbc1-4cba-b279-93c07a8b6e77?TKN=&#34; + document.getElementById(&#39;TKN&#39;).value + &#34;&amp;ISO_MIN_TIME=&#34; + document.getElementById(&#39;ISO-MIN-TIME_lps&#39;).value;;document.getElementById(&#39;Big Stakes by Token&#39;).src = url;}function redirect4() {var url = &#34;</description>
-    </item>
-    
-    <item>
-      <title>Top Traders</title>
-      <link>https://gallant-poincare-1a2f56.netlify.app/dashboard/2022/02/01/top-traders/</link>
-      <pubDate>Tue, 01 Feb 2022 00:00:00 +0000</pubDate>
-      
-      <guid>https://gallant-poincare-1a2f56.netlify.app/dashboard/2022/02/01/top-traders/</guid>
-      <description>Top Traders Since (YYYY-MM-DD):Searchfunction redirect5() {var url = &#34;https://dune.xyz/embeds/443815/843530/d9fd2712-421d-49bf-98db-bc3fc716514d?trader_group=trader_a&amp;ISO_MIN_TIME=&#34; + document.getElementById(&#39;ISO-MIN-TIME_alltrades&#39;).value;document.getElementById(&#39;All Time Top Traders&#39;).src = url;}function redirect6() {var url = &#34;https://dune.xyz/embeds/443815/843794/a4134a56-9104-4c3c-8bf8-b79ec83b3304?trader_group=trader_a&amp;ISO_MIN_TIME=&#34; + document.getElementById(&#39;ISO-MIN-TIME_alltrades&#39;).value;document.getElementById(&#39;All Time Top Traders Pie&#39;).src = url;}Trader Specific Token VolumeTrader:SearchSince (YYYY-MM-DD):Searchfunction redirect3() {var url = &#34;</description>
-    </item>
-    
-    <item>
-      <title>Prototype Dashboard</title>
-      <link>https://gallant-poincare-1a2f56.netlify.app/dashboard/2022/01/31/prototype-dashboard/</link>
-      <pubDate>Mon, 31 Jan 2022 00:00:00 +0000</pubDate>
-      
-      <guid>https://gallant-poincare-1a2f56.netlify.app/dashboard/2022/01/31/prototype-dashboard/</guid>
-      <description>Token StatsTrade StatsLP StatsTKN Specific Trades (case sensitive):Search TKN Specific LP (case sensitive):Search function redirect() {var url = &#34;</description>
-    </item>
-    
-  </channel>
-</rss>

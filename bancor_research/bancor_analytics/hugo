@@ -1,4 +1,0 @@
-#!/bin/bash
-cd "$(dirname "$0")"
-
-hugo server --buildDrafts --buildFuture --watch -p 8080

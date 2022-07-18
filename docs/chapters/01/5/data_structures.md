@@ -35,7 +35,7 @@ class Config:
 @dataclass(config=Config)
 class GlobalSettings:
     """
-    Represents the default global settings. These can be overridden by the BancorNetwork configuration upon instantiation.
+    Represents the default global settings. These can be overridden by the BancorDapp configuration upon instantiation.
     """
     timestamp: int = DEFAULT_TIMESTAMP
     model: str = MODEL

@@ -13,7 +13,7 @@ kernelspec:
 
 # Network dApp Environment
 
-The `BancorNetwork` class provides the top level interface through which the entire codebase is made to simulate real-world scenarios in a practical sense. An instance of this class is analogous to the **Environment** in common agent-oriented-programming jargon, and more practically, can be thought of like an instance of the **Bancor dApp** where Traders can perform trades, and where LPs can make deposits, withdraws, and participate in DAO votes which change the system's tuneable fee (and other) parameters. 
+The `BancorDapp` class provides the top level interface through which the entire codebase is made to simulate real-world scenarios in a practical sense. An instance of this class is analogous to the **Environment** in common agent-oriented-programming jargon, and more practically, can be thought of like an instance of the **Bancor dApp** where Traders can perform trades, and where LPs can make deposits, withdraws, and participate in DAO votes which change the system's tuneable fee (and other) parameters. 
 
  * `v3.begin_cooldown`
  * `v3.burn`
@@ -47,7 +47,7 @@ The `BancorNetwork` class provides the top level interface through which the ent
 ## Example 
 
 ```
-v3 = BancorNetwork()
+v3 = BancorDapp()
 
 tkn_name = 'wbtc'
 value = .005

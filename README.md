@@ -92,7 +92,7 @@ in [BIP15: Proposing Bancor 3](https://docs.google.com/document/d/11UeMYaI_1CWdf
 1. Get your copy of this repository:
 
    ```
-   git clone https://github.com/bancorprotocol/simulator-v3
+   git clone https://github.com/bancorprotocol/research
    ```
 
 ### Build and preview the jupyter-book text locally

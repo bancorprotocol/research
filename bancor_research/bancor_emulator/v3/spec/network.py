@@ -102,7 +102,7 @@ class BancorDapp:
         self.poolTokenFactory   = PoolTokenFactory()
         self.poolMigrator       = None
         self.poolCollection     = PoolCollection(self.network, self.bnt, self.networkSettings, self.masterVault, self.bntPool, self.epVault, self.poolTokenFactory, self.poolMigrator, toPPM(network_fee))
-        self.standardRewards    = StandardRewards(self.network, self.networkSettings, self.bntGovernance, self.vbnt, self.bntPool, self.erVault)
+        self.standardRewards    = StandardRewards(self.network, self.networkSettings, self.bntGovernance, self.vbnt, self.bntPool)
 
         self.networkSettings.initialize()
         self.network.initialize(self.bntPool, self.pendingWithdrawals, self.poolMigrator)

@@ -129,7 +129,7 @@ def execute(fileName):
     poolTokenFactory   = PoolTokenFactory()
     poolMigrator       = None
     poolCollection     = PoolCollection(network, bnt, networkSettings, masterVault, bntPool, epVault, poolTokenFactory, poolMigrator, toPPM(flow.networkFee))
-    standardRewards    = StandardRewards(network, networkSettings, bntGovernance, vbnt, bntPool, erVault);
+    standardRewards    = StandardRewards(network, networkSettings, bntGovernance, vbnt, bntPool);
 
     networkSettings.initialize()
     network.initialize(bntPool, pendingWithdrawals, poolMigrator)
@@ -166,8 +166,8 @@ def execute(fileName):
         tkn.connect(DEPLOYER).transfer(user.id, decimalToInteger(user.tknBalance, tknDecimals));
         bnt.connect(DEPLOYER).transfer(user.id, decimalToInteger(user.bntBalance, bntDecimals));
 
-    tknProgramId = standardRewards.createProgram(tkn, tkn, tknRewardsAmount, block.timestamp, block.timestamp + flow.tknRewardsDuration);
-    bntProgramId = standardRewards.createProgram(bnt, bnt, bntRewardsAmount, block.timestamp, block.timestamp + flow.bntRewardsDuration);
+    tknProgramId = standardRewards.createProgram(tkn, tknRewardsAmount, block.timestamp, block.timestamp + flow.tknRewardsDuration);
+    bntProgramId = standardRewards.createProgram(bnt, bntRewardsAmount, block.timestamp, block.timestamp + flow.bntRewardsDuration);
 
     for token in [vbnt, tkn, bnt, bntkn, bnbnt]:
         assert token.balanceOf(DEPLOYER) == 0;

@@ -1,4 +1,4 @@
-from bancor_research.bancor_emulator.solidity import uint, uint32, uint256, address, payable, mapping, revert
+from bancor_research.bancor_emulator.solidity import uint, uint32, uint256, address, mapping, revert
 from bancor_research.bancor_emulator.utils import contract, parse
 
 from bancor_research.bancor_emulator.EnumerableSet import EnumerableSet
@@ -16,7 +16,7 @@ class ProgramData:
         self.pool = parse(address, x, 'pool');
         self.poolToken = parse(address, x, 'poolToken');
         self.rewardsToken = parse(address, x, 'rewardsToken');
-        self.isEnabled = parse(bool, x, 'isEnabled');
+        self.isPaused = parse(bool, x, 'isPaused');
         self.startTime = parse(uint32, x, 'startTime');
         self.endTime = parse(uint32, x, 'endTime');
         self.rewardRate = parse(uint256, x, 'rewardRate');
@@ -37,11 +37,6 @@ class StakeAmounts:
  * @dev Standard Rewards contract
 '''
 class StandardRewards(contract, Time):
-    class RewardData:
-        def __init__(self, x = None) -> None:
-            self.rewardsToken = parse(address, x, 'rewardsToken');
-            self.amount = parse(uint256, x, 'amount');
-
     class ClaimData:
         def __init__(self, x = None) -> None:
             self.reward = parse(uint256, x, 'reward');
@@ -62,8 +57,7 @@ class StandardRewards(contract, Time):
         initNetworkSettings,
         initBNTGovernance,
         initVBNT,
-        initBNTPool,
-        initExternalRewardsVault
+        initBNTPool
     ) -> None:
         contract.__init__(self)
         Time.__init__(self)
@@ -74,7 +68,6 @@ class StandardRewards(contract, Time):
         self._bnt = initBNTGovernance.token();
         self._vbnt = initVBNT;
         self._bntPoolToken = initBNTPool.poolToken();
-        self._externalRewardsVault = initExternalRewardsVault;
 
     '''
      * @dev fully initializes the contract and its parents
@@ -113,9 +106,6 @@ class StandardRewards(contract, Time):
 
         # a mapping between programs and their total stakes
         self._programStakes = mapping(lambda: uint256());
-
-        # a mapping between reward tokens and total unclaimed rewards
-        self._unclaimedRewards = mapping(lambda: uint256());
 
     # solhint-enable func-name-mixedcase
 
@@ -178,8 +168,8 @@ class StandardRewards(contract, Time):
     '''
      * @inheritdoc IStandardRewards
     '''
-    def isProgramEnabled(self, id) -> (bool):
-        return self._isProgramEnabled(self._programs[id]);
+    def isProgramPaused(self, id) -> (bool):
+        return self._isProgramPaused(self._programs[id]);
 
     '''
      * @inheritdoc IStandardRewards
@@ -192,7 +182,6 @@ class StandardRewards(contract, Time):
     '''
     def createProgram(self,
         pool,
-        rewardsToken,
         totalRewards,
         startTime,
         endTime
@@ -213,12 +202,6 @@ class StandardRewards(contract, Time):
 
             poolToken = self._network.collectionByPool(pool).poolToken(pool);
 
-        # ensure that the rewards were already deposited to the rewards vault
-        unclaimedRewards = self._unclaimedRewards[rewardsToken];
-        if (not rewardsToken is (self._bnt)):
-            if (rewardsToken.balanceOf(address(self._externalRewardsVault)) < unclaimedRewards + totalRewards):
-                revert("InsufficientFunds");
-
         id = self._nextProgramId.clone(); self._nextProgramId += 1;
         rewardRate = totalRewards / (endTime - startTime);
 
@@ -226,8 +209,8 @@ class StandardRewards(contract, Time):
             'id': id,
             'pool': pool,
             'poolToken': poolToken,
-            'rewardsToken': rewardsToken,
-            'isEnabled': True,
+            'rewardsToken': address(self._bnt),
+            'isPaused': False,
             'startTime': startTime,
             'endTime': endTime,
             'rewardRate': rewardRate,
@@ -236,9 +219,6 @@ class StandardRewards(contract, Time):
 
         # set the program as the latest program of the pool
         self._latestProgramIdByPool[pool] = id;
-
-        # increase the unclaimed rewards for the token by the total rewards in the new program
-        self._unclaimedRewards[rewardsToken] = unclaimedRewards + totalRewards;
 
         return id;
 
@@ -253,26 +233,25 @@ class StandardRewards(contract, Time):
         # unset the program from being the latest program of the pool
         del self._latestProgramIdByPool[p.pool];
 
-        # reduce the unclaimed rewards for the token by the remaining rewards
-        remainingRewards = self._remainingRewards(p);
-        self._unclaimedRewards[p.rewardsToken] -= remainingRewards;
+        endTime = p.endTime;
 
-        # stop rewards accumulation
-        self._programs[id].endTime = self._time();
+        # reduce the remaining rewards for the token by the remaining rewards and stop rewards accumulation
+        p.remainingRewards -= self._remainingRewards(p);
+        p.endTime = self._time();
 
     '''
      * @inheritdoc IStandardRewards
     '''
-    def enableProgram(self, id, status) -> None:
+    def pauseProgram(self, id, pause) -> None:
         p = self._programs[id];
 
         self._verifyProgramExists(p);
 
-        prevStatus = p.isEnabled;
-        if (prevStatus == status):
+        prevStatus = p.isPaused;
+        if (prevStatus == pause):
             return;
 
-        p.isEnabled = status;
+        p.isPaused = pause;
 
     '''
      * @inheritdoc IStandardRewards
@@ -280,7 +259,7 @@ class StandardRewards(contract, Time):
     def join(self, id, poolTokenAmount) -> None:
         p = self._programs[id];
 
-        self._verifyProgramActiveAndEnabled(p);
+        self._verifyProgramActiveAndNotPaused(p);
 
         self._join(self.msg_sender, p, poolTokenAmount, self.msg_sender);
 
@@ -300,7 +279,7 @@ class StandardRewards(contract, Time):
     def depositAndJoin(self, id, tokenAmount) -> None:
         p = self._programs[id];
 
-        self._verifyProgramActiveAndEnabled(p);
+        self._verifyProgramActiveAndNotPaused(p);
 
         self._depositAndJoin(self.msg_sender, p, tokenAmount);
 
@@ -309,7 +288,6 @@ class StandardRewards(contract, Time):
     '''
     def pendingRewards(self, provider, ids) -> (uint):
         reward = uint256(0);
-        rewardsToken = address(0);
 
         for i in range(len(ids)):
             id = ids[i];
@@ -317,12 +295,6 @@ class StandardRewards(contract, Time):
             p = self._programs[id];
 
             self._verifyProgramExists(p);
-
-            if (i == 0):
-                rewardsToken = p.rewardsToken;
-
-            if (p.rewardsToken != rewardsToken):
-                revert("RewardsTokenMismatch");
 
             newRewardPerToken = self._rewardPerToken(p, self._programRewards[id]);
             providerRewardsData = self._providerRewards[provider][id];
@@ -335,37 +307,31 @@ class StandardRewards(contract, Time):
      * @inheritdoc IStandardRewards
     '''
     def claimRewards(self, ids) -> (uint):
-        rewardData = self._claimRewards(self.msg_sender, ids, False);
+        reward = self._claimRewards(self.msg_sender, ids, False);
 
-        if (rewardData.amount == 0):
+        if (reward == 0):
             return uint256(0);
 
-        self._distributeRewards(self.msg_sender, rewardData);
+        self._bntGovernance.mint(self.msg_sender, reward);
 
-        return rewardData.amount;
+        return reward;
 
     '''
      * @inheritdoc IStandardRewards
     '''
     def stakeRewards(self, ids) -> (StakeAmounts):
-        rewardData = self._claimRewards(self.msg_sender, ids, True);
+        reward = self._claimRewards(self.msg_sender, ids, True);
 
-        if (rewardData.amount == 0):
+        if (reward == 0):
             return StakeAmounts({ 'stakedRewardAmount': 0, 'poolTokenAmount': 0 });
 
-        self._distributeRewards(address(self), rewardData);
+        self._bntGovernance.mint(address(self), reward);
 
         # deposit provider's tokens to the network. Please note, that since we're staking rewards, then the deposit
         # should come from the contract itself, but the pool tokens should be sent to the provider directly
-        poolTokenAmount = self._deposit(
-            self.msg_sender,
-            address(self),
-            False,
-            rewardData.rewardsToken,
-            rewardData.amount
-        );
+        poolTokenAmount = self._deposit(self.msg_sender, address(self), False, address(self._bnt), reward);
 
-        return StakeAmounts({ 'stakedRewardAmount': rewardData.amount, 'poolTokenAmount': poolTokenAmount });
+        return StakeAmounts({ 'stakedRewardAmount': reward, 'poolTokenAmount': poolTokenAmount });
 
     '''
      * @dev adds provider's stake to the program
@@ -470,19 +436,13 @@ class StandardRewards(contract, Time):
         provider,
         ids,
         stake
-    ) -> (RewardData):
-        rewardData = self.RewardData({ 'rewardsToken': address(0), 'amount': 0 });
+    ) -> (uint):
+        reward = uint256(0);
 
         for i in range(len(ids)):
             p = self._programs[ids[i]];
 
-            self._verifyProgramEnabled(p);
-
-            if (i == 0):
-                rewardData.rewardsToken = p.rewardsToken;
-
-            if (p.rewardsToken != rewardData.rewardsToken):
-                revert("RewardsTokenMismatch");
+            self._verifyProgramNotPaused(p);
 
             claimData = self._claimRewards_(provider, p);
 
@@ -497,17 +457,14 @@ class StandardRewards(contract, Time):
                 self._programs[ids[i]].remainingRewards = remainingRewards - claimData.reward;
 
                 # collect same-reward token rewards
-                rewardData.amount += claimData.reward;
+                reward += claimData.reward;
 
             # if the program is no longer active, has no stake left, and there are no pending rewards - remove the
             # program from the provider's program list
             if (not self._isProgramActive(p) and claimData.stakedAmount == 0):
                 self._programIdsByProvider[provider].remove(p.id);
 
-        # decrease the unclaimed rewards for the token by the total claimed rewards
-        self._unclaimedRewards[rewardData.rewardsToken] -= rewardData.amount;
-
-        return rewardData;
+        return reward;
 
     '''
      * @dev claims rewards and returns the received and the pending reward amounts
@@ -534,10 +491,10 @@ class StandardRewards(contract, Time):
             self._latestProgramIdByPool[p.pool] == p.id;
 
     '''
-     * @dev returns whether the specified program is active
+     * @dev returns whether the specified program is paused
     '''
-    def _isProgramEnabled(self, p) -> (bool):
-        return p.isEnabled;
+    def _isProgramPaused(self, p) -> (bool):
+        return p.isPaused;
 
     '''
      * @dev returns whether or not a given program exists
@@ -562,20 +519,20 @@ class StandardRewards(contract, Time):
             revert("ProgramInactive");
 
     '''
-     * @dev verifies that a program is enabled
+     * @dev verifies that a program is not paused
     '''
-    def _verifyProgramEnabled(self, p) -> None:
+    def _verifyProgramNotPaused(self, p) -> None:
         self._verifyProgramExists(p);
 
-        if (not p.isEnabled):
-            revert("ProgramDisabled");
+        if (p.isPaused):
+            revert("ProgramSuspended");
 
     '''
-     * @dev verifies that a program exists, active, and enabled
+     * @dev verifies that a program exists, active, and not paused
     '''
-    def _verifyProgramActiveAndEnabled(self, p) -> None:
+    def _verifyProgramActiveAndNotPaused(self, p) -> None:
         self._verifyProgramActive(p);
-        self._verifyProgramEnabled(p);
+        self._verifyProgramNotPaused(p);
 
     '''
      * @dev returns the remaining rewards of given program
@@ -638,15 +595,6 @@ class StandardRewards(contract, Time):
             self.REWARD_RATE_FACTOR;
 
     '''
-     * @dev distributes reward
-    '''
-    def _distributeRewards(self, recipient, rewardData) -> None:
-        if (rewardData.rewardsToken is (self._bnt)):
-            self._bntGovernance.mint(recipient, rewardData.amount);
-        else:
-            self._externalRewardsVault.withdrawFunds(rewardData.rewardsToken, payable(recipient), rewardData.amount);
-
-    '''
      * @dev returns whether the specified array has duplicates
     '''
     def _isArrayUnique(self, ids) -> (bool):
@@ -656,3 +604,17 @@ class StandardRewards(contract, Time):
                     return False;
 
         return True;
+
+    '''
+     * @dev post upgrade callback
+    '''
+    def _postUpgrade(self,
+        data
+    ) -> None:
+        # since we have renamed the "isEnabled" field to "isPaused", we need to manually inverse all exiting programs
+        # values (which is still manageable, as at the time of this upgrade - there were only 8 programs)
+        length = self._nextProgramId - self.INITIAL_PROGRAM_ID;
+        for i in range(length):
+            id = uint256(i) + self.INITIAL_PROGRAM_ID;
+
+            self._programs[id].isPaused = False;

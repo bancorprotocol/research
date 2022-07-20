@@ -210,39 +210,54 @@ class BancorDapp:
         tkn_amt: Decimal,
         user_name: str,
         rewards_ids: list[int],
-        transaction_type: str = "claim_standard_rewards",
         timestamp: int = 0,
+        transaction_type: str = "claim_standard_rewards",
     ):
         updateBlock(timestamp)
         return self.standardRewards.connect(user_name).claimRewards(rewards_ids)
 
-    def join_standard_rewards(
+    def create_standard_rewards_program(
+        self,
+        tkn_name: str,
+        tkn_amt: Decimal,
+        start_time: int,
+        end_time: int,
+        timestamp: int = 0,
+        transaction_type="create_standard_rewards_program",
+    ):
+        updateBlock(timestamp)
+        tkn = self.reserveTokens[tkn_name]
+        amt = toWei(tkn_amt, tkn.decimals())
+        return self.standardRewards.createProgram(tkn, amt, start_time, end_time)
+
+    def join_standard_rewards_program(
         self,
         tkn_name: str,
         tkn_amt: Decimal,
         user_name: str,
+        program_id: int,
         timestamp: int = 0,
-        transaction_type="join_standard_rewards",
+        transaction_type="join_standard_rewards_program",
     ):
         updateBlock(timestamp)
         tkn = self.poolTokens[tkn_name]
         amt = toWei(tkn_amt, tkn.decimals())
         tkn.connect(user_name).approve(self.standardRewards, amt)
-        return self.standardRewards.connect(user_name).join(tknProgramId, amt)
+        return self.standardRewards.connect(user_name).join(program_id, amt)
 
-    def leave_standard_rewards(
+    def leave_standard_rewards_program(
         self,
         tkn_name: str,
         tkn_amt: Decimal,
         user_name: str,
-        id_number: int,
+        program_id: int,
         timestamp: int = 0,
-        transaction_type="leave_standard_rewards",
+        transaction_type="leave_standard_rewards_program",
     ):
         updateBlock(timestamp)
         tkn = self.poolTokens[tkn_name]
         amt = toWei(tkn_amt, tkn.decimals())
-        return self.standardRewards.connect(user_name).leave(tknProgramId, amt)
+        return self.standardRewards.connect(user_name).leave(program_id, amt)
 
     def set_user_balance(
         self,

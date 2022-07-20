@@ -582,9 +582,9 @@ class BancorDapp:
         tkn_name: str,
         tkn_amt: Decimal,
         user_name: str,
-        rewards_ids: List[int],
-        transaction_type: str = "claim_standard_rewards",
+        program_ids: List[int],
         timestamp: int = 0,
+        transaction_type: str = "claim_standard_rewards",
     ):
         """
         Claim standard rewards for a given reward program and user.
@@ -593,7 +593,7 @@ class BancorDapp:
         state, tkn_name, tkn_amt, user_name = validate_input(
             state, tkn_name, tkn_amt, user_name, timestamp
         )
-        state = claim_standard_rewards(state, user_name, rewards_ids, timestamp)
+        state = claim_standard_rewards(state, user_name, program_ids, timestamp)
         self.next_transaction(state)
         handle_logging(
             tkn_name, tkn_amt, transaction_type, user_name, self.transaction_id, state
@@ -604,13 +604,14 @@ class BancorDapp:
             )
             self.global_state.json_export["operations"].append(json_operation)
 
-    def join_standard_rewards(
+    def join_standard_rewards_program(
         self,
         tkn_name: str,
         tkn_amt: Decimal,
         user_name: str,
+        program_id: int,
         timestamp: int = 0,
-        transaction_type="join_standard_rewards",
+        transaction_type="join_standard_rewards_program",
     ):
         """
         Join the standard rewards program for a given user.
@@ -622,7 +623,7 @@ class BancorDapp:
         state = join_standard_reward_program(
             state=state,
             provider_id=user_name,
-            program_id=tkn_name,
+            program_id=program_id,
             tkn_amt=tkn_amt,
             curr_time=timestamp,
         )
@@ -636,14 +637,14 @@ class BancorDapp:
             )
             self.global_state.json_export["operations"].append(json_operation)
 
-    def leave_standard_rewards(
+    def leave_standard_rewards_program(
         self,
         tkn_name: str,
         tkn_amt: Decimal,
         user_name: str,
-        id_number: int,
+        program_id: int,
         timestamp: int = 0,
-        transaction_type="leave_standard_rewards",
+        transaction_type="leave_standard_rewards_program",
     ):
         """
         Leave the standard rewards program for a given user.
@@ -655,7 +656,7 @@ class BancorDapp:
         state = leave_standard_reward_program(
             state=state,
             provider_id=user_name,
-            program_id=id_number,
+            program_id=program_id,
             tkn_amt=tkn_amt,
             curr_time=timestamp,
         )

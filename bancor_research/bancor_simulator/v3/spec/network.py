@@ -577,6 +577,41 @@ class BancorDapp:
                 )
                 self.global_state.json_export["operations"].append(json_operation)
 
+    def create_standard_rewards_program(
+        self,
+        tkn_name: str,
+        tkn_amt: Decimal,
+        start_time: int,
+        end_time: int,
+        timestamp: int,
+        transaction_type="create_standard_rewards_program",
+    ):
+        """
+        Create a standard rewards program for a given token.
+        """
+        state = self.get_state(copy_type="initial", timestamp=timestamp)
+        state, tkn_name, tkn_amt, user_name = validate_input(
+            state, tkn_name, tkn_amt, user_name, timestamp
+        )
+        state = create_standard_reward_program(
+            state=state,
+            tkn_name=tkn_name,
+            rewards_token="bnt",
+            total_rewards=tkn_amt,
+            start_time=start_time,
+            end_time=end_time,
+            curr_time=timestamp,
+        )
+        self.next_transaction(state)
+        handle_logging(
+            tkn_name, tkn_amt, transaction_type, user_name, self.transaction_id, state
+        )
+        if self.generate_json_tests:
+            json_operation = build_json_operation(
+                state, tkn_name, tkn_amt, transaction_type, user_name, timestamp
+            )
+            self.global_state.json_export["operations"].append(json_operation)
+
     def join_standard_rewards_program(
         self,
         tkn_name: str,
@@ -595,10 +630,10 @@ class BancorDapp:
         )
         state = join_standard_reward_program(
             state=state,
-            provider_id=user_name,
-            program_id=program_id,
-            tkn_amt=tkn_amt,
-            curr_time=timestamp,
+            user_name=user_name,
+            id=program_id,
+            pool_token_amount=tkn_amt,
+            timestamp=timestamp,
         )
         self.next_transaction(state)
         handle_logging(
@@ -628,10 +663,10 @@ class BancorDapp:
         )
         state = leave_standard_reward_program(
             state=state,
-            provider_id=user_name,
-            program_id=program_id,
-            tkn_amt=tkn_amt,
-            curr_time=timestamp,
+            user_name=user_name,
+            id=program_id,
+            pool_token_amount=tkn_amt,
+            timestamp=timestamp,
         )
         self.next_transaction(state)
         handle_logging(
@@ -659,7 +694,12 @@ class BancorDapp:
         state, tkn_name, tkn_amt, user_name = validate_input(
             state, tkn_name, tkn_amt, user_name, timestamp
         )
-        state = claim_standard_rewards(state, user_name, program_ids, timestamp)
+        state = claim_standard_rewards(
+            state=state,
+            user_name=user_name,
+            ids=program_ids,
+            timestamp=timestamp,
+        )
         self.next_transaction(state)
         handle_logging(
             tkn_name, tkn_amt, transaction_type, user_name, self.transaction_id, state

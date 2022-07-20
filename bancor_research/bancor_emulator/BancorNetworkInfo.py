@@ -2,16 +2,12 @@ from bancor_research.bancor_emulator.solidity import uint, uint128, address, rev
 from bancor_research.bancor_emulator.utils import contract, parse
 
 from bancor_research.bancor_emulator import ERC20 as IERC20
-
 from bancor_research.bancor_emulator import TokenGovernance as ITokenGovernance
-
 from bancor_research.bancor_emulator.Vault import Vault as IVault
-
 from bancor_research.bancor_emulator import PoolToken as IPoolToken
 from bancor_research.bancor_emulator import PoolCollection as IPoolCollection
 from bancor_research.bancor_emulator.PoolCollection import WithdrawalAmounts
 from bancor_research.bancor_emulator import BNTPool as IBNTPool
-
 from bancor_research.bancor_emulator import BancorNetwork as IBancorNetwork
 from bancor_research.bancor_emulator import NetworkSettings as INetworkSettings
 from bancor_research.bancor_emulator import PendingWithdrawals as IPendingWithdrawals
@@ -77,13 +73,6 @@ class BancorNetworkInfo(contract):
         pass
 
     # solhint-enable func-name-mixedcase
-
-    '''
-     * @dev validates that the provided tokens are valid and unique
-    '''
-    def _validTokensForTrade(self, sourceToken, targetToken) -> None:
-        if (sourceToken == targetToken):
-            revert("InvalidToken");
 
     '''
      * @inheritdoc Upgradeable

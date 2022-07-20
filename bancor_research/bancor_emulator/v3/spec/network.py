@@ -204,18 +204,6 @@ class BancorDapp:
         amt = toWei(tkn_amt, tkn.decimals())
         tkn.connect(user_name).burn(amt)
 
-    def claim_standard_rewards(
-        self,
-        tkn_name: str,
-        tkn_amt: Decimal,
-        user_name: str,
-        rewards_ids: list[int],
-        timestamp: int = 0,
-        transaction_type: str = "claim_standard_rewards",
-    ):
-        updateBlock(timestamp)
-        return self.standardRewards.connect(user_name).claimRewards(rewards_ids)
-
     def create_standard_rewards_program(
         self,
         tkn_name: str,
@@ -258,6 +246,18 @@ class BancorDapp:
         tkn = self.poolTokens[tkn_name]
         amt = toWei(tkn_amt, tkn.decimals())
         return self.standardRewards.connect(user_name).leave(program_id, amt)
+
+    def claim_standard_rewards(
+        self,
+        tkn_name: str,
+        tkn_amt: Decimal,
+        user_name: str,
+        rewards_ids: list[int],
+        timestamp: int = 0,
+        transaction_type: str = "claim_standard_rewards",
+    ):
+        updateBlock(timestamp)
+        return self.standardRewards.connect(user_name).claimRewards(rewards_ids)
 
     def set_user_balance(
         self,

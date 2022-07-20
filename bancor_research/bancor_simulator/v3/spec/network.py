@@ -577,33 +577,6 @@ class BancorDapp:
                 )
                 self.global_state.json_export["operations"].append(json_operation)
 
-    def claim_standard_rewards(
-        self,
-        tkn_name: str,
-        tkn_amt: Decimal,
-        user_name: str,
-        program_ids: List[int],
-        timestamp: int = 0,
-        transaction_type: str = "claim_standard_rewards",
-    ):
-        """
-        Claim standard rewards for a given reward program and user.
-        """
-        state = self.get_state(copy_type="initial", timestamp=timestamp)
-        state, tkn_name, tkn_amt, user_name = validate_input(
-            state, tkn_name, tkn_amt, user_name, timestamp
-        )
-        state = claim_standard_rewards(state, user_name, program_ids, timestamp)
-        self.next_transaction(state)
-        handle_logging(
-            tkn_name, tkn_amt, transaction_type, user_name, self.transaction_id, state
-        )
-        if self.generate_json_tests:
-            json_operation = build_json_operation(
-                state, tkn_name, tkn_amt, transaction_type, user_name, timestamp
-            )
-            self.global_state.json_export["operations"].append(json_operation)
-
     def join_standard_rewards_program(
         self,
         tkn_name: str,
@@ -660,6 +633,33 @@ class BancorDapp:
             tkn_amt=tkn_amt,
             curr_time=timestamp,
         )
+        self.next_transaction(state)
+        handle_logging(
+            tkn_name, tkn_amt, transaction_type, user_name, self.transaction_id, state
+        )
+        if self.generate_json_tests:
+            json_operation = build_json_operation(
+                state, tkn_name, tkn_amt, transaction_type, user_name, timestamp
+            )
+            self.global_state.json_export["operations"].append(json_operation)
+
+    def claim_standard_rewards(
+        self,
+        tkn_name: str,
+        tkn_amt: Decimal,
+        user_name: str,
+        program_ids: List[int],
+        timestamp: int = 0,
+        transaction_type: str = "claim_standard_rewards",
+    ):
+        """
+        Claim standard rewards for a given reward program and user.
+        """
+        state = self.get_state(copy_type="initial", timestamp=timestamp)
+        state, tkn_name, tkn_amt, user_name = validate_input(
+            state, tkn_name, tkn_amt, user_name, timestamp
+        )
+        state = claim_standard_rewards(state, user_name, program_ids, timestamp)
         self.next_transaction(state)
         handle_logging(
             tkn_name, tkn_amt, transaction_type, user_name, self.transaction_id, state

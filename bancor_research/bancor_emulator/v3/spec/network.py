@@ -2,6 +2,7 @@ from bancor_research.bancor_emulator.solidity.uint.float import Decimal
 from bancor_research.bancor_emulator.solidity import uint32, uint256, time, block
 
 from bancor_research.bancor_emulator.BancorNetwork      import BancorNetwork     
+from bancor_research.bancor_emulator.BancorNetworkInfo  import BancorNetworkInfo 
 from bancor_research.bancor_emulator.BNTPool            import BNTPool           
 from bancor_research.bancor_emulator.Constants          import PPM_RESOLUTION    
 from bancor_research.bancor_emulator.NetworkSettings    import NetworkSettings   
@@ -103,6 +104,7 @@ class BancorDapp:
         self.poolMigrator       = None
         self.poolCollection     = PoolCollection(self.network, self.bnt, self.networkSettings, self.masterVault, self.bntPool, self.epVault, self.poolTokenFactory, self.poolMigrator, toPPM(network_fee))
         self.standardRewards    = StandardRewards(self.network, self.networkSettings, self.bntGovernance, self.vbnt, self.bntPool)
+        self.networkInfo        = BancorNetworkInfo(self.network, self.bntGovernance, self.vbntGovernance, self.networkSettings, self.masterVault, self.epVault, self.erVault, self.bntPool, self.pendingWithdrawals, self.poolMigrator)
 
         self.networkSettings.initialize()
         self.network.initialize(self.bntPool, self.pendingWithdrawals, self.poolMigrator)
@@ -110,6 +112,7 @@ class BancorDapp:
         self.pendingWithdrawals.initialize()
         self.poolTokenFactory.initialize()
         self.standardRewards.initialize()
+        self.networkInfo.initialize()
 
         self.networkSettings.setWithdrawalFeePPM(toPPM(withdrawal_fee))
         self.networkSettings.setMinLiquidityForTrading(toWei(bnt_min_liquidity * 2, DEFAULT_DECIMALS))

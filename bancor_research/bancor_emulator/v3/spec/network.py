@@ -1,5 +1,5 @@
 from bancor_research.bancor_emulator.solidity.uint.float import Decimal
-from bancor_research.bancor_emulator.solidity import uint32, uint256, time, block
+from bancor_research.bancor_emulator.solidity import uint, uint32, uint256, time, block
 
 from bancor_research.bancor_emulator.BancorNetwork      import BancorNetwork     
 from bancor_research.bancor_emulator.BancorNetworkInfo  import BancorNetworkInfo 
@@ -56,6 +56,9 @@ def toPPM(value: Decimal):
 
 def toWei(value: Decimal, decimals: int):
     return uint256(value * 10 ** decimals)
+
+def fromWei(value: uint, decimals: int):
+    return Decimal(int(value)) / 10 ** decimals
 
 def updateBlock(timestamp):
     if block.timestamp < timestamp:
@@ -343,7 +346,46 @@ class BancorDapp:
         pass
 
     def describe(self, rates: bool = False, decimals: int = 6):
-        pass
+        table = []
+        bnt_decimals = self.bnt.decimals()
+
+        for tkn in [reserveToken for reserveToken in self.reserveTokens.values() if reserveToken is not self.bnt]:
+            bn_tkn = self.networkInfo.poolToken(tkn)
+            tkn_decimals = tkn.decimals()
+            bn_tkn_decimals = bn_tkn.decimals()
+            tradingLiquidity = self.networkInfo.tradingLiquidity(tkn)
+            tkn_staked_balance = self.networkInfo.stakedBalance(tkn)
+            table.append({
+                'tkn_symbol': tkn.symbol(),
+                'bn_tkn_symbol': bn_tkn.symbol(),
+                'bnt_trading_liquidity': fromWei(tradingLiquidity.bntTradingLiquidity, bnt_decimals),
+                'tkn_trading_liquidity': fromWei(tradingLiquidity.baseTokenTradingLiquidity, tkn_decimals),
+                'tkn_master_vault_balance': fromWei(tkn.balanceOf(self.masterVault), tkn_decimals),
+                'tkn_staked_balance': fromWei(tkn_staked_balance, tkn_decimals),
+                'bn_tkn_total_supply': fromWei(bn_tkn.totalSupply(), bn_tkn_decimals),
+                'tkn_ep_vault_balance': fromWei(tkn.balanceOf(self.epVault), tkn_decimals),
+            })
+
+        fmt_one = '{{:.{}f}}'.format(decimals)
+        fmt_all = '{{}}: bnt={0}, {{}}={0} | {{}}={0} | {{}}={0} | {{}}={0} | {{}}={0}'.format(fmt_one)
+
+        print('Pool | Trading Liquidity | Master Vault | Staked Balance | Total Supply | EP Vault')
+
+        for row in table:
+            print(fmt_all.format(
+                row['tkn_symbol'],
+                row['bnt_trading_liquidity'],
+                row['tkn_symbol'],
+                row['tkn_trading_liquidity'],
+                row['tkn_symbol'],
+                row['tkn_master_vault_balance'],
+                row['tkn_symbol'],
+                row['tkn_staked_balance'],
+                row['bn_tkn_symbol'],
+                row['bn_tkn_total_supply'],
+                row['tkn_symbol'],
+                row['tkn_ep_vault_balance'],
+            ))
 
 # whitelisted_tokens: list = ['bnt', 'eth', 'wbtc', 'link']
 # v3 = BancorDapp(whitelisted_tokens=whitelisted_tokens)

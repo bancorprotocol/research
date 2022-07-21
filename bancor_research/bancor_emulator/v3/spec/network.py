@@ -18,7 +18,6 @@ from bancor_research.bancor_emulator.Vault              import Vault
 import pandas as pd
 import warnings
 from pydantic.fields import TypeVar
-from collections import defaultdict
 
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 PandasDataFrame = TypeVar("pandas.core.frame.DataFrame")
@@ -347,103 +346,37 @@ class BancorDapp:
         pass
 
     def describe(self, rates: bool = False, decimals: int = 6):
-        table = []
-        bnt_decimals = self.bnt.decimals()
+        table = {}
 
-        for tkn in [reserveToken for reserveToken in self.reserveTokens.values() if reserveToken is not self.bnt]:
-            bn_tkn = self.networkInfo.poolToken(tkn)
-            tkn_decimals = tkn.decimals()
-            bn_tkn_decimals = bn_tkn.decimals()
-            tradingLiquidity = self.networkInfo.tradingLiquidity(tkn)
-            tkn_staked_balance = self.networkInfo.stakedBalance(tkn)
-            table.append({
-                'tkn_symbol': tkn.symbol(),
-                'bn_tkn_symbol': bn_tkn.symbol(),
-                'bnt_trading_liquidity': fromWei(tradingLiquidity.bntTradingLiquidity, bnt_decimals),
-                'tkn_trading_liquidity': fromWei(tradingLiquidity.baseTokenTradingLiquidity, tkn_decimals),
-                'tkn_master_vault_balance': fromWei(tkn.balanceOf(self.masterVault), tkn_decimals),
-                'tkn_staked_balance': fromWei(tkn_staked_balance, tkn_decimals),
-                'bn_tkn_total_supply': fromWei(bn_tkn.totalSupply(), bn_tkn_decimals),
-                'tkn_ep_vault_balance': fromWei(tkn.balanceOf(self.epVault), tkn_decimals),
-            })
+        reserveTokens = list(self.reserveTokens.values())
+        poolTokens = list(self.poolTokens.values())
+        bntDecimals = self.bnt.decimals()
 
-        fmt_one = '{{:.{}f}}'.format(decimals)
-        fmt_all = '{{}}: bnt={0}, {{}}={0} | {{}}={0} | {{}}={0} | {{}}={0} | {{}}={0}'.format(fmt_one)
-
-        print('Pool | Trading Liquidity | Master Vault | Staked Balance | Total Supply | EP Vault')
-
-        for row in table:
-            print(fmt_all.format(
-                row['tkn_symbol'],
-                row['bnt_trading_liquidity'],
-                row['tkn_symbol'],
-                row['tkn_trading_liquidity'],
-                row['tkn_symbol'],
-                row['tkn_master_vault_balance'],
-                row['tkn_symbol'],
-                row['tkn_staked_balance'],
-                row['bn_tkn_symbol'],
-                row['bn_tkn_total_supply'],
-                row['tkn_symbol'],
-                row['tkn_ep_vault_balance'],
-            ))
-
-    def getState(self):
-        pools = {}
-        users = {}
-
-        bnt_decimals = self.bnt.decimals()
-
-        for token in [reserveToken for reserveToken in self.reserveTokens.values() if reserveToken is not self.bnt]:
+        for token in reserveTokens + poolTokens:
             symbol = token.symbol()
-            decimals = token.decimals()
-            tkn_staked_balance = self.networkInfo.stakedBalance(token)
-            trading_liquidity = self.networkInfo.tradingLiquidity(token)
-            bnt_current_funding = self.bntPool.currentPoolFunding(token)
-            pools[symbol] = {
-                'tkn_staked_balance'   : fromWei(tkn_staked_balance, decimals),
-                'tkn_trading_liquidity': fromWei(trading_liquidity.baseTokenTradingLiquidity, decimals),
-                'bnt_trading_liquidity': fromWei(trading_liquidity.bntTradingLiquidity, bnt_decimals),
-                'bnt_current_funding  ': fromWei(bnt_current_funding, bnt_decimals),
-            }
+            tknDecimals = token.decimals()
 
-        for token in list(self.reserveTokens.values()) + list(self.poolTokens.values()):
-            symbol = token.symbol()
-            decimals = token.decimals()
-            users[symbol] = defaultdict(Decimal)
+            table[symbol] = {}
+
             for user in token._balances.keys():
                 match user:
-                    case self.masterVault: user_id = ['Contract', 'masterVault']
-                    case self.epVault    : user_id = ['Contract', 'epVault'    ]
-                    case self.erVault    : user_id = ['Contract', 'erVault'    ]
-                    case self.bntPool    : user_id = ['Contract', 'bntPool'    ]
-                    case other           : user_id = ['Account' , user         ]
-                users[symbol][tuple(user_id)] = fromWei(token.balanceOf(user), decimals)
+                    case self.masterVault: userId = 'Contract Master Vault'
+                    case self.epVault    : userId = 'Contract EP Vault'
+                    case self.erVault    : userId = 'Contract ER Vault'
+                    case self.bntPool    : userId = 'Contract BNT Pool'
+                    case other           : userId = 'Account ' + user
+                table[symbol][userId + ' Balance'] = fromWei(token.balanceOf(user), tknDecimals)
 
-        return {
-            'pools': pools,
-            'users': users,
-        }
+            if token in reserveTokens and token is not self.bnt:
+                tkn_staked_balance = self.networkInfo.stakedBalance(token)
+                trading_liquidity = self.networkInfo.tradingLiquidity(token)
+                bnt_current_funding = self.bntPool.currentPoolFunding(token)
+                table[symbol]['Pool TKN Staked Balance'   ] = fromWei(tkn_staked_balance, tknDecimals)
+                table[symbol]['Pool TKN Trading Liquidity'] = fromWei(trading_liquidity.baseTokenTradingLiquidity, tknDecimals)
+                table[symbol]['Pool BNT Trading Liquidity'] = fromWei(trading_liquidity.bntTradingLiquidity, bntDecimals)
+                table[symbol]['Pool BNT Current Funding'  ] = fromWei(bnt_current_funding, bntDecimals)
 
-    def printState(self):
-        state = self.getState()
-        pools = state['pools']
-        users = state['users']
-
-        def display(title, grid):
-            print(title + ':')
-            sizes = [max(len(row[index]) for row in grid) for index in range(len(grid[0]))]
-            print('\n'.join(' | '.join(cell.ljust(size) for cell, size in zip(row, sizes)) for row in grid))
-
-        cols = list(pools.keys())
-        rows = list(pools[cols[0]].keys())
-        grid = [['Attribute'] + cols] + [[row] + [str(pools[symbol][row]) for symbol in cols] for row in rows]
-        display('Pools', grid)
-
-        cols = list(users.keys())
-        rows = sorted(set([user_id for user_ids in [users[symbol].keys() for symbol in cols] for user_id in user_ids]))
-        grid = [['Type', 'Name'] + cols] + [list(row) + [str(users[symbol][row]) for symbol in cols] for row in rows]
-        display('Users', grid)
+        return pd.DataFrame(table)
 
 # whitelisted_tokens: list = ['bnt', 'eth', 'wbtc', 'link']
 # v3 = BancorDapp(whitelisted_tokens=whitelisted_tokens)

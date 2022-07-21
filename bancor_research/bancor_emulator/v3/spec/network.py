@@ -413,12 +413,12 @@ class BancorDapp:
             users[symbol] = defaultdict(Decimal)
             for user in token._balances.keys():
                 match user:
-                    case self.masterVault: typename = ['Contract', 'masterVault']
-                    case self.epVault    : typename = ['Contract', 'epVault'    ]
-                    case self.erVault    : typename = ['Contract', 'erVault'    ]
-                    case self.bntPool    : typename = ['Contract', 'bntPool'    ]
-                    case other           : typename = ['Account' , user         ]
-                users[symbol][tuple(typename)] = fromWei(token.balanceOf(user), decimals)
+                    case self.masterVault: user_id = ['Contract', 'masterVault']
+                    case self.epVault    : user_id = ['Contract', 'epVault'    ]
+                    case self.erVault    : user_id = ['Contract', 'erVault'    ]
+                    case self.bntPool    : user_id = ['Contract', 'bntPool'    ]
+                    case other           : user_id = ['Account' , user         ]
+                users[symbol][tuple(user_id)] = fromWei(token.balanceOf(user), decimals)
 
         return {
             'pools': pools,
@@ -430,13 +430,10 @@ class BancorDapp:
         pools = state['pools']
         users = state['users']
 
-        def adjust(s, n, i, j, k):
-            return s.rjust(n) if i > 0 and j > k else s.ljust(n)
-
         def display(title, grid):
             print(title + ':')
-            lens = [max(len(row[n]) for row in grid) for n in range(len(grid[0]))]
-            print('\n'.join(' | '.join(adjust(grid[i][j], lens[j], i, j, 1) for j in range(len(grid[i]))) for i in range(len(grid))))
+            sizes = [max(len(row[index]) for row in grid) for index in range(len(grid[0]))]
+            print('\n'.join(' | '.join(cell.ljust(size) for cell, size in zip(row, sizes)) for row in grid))
 
         cols = list(pools.keys())
         rows = list(pools[cols[0]].keys())
@@ -444,7 +441,7 @@ class BancorDapp:
         display('Pools', grid)
 
         cols = list(users.keys())
-        rows = sorted(set([typename for typenames in [users[symbol].keys() for symbol in cols] for typename in typenames]))
+        rows = sorted(set([user_id for user_ids in [users[symbol].keys() for symbol in cols] for user_id in user_ids]))
         grid = [['Type', 'Name'] + cols] + [list(row) + [str(users[symbol][row]) for symbol in cols] for row in rows]
         display('Users', grid)
 

@@ -18,6 +18,7 @@ from bancor_research.bancor_emulator.Vault              import Vault
 import pandas as pd
 import warnings
 from pydantic.fields import TypeVar
+from collections import defaultdict
 
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 PandasDataFrame = TypeVar("pandas.core.frame.DataFrame")
@@ -386,6 +387,66 @@ class BancorDapp:
                 row['tkn_symbol'],
                 row['tkn_ep_vault_balance'],
             ))
+
+    def getState(self):
+        pools = {}
+        users = {}
+
+        bnt_decimals = self.bnt.decimals()
+
+        for token in [reserveToken for reserveToken in self.reserveTokens.values() if reserveToken is not self.bnt]:
+            symbol = token.symbol()
+            decimals = token.decimals()
+            tkn_staked_balance = self.networkInfo.stakedBalance(token)
+            trading_liquidity = self.networkInfo.tradingLiquidity(token)
+            bnt_current_funding = self.bntPool.currentPoolFunding(token)
+            pools[symbol] = {
+                'tkn_staked_balance'   : fromWei(tkn_staked_balance, decimals),
+                'tkn_trading_liquidity': fromWei(trading_liquidity.baseTokenTradingLiquidity, decimals),
+                'bnt_trading_liquidity': fromWei(trading_liquidity.bntTradingLiquidity, bnt_decimals),
+                'bnt_current_funding  ': fromWei(bnt_current_funding, bnt_decimals),
+            }
+
+        for token in list(self.reserveTokens.values()) + list(self.poolTokens.values()):
+            symbol = token.symbol()
+            decimals = token.decimals()
+            users[symbol] = defaultdict(Decimal)
+            for user in token._balances.keys():
+                match user:
+                    case self.masterVault: typename = ['Contract', 'masterVault']
+                    case self.epVault    : typename = ['Contract', 'epVault'    ]
+                    case self.erVault    : typename = ['Contract', 'erVault'    ]
+                    case self.bntPool    : typename = ['Contract', 'bntPool'    ]
+                    case other           : typename = ['Account' , user         ]
+                users[symbol][tuple(typename)] = fromWei(token.balanceOf(user), decimals)
+
+        return {
+            'pools': pools,
+            'users': users,
+        }
+
+    def printState(self):
+        state = self.getState()
+        pools = state['pools']
+        users = state['users']
+
+        def adjust(s, n, i, j, k):
+            return s.rjust(n) if i > 0 and j > k else s.ljust(n)
+
+        def display(title, grid):
+            print(title + ':')
+            lens = [max(len(row[n]) for row in grid) for n in range(len(grid[0]))]
+            print('\n'.join(' | '.join(adjust(grid[i][j], lens[j], i, j, 1) for j in range(len(grid[i]))) for i in range(len(grid))))
+
+        cols = list(pools.keys())
+        rows = list(pools[cols[0]].keys())
+        grid = [['Attribute'] + cols] + [[row] + [str(pools[symbol][row]) for symbol in cols] for row in rows]
+        display('Pools', grid)
+
+        cols = list(users.keys())
+        rows = sorted(set([typename for typenames in [users[symbol].keys() for symbol in cols] for typename in typenames]))
+        grid = [['Type', 'Name'] + cols] + [list(row) + [str(users[symbol][row]) for symbol in cols] for row in rows]
+        display('Users', grid)
 
 # whitelisted_tokens: list = ['bnt', 'eth', 'wbtc', 'link']
 # v3 = BancorDapp(whitelisted_tokens=whitelisted_tokens)

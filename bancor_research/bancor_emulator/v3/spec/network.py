@@ -360,23 +360,23 @@ class BancorDapp:
 
             for user in token._balances.keys():
                 match user:
-                    case self.masterVault: userId = 'Contract Master Vault'
-                    case self.epVault    : userId = 'Contract EP Vault'
-                    case self.erVault    : userId = 'Contract ER Vault'
-                    case self.bntPool    : userId = 'Contract BNT Pool'
-                    case other           : userId = 'Account ' + user
-                table[symbol][userId + ' Balance'] = fromWei(token.balanceOf(user), tknDecimals)
+                    case self.masterVault: userId = ['Contract', 'Master Vault']
+                    case self.epVault    : userId = ['Contract', 'EP Vault'    ]
+                    case self.erVault    : userId = ['Contract', 'ER Vault'    ]
+                    case self.bntPool    : userId = ['Contract', 'BNT Pool'    ]
+                    case other           : userId = ['Account' , user          ]
+                table[symbol][tuple(userId)] = fromWei(token.balanceOf(user), tknDecimals)
 
             if token in reserveTokens and token is not self.bnt:
-                tkn_staked_balance = self.networkInfo.stakedBalance(token)
-                trading_liquidity = self.networkInfo.tradingLiquidity(token)
-                bnt_current_funding = self.bntPool.currentPoolFunding(token)
-                table[symbol]['Pool TKN Staked Balance'   ] = fromWei(tkn_staked_balance, tknDecimals)
-                table[symbol]['Pool TKN Trading Liquidity'] = fromWei(trading_liquidity.baseTokenTradingLiquidity, tknDecimals)
-                table[symbol]['Pool BNT Trading Liquidity'] = fromWei(trading_liquidity.bntTradingLiquidity, bntDecimals)
-                table[symbol]['Pool BNT Current Funding'  ] = fromWei(bnt_current_funding, bntDecimals)
+                stakedBalance = self.networkInfo.stakedBalance(token)
+                tradingLiquidity = self.networkInfo.tradingLiquidity(token)
+                currentPoolFunding = self.bntPool.currentPoolFunding(token)
+                table[symbol][tuple(['Pool', 'Staked Balance / TKN'   ])] = fromWei(stakedBalance, tknDecimals)
+                table[symbol][tuple(['Pool', 'Trading Liquidity / TKN'])] = fromWei(tradingLiquidity.baseTokenTradingLiquidity, tknDecimals)
+                table[symbol][tuple(['Pool', 'Trading Liquidity / BNT'])] = fromWei(tradingLiquidity.bntTradingLiquidity, bntDecimals)
+                table[symbol][tuple(['Pool', 'Current Funding / BNT'  ])] = fromWei(currentPoolFunding, bntDecimals)
 
-        return pd.DataFrame(table)
+        return pd.DataFrame(table).sort_index()
 
 # whitelisted_tokens: list = ['bnt', 'eth', 'wbtc', 'link']
 # v3 = BancorDapp(whitelisted_tokens=whitelisted_tokens)

@@ -65,7 +65,7 @@ def execute(fileName):
     pendingWithdrawals = PendingWithdrawals(network, bnt, bntPool)
     poolTokenFactory   = PoolTokenFactory()
     poolMigrator       = None
-    poolCollection     = PoolCollection(network, bnt, networkSettings, masterVault, bntPool, epVault, poolTokenFactory, poolMigrator, toPPM(flow['networkFee']))
+    poolCollection     = PoolCollection(network, bnt, networkSettings, masterVault, bntPool, epVault, poolTokenFactory, poolMigrator)
     standardRewards    = StandardRewards(network, networkSettings, bntGovernance, vbnt, bntPool);
 
     networkSettings.initialize()
@@ -86,6 +86,7 @@ def execute(fileName):
     network.createPools([tkn], poolCollection)
     bntkn = network.collectionByPool(tkn).poolToken(tkn)
 
+    poolCollection.setNetworkFeePPM(toPPM(flow['networkFee']));
     poolCollection.setTradingFeePPM(tkn, toPPM(flow['tradingFee']));
 
     tkn.issue(DEPLOYER, tknAmount);

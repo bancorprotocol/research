@@ -105,7 +105,7 @@ class BancorDapp:
         self.pendingWithdrawals = PendingWithdrawals(self.network, self.bnt, self.bntPool)
         self.poolTokenFactory   = PoolTokenFactory()
         self.poolMigrator       = None
-        self.poolCollection     = PoolCollection(self.network, self.bnt, self.networkSettings, self.masterVault, self.bntPool, self.epVault, self.poolTokenFactory, self.poolMigrator, toPPM(network_fee))
+        self.poolCollection     = PoolCollection(self.network, self.bnt, self.networkSettings, self.masterVault, self.bntPool, self.epVault, self.poolTokenFactory, self.poolMigrator)
         self.standardRewards    = StandardRewards(self.network, self.networkSettings, self.bntGovernance, self.vbnt, self.bntPool)
         self.networkInfo        = BancorNetworkInfo(self.network, self.bntGovernance, self.vbntGovernance, self.networkSettings, self.masterVault, self.epVault, self.erVault, self.bntPool, self.pendingWithdrawals, self.poolMigrator)
 
@@ -121,6 +121,8 @@ class BancorDapp:
         self.networkSettings.setMinLiquidityForTrading(toWei(bnt_min_liquidity * 2, DEFAULT_DECIMALS))
 
         self.pendingWithdrawals.setLockDuration(cooldown_time)
+
+        self.poolCollection.setNetworkFeePPM(toPPM(network_fee))
 
         self.network.registerPoolCollection(self.poolCollection)
 

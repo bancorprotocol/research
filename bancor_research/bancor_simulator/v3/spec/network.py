@@ -32,7 +32,7 @@ class BancorDapp:
         trading_fee (Decimal): This value is set on a per pool basis, however, for convenience a single input is offered
                                 here which will be used upon system genesis, and can be changed at the pool level later.
         whitelisted_tokens (List[str]): List of token tickernames indicating whitelist status approval.
-                                        (default=['link','usdc','eth','bnt','tkn', wbtc])
+                                        (default=["dai", "eth", "link", "bnt", "tkn", "wbtc"])
         bnt_virtual_balance (Decimal): BNT value provided for testing Barak's solidity output. (default=0)
         base_token_virtual_balance (Decimal): BNT value provided for testing Barak's solidity output. (default=2)
 

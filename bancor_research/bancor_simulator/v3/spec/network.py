@@ -27,7 +27,7 @@ class BancorDapp:
         withdrawal_fee (Decimal): The global exit (withdrawal) fee. (default=0.002)
         coolown_time (int): The cooldown period in days. (default=7)
         bnt_funding_limit (Decimal): The BancorDAO determines the available liquidity for trading, through adjustment
-                                    of the "BNT funding limit" parameter. (default=100000)
+                                    of the 'BNT funding limit' parameter. (default=100000)
         network_fee (Decimal): The global network fee. (default=1.002)
         trading_fee (Decimal): This value is set on a per pool basis, however, for convenience a single input is offered
                                 here which will be used upon system genesis, and can be changed at the pool level later.

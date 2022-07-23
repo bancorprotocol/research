@@ -52,16 +52,16 @@ DEFAULT_PRICE_FEEDS = pd.DataFrame(
 )
 
 def toPPM(value: Decimal):
-    return uint32(value * int(PPM_RESOLUTION))
+    return uint32(value * PPM_RESOLUTION.data)
 
 def toWei(value: Decimal, decimals: int):
     return uint256(value * 10 ** decimals)
 
 def fromWei(value: uint, decimals: int):
-    return Decimal(int(value)) / 10 ** decimals
+    return Decimal(value.data) / 10 ** decimals
 
 def toDecimal(n: uint, d: uint):
-    return Decimal(int(n)) / Decimal(int(d))
+    return Decimal(n.data) / Decimal(d.data)
 
 def updateBlock(timestamp):
     if block.timestamp < timestamp:

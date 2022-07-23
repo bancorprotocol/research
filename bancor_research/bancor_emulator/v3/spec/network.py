@@ -61,7 +61,7 @@ def fromWei(value: uint, decimals: int):
     return Decimal(value.data) / 10 ** decimals
 
 def fromFraction(n: uint, d: uint):
-    return Decimal(n.data) / Decimal(d.data)
+    return Decimal(1) if n == d else Decimal(n.data) / Decimal(d.data)
 
 def updateBlock(timestamp):
     if block.timestamp < timestamp:

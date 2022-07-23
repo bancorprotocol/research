@@ -24,7 +24,7 @@ PandasDataFrame = TypeVar("pandas.core.frame.DataFrame")
 
 DEFAULT_TIMESTAMP = 0
 DEFAULT_WHITELIST = ["dai", "eth", "link", "bnt", "tkn", "wbtc"]
-DEFAULT_USERS = ["alice", "bob", "charlie", "trader", "user", "protocol"]
+DEFAULT_USERS = ["alice", "bob", "charlie", "trader", "protocol"]
 DEFAULT_DECIMALS = 18
 DEFAULT_QDECIMALS = Decimal(10) ** -DEFAULT_DECIMALS
 DEFAULT_WITHDRAWAL_FEE = Decimal("0.0025")

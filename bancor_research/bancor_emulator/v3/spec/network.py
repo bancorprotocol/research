@@ -339,9 +339,10 @@ class BancorDapp:
         user_name: str = "protocol",
     ) -> None:
         updateBlock(timestamp)
-        for pool in [pool for pool in pools if self.reserveTokens[pool] != self.bnt]:
+        bntPriceInitialValue = self.price_feeds.at[timestamp, self.bnt.symbol().lower()]
+        for pool in [pool for pool in pools if self.reserveTokens[pool] is not self.bnt]:
             tknPrice = self.price_feeds.at[timestamp, pool]
-            bntPrice = self.price_feeds.at[timestamp, "bnt"]
+            bntPrice = bntPriceInitialValue
             while tknPrice != int(tknPrice) or bntPrice != int(bntPrice):
                 tknPrice *= 10
                 bntPrice *= 10

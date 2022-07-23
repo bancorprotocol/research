@@ -121,9 +121,9 @@ def compute_changed_bnt_trading_liquidity(
     """
     Computes the changed state values according to the swap algorithm.
     """
-    if direction == "tkn":
+    if direction == "TKN":
         return a * (b + d * x * (1 - e)) / (b + x)
-    elif direction == "bnt":
+    elif direction == "BNT":
         return (a * (a + x) + d * (1 - e) * (a * x + x**2)) / (a + d * x)
 
 
@@ -133,9 +133,9 @@ def compute_changed_tkn_trading_liquidity(
     """
     Computes the changed state values according to the swap algorithm.
     """
-    if direction == "tkn":
+    if direction == "TKN":
         return b + x
-    elif direction == "bnt":
+    elif direction == "BNT":
         return b * (a + d * x) / (a + x)
 
 
@@ -145,9 +145,9 @@ def compute_target_amt(
     """
     Computes the changed state values according to the swap algorithm.
     """
-    if direction == "tkn":
+    if direction == "TKN":
         return a * x * (1 - d) / (b + x)
-    elif direction == "bnt":
+    elif direction == "BNT":
         return b * x * (1 - d) / (a + x)
 
 
@@ -213,7 +213,7 @@ def enable_trading(state: State, tkn_name: str) -> State:
         tkn_bootstrap_liquidity = get_tkn_bootstrap_liquidity(state, tkn_name)
         state.set_tkn_trading_liquidity(tkn_name, tkn_bootstrap_liquidity)
 
-        state.set_protocol_wallet_balance("bnt", bnt_bootstrap_liquidity)
+        state.set_protocol_wallet_balance("BNT", bnt_bootstrap_liquidity)
 
     return state
 
@@ -223,7 +223,7 @@ def dao_msig_init_pools(state: State, pools: list) -> State:
     DAO msig initilizes new tokens to allow trading once specified conditions are met.
     """
     for token_name in pools:
-        if token_name != "bnt":
+        if token_name != "BNT":
             state = enable_trading(state, token_name)
     return state
 
@@ -233,10 +233,10 @@ def mint_protocol_bnt(state: State, tkn_amt: Decimal) -> State:
     Handles adjustments to the system resulting from the v3 minting BNT.
     """
     bnbnt_amt = compute_bnbnt_amt(state, tkn_amt)
-    state.increase_vault_balance("bnt", tkn_amt)
-    state.increase_pooltoken_balance("bnt", bnbnt_amt)
-    state.increase_staked_balance("bnt", tkn_amt)
-    state.increase_protocol_wallet_balance("bnt", bnbnt_amt)
+    state.increase_vault_balance("BNT", tkn_amt)
+    state.increase_pooltoken_balance("BNT", bnbnt_amt)
+    state.increase_staked_balance("BNT", tkn_amt)
+    state.increase_protocol_wallet_balance("BNT", bnbnt_amt)
     return state
 
 
@@ -251,10 +251,10 @@ def shutdown_pool(state: State, tkn_name: str) -> State:
     bnbnt_renounced = compute_bnbnt_amt(state, bnt_trading_liquidity)
 
     # adjust balances
-    state.decrease_staked_balance("bnt", bnt_trading_liquidity)
-    state.decrease_vault_balance("bnt", bnt_trading_liquidity)
-    state.decrease_pooltoken_balance("bnt", bnbnt_renounced)
-    state.decrease_protocol_wallet_balance("bnt", bnbnt_renounced)
+    state.decrease_staked_balance("BNT", bnt_trading_liquidity)
+    state.decrease_vault_balance("BNT", bnt_trading_liquidity)
+    state.decrease_pooltoken_balance("BNT", bnbnt_renounced)
+    state.decrease_protocol_wallet_balance("BNT", bnbnt_renounced)
     state.decrease_bnt_funding_amt(tkn_name, bnt_trading_liquidity)
 
     # set balances
@@ -325,9 +325,9 @@ def vortex_collection(
     """
     Computes the changed state values according to the swap algorithm.
     """
-    if direction == "tkn":
+    if direction == "TKN":
         return a * d * e * x / (b + x)
-    elif direction == "bnt":
+    elif direction == "BNT":
         return d * e * x * (a + x) / (a + d * x)
 
 
@@ -337,9 +337,9 @@ def swap_fee_collection(
     """
     Computes the swap fees according to the swap algorithm.
     """
-    if direction == "tkn":
+    if direction == "TKN":
         return a * d * x * (1 - e) / (b + x)
-    elif direction == "bnt":
+    elif direction == "BNT":
         return b * d * x * (1 - e) / (a + x)
 
 
@@ -415,9 +415,9 @@ def init_protocol(
                 cooldown_time=cooldown_time,
             )
 
-            if tkn_name == "bnt":
+            if tkn_name == "BNT":
                 # initialize vbnt tokens
-                state.tokens["vbnt"] = Tokens(
+                state.tokens["VBNT"] = Tokens(
                     trading_fee=trading_fee,
                     bnt_min_liquidity=bnt_min_liquidity,
                     network_fee=network_fee,
@@ -443,7 +443,7 @@ def init_json_simulation(state: State) -> State:
     Initializes pre-formatted JSON file containing simulation modules to run and report on.
     """
 
-    tkn_name = [tkn for tkn in state.whitelisted_tokens if tkn != "bnt"][0]
+    tkn_name = [tkn for tkn in state.whitelisted_tokens if tkn != "BNT"][0]
 
     if len(state.json_export["users"]) == 0:
         state.json_export["tradingFee"] = format_json(
@@ -471,12 +471,12 @@ def init_json_simulation(state: State) -> State:
                 state.standard_reward_programs[tkn_name].end_time, integer=True
             )
             state.json_export["bntRewardsamt"] = format_json(
-                state.standard_reward_programs["bnt"].total_staked.balance.quantize(
+                state.standard_reward_programs["BNT"].total_staked.balance.quantize(
                     DEFAULT_QDECIMALS
                 )
             )
             state.json_export["bntRewardsDuration"] = format_json(
-                state.standard_reward_programs["bnt"].end_time, integer=True
+                state.standard_reward_programs["BNT"].end_time, integer=True
             )
 
         state.json_export["tknDecimals"] = format_json(state.decimals, integer=True)
@@ -545,11 +545,11 @@ def handle_logging(
             "withdrawal_fee": [state.withdrawal_fee],
             "bnt_min_liquidity": [state.bnt_min_liquidity],
             "cooldown_time": [state.cooldown_time],
-            "protocol_wallet_bnbnt": [get_protocol_wallet_balance(state, "bnt")],
-            "vortex_bnt": [get_vortex_balance(state, "bnt")],
-            "erc20contracts_bnbnt": [get_pooltoken_balance(state, "bnt")],
-            "vault_bnt": [get_vault_balance(state, "bnt")],
-            "staked_bnt": [get_staked_balance(state, "bnt")],
+            "protocol_wallet_bnbnt": [get_protocol_wallet_balance(state, "BNT")],
+            "vortex_bnt": [get_vortex_balance(state, "BNT")],
+            "erc20contracts_bnbnt": [get_pooltoken_balance(state, "BNT")],
+            "vault_bnt": [get_vault_balance(state, "BNT")],
+            "staked_bnt": [get_staked_balance(state, "BNT")],
             "bnbnt_rate": [state.bnbnt_rate],
         }
         state.history.append(pd.DataFrame(state_variables))
@@ -623,27 +623,27 @@ def build_json_operation(
     user_name: str,
     timestamp: int,
 ) -> dict:
-    if "tkn" in state.autocompounding_reward_programs:
+    if "TKN" in state.autocompounding_reward_programs:
         program_wallet_bntkn = get_protocol_wallet_balance(state, tkn_name)
         tkn_remaining_rewards = get_autocompounding_remaining_rewards(state, tkn_name)
     else:
         program_wallet_bntkn = Decimal("0")
         tkn_remaining_rewards = Decimal("0")
 
-    if "bnt" in state.autocompounding_reward_programs:
-        bnt_remaining_rewards = get_autocompounding_remaining_rewards(state, "bnt")
+    if "BNT" in state.autocompounding_reward_programs:
+        bnt_remaining_rewards = get_autocompounding_remaining_rewards(state, "BNT")
     else:
         bnt_remaining_rewards = Decimal("0")
 
-    if "tkn" in state.standard_reward_programs:
+    if "TKN" in state.standard_reward_programs:
         er_vault_tkn = state.tokens[
             tkn_name
         ].protocol_wallet_pooltokens.balance.quantize(DEFAULT_QDECIMALS)
     else:
         er_vault_tkn = Decimal("0")
 
-    if "bnt" in state.autocompounding_reward_programs:
-        er_vault_bnt = state.tokens["bnt"].protocol_wallet_pooltokens.balance.quantize(
+    if "BNT" in state.autocompounding_reward_programs:
+        er_vault_bnt = state.tokens["BNT"].protocol_wallet_pooltokens.balance.quantize(
             DEFAULT_QDECIMALS
         )
     else:
@@ -666,8 +666,8 @@ def build_json_operation(
                 "epVault": format_json(get_external_protection_vault(state, tkn_name)),
             },
             "bntBalances": {
-                "User": format_json(get_user_balance(state, "bnt", user_name)),
-                "masterVault": format_json(get_vault_balance(state, "bnt")),
+                "User": format_json(get_user_balance(state, "BNT", user_name)),
+                "masterVault": format_json(get_vault_balance(state, "BNT")),
                 "erVault": format_json(er_vault_bnt),
             },
             "bntknBalances": {
@@ -677,14 +677,14 @@ def build_json_operation(
                 "TKNProgramWallet": format_json(program_wallet_bntkn),
             },
             "bnbntBalances": {
-                "User": format_json(get_user_balance(state, "bnbnt", user_name)),
-                "bntPool": format_json(get_protocol_wallet_balance(state, "bnt")),
+                "User": format_json(get_user_balance(state, "bnBNT", user_name)),
+                "bntPool": format_json(get_protocol_wallet_balance(state, "BNT")),
             },
             "tknRewardsRemaining": format_json(tkn_remaining_rewards),
             "bntRewardsRemaining": format_json(bnt_remaining_rewards),
             "bntCurrentPoolFunding": format_json(get_bnt_funding_amt(state, tkn_name)),
             "tknStakedBalance": format_json(get_staked_balance(state, tkn_name)),
-            "bntStakedBalance": format_json(get_staked_balance(state, "bnt")),
+            "bntStakedBalance": format_json(get_staked_balance(state, "BNT")),
             "tknTradingLiquidity": format_json(
                 get_tkn_trading_liquidity(state, tkn_name)
             ),
@@ -711,7 +711,7 @@ def build_json_operation(
 def log_json_operation(state, transaction_type, user_name, amt, timestamp):
     """Logs the latest operation for json testing."""
 
-    tkn_name = [tkn for tkn in state.whitelisted_tokens if tkn != "bnt"][0]
+    tkn_name = [tkn for tkn in state.whitelisted_tokens if tkn != "BNT"][0]
     json_operation = build_json_operation(
         state, tkn_name, amt, transaction_type, user_name, timestamp
     )
@@ -719,30 +719,30 @@ def log_json_operation(state, transaction_type, user_name, amt, timestamp):
     if transaction_type == "createAutocompoundingRewardProgramTKN":
         json_operation["amt"] = {}
         json_operation["amt"]["tknRewardsTotalamt"] = format_json(
-            state.autocompounding_reward_programs["tkn"].total_rewards
+            state.autocompounding_reward_programs["TKN"].total_rewards
         )
         json_operation["amt"]["tknRewardsStartTime"] = format_json(
-            state.autocompounding_reward_programs["tkn"].start_time, integer=True
+            state.autocompounding_reward_programs["TKN"].start_time, integer=True
         )
         json_operation["amt"]["tknRewardsType"] = str(
-            state.autocompounding_reward_programs["tkn"].distribution_type
+            state.autocompounding_reward_programs["TKN"].distribution_type
         )
         json_operation["amt"]["tknHalfLifeInDays"] = format_json(
-            state.autocompounding_reward_programs["tkn"].half_life_days, integer=True
+            state.autocompounding_reward_programs["TKN"].half_life_days, integer=True
         )
 
     if transaction_type == "createAutocompoundingRewardProgramBNT":
         state.json_export["bntRewardsTotalamt"] = format_json(
-            state.autocompounding_reward_programs["bnt"].total_rewards
+            state.autocompounding_reward_programs["BNT"].total_rewards
         )
         state.json_export["bntRewardsStartTime"] = format_json(
-            state.autocompounding_reward_programs["bnt"].start_time, integer=True
+            state.autocompounding_reward_programs["BNT"].start_time, integer=True
         )
         state.json_export["bntRewardsType"] = str(
-            state.autocompounding_reward_programs["bnt"].distribution_type
+            state.autocompounding_reward_programs["BNT"].distribution_type
         )
         state.json_export["bntHalfLifeInDays"] = format_json(
-            state.autocompounding_reward_programs["bnt"].half_life_days, integer=True
+            state.autocompounding_reward_programs["BNT"].half_life_days, integer=True
         )
 
     return json_operation
@@ -760,12 +760,12 @@ def validate_input(
     """
 
     try:
-        tkn_name = tkn_name.lower()
+        tkn_name = tkn_name
     except ValueError("tkn_name must be type String") as e:
         print(e)
 
     try:
-        user_name = user_name.lower()
+        user_name = user_name
     except ValueError("user_name must be type String") as e:
         print(e)
 
@@ -806,10 +806,10 @@ def setup_json_simulation(
             state.standard_reward_programs[id_number].end_time = int(
                 json_data["tknRewardsDuration"]
             )
-            state.standard_reward_programs["bnt"].total_rewards = Decimal(
+            state.standard_reward_programs["BNT"].total_rewards = Decimal(
                 json_data["bntRewardsamt"]
             )
-            state.standard_reward_programs["bnt"].end_time = int(
+            state.standard_reward_programs["BNT"].end_time = int(
                 json_data["bntRewardsDuration"]
             )
         except:
@@ -833,7 +833,7 @@ def setup_json_simulation(
     state.bnt_funding_limit = Decimal(json_data["bntFundingLimit"])
     state.trading_fee = trading_fee
 
-    for tkn_name in ["bnt", tkn_name]:
+    for tkn_name in ["BNT", tkn_name]:
         state.tokens[tkn_name].trading_fee = trading_fee
         state.tokens[tkn_name].bnt_min_liquidity = state.bnt_min_liquidity
         state.tokens[tkn_name].bnt_funding_limit = state.bnt_funding_limit
@@ -843,8 +843,8 @@ def setup_json_simulation(
         state.create_user(user_name)
         tknBalance = Decimal(user["tknBalance"])
         bntBalance = Decimal(user["bntBalance"])
-        state.set_user_balance(user_name, "bnt", bntBalance)
-        state.set_user_balance(user_name, "tkn", tknBalance)
+        state.set_user_balance(user_name, "BNT", bntBalance)
+        state.set_user_balance(user_name, "TKN", tknBalance)
 
     # set data to iterate
     state.json_data = json_data

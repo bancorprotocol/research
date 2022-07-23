@@ -38,8 +38,8 @@ PRECISION = 155
 
 # Configurable Genesis Variables
 DEFAULT_TIMESTAMP = 0
-DEFAULT_WHITELIST = ["dai", "eth", "link", "bnt", "tkn", "wbtc"]
-DEFAULT_USERS = ["alice", "bob", "charlie", "trader", "protocol"]
+DEFAULT_WHITELIST = ["DAI", "ETH", "LINK", "BNT", "TKN", "WBTC"]
+DEFAULT_USERS = ["Alice", "Bob", "Charlie", "Trader", "Protocol"]
 DEFAULT_DECIMALS = 18
 DEFAULT_QDECIMALS = Decimal(10) ** -DEFAULT_DECIMALS
 DEFAULT_PRICE_FEEDS_PATH = (
@@ -60,12 +60,12 @@ DEFAULT_NUM_TIMESTAMPS = SECONDS_PER_DAY * 30
 DEFAULT_PRICE_FEEDS = pd.DataFrame(
     {
         "INDX": (0 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
-        "vbnt": (1.0 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
-        "tkn": (2.5 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
-        "bnt": (2.5 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
-        "link": (15.00 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
-        "eth": (2500.00 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
-        "wbtc": (40000.00 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
+        "VBNT": (1.0 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
+        "TKN": (2.5 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
+        "BNT": (2.5 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
+        "LINK": (15.00 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
+        "ETH": (2500.00 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
+        "WBTC": (40000.00 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
     }
 )
 
@@ -284,7 +284,7 @@ class Tokens(GlobalSettings):
         Returns the price of the current vbnt token. Only valid when name==bnt
         """
         assert (
-            self.name == "bnt"
+            self.name == "BNT"
         ), f"vbnt_price attempted to be accessed in {self.name} state, call bnt state instead"
         return self._vbnt_price
 
@@ -507,7 +507,7 @@ class State(GlobalSettings):
         """
         Returns the bnt price feed at the current timestamp.
         """
-        return Decimal(self.price_feeds.at[self.timestamp, "bnt"])
+        return Decimal(self.price_feeds.at[self.timestamp, "BNT"])
 
     @property
     def bnt_virtual_balance(self) -> Decimal:
@@ -522,15 +522,15 @@ class State(GlobalSettings):
         Returns the inverse of the bnt price feed at the current timestamp
         """
         if (
-            self.tokens["bnt"].staking_ledger.balance.quantize(DEFAULT_QDECIMALS) == 0
-            and self.tokens["bnt"].pooltoken_supply.balance.quantize(DEFAULT_QDECIMALS)
+            self.tokens["BNT"].staking_ledger.balance.quantize(DEFAULT_QDECIMALS) == 0
+            and self.tokens["BNT"].pooltoken_supply.balance.quantize(DEFAULT_QDECIMALS)
             == 0
         ):
             bnbnt_rate = Decimal("1")
         else:
             bnbnt_rate = Decimal(
-                self.tokens["bnt"].pooltoken_supply.balance.quantize(DEFAULT_QDECIMALS)
-                / self.tokens["bnt"].staking_ledger.balance.quantize(DEFAULT_QDECIMALS)
+                self.tokens["BNT"].pooltoken_supply.balance.quantize(DEFAULT_QDECIMALS)
+                / self.tokens["BNT"].staking_ledger.balance.quantize(DEFAULT_QDECIMALS)
             )
         return bnbnt_rate
 
@@ -964,9 +964,9 @@ class State(GlobalSettings):
                 self.users[user_name].wallet[get_pooltoken_name(tkn_name)] = Token(
                     balance=Decimal("0")
                 )
-            if tkn_name == "bnt":
-                if "vbnt" not in self.users[user_name].wallet:
-                    self.users[user_name].wallet["vbnt"] = Token(balance=Decimal("0"))
+            if tkn_name == "BNT":
+                if "VBNT" not in self.users[user_name].wallet:
+                    self.users[user_name].wallet["VBNT"] = Token(balance=Decimal("0"))
 
     def update_inv_spot_rate(self, tkn_name: str):
         """
@@ -1408,7 +1408,7 @@ def get_tkn_price(state: State, tkn_name: str) -> Decimal:
     """
     return (
         state.tokens[tkn_name].vbnt_price.quantize(DEFAULT_QDECIMALS)
-        if tkn_name == "vbnt"
+        if tkn_name == "VBNT"
         else Decimal(state.price_feeds.at[state.timestamp, tkn_name])
     )
 
@@ -1429,7 +1429,7 @@ def get_prices(state: State, tkn_name: str) -> Tuple[Decimal, Decimal]:
     """
     Returns tkn & bnt price from the price feed.
     """
-    return get_tkn_price(state, tkn_name), get_tkn_price(state, "bnt")
+    return get_tkn_price(state, tkn_name), get_tkn_price(state, "BNT")
 
 
 def get_is_ema_update_allowed(state: State, tkn_name: str) -> bool:
@@ -1447,7 +1447,7 @@ def get_total_bnt_trading_liquidity(state: State) -> Decimal:
         [
             state.tokens[name].bnt_trading_liquidity.balance.quantize(DEFAULT_QDECIMALS)
             for name in state.whitelisted_tokens
-            if name != "bnt"
+            if name != "BNT"
         ]
     )
 
@@ -1477,7 +1477,7 @@ def get_trading_liquidity_description(state: State, qdecimals: Decimal) -> list:
         f"bnt={get_bnt_trading_liquidity(state, tkn_name).quantize(qdecimals)} {tkn_name}="
         + str(get_tkn_trading_liquidity(state, tkn_name).quantize(qdecimals))
         for tkn_name in state.whitelisted_tokens
-        if tkn_name != "bnt"
+        if tkn_name != "BNT"
     ]
 
 
@@ -1485,10 +1485,10 @@ def get_vault_description(state: State, qdecimals: Decimal) -> list:
     """
     Builds a structured list for current state information display.
     """
-    return [f"bnt={get_vault_balance(state, 'bnt').quantize(qdecimals)}"] + [
+    return [f"bnt={get_vault_balance(state, 'BNT').quantize(qdecimals)}"] + [
         f"{tkn_name}=" + str(get_vault_balance(state, tkn_name).quantize(qdecimals))
         for tkn_name in state.whitelisted_tokens
-        if tkn_name != "bnt"
+        if tkn_name != "BNT"
     ]
 
 
@@ -1496,10 +1496,10 @@ def get_staking_description(state: State, qdecimals: Decimal) -> list:
     """
     Builds a structured list for current state information display.
     """
-    return [f"bnt={get_staked_balance(state, 'bnt').quantize(qdecimals)}"] + [
+    return [f"bnt={get_staked_balance(state, 'BNT').quantize(qdecimals)}"] + [
         f"{tkn_name}=" + str(get_staked_balance(state, tkn_name).quantize(qdecimals))
         for tkn_name in state.whitelisted_tokens
-        if tkn_name != "bnt"
+        if tkn_name != "BNT"
     ]
 
 
@@ -1507,11 +1507,11 @@ def get_pooltoken_description(state: State, qdecimals: Decimal) -> list:
     """
     Builds a structured list for current state information display.
     """
-    return [f"bnbnt={get_pooltoken_balance(state, 'bnt').quantize(qdecimals)}"] + [
+    return [f"bnbnt={get_pooltoken_balance(state, 'BNT').quantize(qdecimals)}"] + [
         f"bn{tkn_name}="
         + str(get_pooltoken_balance(state, tkn_name).quantize(qdecimals))
         for tkn_name in state.whitelisted_tokens
-        if tkn_name != "bnt"
+        if tkn_name != "BNT"
     ]
 
 
@@ -1519,7 +1519,7 @@ def get_vortex_description(state: State, qdecimals: Decimal) -> list:
     """
     Builds a structured list for current state information display.
     """
-    return ["bnt=" + str(get_vortex_balance(state, "bnt").quantize(qdecimals))] + [
+    return ["bnt=" + str(get_vortex_balance(state, "BNT").quantize(qdecimals))] + [
         "" for x in range(len(state.whitelisted_tokens[:-1]))
     ]
 
@@ -1540,7 +1540,7 @@ def get_protocol_wallet_description(state: State, qdecimals: Decimal) -> list:
     Builds a structured list for current state information display.
     """
     return [
-        f"bnbnt=" + str(get_protocol_wallet_balance(state, "bnt").quantize(qdecimals))
+        f"bnbnt=" + str(get_protocol_wallet_balance(state, "BNT").quantize(qdecimals))
     ] + ["" for tkn_name in state.whitelisted_tokens[:-1]]
 
 
@@ -1579,7 +1579,7 @@ def get_json_virtual_balances(state: State, tkn_name: str) -> dict:
     """
     return {
         "bntVirtualBalance": state.price_feeds[tkn_name].values[0],
-        "baseTokenVirtualBalance": state.price_feeds["bnt"].values[0],
+        "baseTokenVirtualBalance": state.price_feeds["BNT"].values[0],
     }
 
 
@@ -1590,7 +1590,7 @@ def get_max_bnt_deposit(
     """
     Used in simulation only.
     """
-    return max(get_pooltoken_balance(state, "bnt"), user_bnt)
+    return max(get_pooltoken_balance(state, "BNT"), user_bnt)
 
 
 def get_network_fee(state: State, tkn_name: str) -> Decimal:

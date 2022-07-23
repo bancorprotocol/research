@@ -32,7 +32,7 @@ class BancorDapp:
         trading_fee (Decimal): This value is set on a per pool basis, however, for convenience a single input is offered
                                 here which will be used upon system genesis, and can be changed at the pool level later.
         whitelisted_tokens (List[str]): List of token tickernames indicating whitelist status approval.
-                                        (default=["dai", "eth", "link", "bnt", "tkn", "wbtc"])
+                                        (default=["DAI", "ETH", "LINK", "BNT", "TKN", "WBTC"])
         bnt_virtual_balance (Decimal): BNT value provided for testing Barak's solidity output. (default=0)
         base_token_virtual_balance (Decimal): BNT value provided for testing Barak's solidity output. (default=2)
 
@@ -67,7 +67,7 @@ class BancorDapp:
 
         if price_feeds is None:
             price_feeds = pd.read_parquet(price_feeds_path)
-            price_feeds.columns = [col.lower() for col in price_feeds.columns]
+            price_feeds.columns = [col for col in price_feeds.columns]
 
         state = State(
             transaction_id=transaction_id,
@@ -248,7 +248,7 @@ class BancorDapp:
             state, tkn_name, tkn_amt, user_name, timestamp
         )
 
-        if tkn_name == "bnt":
+        if tkn_name == "BNT":
             state = deposit_bnt(
                 state=state, tkn_name=tkn_name, tkn_amt=tkn_amt, user_name=user_name
             )
@@ -342,8 +342,8 @@ class BancorDapp:
         Main withdrawal logic based on the withdraw algorithm of the BIP15 spec.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        user_name = user_name.lower()
-        tkn_name = tkn_name.lower()
+        user_name = user_name
+        tkn_name = tkn_name
         state = process_withdrawal(
             state, user_name, id_number, timestamp, tkn_name, tkn_amt
         )
@@ -364,15 +364,15 @@ class BancorDapp:
         tkn_name: str = None,
         timestamp: int = 0,
         transaction_type: str = "enableTrading",
-        user_name: str = "protocol",
+        user_name: str = "Protocol",
     ) -> None:
         """
         DAO msig initilizes new tokens to allow trading once specified conditions are met.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
         state.timestamp = timestamp
-        user_name = user_name.lower()
-        tkn_name = tkn_name.lower()
+        user_name = user_name
+        tkn_name = tkn_name
         state = dao_msig_init_pools(state, pools)
         amt = get_json_virtual_balances(state, tkn_name)
         self.next_transaction(state)
@@ -413,7 +413,7 @@ class BancorDapp:
         Creates a new whitelisted token with initialized starting balances
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        tkn_name = tkn_name.lower()
+        tkn_name = tkn_name
         state.create_whitelisted_tkn(tkn_name)
         self.next_transaction(state)
         handle_logging(
@@ -430,7 +430,7 @@ class BancorDapp:
         Creates a new user with a valid wallet
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        state.create_user(user_name.lower())
+        state.create_user(user_name)
         self.next_transaction(state)
         handle_logging(
             "NA", Decimal("0"), f"create_{user_name}", "NA", state.transaction_id, state
@@ -438,16 +438,16 @@ class BancorDapp:
 
     def distribute_autocompounding_program(
         self,
-        tkn_name: str = "tkn",
+        tkn_name: str = "TKN",
         timestamp: int = 0,
         transaction_type: str = "distribute_autocompounding_program",
-        user_name: str = "protocol",
+        user_name: str = "Protocol",
     ):
         """
         Distribute auto-compounding program.
         """
-        user_name = user_name.lower()
-        tkn_name = tkn_name.lower()
+        user_name = user_name
+        tkn_name = tkn_name
         state = self.get_state(copy_type="initial", timestamp=timestamp)
         state = distribute_autocompounding_program(
             state=state, tkn_name=tkn_name, timestamp=timestamp
@@ -459,11 +459,11 @@ class BancorDapp:
             )
             self.global_state.json_export["operations"].append(json_operation)
 
-    def load_json_simulation(self, path, tkn_name="tkn", timestamp: int = 0):
+    def load_json_simulation(self, path, tkn_name="TKN", timestamp: int = 0):
         """
         Loads a JSON file containing simulation modules to run and report on.
         """
-        tkn_name = tkn_name.lower()
+        tkn_name = tkn_name
         state = self.get_state(copy_type="initial", timestamp=timestamp)
         json_data = BancorDapp.load_json(path)
         state = setup_json_simulation(state, json_data, tkn_name)
@@ -487,8 +487,8 @@ class BancorDapp:
         Creates a new autocompounding program.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        user_name = user_name.lower()
-        tkn_name = tkn_name.lower()
+        user_name = user_name
+        tkn_name = tkn_name
         if total_duration_in_seconds == 0 and total_duration_in_days != 0:
             total_duration_in_seconds = Decimal(f"{SECONDS_PER_DAY}") * Decimal(
                 total_duration_in_days
@@ -496,7 +496,7 @@ class BancorDapp:
 
         program_id = state.autocompounding_programs_count + 1
 
-        if tkn_name != "bnt":
+        if tkn_name != "BNT":
             program_wallet_bntkn = self.deposit(
                 tkn_name=tkn_name,
                 tkn_amt=total_rewards,
@@ -505,7 +505,7 @@ class BancorDapp:
             )
             state.decrease_protocol_wallet_balance(tkn_name, program_wallet_bntkn)
         else:
-            program_wallet_bntkn = get_protocol_wallet_balance(state, "bnt")
+            program_wallet_bntkn = get_protocol_wallet_balance(state, "BNT")
 
         if timestamp >= start_time:
             is_active = True
@@ -557,7 +557,7 @@ class BancorDapp:
         state, tkn_name, tkn_amt, user_name = validate_input(
             state, tkn_name, tkn_amt, user_name, timestamp
         )
-        if tkn_name != "bnt":
+        if tkn_name != "BNT":
             state.decrease_pooltoken_balance(tkn_name, tkn_amt)
             state.decrease_user_balance(
                 user_name, get_pooltoken_name(tkn_name), tkn_amt
@@ -596,7 +596,7 @@ class BancorDapp:
         state = create_standard_reward_program(
             state=state,
             tkn_name=tkn_name,
-            rewards_token="bnt",
+            rewards_token="BNT",
             total_rewards=tkn_amt,
             start_time=start_time,
             end_time=end_time,
@@ -722,8 +722,8 @@ class BancorDapp:
         Sets user balance at the network interface level for convenience.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        user_name = user_name.lower()
-        tkn_name = tkn_name.lower()
+        user_name = user_name
+        tkn_name = tkn_name
         state.set_user_balance(user_name, tkn_name, tkn_amt)
         self.next_transaction(state)
         handle_logging(
@@ -747,13 +747,13 @@ class BancorDapp:
         value: Decimal,
         timestamp: int = 0,
         transaction_type: str = "set trading fee",
-        user_name: str = "protocol",
+        user_name: str = "Protocol",
     ):
         """
         Sets the system trading fee at the network interface level for convenience.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        tkn_name = tkn_name.lower()
+        tkn_name = tkn_name
         state.set_trading_fee(tkn_name, value)
         self.next_transaction(state)
         handle_logging(
@@ -772,13 +772,13 @@ class BancorDapp:
         value: Decimal,
         timestamp: int = 0,
         transaction_type: str = "set network fee",
-        user_name: str = "protocol",
+        user_name: str = "Protocol",
     ):
         """
         Sets the system network fee at the network interface level for convenience.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        tkn_name = tkn_name.lower()
+        tkn_name = tkn_name
         state.set_network_fee(tkn_name, value)
         self.next_transaction(state)
         handle_logging(
@@ -797,13 +797,13 @@ class BancorDapp:
         value: Decimal,
         timestamp: int = 0,
         transaction_type: str = "set withdrawal fee",
-        user_name: str = "protocol",
+        user_name: str = "Protocol",
     ):
         """
         Sets the system withdrawal fee at the network interface level for convenience.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        tkn_name = tkn_name.lower()
+        tkn_name = tkn_name
         state.set_withdrawal_fee(tkn_name, value)
         self.next_transaction(state)
         handle_logging(
@@ -822,13 +822,13 @@ class BancorDapp:
         value: Decimal,
         timestamp: int = 0,
         transaction_type: str = "set bnt funding limit",
-        user_name: str = "protocol",
+        user_name: str = "Protocol",
     ):
         """
         Sets the system withdrawal fee at the network interface level for convenience.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        tkn_name = tkn_name.lower()
+        tkn_name = tkn_name
         state.set_bnt_funding_limit(tkn_name, value)
         self.next_transaction(state)
         handle_logging(

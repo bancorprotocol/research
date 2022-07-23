@@ -23,8 +23,8 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 PandasDataFrame = TypeVar("pandas.core.frame.DataFrame")
 
 DEFAULT_TIMESTAMP = 0
-DEFAULT_WHITELIST = ["dai", "eth", "link", "bnt", "tkn", "wbtc"]
-DEFAULT_USERS = ["alice", "bob", "charlie", "trader", "protocol"]
+DEFAULT_WHITELIST = ["DAI", "ETH", "LINK", "BNT", "TKN", "WBTC"]
+DEFAULT_USERS = ["Alice", "Bob", "Charlie", "Trader", "Protocol"]
 DEFAULT_DECIMALS = 18
 DEFAULT_QDECIMALS = Decimal(10) ** -DEFAULT_DECIMALS
 DEFAULT_WITHDRAWAL_FEE = Decimal("0.0025")
@@ -42,12 +42,12 @@ DEFAULT_PRICE_FEEDS_PATH = (
 DEFAULT_PRICE_FEEDS = pd.DataFrame(
     {
         "INDX": (0 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
-        "vbnt": (1.0 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
-        "tkn": (2.5 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
-        "bnt": (2.5 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
-        "link": (15.00 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
-        "eth": (2500.00 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
-        "wbtc": (40000.00 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
+        "VBNT": (1.0 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
+        "TKN": (2.5 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
+        "BNT": (2.5 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
+        "LINK": (15.00 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
+        "ETH": (2500.00 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
+        "WBTC": (40000.00 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
     }
 )
 
@@ -129,9 +129,9 @@ class BancorDapp:
 
         self.network.registerPoolCollection(self.poolCollection)
 
-        self.reserveTokens = {'bnt': self.bnt}
-        self.poolTokens = {'bnbnt': self.bnbnt}
-        for tkn_name in [tkn_name for tkn_name in whitelisted_tokens if tkn_name != 'bnt']:
+        self.reserveTokens = {'BNT': self.bnt}
+        self.poolTokens = {'bnBNT': self.bnbnt}
+        for tkn_name in [tkn_name for tkn_name in whitelisted_tokens if tkn_name != 'BNT']:
             tkn = ReserveToken(tkn_name, tkn_name, DEFAULT_DECIMALS) # TODO: support decimals per reserve token
             self.networkSettings.addTokenToWhitelist(tkn)
             self.networkSettings.setFundingLimit(tkn, toWei(bnt_funding_limit, DEFAULT_DECIMALS))
@@ -142,7 +142,7 @@ class BancorDapp:
 
         if price_feeds is None:
             price_feeds = pd.read_parquet(price_feeds_path)
-            price_feeds.columns = [col.lower() for col in price_feeds.columns]
+            price_feeds.columns = [col for col in price_feeds.columns]
         self.price_feeds = price_feeds
 
     def deposit(
@@ -290,7 +290,7 @@ class BancorDapp:
         value: Decimal,
         timestamp: int = 0,
         transaction_type: str = "set trading fee",
-        user_name: str = "protocol",
+        user_name: str = "Protocol",
     ):
         updateBlock(timestamp)
         self.poolCollection.setTradingFeePPM(self.reserveTokens[tkn_name], toPPM(value))
@@ -301,7 +301,7 @@ class BancorDapp:
         value: Decimal,
         timestamp: int = 0,
         transaction_type: str = "set network fee",
-        user_name: str = "protocol",
+        user_name: str = "Protocol",
     ):
         updateBlock(timestamp)
         self.poolCollection.setNetworkFeePPM(toPPM(value))
@@ -312,7 +312,7 @@ class BancorDapp:
         value: Decimal,
         timestamp: int = 0,
         transaction_type: str = "set withdrawal fee",
-        user_name: str = "protocol",
+        user_name: str = "Protocol",
     ):
         updateBlock(timestamp)
         self.networkSettings.setWithdrawalFeePPM(toPPM(value))
@@ -323,7 +323,7 @@ class BancorDapp:
         value: Decimal,
         timestamp: int = 0,
         transaction_type: str = "set bnt funding limit",
-        user_name: str = "protocol",
+        user_name: str = "Protocol",
     ):
         updateBlock(timestamp)
         tkn = self.reserveTokens[tkn_name]
@@ -336,12 +336,12 @@ class BancorDapp:
         tkn_name: str = None,
         timestamp: int = 0,
         transaction_type: str = "enableTrading",
-        user_name: str = "protocol",
+        user_name: str = "Protocol",
     ) -> None:
         updateBlock(timestamp)
         for pool in [pool for pool in pools if self.reserveTokens[pool] != self.bnt]:
             tknPrice = self.price_feeds.at[timestamp, pool]
-            bntPrice = self.price_feeds.at[timestamp, "bnt"]
+            bntPrice = self.price_feeds.at[timestamp, "BNT"]
             while tknPrice != int(tknPrice) or bntPrice != int(bntPrice):
                 tknPrice *= 10
                 bntPrice *= 10
@@ -395,5 +395,5 @@ class BancorDapp:
 
         return pd.DataFrame(table).sort_index()
 
-# whitelisted_tokens: list = ['bnt', 'eth', 'wbtc', 'link']
+# whitelisted_tokens: list = ['BNT', 'ETH', 'WBTC', 'LINK']
 # v3 = BancorDapp(whitelisted_tokens=whitelisted_tokens)

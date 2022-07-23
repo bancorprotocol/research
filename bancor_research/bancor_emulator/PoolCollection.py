@@ -93,6 +93,7 @@ class PoolCollection(contract, BlockNumber):
     LIQUIDITY_GROWTH_FACTOR = uint256(2);
     BOOTSTRAPPING_LIQUIDITY_BUFFER_FACTOR = uint256(2);
     DEFAULT_TRADING_FEE_PPM = uint32(2_000); # 0.2%
+    DEFAULT_NETWORK_FEE_PPM = uint32(200_000); # 20%
     RATE_MAX_DEVIATION_PPM = uint32(10_000); # %1
     RATE_RESET_BLOCK_THRESHOLD = uint32(100);
 
@@ -133,8 +134,7 @@ class PoolCollection(contract, BlockNumber):
         initBNTPool,
         initExternalProtectionVault,
         initPoolTokenFactory,
-        initPoolMigrator,
-        initNetworkFeePPM
+        initPoolMigrator
     ) -> None:
         contract.__init__(self)
         BlockNumber.__init__(self)
@@ -147,7 +147,6 @@ class PoolCollection(contract, BlockNumber):
         self._externalProtectionVault = initExternalProtectionVault;
         self._poolTokenFactory = initPoolTokenFactory;
         self._poolMigrator = initPoolMigrator;
-        self._networkFeePPM = uint32(initNetworkFeePPM);
 
         # a mapping between tokens and their pools
         self._poolData = mapping(lambda: Pool());
@@ -158,15 +157,20 @@ class PoolCollection(contract, BlockNumber):
         # the default trading fee (in units of PPM)
         self._defaultTradingFeePPM = uint32();
 
+        # true if protection is enabled, false otherwise
         self._protectionEnabled = True;
 
+        # the global network fee (in units of PPM)
+        self._networkFeePPM = uint32();
+
         self._setDefaultTradingFeePPM(self.DEFAULT_TRADING_FEE_PPM);
+        self._setNetworkFeePPM(self.DEFAULT_NETWORK_FEE_PPM);
 
     '''
      * @inheritdoc IVersioned
     '''
     def version(self) -> (int):
-        return 8;
+        return 9;
 
     '''
      * @inheritdoc IPoolCollection
@@ -207,6 +211,16 @@ class PoolCollection(contract, BlockNumber):
     '''
     def setDefaultTradingFeePPM(self, newDefaultTradingFeePPM) -> None:
         self._setDefaultTradingFeePPM(newDefaultTradingFeePPM);
+
+    '''
+     * @dev sets the network fee (in units of PPM)
+     *
+     * requirements:
+     *
+     * - the caller must be the owner of the contract
+    '''
+    def setNetworkFeePPM(self, newNetworkFeePPM) -> None:
+        self._setNetworkFeePPM(newNetworkFeePPM);
 
     '''
      * @dev enables/disables protection
@@ -902,6 +916,16 @@ class PoolCollection(contract, BlockNumber):
             return;
 
         self._defaultTradingFeePPM = uint32(newDefaultTradingFeePPM);
+
+    '''
+     * @dev sets the network fee (in units of PPM)
+    '''
+    def _setNetworkFeePPM(self, newNetworkFeePPM) -> None:
+        prevNetworkFeePPM = self._networkFeePPM;
+        if (prevNetworkFeePPM == newNetworkFeePPM):
+            return;
+
+        self._networkFeePPM = uint32(newNetworkFeePPM);
 
     '''
      * @dev returns a storage reference to pool data

@@ -60,6 +60,9 @@ def toWei(value: Decimal, decimals: int):
 def fromWei(value: uint, decimals: int):
     return Decimal(int(value)) / 10 ** decimals
 
+def toDecimal(n: uint, d: uint):
+    return Decimal(int(n)) / Decimal(int(d))
+
 def updateBlock(timestamp):
     if block.timestamp < timestamp:
         block.timestamp = timestamp
@@ -373,10 +376,22 @@ class BancorDapp:
                 stakedBalance = self.networkInfo.stakedBalance(token)
                 tradingLiquidity = self.networkInfo.tradingLiquidity(token)
                 currentPoolFunding = self.bntPool.currentPoolFunding(token)
-                table[symbol][tuple(['Pool', 'Staked Balance / TKN'   ])] = fromWei(stakedBalance, tknDecimals)
-                table[symbol][tuple(['Pool', 'Trading Liquidity / TKN'])] = fromWei(tradingLiquidity.baseTokenTradingLiquidity, tknDecimals)
-                table[symbol][tuple(['Pool', 'Trading Liquidity / BNT'])] = fromWei(tradingLiquidity.bntTradingLiquidity, bntDecimals)
-                table[symbol][tuple(['Pool', 'Current Funding / BNT'  ])] = fromWei(currentPoolFunding, bntDecimals)
+
+                table[symbol][tuple(['Pool', 'a: TKN Staked Balance'   ])] = fromWei(stakedBalance, tknDecimals)
+                table[symbol][tuple(['Pool', 'b: TKN Trading Liquidity'])] = fromWei(tradingLiquidity.baseTokenTradingLiquidity, tknDecimals)
+                table[symbol][tuple(['Pool', 'c: BNT Trading Liquidity'])] = fromWei(tradingLiquidity.bntTradingLiquidity, bntDecimals)
+                table[symbol][tuple(['Pool', 'd: BNT Current Funding'  ])] = fromWei(currentPoolFunding, bntDecimals)
+
+                spotRateN       = self.poolCollection._poolData[token].liquidity.bntTradingLiquidity
+                spotRateD       = self.poolCollection._poolData[token].liquidity.baseTokenTradingLiquidity
+                averageRateN    = self.poolCollection._poolData[token].averageRates.rate.n
+                averageRateD    = self.poolCollection._poolData[token].averageRates.rate.d
+                averageInvRateN = self.poolCollection._poolData[token].averageRates.invRate.n
+                averageInvRateD = self.poolCollection._poolData[token].averageRates.invRate.d
+
+                table[symbol][tuple(['Pool', 'e: Spot Rate'           ])] = toDecimal(spotRateN      , spotRateD      )
+                table[symbol][tuple(['Pool', 'f: Average Rate'        ])] = toDecimal(averageRateN   , averageRateD   )
+                table[symbol][tuple(['Pool', 'g: Average Inverse Rate'])] = toDecimal(averageInvRateN, averageInvRateD)
 
         return pd.DataFrame(table).sort_index()
 

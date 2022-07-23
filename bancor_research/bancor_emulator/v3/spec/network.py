@@ -60,7 +60,7 @@ def toWei(value: Decimal, decimals: int):
 def fromWei(value: uint, decimals: int):
     return Decimal(value.data) / 10 ** decimals
 
-def toDecimal(n: uint, d: uint):
+def fromFraction(n: uint, d: uint):
     return Decimal(n.data) / Decimal(d.data)
 
 def updateBlock(timestamp):
@@ -389,9 +389,9 @@ class BancorDapp:
                 averageInvRateN = self.poolCollection._poolData[token].averageRates.invRate.n
                 averageInvRateD = self.poolCollection._poolData[token].averageRates.invRate.d
 
-                table[symbol][tuple(['Pool', 'e: Spot Rate'           ])] = toDecimal(spotRateN      , spotRateD      )
-                table[symbol][tuple(['Pool', 'f: Average Rate'        ])] = toDecimal(averageRateN   , averageRateD   )
-                table[symbol][tuple(['Pool', 'g: Average Inverse Rate'])] = toDecimal(averageInvRateN, averageInvRateD)
+                table[symbol][tuple(['Pool', 'e: Spot Rate'           ])] = fromFraction(spotRateN      , spotRateD      )
+                table[symbol][tuple(['Pool', 'f: Average Rate'        ])] = fromFraction(averageRateN   , averageRateD   )
+                table[symbol][tuple(['Pool', 'g: Average Inverse Rate'])] = fromFraction(averageInvRateN, averageInvRateD)
 
         return pd.DataFrame(table).sort_index()
 

@@ -121,7 +121,7 @@ class BancorDapp:
         self.networkInfo.initialize()
 
         self.networkSettings.setWithdrawalFeePPM(toPPM(withdrawal_fee))
-        self.networkSettings.setMinLiquidityForTrading(toWei(bnt_min_liquidity * 2, DEFAULT_DECIMALS))
+        self.networkSettings.setMinLiquidityForTrading(toWei(bnt_min_liquidity, DEFAULT_DECIMALS))
 
         self.pendingWithdrawals.setLockDuration(cooldown_time)
 

@@ -3,7 +3,6 @@
 </p>
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-netlify env:set SECRET_KEY secretValue
 
 # Bancor Simulator
 

@@ -7,6 +7,7 @@
 import json
 import pickle
 import cloudpickle
+import pandas as pd
 
 from bancor_research.bancor_simulator.v3.spec.actions import *
 from bancor_research.bancor_simulator.v3.spec.rewards import *
@@ -342,7 +343,6 @@ class BancorDapp:
         Main withdrawal logic based on the withdraw algorithm of the BIP15 spec.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        user_name = user_name.lower()
         tkn_name = tkn_name.lower()
         state = process_withdrawal(
             state, user_name, id_number, timestamp, tkn_name, tkn_amt
@@ -371,7 +371,6 @@ class BancorDapp:
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
         state.timestamp = timestamp
-        user_name = user_name.lower()
         tkn_name = tkn_name.lower()
         state = dao_msig_init_pools(state, pools)
         amt = get_json_virtual_balances(state, tkn_name)
@@ -390,17 +389,37 @@ class BancorDapp:
             )
             self.global_state.json_export["operations"].append(json_operation)
 
-    def describe(self, rates: bool = False, decimals: int = 6):
+    def describe(self, decimals: int = -1):
         """
-        Describes the state ledger balances in a format similar to BIP15 documentation.
+        Describes the state ledger in a format similar to BIP15 documentation.
         """
-        return describe(self.global_state, rates=rates, decimals=decimals)
+        table = {}
 
-    def describe_rates(self):
-        """
-        Describes the state variable rates in a format similar to BIP15 documentation.
-        """
-        return describe_rates(self.global_state)
+        state = self.global_state
+
+        for tkn_name in state.whitelisted_tokens + ["bn" + tkn_name for tkn_name in state.whitelisted_tokens]:
+            table[tkn_name] = {}
+
+            for username in state.usernames:
+                table[tkn_name][tuple(["Account", username])] = state.users[username].wallet[tkn_name].balance
+
+        for tkn_name in state.whitelisted_tokens:
+            table[       tkn_name][tuple(["Contract", "Master Vault"])] = state.tokens[tkn_name].master_vault.balance
+            table[       tkn_name][tuple(["Contract", "EP Vault"    ])] = state.tokens[tkn_name].external_protection_vault.balance
+            table[       tkn_name][tuple(["Contract", "ER Vault"    ])] = state.tokens[tkn_name].standard_rewards_vault.balance
+            table["bn" + tkn_name][tuple(["Contract", "Protocol"    ])] = state.tokens[tkn_name].protocol_wallet_pooltokens.balance
+
+        for tkn_name in [tkn_name for tkn_name in state.whitelisted_tokens if tkn_name != "bnt"]:
+            table[tkn_name][tuple(["Pool", "a: TKN Staked Balance"   ])] = state.tokens[tkn_name].staking_ledger.balance
+            table[tkn_name][tuple(["Pool", "b: TKN Trading Liquidity"])] = state.tokens[tkn_name].tkn_trading_liquidity.balance
+            table[tkn_name][tuple(["Pool", "c: BNT Trading Liquidity"])] = state.tokens[tkn_name].bnt_trading_liquidity.balance
+            table[tkn_name][tuple(["Pool", "d: BNT Current Funding"  ])] = state.tokens[tkn_name].bnt_funding_amt.balance
+            table[tkn_name][tuple(["Pool", "e: Spot Rate"            ])] = state.tokens[tkn_name].spot_rate
+            table[tkn_name][tuple(["Pool", "f: Average Rate"         ])] = state.tokens[tkn_name].ema_rate
+            table[tkn_name][tuple(["Pool", "g: Average Inverse Rate" ])] = state.tokens[tkn_name].inv_ema_rate
+
+        df = pd.DataFrame(table).sort_index()
+        return df.applymap(lambda x : round(x, decimals)) if decimals >= 0 else df
 
     def export(self):
         """
@@ -430,7 +449,7 @@ class BancorDapp:
         Creates a new user with a valid wallet
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        state.create_user(user_name.lower())
+        state.create_user(user_name)
         self.next_transaction(state)
         handle_logging(
             "NA", Decimal("0"), f"create_{user_name}", "NA", state.transaction_id, state
@@ -446,7 +465,6 @@ class BancorDapp:
         """
         Distribute auto-compounding program.
         """
-        user_name = user_name.lower()
         tkn_name = tkn_name.lower()
         state = self.get_state(copy_type="initial", timestamp=timestamp)
         state = distribute_autocompounding_program(
@@ -487,7 +505,6 @@ class BancorDapp:
         Creates a new autocompounding program.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        user_name = user_name.lower()
         tkn_name = tkn_name.lower()
         if total_duration_in_seconds == 0 and total_duration_in_days != 0:
             total_duration_in_seconds = Decimal(f"{SECONDS_PER_DAY}") * Decimal(
@@ -722,7 +739,6 @@ class BancorDapp:
         Sets user balance at the network interface level for convenience.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        user_name = user_name.lower()
         tkn_name = tkn_name.lower()
         state.set_user_balance(user_name, tkn_name, tkn_amt)
         self.next_transaction(state)

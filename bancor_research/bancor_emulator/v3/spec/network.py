@@ -351,7 +351,7 @@ class BancorDapp:
     def create_user(self, user_name: str, timestamp: int = 0):
         pass
 
-    def describe(self, rates: bool = False, decimals: int = 6):
+    def describe(self, rates: bool = False, decimals: int = -1):
         table = {}
 
         reserveTokens = list(self.reserveTokens.values())
@@ -394,7 +394,8 @@ class BancorDapp:
                 table[symbol][tuple(['Pool', 'f: Average Rate'        ])] = fromFraction(averageRateN   , averageRateD   )
                 table[symbol][tuple(['Pool', 'g: Average Inverse Rate'])] = fromFraction(averageInvRateN, averageInvRateD)
 
-        return pd.DataFrame(table).sort_index()
+        df = pd.DataFrame(table).sort_index()
+        return df.applymap(lambda x : round(x, decimals)) if decimals >= 0 else df
 
 # whitelisted_tokens: list = ['bnt', 'eth', 'wbtc', 'link']
 # v3 = BancorDapp(whitelisted_tokens=whitelisted_tokens)

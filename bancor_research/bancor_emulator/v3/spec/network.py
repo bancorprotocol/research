@@ -93,9 +93,9 @@ class BancorDapp:
         block.number = 0
         updateBlock(timestamp)
 
-        self.bnt   = ReserveToken('BNT'  , 'BNT'  , DEFAULT_DECIMALS)
-        self.vbnt  = ReserveToken('VBNT' , 'VBNT' , DEFAULT_DECIMALS)
-        self.bnbnt = PoolToken   ('bnBNT', 'bnBNT', DEFAULT_DECIMALS, self.bnt)
+        self.bnt   = ReserveToken('bnt'  , 'bnt'  , DEFAULT_DECIMALS)
+        self.vbnt  = ReserveToken('vbnt' , 'vbnt' , DEFAULT_DECIMALS)
+        self.bnbnt = PoolToken   ('bnbnt', 'bnbnt', DEFAULT_DECIMALS, self.bnt)
 
         self.bntGovernance      = TokenGovernance(self.bnt)
         self.vbntGovernance     = TokenGovernance(self.vbnt)
@@ -129,8 +129,8 @@ class BancorDapp:
 
         self.network.registerPoolCollection(self.poolCollection)
 
-        self.reserveTokens = {self.bnt.symbol().lower(): self.bnt}
-        self.poolTokens = {self.bnbnt.symbol().lower(): self.bnbnt}
+        self.reserveTokens = {self.bnt.symbol(): self.bnt}
+        self.poolTokens = {self.bnbnt.symbol(): self.bnbnt}
         for tkn_name in [tkn_name for tkn_name in whitelisted_tokens if tkn_name not in self.reserveTokens]:
             tkn = ReserveToken(tkn_name, tkn_name, DEFAULT_DECIMALS) # TODO: support decimals per reserve token
             self.networkSettings.addTokenToWhitelist(tkn)
@@ -339,7 +339,7 @@ class BancorDapp:
         user_name: str = "protocol",
     ) -> None:
         updateBlock(timestamp)
-        bntPriceInitialValue = self.price_feeds.at[timestamp, self.bnt.symbol().lower()]
+        bntPriceInitialValue = self.price_feeds.at[timestamp, self.bnt.symbol()]
         for pool in [pool for pool in pools if self.reserveTokens[pool] is not self.bnt]:
             tknPrice = self.price_feeds.at[timestamp, pool]
             bntPrice = bntPriceInitialValue

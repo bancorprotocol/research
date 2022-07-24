@@ -369,7 +369,7 @@ class BancorDapp:
                     case self.masterVault: userId = ['Contract', 'Master Vault']
                     case self.epVault    : userId = ['Contract', 'EP Vault'    ]
                     case self.erVault    : userId = ['Contract', 'ER Vault'    ]
-                    case self.bntPool    : userId = ['Contract', 'BNT Pool'    ]
+                    case self.bntPool    : userId = ['Contract', 'Protocol'    ]
                     case other           : userId = ['Account' , user          ]
                 table[symbol][tuple(userId)] = fromWei(token.balanceOf(user), tknDecimals)
 

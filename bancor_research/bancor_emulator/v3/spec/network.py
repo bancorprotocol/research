@@ -351,7 +351,7 @@ class BancorDapp:
     def create_user(self, user_name: str, timestamp: int = 0):
         pass
 
-    def describe(self, rates: bool = False, decimals: int = -1):
+    def describe(self, decimals: int = -1):
         table = {}
 
         reserveTokens = list(self.reserveTokens.values())

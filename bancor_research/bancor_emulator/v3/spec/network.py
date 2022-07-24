@@ -24,7 +24,7 @@ PandasDataFrame = TypeVar("pandas.core.frame.DataFrame")
 
 DEFAULT_TIMESTAMP = 0
 DEFAULT_WHITELIST = ["dai", "eth", "link", "bnt", "tkn", "wbtc"]
-DEFAULT_USERS = ["alice", "bob", "charlie", "trader", "protocol"]
+DEFAULT_USERS = ["Alice", "Bob", "Charlie", "Trader", "protocol"]
 DEFAULT_DECIMALS = 18
 DEFAULT_QDECIMALS = Decimal(10) ** -DEFAULT_DECIMALS
 DEFAULT_WITHDRAWAL_FEE = Decimal("0.0025")
@@ -121,7 +121,7 @@ class BancorDapp:
         self.networkInfo.initialize()
 
         self.networkSettings.setWithdrawalFeePPM(toPPM(withdrawal_fee))
-        self.networkSettings.setMinLiquidityForTrading(toWei(bnt_min_liquidity * 2, DEFAULT_DECIMALS))
+        self.networkSettings.setMinLiquidityForTrading(toWei(bnt_min_liquidity, DEFAULT_DECIMALS))
 
         self.pendingWithdrawals.setLockDuration(cooldown_time)
 
@@ -351,7 +351,7 @@ class BancorDapp:
     def create_user(self, user_name: str, timestamp: int = 0):
         pass
 
-    def describe(self, rates: bool = False, decimals: int = -1):
+    def describe(self, decimals: int = -1):
         table = {}
 
         reserveTokens = list(self.reserveTokens.values())
@@ -369,7 +369,7 @@ class BancorDapp:
                     case self.masterVault: userId = ['Contract', 'Master Vault']
                     case self.epVault    : userId = ['Contract', 'EP Vault'    ]
                     case self.erVault    : userId = ['Contract', 'ER Vault'    ]
-                    case self.bntPool    : userId = ['Contract', 'BNT Pool'    ]
+                    case self.bntPool    : userId = ['Contract', 'Protocol'    ]
                     case other           : userId = ['Account' , user          ]
                 table[symbol][tuple(userId)] = fromWei(token.balanceOf(user), tknDecimals)
 

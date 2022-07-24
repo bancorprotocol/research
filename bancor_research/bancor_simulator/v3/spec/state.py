@@ -39,7 +39,7 @@ PRECISION = 155
 # Configurable Genesis Variables
 DEFAULT_TIMESTAMP = 0
 DEFAULT_WHITELIST = ["dai", "eth", "link", "bnt", "tkn", "wbtc"]
-DEFAULT_USERS = ["alice", "bob", "charlie", "trader", "protocol"]
+DEFAULT_USERS = ["Alice", "Bob", "Charlie", "Trader", "protocol"]
 DEFAULT_DECIMALS = 18
 DEFAULT_QDECIMALS = Decimal(10) ** -DEFAULT_DECIMALS
 DEFAULT_PRICE_FEEDS_PATH = (

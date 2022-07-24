@@ -765,9 +765,9 @@ def validate_input(
         print(e)
 
     try:
-        user_name = user_name.lower()
-    except ValueError("user_name must be type String") as e:
-        print(e)
+        assert type(user_name) is str
+    except AssertionError:
+        print("user_name must be type String")
 
     try:
         tkn_amt = Decimal(tkn_amt)

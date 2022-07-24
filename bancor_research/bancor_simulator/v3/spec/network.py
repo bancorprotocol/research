@@ -343,7 +343,6 @@ class BancorDapp:
         Main withdrawal logic based on the withdraw algorithm of the BIP15 spec.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        user_name = user_name.lower()
         tkn_name = tkn_name.lower()
         state = process_withdrawal(
             state, user_name, id_number, timestamp, tkn_name, tkn_amt
@@ -372,7 +371,6 @@ class BancorDapp:
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
         state.timestamp = timestamp
-        user_name = user_name.lower()
         tkn_name = tkn_name.lower()
         state = dao_msig_init_pools(state, pools)
         amt = get_json_virtual_balances(state, tkn_name)
@@ -451,7 +449,7 @@ class BancorDapp:
         Creates a new user with a valid wallet
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        state.create_user(user_name.lower())
+        state.create_user(user_name)
         self.next_transaction(state)
         handle_logging(
             "NA", Decimal("0"), f"create_{user_name}", "NA", state.transaction_id, state
@@ -467,7 +465,6 @@ class BancorDapp:
         """
         Distribute auto-compounding program.
         """
-        user_name = user_name.lower()
         tkn_name = tkn_name.lower()
         state = self.get_state(copy_type="initial", timestamp=timestamp)
         state = distribute_autocompounding_program(
@@ -508,7 +505,6 @@ class BancorDapp:
         Creates a new autocompounding program.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        user_name = user_name.lower()
         tkn_name = tkn_name.lower()
         if total_duration_in_seconds == 0 and total_duration_in_days != 0:
             total_duration_in_seconds = Decimal(f"{SECONDS_PER_DAY}") * Decimal(
@@ -743,7 +739,6 @@ class BancorDapp:
         Sets user balance at the network interface level for convenience.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        user_name = user_name.lower()
         tkn_name = tkn_name.lower()
         state.set_user_balance(user_name, tkn_name, tkn_amt)
         self.next_transaction(state)

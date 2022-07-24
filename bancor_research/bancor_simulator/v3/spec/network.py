@@ -416,7 +416,7 @@ class BancorDapp:
             table[tkn_name][tuple(["Pool", "d: BNT Current Funding"  ])] = state.tokens[tkn_name].bnt_funding_amt.balance
             table[tkn_name][tuple(["Pool", "e: Spot Rate"            ])] = state.tokens[tkn_name].spot_rate
             table[tkn_name][tuple(["Pool", "f: Average Rate"         ])] = state.tokens[tkn_name].ema_rate
-            table[tkn_name][tuple(["Pool", "g: Average Inverse Rate" ])] = state.tokens[tkn_name]._inv_ema_rate
+            table[tkn_name][tuple(["Pool", "g: Average Inverse Rate" ])] = state.tokens[tkn_name].inv_ema_rate
 
         df = pd.DataFrame(table).sort_index()
         return df.applymap(lambda x : round(x, decimals)) if decimals >= 0 else df

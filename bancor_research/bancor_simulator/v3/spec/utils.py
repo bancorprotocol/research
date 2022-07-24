@@ -774,12 +774,9 @@ def validate_input(
     except ValueError("tkn_amt must be convertable to type Decimal") as e:
         print(e)
 
-    try:
+    if user_name not in state.users:
         wallet_test = state.users[user_name].wallet
-    except ValueError(
-        "user_name not found. Create a new user by calling the .create_user(user_name) method"
-    ) as e:
-        print(e)
+        state = state.create_user(user_name)
 
     if timestamp is not None:
         state.timestamp = timestamp

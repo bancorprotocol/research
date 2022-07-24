@@ -49,29 +49,38 @@ The following values are (configurable) genesis variables used throughout the sp
 *Note*: Where applicable, the default values correspond to those used in BIP15 examples, or are otherwise expected to be those values which are actually implemented on the Bancor dApp.
 
 ```
+# Configurable Genesis Variables
 DEFAULT_TIMESTAMP = 0
 DEFAULT_WHITELIST = ["dai", "eth", "link", "bnt", "tkn", "wbtc"]
-DEFAULT_USERS = ["alice", "bob", "charlie", "trader", "user", "protocol"]
+DEFAULT_USERS = ["Alice", "Bob", "Charlie"]
 DEFAULT_DECIMALS = 18
 DEFAULT_QDECIMALS = Decimal(10) ** -DEFAULT_DECIMALS
-DEFAULT_PRICE_FEEDS_PATH = "https://bancorml.s3.us-east-2.amazonaws.com/price_feeds.parquet"
+DEFAULT_PRICE_FEEDS_PATH = (
+    "https://bancorml.s3.us-east-2.amazonaws.com/price_feeds.parquet"
+)
 DEFAULT_EXP_DECAY_DISTRIBUTION = 1
 DEFAULT_FLAT_DISTRIBUTION = 0
-DEFAULT_WITHDRAWAL_FEE = Decimal('0.002')
-DEFAULT_TRADING_FEE = Decimal('0.0025')
-DEFAULT_NETWORK_FEE = Decimal('0.0025')
-DEFAULT_BNT_FUNDING_LIMIT = Decimal('1000000')
-DEFAULT_BNT_MIN_LIQUIDITY = Decimal('10000')
-DEFAULT_COOLDOWN_TIME = 604800
+DEFAULT_WITHDRAWAL_FEE = Decimal("0.0025")
+DEFAULT_TRADING_FEE = Decimal("0.01")
+DEFAULT_NETWORK_FEE = Decimal("0.2")
+DEFAULT_BNT_FUNDING_LIMIT = Decimal("1000000")
+DEFAULT_BNT_MIN_LIQUIDITY = Decimal("10000")
+DEFAULT_COOLDOWN_TIME = SECONDS_PER_DAY * 7
 DEFAULT_ALPHA = Decimal("0.2").quantize(DEFAULT_QDECIMALS)
 DEFAULT_LOWER_EMA_LIMIT = Decimal("0.99").quantize(DEFAULT_QDECIMALS)
 DEFAULT_UPPER_EMA_LIMIT = Decimal("1.01").quantize(DEFAULT_QDECIMALS)
-DEFAULT_PRICE_FEEDS = pd.DataFrame({'INDX': [0 for _ in range(100000)],
-                                    'vbnt': [1.0 for _ in range(100000)],
-                                    'tkn': [2.5 for _ in range(100000)],
-                                    'bnt': [2.5 for _ in range(100000)],
-                                    'link': [15.00 for _ in range(100000)],
-                                    'eth': [2500.00 for _ in range(100000)],
-                                    'wbtc': [40000.00 for _ in range(100000)]})
+DEFAULT_NUM_TIMESTAMPS = SECONDS_PER_DAY * 30
+DEFAULT_ACCOUNT_BALANCE = Decimal(np.nan)
+DEFAULT_PRICE_FEEDS = pd.DataFrame(
+    {
+        "INDX": (0 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
+        "vbnt": (1.0 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
+        "tkn": (2.5 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
+        "bnt": (2.5 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
+        "link": (15.00 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
+        "eth": (2500.00 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
+        "wbtc": (40000.00 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
+    }
+)
 ```
 

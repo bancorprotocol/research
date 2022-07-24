@@ -83,16 +83,18 @@ class Token(object):
         self.qdecimals = qdecimals
 
     def add(self, value: Decimal):
+        self.validate_balance()
         self.balance += self.validate(value)
 
     def subtract(self, value: Decimal):
+        self.validate_balance()
         self.balance -= self.validate(value)
 
     def set(self, value: Decimal):
+        self.validate_balance()
         self.balance = self.validate(value)
 
     def validate(self, value) -> Decimal:
-        self.validate_balance()
         return self.validate_value(value)
 
     def validate_balance(self):
@@ -116,7 +118,6 @@ class GlobalSettings:
     """
     Represents the default global settings. These can be overridden by the BancorDapp configuration upon instantiation.
     """
-
     timestamp: int = DEFAULT_TIMESTAMP
     model: str = MODEL
     version: str = VERSION

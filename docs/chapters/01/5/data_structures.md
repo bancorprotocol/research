@@ -62,7 +62,7 @@ class GlobalSettings:
 @dataclass(config=Config)
 class Cooldown:
     """
-    Represents a pending withdrawal cooldown state.
+    Represents a pending withdrawal cooldown.
     """
     id: int
     created_at: int
@@ -81,6 +81,7 @@ class StandardProgram:
     """
     Represents an standard reward program state.
     """
+
     id: int
     tkn_name: str
     rewards_token: str
@@ -106,6 +107,7 @@ class AutocompoundingProgram:
     """
     Represents an autocompounding reward program state.
     """
+
     id: int
     tkn_name: str
     owner_id: str
@@ -126,7 +128,10 @@ class AutocompoundingProgram:
         """
         Returns the rate per second of the distribution.
         """
-        return self.total_rewards.balance.quantize(DEFAULT_QDECIMALS) / self.total_duration_in_seconds
+        return (
+                self.total_rewards.balance.quantize(DEFAULT_QDECIMALS)
+                / self.total_duration_in_seconds
+        )
 
     @property
     def half_life_seconds(self):

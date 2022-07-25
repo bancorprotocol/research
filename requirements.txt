@@ -8,3 +8,4 @@ mesa
 pydantic
 click
 black
+jupyter-black

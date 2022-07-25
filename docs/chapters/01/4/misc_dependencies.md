@@ -23,7 +23,9 @@ class Token(object):
     Represents a token balance with common math operations to increase, decrease, and set the balance.
     """
 
-    def __init__(self, balance: Decimal = Decimal('0'), qdecimals: Decimal = DEFAULT_QDECIMALS):
+    def __init__(
+            self, balance: Decimal = Decimal('0'), qdecimals: Decimal = DEFAULT_QDECIMALS
+    ):
         self.balance = balance
         self.qdecimals = qdecimals
 
@@ -37,5 +39,15 @@ class Token(object):
         self.balance = self.validate(value)
 
     def validate(self, value) -> Decimal:
+        self.validate_balance()
+        return self.validate_value(value)
+
+    def validate_balance(self):
+        if pd.isnull(self.balance):
+            self.balance = Decimal('0')
+
+    def validate_value(self, value) -> Decimal:
+        if pd.isnull(value):
+            value = Decimal('0')
         return Decimal(str(value)).quantize(self.qdecimals)
 ```

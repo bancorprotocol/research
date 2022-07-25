@@ -356,46 +356,46 @@ class BancorDapp:
 
         reserveTokens = list(self.reserveTokens.values())
         poolTokens = list(self.poolTokens.values())
-        bntDecimals = self.bnt.decimals()
 
+        # Iterate all reserve tokens and all pool tokens
         for token in reserveTokens + poolTokens:
-            symbol = token.symbol()
-            tknDecimals = token.decimals()
+            table[token.symbol()] = {}
+            for account in [user for user in token._balances.keys() if type(user) is str]:
+                table[token.symbol()][tuple([1, 'Account', account])] = fromWei(token.balanceOf(account), token.decimals())
 
-            table[symbol] = {}
+        # Iterate all reserve tokens except bnt
+        for token in [reserveToken for reserveToken in reserveTokens if reserveToken is not self.bnt]:
+            stakedBalance = self.networkInfo.stakedBalance(token)
+            tradingLiquidity = self.networkInfo.tradingLiquidity(token)
+            currentPoolFunding = self.bntPool.currentPoolFunding(token)
 
-            for user in token._balances.keys():
-                match user:
-                    case self.masterVault: userId = ['Contract', 'Master Vault']
-                    case self.epVault    : userId = ['Contract', 'EP Vault'    ]
-                    case self.erVault    : userId = ['Contract', 'ER Vault'    ]
-                    case self.bntPool    : userId = ['Contract', 'Protocol'    ]
-                    case other           : userId = ['Account' , user          ]
-                table[symbol][tuple(userId)] = fromWei(token.balanceOf(user), tknDecimals)
+            spotRateN       = self.poolCollection._poolData[token].liquidity.bntTradingLiquidity
+            spotRateD       = self.poolCollection._poolData[token].liquidity.baseTokenTradingLiquidity
+            averageRateN    = self.poolCollection._poolData[token].averageRates.rate.n
+            averageRateD    = self.poolCollection._poolData[token].averageRates.rate.d
+            averageInvRateN = self.poolCollection._poolData[token].averageRates.invRate.n
+            averageInvRateD = self.poolCollection._poolData[token].averageRates.invRate.d
 
-            if token in reserveTokens and token is not self.bnt:
-                stakedBalance = self.networkInfo.stakedBalance(token)
-                tradingLiquidity = self.networkInfo.tradingLiquidity(token)
-                currentPoolFunding = self.bntPool.currentPoolFunding(token)
+            table[token.symbol()][tuple([2, 'Pool', 'a: TKN Staked Balance'   ])] = fromWei(stakedBalance, token.decimals())
+            table[token.symbol()][tuple([2, 'Pool', 'b: TKN Trading Liquidity'])] = fromWei(tradingLiquidity.baseTokenTradingLiquidity, token.decimals())
+            table[token.symbol()][tuple([2, 'Pool', 'c: BNT Trading Liquidity'])] = fromWei(tradingLiquidity.bntTradingLiquidity, self.bnt.decimals())
+            table[token.symbol()][tuple([2, 'Pool', 'd: BNT Current Funding'  ])] = fromWei(currentPoolFunding, self.bnt.decimals())
+            table[token.symbol()][tuple([2, 'Pool', 'e: Spot Rate'            ])] = fromFraction(spotRateN      , spotRateD      )
+            table[token.symbol()][tuple([2, 'Pool', 'f: Average Rate'         ])] = fromFraction(averageRateN   , averageRateD   )
+            table[token.symbol()][tuple([2, 'Pool', 'g: Average Inverse Rate' ])] = fromFraction(averageInvRateN, averageInvRateD)
 
-                table[symbol][tuple(['Pool', 'a: TKN Staked Balance'   ])] = fromWei(stakedBalance, tknDecimals)
-                table[symbol][tuple(['Pool', 'b: TKN Trading Liquidity'])] = fromWei(tradingLiquidity.baseTokenTradingLiquidity, tknDecimals)
-                table[symbol][tuple(['Pool', 'c: BNT Trading Liquidity'])] = fromWei(tradingLiquidity.bntTradingLiquidity, bntDecimals)
-                table[symbol][tuple(['Pool', 'd: BNT Current Funding'  ])] = fromWei(currentPoolFunding, bntDecimals)
+        # Iterate all reserve tokens
+        for token in reserveTokens:
+            table[token.symbol()][tuple([3, "Network", "Master Vault"    ])] = fromWei(token.balanceOf(self.masterVault), token.decimals())
+            table[token.symbol()][tuple([3, "Network", "Protection Vault"])] = fromWei(token.balanceOf(self.epVault    ), token.decimals())
 
-                spotRateN       = self.poolCollection._poolData[token].liquidity.bntTradingLiquidity
-                spotRateD       = self.poolCollection._poolData[token].liquidity.baseTokenTradingLiquidity
-                averageRateN    = self.poolCollection._poolData[token].averageRates.rate.n
-                averageRateD    = self.poolCollection._poolData[token].averageRates.rate.d
-                averageInvRateN = self.poolCollection._poolData[token].averageRates.invRate.n
-                averageInvRateD = self.poolCollection._poolData[token].averageRates.invRate.d
-
-                table[symbol][tuple(['Pool', 'e: Spot Rate'           ])] = fromFraction(spotRateN      , spotRateD      )
-                table[symbol][tuple(['Pool', 'f: Average Rate'        ])] = fromFraction(averageRateN   , averageRateD   )
-                table[symbol][tuple(['Pool', 'g: Average Inverse Rate'])] = fromFraction(averageInvRateN, averageInvRateD)
+        # Iterate all pool tokens
+        for token in poolTokens:
+            table[token.symbol()][tuple([3, "Network", "Rewards Vault"  ])] = fromWei(token.balanceOf(self.erVault), token.decimals())
+            table[token.symbol()][tuple([3, "Network", "Protocol Equity"])] = fromWei(token.balanceOf(self.bntPool), token.decimals())
 
         df = pd.DataFrame(table).sort_index()
-        return df.applymap(lambda x : round(x, decimals)) if decimals >= 0 else df
+        return df.applymap(lambda x: round(x, decimals)) if decimals >= 0 else df
 
 # whitelisted_tokens: list = ['bnt', 'eth', 'wbtc', 'link']
 # v3 = BancorDapp(whitelisted_tokens=whitelisted_tokens)

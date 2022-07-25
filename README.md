@@ -7,15 +7,15 @@ netlify env:set SECRET_KEY secretValue
 
 # Bancor Simulator
 
-[![PyPI version](https://badge.fury.io/py/bancor-simulator.svg)](https://badge.fury.io/py/bancor-simulator)
+[![PyPI version](https://badge.fury.io/py/bancor-research.svg)](https://badge.fury.io/py/bancor-research)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Jupyter Book Badge](https://jupyterbook.org/badge.svg)](https://simulator.bancor.network/chapters/bancor-simulator.html)
+[![Jupyter Book Badge](https://jupyterbook.org/badge.svg)](https://simulator.bancor.network/chapters/bancor-research.html)
 [![Netlify Status](https://api.netlify.com/api/v1/badges/b4173988-e380-443b-94b1-78918e13a013/deploy-status)](https://app.netlify.com/sites/incandescent-kelpie-250f0e/deploys)
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 
 **Bancor Simulator** is an open-source python package developed by the **Bancor Research Team**. It aims to assist the design, testing, and validation of Bancor v3 tokenomics.
 
-See [official documentation](https://simulator.bancor.network/chapters/bancor-simulator.html) for complete details.
+See [official documentation](https://simulator.bancor.network/chapters/bancor-research.html) for complete details.
 
 **Warning**: The docs are a work in progress with potentially broken links, unfinished sections, and a non-exhuastive overview of commands and example usage. Moreover, the entirety of the codebase and documentation is subject to change without warning.
 
@@ -76,7 +76,7 @@ using [these instructions](https://docs.python.org/3/library/venv.html)
 To install using [pypi](https://pypi.org/project/bancor-simulation/), run this command:
 
 ````{tab} PyPI
-$ pip install bancor-simulator
+$ pip install bancor-research
 ````
 
 ## Documentation

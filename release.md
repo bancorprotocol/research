@@ -5,7 +5,7 @@ Before starting the release process, verify the following:
 * All work required for this release has been completed and the team is ready to release.
 * [All Github Actions tests are green on main](https://github.com/bancorprotocol/research/actions?query=branch%3Amain).
 * The [Netlify build](https://api.netlify.com/api/v1/badges/b4173988-e380-443b-94b1-78918e13a013/deploy-status) for "latest" is marked as passed. To avoid mysterious errors, best practice is to empty your browser cache when reading new versions of the docs!
-* The [public documentation for the "latest" branch](https://simulator.bancor.network/chapters/bancor-simulator.html) looks correct, and the [release notes](https://github.com/bancorprotocol/research/releases) includes the last change which was made on main.
+* The [public documentation for the "latest" branch](https://simulator.bancor.network/chapters/bancor-research.html) looks correct, and the [release notes](https://github.com/bancorprotocol/research/releases) includes the last change which was made on main.
 * Get agreement on the version number to use for the release.
 
 #### Version Numbering
@@ -64,16 +64,16 @@ Please do the following:
 ## 5. Verify the release package has been deployed
 Now that the release has been made in the repo, to pypi and in our documentation, the final step is making sure the new release is publicly pip-installable via pypi.
 
-In a fresh virtualenv, install bancor-simulator via pip and ensure it installs successfully:
+In a fresh virtualenv, install bancor-research via pip and ensure it installs successfully:
 ```shell
 # should come back empty
-pip freeze | grep bancor-simulator
+pip freeze | grep bancor-research
 
-pip install bancor-simulator
+pip install bancor-research
 python --version
 # should now list the correct version
 python -c "import bancor_research; print(bancor_research.__version__)"
-pip freeze | grep bancor-simulator
+pip freeze | grep bancor-research
 ```
 
 Note: make sure when you do this that you're in a virtualenv, your current working directory isn't in the evalml repo, and that you haven't added your repo to the `PYTHONPATH`, because in both cases python could pick up the repo instead, even in a virtualenv.

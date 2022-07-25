@@ -1,5 +1,5 @@
 format: jb-article
-root: chapters/bancor-simulator
+root: chapters/bancor-research
 title: Bancor Simulator
 options:
   numbered: false

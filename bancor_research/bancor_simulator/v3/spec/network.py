@@ -397,29 +397,57 @@ class BancorDapp:
 
         state = self.global_state
 
-        for tkn_name in state.whitelisted_tokens + ["bn" + tkn_name for tkn_name in state.whitelisted_tokens]:
+        for tkn_name in state.whitelisted_tokens + [
+            "bn" + tkn_name for tkn_name in state.whitelisted_tokens
+        ]:
             table[tkn_name] = {}
 
             for username in state.usernames:
-                table[tkn_name][tuple(["Account", username])] = state.users[username].wallet[tkn_name].balance
+                table[tkn_name][tuple(["Account", username])] = (
+                    state.users[username].wallet[tkn_name].balance
+                )
 
         for tkn_name in state.whitelisted_tokens:
-            table[       tkn_name][tuple(["Contract", "Master Vault"])] = state.tokens[tkn_name].master_vault.balance
-            table[       tkn_name][tuple(["Contract", "EP Vault"    ])] = state.tokens[tkn_name].external_protection_vault.balance
-            table[       tkn_name][tuple(["Contract", "ER Vault"    ])] = state.tokens[tkn_name].standard_rewards_vault.balance
-            table["bn" + tkn_name][tuple(["Contract", "Protocol"    ])] = state.tokens[tkn_name].protocol_wallet_pooltokens.balance
+            table[tkn_name][tuple(["Contract", "Master Vault"])] = state.tokens[
+                tkn_name
+            ].master_vault.balance
+            table[tkn_name][tuple(["Contract", "EP Vault"])] = state.tokens[
+                tkn_name
+            ].external_protection_vault.balance
+            table[tkn_name][tuple(["Contract", "ER Vault"])] = state.tokens[
+                tkn_name
+            ].standard_rewards_vault.balance
+            table["bn" + tkn_name][tuple(["Contract", "Protocol"])] = state.tokens[
+                tkn_name
+            ].protocol_wallet_pooltokens.balance
 
-        for tkn_name in [tkn_name for tkn_name in state.whitelisted_tokens if tkn_name != "bnt"]:
-            table[tkn_name][tuple(["Pool", "a: TKN Staked Balance"   ])] = state.tokens[tkn_name].staking_ledger.balance
-            table[tkn_name][tuple(["Pool", "b: TKN Trading Liquidity"])] = state.tokens[tkn_name].tkn_trading_liquidity.balance
-            table[tkn_name][tuple(["Pool", "c: BNT Trading Liquidity"])] = state.tokens[tkn_name].bnt_trading_liquidity.balance
-            table[tkn_name][tuple(["Pool", "d: BNT Current Funding"  ])] = state.tokens[tkn_name].bnt_funding_amt.balance
-            table[tkn_name][tuple(["Pool", "e: Spot Rate"            ])] = state.tokens[tkn_name].spot_rate
-            table[tkn_name][tuple(["Pool", "f: Average Rate"         ])] = state.tokens[tkn_name].ema_rate
-            table[tkn_name][tuple(["Pool", "g: Average Inverse Rate" ])] = state.tokens[tkn_name].inv_ema_rate
+        for tkn_name in [
+            tkn_name for tkn_name in state.whitelisted_tokens if tkn_name != "bnt"
+        ]:
+            table[tkn_name][tuple(["Pool", "a: TKN Staked Balance"])] = state.tokens[
+                tkn_name
+            ].staking_ledger.balance
+            table[tkn_name][tuple(["Pool", "b: TKN Trading Liquidity"])] = state.tokens[
+                tkn_name
+            ].tkn_trading_liquidity.balance
+            table[tkn_name][tuple(["Pool", "c: BNT Trading Liquidity"])] = state.tokens[
+                tkn_name
+            ].bnt_trading_liquidity.balance
+            table[tkn_name][tuple(["Pool", "d: BNT Current Funding"])] = state.tokens[
+                tkn_name
+            ].bnt_funding_amt.balance
+            table[tkn_name][tuple(["Pool", "e: Spot Rate"])] = state.tokens[
+                tkn_name
+            ].spot_rate
+            table[tkn_name][tuple(["Pool", "f: Average Rate"])] = state.tokens[
+                tkn_name
+            ].ema_rate
+            table[tkn_name][tuple(["Pool", "g: Average Inverse Rate"])] = state.tokens[
+                tkn_name
+            ].inv_ema_rate
 
         df = pd.DataFrame(table).sort_index()
-        return df.applymap(lambda x : round(x, decimals)) if decimals >= 0 else df
+        return df.applymap(lambda x: round(x, decimals)) if decimals >= 0 else df
 
     def export(self):
         """
@@ -600,6 +628,7 @@ class BancorDapp:
         tkn_amt: Decimal,
         start_time: int,
         end_time: int,
+        user_name: str,
         timestamp: int,
         transaction_type="create_standard_rewards_program",
     ):

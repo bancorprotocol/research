@@ -4,7 +4,9 @@
 from decimal import Decimal
 
 from bancor_research.bancor_simulator.v3.spec.state import State
-from bancor_research.bancor_simulator.v3.spec.utils import generate_emulator_expected_results
+from bancor_research.bancor_simulator.v3.spec.utils import (
+    generate_emulator_expected_results,
+)
 
 
 def emulate_deposit(

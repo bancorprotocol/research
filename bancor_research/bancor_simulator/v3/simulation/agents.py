@@ -6,7 +6,10 @@
 
 import mesa
 
-from bancor_research.bancor_simulator.v3.spec.actions import unpack_withdrawal_cooldown, vortex_burner
+from bancor_research.bancor_simulator.v3.spec.actions import (
+    unpack_withdrawal_cooldown,
+    vortex_burner,
+)
 from bancor_research.bancor_simulator.v3.spec.network import BancorDapp
 from bancor_research.bancor_simulator.v3.simulation.random_walk import RandomWalker
 from bancor_research.bancor_simulator.v3.simulation.utils import (

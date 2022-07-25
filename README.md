@@ -3,20 +3,17 @@
 </p>
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-
 # Bancor Simulator
 
-[![PyPI](https://vsrm.dev.azure.com/gcode-ai/_apis/public/Release/badge/52109c77-be71-4849-9d35-4fc861db41a6/1/1)](https://vsrm.dev.azure.com/gcode-ai/_apis/public/Release/badge/52109c77-be71-4849-9d35-4fc861db41a6/1/1)
-[![bancorml-0.1.0-py3-none-any.whl package in bancorml@Release feed in Azure Artifacts](https://feeds.dev.azure.com/gcode-ai/52109c77-be71-4849-9d35-4fc861db41a6/_apis/public/Packaging/Feeds/bancorml@Release/Packages/0926c7d3-1ac4-4316-a132-cf9867850696/Badge)](https://dev.azure.com/gcode-ai/BancorML/_artifacts/feed/bancorml@Release/UPack/bancorml-0.1.0-py3-none-any.whl/0.0.16)
-[![PyPI version](https://badge.fury.io/py/bancorml.svg)](https://badge.fury.io/py/bancorml)
-[![Documentation Status](https://readthedocs.com/projects/gcodeai-bancorml/badge/?version=latest&token=55e06511a714e5d89e1eea25f71fe67e6a96aa5d3b813aa09547303f31b088e4)](https://gcodeai-bancorml.readthedocs-hosted.com/en/latest/?badge=latest)
-
-
+[![PyPI version](https://badge.fury.io/py/bancor-research.svg)](https://badge.fury.io/py/bancor-research)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Jupyter Book Badge](https://jupyterbook.org/badge.svg)](https://simulator.bancor.network/chapters/bancor-research.html)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/b4173988-e380-443b-94b1-78918e13a013/deploy-status)](https://app.netlify.com/sites/incandescent-kelpie-250f0e/deploys)
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 
 **Bancor Simulator** is an open-source python package developed by the **Bancor Research Team**. It aims to assist the design, testing, and validation of Bancor v3 tokenomics.
 
-See [official documentation](https://simulator.bancor.network/chapters/bancor-simulator.html) for complete details.
+See [official documentation](https://simulator.bancor.network/chapters/bancor-research.html) for complete details.
 
 **Warning**: The docs are a work in progress with potentially broken links, unfinished sections, and a non-exhuastive overview of commands and example usage. Moreover, the entirety of the codebase and documentation is subject to change without warning.
 
@@ -77,7 +74,7 @@ using [these instructions](https://docs.python.org/3/library/venv.html)
 To install using [pypi](https://pypi.org/project/bancor-simulation/), run this command:
 
 ````{tab} PyPI
-$ pip install bancor-simulator
+$ pip install bancor-research
 ````
 
 ## Documentation

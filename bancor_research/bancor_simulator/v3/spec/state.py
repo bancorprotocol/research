@@ -32,7 +32,7 @@ MODEL = "Bancor Network"
 VERSION = "1.0.0"
 GENESIS_EPOCH = Epoch(0)
 SECONDS_PER_DAY = 86400
-MAX_UINT112 = 2 ** 112 - 1
+MAX_UINT112 = 2**112 - 1
 PRECISION = 155
 
 # Configurable Genesis Variables
@@ -77,7 +77,7 @@ class Token(object):
     """
 
     def __init__(
-            self, balance: Decimal = Decimal('0'), qdecimals: Decimal = DEFAULT_QDECIMALS
+        self, balance: Decimal = Decimal("0"), qdecimals: Decimal = DEFAULT_QDECIMALS
     ):
         self.balance = balance
         self.qdecimals = qdecimals
@@ -99,11 +99,11 @@ class Token(object):
 
     def validate_balance(self):
         if pd.isnull(self.balance):
-            self.balance = Decimal('0')
+            self.balance = Decimal("0")
 
     def validate_value(self, value) -> Decimal:
         if pd.isnull(value):
-            value = Decimal('0')
+            value = Decimal("0")
         return Decimal(str(value)).quantize(self.qdecimals)
 
 
@@ -118,6 +118,7 @@ class GlobalSettings:
     """
     Represents the default global settings. These can be overridden by the BancorDapp configuration upon instantiation.
     """
+
     timestamp: int = DEFAULT_TIMESTAMP
     model: str = MODEL
     version: str = VERSION
@@ -202,8 +203,8 @@ class AutocompoundingProgram:
         Returns the rate per second of the distribution.
         """
         return (
-                self.total_rewards.balance.quantize(DEFAULT_QDECIMALS)
-                / self.total_duration_in_seconds
+            self.total_rewards.balance.quantize(DEFAULT_QDECIMALS)
+            / self.total_duration_in_seconds
         )
 
     @property
@@ -295,7 +296,7 @@ class Tokens(GlobalSettings):
         Returns the price of the current vbnt token. Only valid when name==bnt
         """
         assert (
-                self.name == "bnt"
+            self.name == "bnt"
         ), f"vbnt_price attempted to be accessed in {self.name} state, call bnt state instead"
         return self._vbnt_price
 
@@ -305,9 +306,9 @@ class Tokens(GlobalSettings):
         True if the spot price deviation from the EMA is less than 1% (or other preset threshold amount).
         """
         return (
-                Decimal(f"{DEFAULT_LOWER_EMA_LIMIT}") * self.ema_rate
-                <= self.spot_rate
-                <= Decimal(f"{DEFAULT_UPPER_EMA_LIMIT}") * self.ema_rate
+            Decimal(f"{DEFAULT_LOWER_EMA_LIMIT}") * self.ema_rate
+            <= self.spot_rate
+            <= Decimal(f"{DEFAULT_UPPER_EMA_LIMIT}") * self.ema_rate
         )
 
     @property
@@ -328,8 +329,8 @@ class Tokens(GlobalSettings):
         The difference between the master_vault balance and the average trading liquidity.
         """
         return (
-                self.master_vault.balance.quantize(DEFAULT_QDECIMALS)
-                - self.avg_tkn_trading_liquidity
+            self.master_vault.balance.quantize(DEFAULT_QDECIMALS)
+            - self.avg_tkn_trading_liquidity
         )
 
     @property
@@ -380,8 +381,8 @@ class Tokens(GlobalSettings):
         Used for descaling the ema into at most 112 bits per component.
         """
         return (
-                       int(max(self.ema.numerator, self.ema.denominator)) + self.max_uint112 - 1
-               ) // self.max_uint112
+            int(max(self.ema.numerator, self.ema.denominator)) + self.max_uint112 - 1
+        ) // self.max_uint112
 
     @property
     def ema_compressed_numerator(self) -> int:
@@ -448,7 +449,7 @@ class State(GlobalSettings):
             p
             for p in self.autocompounding_reward_programs
             if self.autocompounding_reward_programs[p].is_active
-               and self.autocompounding_reward_programs[p].is_enabled
+            and self.autocompounding_reward_programs[p].is_enabled
         ]
 
     @property
@@ -533,9 +534,9 @@ class State(GlobalSettings):
         Returns the inverse of the bnt price feed at the current timestamp
         """
         if (
-                self.tokens["bnt"].staking_ledger.balance.quantize(DEFAULT_QDECIMALS) == 0
-                and self.tokens["bnt"].pooltoken_supply.balance.quantize(DEFAULT_QDECIMALS)
-                == 0
+            self.tokens["bnt"].staking_ledger.balance.quantize(DEFAULT_QDECIMALS) == 0
+            and self.tokens["bnt"].pooltoken_supply.balance.quantize(DEFAULT_QDECIMALS)
+            == 0
         ):
             bnbnt_rate = Decimal("1")
         else:
@@ -570,7 +571,7 @@ class State(GlobalSettings):
         self.tokens[tkn_name].standard_rewards_vault.set(value)
 
     def set_user_pending_standard_rewards(
-            self, user_name: str, id: int, value: Decimal
+        self, user_name: str, id: int, value: Decimal
     ):
         """
         Set standard rewards vault balance by a given amount.
@@ -602,7 +603,7 @@ class State(GlobalSettings):
         self.tokens[tkn_name].pooltoken_supply.add(value)
 
     def increase_user_standard_rewards_stakes(
-            self, id: int, user_name: str, value: Decimal
+        self, id: int, user_name: str, value: Decimal
     ):
         """
         Increase user standard rewards staked_reward_amt pooltokens by a given amount.
@@ -610,7 +611,7 @@ class State(GlobalSettings):
         self.users[user_name].pending_standard_rewards[id].staked_amt.add(value)
 
     def decrease_user_standard_rewards_stakes(
-            self, id: int, user_name: str, value: Decimal
+        self, id: int, user_name: str, value: Decimal
     ):
         """
         Increase user standard rewards staked_reward_amt pooltokens by a given amount.
@@ -780,7 +781,7 @@ class State(GlobalSettings):
         self.standard_reward_programs[id].last_update_time = value
 
     def set_provider_reward_per_token_paid(
-            self, user_name: str, id: int, value: Decimal
+        self, user_name: str, id: int, value: Decimal
     ):
         """
         Set the user's rewards per token paid for a given program.
@@ -790,7 +791,7 @@ class State(GlobalSettings):
         )
 
     def set_provider_pending_standard_rewards(
-            self, user_name: str, id: int, value: Decimal
+        self, user_name: str, id: int, value: Decimal
     ):
         """
         Set the user's pending standard rewards for a given program.
@@ -945,7 +946,7 @@ class State(GlobalSettings):
         self.tokens[tkn_name].inv_spot_rate = value
 
     def set_pending_withdrawals_status(
-            self, user_name: str, tkn_name: str, id_number: int, status: bool
+        self, user_name: str, tkn_name: str, id_number: int, status: bool
     ):
         """
         Set pending_withdrawal to a given status.
@@ -970,14 +971,18 @@ class State(GlobalSettings):
 
         for tkn_name in self.whitelisted_tokens:
             if tkn_name not in self.users[user_name].wallet:
-                self.users[user_name].wallet[tkn_name] = Token(balance=DEFAULT_ACCOUNT_BALANCE)
+                self.users[user_name].wallet[tkn_name] = Token(
+                    balance=DEFAULT_ACCOUNT_BALANCE
+                )
             if get_pooltoken_name(tkn_name) not in self.users[user_name].wallet:
                 self.users[user_name].wallet[get_pooltoken_name(tkn_name)] = Token(
                     balance=DEFAULT_ACCOUNT_BALANCE
                 )
             if tkn_name == "bnt":
                 if "vbnt" not in self.users[user_name].wallet:
-                    self.users[user_name].wallet["vbnt"] = Token(balance=DEFAULT_ACCOUNT_BALANCE)
+                    self.users[user_name].wallet["vbnt"] = Token(
+                        balance=DEFAULT_ACCOUNT_BALANCE
+                    )
 
     def update_inv_spot_rate(self, tkn_name: str):
         """
@@ -1021,8 +1026,8 @@ def get_vault_tvl(state: State) -> Decimal:
     return sum(
         [
             (
-                    get_tkn_price(state, tkn_name)
-                    * state.tokens[tkn_name].master_vault.balance
+                get_tkn_price(state, tkn_name)
+                * state.tokens[tkn_name].master_vault.balance
             )
             for tkn_name in state.whitelisted_tokens
         ]
@@ -1154,28 +1159,28 @@ def get_standard_reward_rate(state: State, id: int) -> int:
 
 
 def get_user_pending_rewards_staked_balance(
-        state: State, id: int, user_name: str
+    state: State, id: int, user_name: str
 ) -> Decimal:
     return (
         state.users[user_name]
-            .pending_standard_rewards[id]
-            .staked.balance.quantize(DEFAULT_QDECIMALS)
+        .pending_standard_rewards[id]
+        .staked.balance.quantize(DEFAULT_QDECIMALS)
     )
 
 
 def get_user_pending_standard_rewards(state: State, id: int, user_name: str) -> Decimal:
     return (
         state.users[user_name]
-            .pending_standard_rewards[id]
-            .pending_rewards.balance.quantize(DEFAULT_QDECIMALS)
+        .pending_standard_rewards[id]
+        .pending_rewards.balance.quantize(DEFAULT_QDECIMALS)
     )
 
 
 def get_user_reward_per_token_paid(state: State, id: int, user_name: str) -> Decimal:
     return (
         state.users[user_name]
-            .pending_standard_rewards[id]
-            .reward_per_token_paid.balance.quantize(DEFAULT_QDECIMALS)
+        .pending_standard_rewards[id]
+        .reward_per_token_paid.balance.quantize(DEFAULT_QDECIMALS)
     )
 
 
@@ -1187,7 +1192,7 @@ def get_user_wallet_tokens(state: State, user_name: str) -> list:
         state.users[user_name].wallet[tkn_name].balance.quantize(DEFAULT_QDECIMALS)
         for tkn_name in state.whitelisted_tokens
         if state.users[user_name].wallet[tkn_name].balance.quantize(DEFAULT_QDECIMALS)
-           > 0
+        > 0
     ]
 
 
@@ -1432,7 +1437,7 @@ def get_user_pending_withdrawals(state: State, user_name: str, tkn_name: str) ->
         id
         for id in state.users[user_name].pending_withdrawals
         if state.users[user_name].pending_withdrawals[id].tkn_name == tkn_name
-           and state.users[user_name].pending_withdrawals[id].is_complete
+        and state.users[user_name].pending_withdrawals[id].is_complete
     ]
 
 
@@ -1551,8 +1556,8 @@ def get_protocol_wallet_description(state: State, qdecimals: Decimal) -> list:
     Builds a structured list for current state information display.
     """
     return [
-               f"bnbnt=" + str(get_protocol_wallet_balance(state, "bnt").quantize(qdecimals))
-           ] + ["" for tkn_name in state.whitelisted_tokens[:-1]]
+        f"bnbnt=" + str(get_protocol_wallet_balance(state, "bnt").quantize(qdecimals))
+    ] + ["" for tkn_name in state.whitelisted_tokens[:-1]]
 
 
 def get_description(state: State, qdecimals: Decimal) -> dict:
@@ -1595,8 +1600,8 @@ def get_json_virtual_balances(state: State, tkn_name: str) -> dict:
 
 
 def get_max_bnt_deposit(
-        state: State,
-        user_bnt: Decimal,
+    state: State,
+    user_bnt: Decimal,
 ) -> Decimal:
     """
     Used in simulation only.
@@ -1612,7 +1617,7 @@ def get_network_fee(state: State, tkn_name: str) -> Decimal:
 
 
 def get_trade_inputs(
-        state: State, tkn_name: str
+    state: State, tkn_name: str
 ) -> Tuple[str, Decimal, Decimal, Decimal, Decimal]:
     """
     Gets all input data required to process trade action.

@@ -7,4 +7,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: psf/black@stable
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install Black
+        run: pip install black
+      - name: Install Black Jupyter
+        run: pip install jupyter-black
+      - name: Run black --check bancor_research/bancor_simulator
+        run: black --check bancor_research/bancor_simulator
+      - name: If needed, commit black changes to the pull request
+        if: failure()
+        run: |
+          black bancor_research/bancor_simulator
+          git config --global user.name 'mikewcasale'
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
+          git checkout $GITHUB_HEAD_REF
+          git commit -am "fixup: Format Python code with Black"
+          git push

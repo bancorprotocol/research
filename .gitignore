@@ -140,4 +140,4 @@ artifacts
 .netlify
 .idea/sonarlint/issuestore/index.pb
 /.run/
-.run/
+.run/bancor_research/bancor_emulator/tests/project/tests/data/

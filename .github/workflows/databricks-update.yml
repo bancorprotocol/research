@@ -1,4 +1,4 @@
-name: Update databricks Repos on PRs
+name: Databricks Update & Tests
 
 
 on:
@@ -20,5 +20,10 @@ jobs:
         DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
       run: |
         python -m pip install --upgrade databricks-cli
-        databricks repos update --path /Repos/etl/prod --branch main
-        databricks repos update --path /Repos/etl/staging --branch staging
+        databricks repos update --path /Repos/research/prod --branch main
+    - name: Trigger notebook from PR branch
+      uses: databricks/run-notebook@v0
+      with:
+        local-notebook-path: bancor_research/bancor_simulator/tests/notebooks/pypi-installer-test.py
+        existing-cluster-id: 0718-131334-gdlfepzf
+

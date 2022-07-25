@@ -23,7 +23,7 @@ setup(
                 'It is meant to assist in the design, testing, and validating of Bancor v3 behavior.',
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url='https://github.com/bancorprotocol/simulator-v3',
+    url='https://github.com/bancorprotocol/research',
     install_requires=open('requirements.txt').readlines(),
     extras_require=extras_require,
     tests_require=open('test-requirements.txt').readlines(),

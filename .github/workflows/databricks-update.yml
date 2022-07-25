@@ -24,6 +24,9 @@ jobs:
     - name: Trigger notebook from PR branch
       uses: databricks/run-notebook@v0
       with:
+        databricks-host: ${{ secrets.DATABRICKS_HOST }}
+        databricks-token: ${{ secrets.DATABRICKS_TOKEN }}
+        git-commit: ${{ github.event.pull_request.head.sha }}
         local-notebook-path: bancor_research/bancor_simulator/tests/notebooks/pypi-installer-test.py
         existing-cluster-id: 0718-131334-gdlfepzf
 

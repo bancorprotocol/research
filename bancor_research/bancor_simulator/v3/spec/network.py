@@ -398,27 +398,55 @@ class BancorDapp:
         state = self.global_state
 
         # Iterate all reserve tokens and all pool tokens
-        for tkn_name in state.whitelisted_tokens + ["bn" + tkn_name for tkn_name in state.whitelisted_tokens]:
+        for tkn_name in state.whitelisted_tokens + [
+            "bn" + tkn_name for tkn_name in state.whitelisted_tokens
+        ]:
             table[tkn_name] = {}
             for account in state.usernames:
-                table[tkn_name][tuple([1, "Account", account])] = state.users[account].wallet[tkn_name].balance
+                table[tkn_name][tuple([1, "Account", account])] = (
+                    state.users[account].wallet[tkn_name].balance
+                )
 
         # Iterate all reserve tokens except bnt
-        for tkn_name in [tkn_name for tkn_name in state.whitelisted_tokens if tkn_name != "bnt"]:
-            table[tkn_name][tuple([2, "Pool", "a: TKN Staked Balance"   ])] = state.tokens[tkn_name].staking_ledger.balance
-            table[tkn_name][tuple([2, "Pool", "b: TKN Trading Liquidity"])] = state.tokens[tkn_name].tkn_trading_liquidity.balance
-            table[tkn_name][tuple([2, "Pool", "c: BNT Trading Liquidity"])] = state.tokens[tkn_name].bnt_trading_liquidity.balance
-            table[tkn_name][tuple([2, "Pool", "d: BNT Current Funding"  ])] = state.tokens[tkn_name].bnt_funding_amt.balance
-            table[tkn_name][tuple([2, "Pool", "e: Spot Rate"            ])] = state.tokens[tkn_name].spot_rate
-            table[tkn_name][tuple([2, "Pool", "f: Average Rate"         ])] = state.tokens[tkn_name].ema_rate
-            table[tkn_name][tuple([2, "Pool", "g: Average Inverse Rate" ])] = state.tokens[tkn_name].inv_ema_rate
+        for tkn_name in [
+            tkn_name for tkn_name in state.whitelisted_tokens if tkn_name != "bnt"
+        ]:
+            table[tkn_name][tuple([2, "Pool", "a: TKN Staked Balance"])] = state.tokens[
+                tkn_name
+            ].staking_ledger.balance
+            table[tkn_name][
+                tuple([2, "Pool", "b: TKN Trading Liquidity"])
+            ] = state.tokens[tkn_name].tkn_trading_liquidity.balance
+            table[tkn_name][
+                tuple([2, "Pool", "c: BNT Trading Liquidity"])
+            ] = state.tokens[tkn_name].bnt_trading_liquidity.balance
+            table[tkn_name][
+                tuple([2, "Pool", "d: BNT Current Funding"])
+            ] = state.tokens[tkn_name].bnt_funding_amt.balance
+            table[tkn_name][tuple([2, "Pool", "e: Spot Rate"])] = state.tokens[
+                tkn_name
+            ].spot_rate
+            table[tkn_name][tuple([2, "Pool", "f: Average Rate"])] = state.tokens[
+                tkn_name
+            ].ema_rate
+            table[tkn_name][
+                tuple([2, "Pool", "g: Average Inverse Rate"])
+            ] = state.tokens[tkn_name].inv_ema_rate
 
         # Iterate all reserve tokens
         for tkn_name in state.whitelisted_tokens:
-            table[       tkn_name][tuple([3, "Network", "Master Vault"    ])] = state.tokens[tkn_name].master_vault.balance
-            table[       tkn_name][tuple([3, "Network", "Protection Vault"])] = state.tokens[tkn_name].external_protection_vault.balance
-            table["bn" + tkn_name][tuple([3, "Network", "Rewards Vault"   ])] = state.tokens[tkn_name].standard_rewards_vault.balance
-            table["bn" + tkn_name][tuple([3, "Network", "Protocol Equity" ])] = state.tokens[tkn_name].protocol_wallet_pooltokens.balance
+            table[tkn_name][tuple([3, "Network", "Master Vault"])] = state.tokens[
+                tkn_name
+            ].master_vault.balance
+            table[tkn_name][tuple([3, "Network", "Protection Vault"])] = state.tokens[
+                tkn_name
+            ].external_protection_vault.balance
+            table["bn" + tkn_name][
+                tuple([3, "Network", "Rewards Vault"])
+            ] = state.tokens[tkn_name].standard_rewards_vault.balance
+            table["bn" + tkn_name][
+                tuple([3, "Network", "Protocol Equity"])
+            ] = state.tokens[tkn_name].protocol_wallet_pooltokens.balance
 
         df = pd.DataFrame(table).sort_index()
         return df.applymap(lambda x: round(x, decimals)) if decimals >= 0 else df

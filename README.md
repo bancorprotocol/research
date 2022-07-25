@@ -3,8 +3,6 @@
 </p>
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-netlify env:set SECRET_KEY secretValue
-
 # Bancor Simulator
 
 [![PyPI version](https://badge.fury.io/py/bancor-research.svg)](https://badge.fury.io/py/bancor-research)

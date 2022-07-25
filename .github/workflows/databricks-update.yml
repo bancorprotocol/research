@@ -1,4 +1,4 @@
-name: Databricks Update & Tests
+name: Databricks Update & Databricks Install Pypi Test
 
 
 on:

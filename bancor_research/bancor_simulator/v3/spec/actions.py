@@ -16,7 +16,7 @@ from bancor_research.bancor_simulator.v3.spec.utils import *
 
 def deposit_bnt(state: State, tkn_name: str, tkn_amt: Decimal, user_name: str) -> State:
     """
-    Specific case of .stake() method, see .stake() method docstring
+    Specific case of `deposit` for bnt token.
     """
     bnbnt_amt = compute_bnbnt_amt(state, tkn_amt)
     state.decrease_user_balance(user_name, tkn_name, tkn_amt)
@@ -28,7 +28,7 @@ def deposit_bnt(state: State, tkn_name: str, tkn_amt: Decimal, user_name: str) -
 
 def deposit_tkn(state: State, tkn_name: str, tkn_amt: Decimal, user_name: str) -> State:
     """
-    Specific case of .stake() method, see .stake() method docstring
+    Specific case of `deposit` for non-bnt token.
     """
     bntkn_amt = compute_bntkn_amt(state, tkn_name, tkn_amt)
     state.decrease_user_balance(user_name, tkn_name, tkn_amt)
@@ -170,6 +170,9 @@ def trade_bnt_for_tkn(
     tkn_name: str,
     direction: str = "bnt",
 ) -> Tuple[State, Decimal]:
+    """
+    Specific case of `trade` when bnt is the source token.
+    """
     state = handle_ema(state, tkn_name)
     updated_bnt_liquidity = compute_changed_bnt_trading_liquidity(
         bnt_trading_liquidity,
@@ -224,7 +227,7 @@ def trade_tkn_for_bnt(
     direction="tkn",
 ):
     """
-    Main logic to process swaps/trades from TKN->BNT
+    Specific case of `trade` when bnt is the target token.
     """
 
     state = handle_ema(state, tkn_name)

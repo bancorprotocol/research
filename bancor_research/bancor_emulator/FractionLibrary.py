@@ -49,9 +49,9 @@ def inverse(fraction):
     * @dev reduces a standard fraction to a 112-bit fraction
 '''
 def toFraction112(fraction: Fraction256) -> (Fraction112):
-    reducedFraction = MathEx.reducedFraction(fraction, uint112.max);
+    truncatedFraction = MathEx.truncatedFraction(fraction, uint112.max);
 
-    return Fraction112({ 'n': uint112(reducedFraction.n), 'd': uint112(reducedFraction.d) });
+    return Fraction112({ 'n': uint112(truncatedFraction.n), 'd': uint112(truncatedFraction.d) });
 
 '''
     * @dev expands a 112-bit fraction to a standard fraction

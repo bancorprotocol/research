@@ -28,28 +28,28 @@ All state transition functions and accompanying data structures described in the
 This is the project directory structure:
 
 ```
-bancor_analytics/            <------- Tableau Dashboard Project
-bancor_emulator/             <------- Solidity Emulation Project
-bancor_simulator/            <------- ** Spec & Simulation Project **
-├── v3/                      <------- Current Version
-│   └── simulation/          <------- Agent-based simulation module
-│   │     └── agents.py      <------- Mesa Agent-based implementations of the Bancor protocol.
-│   │     └── batch_run.py   <------- Script used to perform a parameter sweep.
-│   │     └── model.py       <------- Main Bancor Simulation module interface.
-│   │     └── random_walk.py <------- Generalized behavior for random walking
-│   │     └── run.py         <------- Runs the simulation server with browser-based UI
-│   │     └── server.py      <------- Configures the browser-based interface.
-│   │     └── utils.py       <------- Misc utility functions
-│   │ 
-│   └── spec/                <------- State transition functions and data structures described in BIP15.
-│         └── actions.py     <------- Deposit, trade, & withdrawal algorithm logic.
-│         └── emulation.py   <------- Verifies solidity result parity.
-│         └── network.py     <------- Main BancorDapp application interface.
-│         └── rewards.py     <------- Autocompounding and standard rewards logic.
-│         └── state.py       <------- State variables, constants, data structures, and CRUD interfaces.
-│         └── utils.py       <------- Misc utility functions
-│ 
-└── main.py                  <------- Application
+bancor_research/                   <------- ** General Research Project **
+└───── bancor_emulator/            <------- Solidity Emulation Project
+   └── bancor_simulator/           <------- ** Spec & Simulation Project **
+      │   ├── v3/                  <------- Current Version
+      │   └── simulation/          <------- Agent-based simulation module
+      │   │     └── agents.py      <------- Mesa Agent-based implementations of the Bancor protocol.
+      │   │     └── batch_run.py   <------- Script used to perform a parameter sweep.
+      │   │     └── model.py       <------- Main Bancor Simulation module interface.
+      │   │     └── random_walk.py <------- Generalized behavior for random walking
+      │   │     └── run.py         <------- Runs the simulation server with browser-based UI
+      │   │     └── server.py      <------- Configures the browser-based interface.
+      │   │     └── utils.py       <------- Misc utility functions
+      │   │ 
+      │   └── spec/                <------- State transition functions and data structures described in BIP15.
+      │         └── actions.py     <------- Deposit, trade, & withdrawal algorithm logic.
+      │         └── emulation.py   <------- Verifies solidity result parity.
+      │         └── network.py     <------- Main BancorDapp application interface.
+      │         └── rewards.py     <------- Autocompounding and standard rewards logic.
+      │         └── state.py       <------- State variables, constants, data structures, and CRUD interfaces.
+      │         └── utils.py       <------- Misc utility functions
+      │ 
+      └── main.py                  <------- Application
 
 ** These docs apply.
 ```

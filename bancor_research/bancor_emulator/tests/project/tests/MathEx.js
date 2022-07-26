@@ -53,9 +53,9 @@ contract('MathEx', () => {
     };
 
     const testReducedFraction = async (f, max) => {
-        console.log(`reducedFraction(${f.n} / ${f.d}, ${max})`);
+        console.log(`truncatedFraction(${f.n} / ${f.d}, ${max})`);
         try {
-            const actual = await mathEx.reducedFraction([f.n, f.d], max);
+            const actual = await mathEx.truncatedFraction([f.n, f.d], max);
             console.log(`${actual.n} / ${actual.d}`);
         }
         catch (error) {

@@ -46,9 +46,9 @@ def testExp(f):
         print('Overflow');
 
 def testReducedFraction(f, max):
-    print('reducedFraction({} / {}, {})'.format(f.n, f.d, max));
+    print('truncatedFraction({} / {}, {})'.format(f.n, f.d, max));
     try:
-        actual = MathEx.reducedFraction(f, max);
+        actual = MathEx.truncatedFraction(f, max);
         print('{} / {}'.format(actual.n, actual.d));
     except AssertionError as error:
         assert str(error) == 'InvalidFraction'

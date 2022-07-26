@@ -23,7 +23,7 @@ class Sint256:
 '''
 class MathEx:
     exp2 = None
-    reducedFraction = None
+    truncatedFraction = None
     weightedAverage = None
     isInRange = None
     toPos256 = None
@@ -117,15 +117,15 @@ def exp2(f: Fraction256) -> (Fraction256):
     return Fraction256({ 'n': n, 'd': ONE });
 
 '''
-    * @dev returns a fraction with reduced components
+    * @dev returns a fraction with truncated components
 '''
-def reducedFraction(fraction: Fraction256, max: int) -> (Fraction256):
+def truncatedFraction(fraction: Fraction256, max: int) -> (Fraction256):
     scale = Math.ceilDiv(Math.max(fraction.n, fraction.d), max);
-    reduced = Fraction256({ 'n': fraction.n / scale, 'd': fraction.d / scale });
-    if (reduced.d == 0):
+    truncated = Fraction256({ 'n': fraction.n / scale, 'd': fraction.d / scale });
+    if (truncated.d == 0):
         revert("InvalidFraction");
 
-    return reduced;
+    return truncated;
 
 '''
     * @dev returns the weighted average of two fractions
@@ -330,7 +330,7 @@ from bancor_research.bancor_emulator import config
 if config.mode == 'float':
     def exp2(f: Fraction256) -> (Fraction256):
         return Fraction256({ 'n': uint256(2) ** (f.n / f.d), 'd': 1 });
-    def reducedFraction(fraction: Fraction256, max: int) -> (Fraction256):
+    def truncatedFraction(fraction: Fraction256, max: int) -> (Fraction256):
         return fraction;
     def mulDivF(x, y, z) -> (uint):
         return uint256(x) * y / z 

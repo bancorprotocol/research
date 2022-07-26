@@ -202,10 +202,7 @@ class AutocompoundingProgram:
         """
         Returns the rate per second of the distribution.
         """
-        return (
-            self.total_rewards.balance
-            / self.total_duration_in_seconds
-        )
+        return self.total_rewards.balance / self.total_duration_in_seconds
 
     @property
     def half_life_seconds(self):
@@ -315,8 +312,7 @@ class Tokens(GlobalSettings):
         The tkn trading liquidity adjusted by the ema.
         """
         return (
-            self.bnt_trading_liquidity.balance
-            / self.ema_rate
+            self.bnt_trading_liquidity.balance / self.ema_rate
             if self.ema_rate > 0
             else 0
         )
@@ -326,10 +322,7 @@ class Tokens(GlobalSettings):
         """
         The difference between the master_vault balance and the average trading liquidity.
         """
-        return (
-            self.master_vault.balance
-            - self.avg_tkn_trading_liquidity
-        )
+        return self.master_vault.balance - self.avg_tkn_trading_liquidity
 
     @property
     def tkn_excess_bnt_equivalence(self):
@@ -533,8 +526,7 @@ class State(GlobalSettings):
         """
         if (
             self.tokens["bnt"].staking_ledger.balance == 0
-            and self.tokens["bnt"].pooltoken_supply.balance
-            == 0
+            and self.tokens["bnt"].pooltoken_supply.balance == 0
         ):
             bnbnt_rate = Decimal("1")
         else:
@@ -1153,19 +1145,11 @@ def get_standard_reward_rate(state: State, id: int) -> int:
 def get_user_pending_rewards_staked_balance(
     state: State, id: int, user_name: str
 ) -> Decimal:
-    return (
-        state.users[user_name]
-        .pending_standard_rewards[id]
-        .staked.balance
-    )
+    return state.users[user_name].pending_standard_rewards[id].staked.balance
 
 
 def get_user_pending_standard_rewards(state: State, id: int, user_name: str) -> Decimal:
-    return (
-        state.users[user_name]
-        .pending_standard_rewards[id]
-        .pending_rewards.balance
-    )
+    return state.users[user_name].pending_standard_rewards[id].pending_rewards.balance
 
 
 def get_user_reward_per_token_paid(state: State, id: int, user_name: str) -> Decimal:
@@ -1183,8 +1167,7 @@ def get_user_wallet_tokens(state: State, user_name: str) -> list:
     return [
         state.users[user_name].wallet[tkn_name].balance
         for tkn_name in state.whitelisted_tokens
-        if state.users[user_name].wallet[tkn_name].balance
-        > 0
+        if state.users[user_name].wallet[tkn_name].balance > 0
     ]
 
 
@@ -1209,7 +1192,6 @@ def get_external_protection_vault(state: State, tkn_name: str) -> Decimal:
     return state.tokens[tkn_name].external_protection_vault.balance
 
 
-
 def get_pooltoken_balance(state: State, tkn_name: str) -> Decimal:
     """
     The current erc20 contracts staked_amt supply for a given tkn_name.
@@ -1222,7 +1204,6 @@ def get_protocol_wallet_balance(state: State, tkn_name: str) -> Decimal:
     The current protocol owned liquidity (when tkn_name==bnt) or the current autocompounding rewards remaining.
     """
     return state.tokens[tkn_name].protocol_wallet_pooltokens.balance
-
 
 
 def get_vortex_balance(state: State, tkn_name: str) -> Decimal:
@@ -1250,9 +1231,7 @@ def get_total_rewards(state: State, tkn_name: str) -> Decimal:
     """
     The initial balance for a given autocompounding rewards program.
     """
-    return state.autocompounding_reward_programs[
-        tkn_name
-    ].total_rewards.balance
+    return state.autocompounding_reward_programs[tkn_name].total_rewards.balance
 
 
 def get_distribution_type(state: State, tkn_name: str) -> str:
@@ -1512,8 +1491,7 @@ def get_pooltoken_description(state: State, qdecimals: Decimal) -> list:
     Builds a structured list for current state information display.
     """
     return [f"bnbnt={get_pooltoken_balance(state, 'bnt')}"] + [
-        f"bn{tkn_name}="
-        + str(get_pooltoken_balance(state, tkn_name))
+        f"bn{tkn_name}=" + str(get_pooltoken_balance(state, tkn_name))
         for tkn_name in state.whitelisted_tokens
         if tkn_name != "bnt"
     ]
@@ -1533,8 +1511,7 @@ def get_external_protection_description(state: State, qdecimals: Decimal) -> lis
     Builds a structured list for current state information display.
     """
     return [
-        f"{tkn_name}="
-        + str(get_external_protection_vault(state, tkn_name))
+        f"{tkn_name}=" + str(get_external_protection_vault(state, tkn_name))
         for tkn_name in state.whitelisted_tokens
     ]
 
@@ -1543,9 +1520,9 @@ def get_protocol_wallet_description(state: State, qdecimals: Decimal) -> list:
     """
     Builds a structured list for current state information display.
     """
-    return [
-        f"bnbnt=" + str(get_protocol_wallet_balance(state, "bnt"))
-    ] + ["" for tkn_name in state.whitelisted_tokens[:-1]]
+    return [f"bnbnt=" + str(get_protocol_wallet_balance(state, "bnt"))] + [
+        "" for tkn_name in state.whitelisted_tokens[:-1]
+    ]
 
 
 def get_description(state: State, qdecimals: Decimal) -> dict:
@@ -1623,9 +1600,7 @@ def get_autocompounding_remaining_rewards(state: State, tkn_name: str) -> Decima
     """
     Get the remaining rewards for a given program.
     """
-    return state.autocompounding_reward_programs[
-        tkn_name
-    ].remaining_rewards.balance
+    return state.autocompounding_reward_programs[tkn_name].remaining_rewards.balance
 
 
 def get_remaining_standard_rewards(state: State, id: int) -> Decimal:
@@ -1635,11 +1610,8 @@ def get_remaining_standard_rewards(state: State, id: int) -> Decimal:
     return state.standard_reward_programs[id].remaining_rewards.balance
 
 
-
 def get_standard_program(state: State, tkn_name: str) -> Decimal:
     """
     Get the remaining rewards for a given program.
     """
-    return state.autocompounding_reward_programs[
-        tkn_name
-    ].remaining_rewards.balance
+    return state.autocompounding_reward_programs[tkn_name].remaining_rewards.balance

@@ -249,9 +249,7 @@ def shutdown_pool(state: State, tkn_name: str) -> State:
     Shutdown pool when the bnt_min_trading_liquidity threshold is breached.
     """
 
-    bnt_trading_liquidity = state.tokens[
-        tkn_name
-    ].bnt_trading_liquidity.balance
+    bnt_trading_liquidity = state.tokens[tkn_name].bnt_trading_liquidity.balance
     bnbnt_renounced = compute_bnbnt_amt(state, bnt_trading_liquidity)
 
     # adjust balances
@@ -465,9 +463,7 @@ def init_json_simulation(state: State) -> State:
 
         if tkn_name in state.standard_reward_programs:
             state.json_export["tknRewardsamt"] = format_json(
-                state.standard_reward_programs[
-                    tkn_name
-                ].staked_reward_amt.balance
+                state.standard_reward_programs[tkn_name].staked_reward_amt.balance
             )
             state.json_export["tknRewardsDuration"] = format_json(
                 state.standard_reward_programs[tkn_name].end_time, integer=True
@@ -488,9 +484,7 @@ def init_json_simulation(state: State) -> State:
             user["id"] = user_name
             for tkn_name in state.whitelisted_tokens:
                 user[f"{tkn_name}Balance"] = format_json(
-                    state.users[user_name]
-                    .wallet[tkn_name]
-                    .balance
+                    state.users[user_name].wallet[tkn_name].balance
                 )
             users.append(user)
 
@@ -636,9 +630,7 @@ def build_json_operation(
         bnt_remaining_rewards = Decimal("0")
 
     if "tkn" in state.standard_reward_programs:
-        er_vault_tkn = state.tokens[
-            tkn_name
-        ].protocol_wallet_pooltokens.balance
+        er_vault_tkn = state.tokens[tkn_name].protocol_wallet_pooltokens.balance
     else:
         er_vault_tkn = Decimal("0")
 
@@ -910,7 +902,7 @@ def load(file_path):
 
 
 def export_test_scenarios(state: State, path: str = "test_scenarios.json"):
-        """
-        Exports the auto-generated json scenarios file to a given path.
-        """
-        save_json(state.json_export, path)
+    """
+    Exports the auto-generated json scenarios file to a given path.
+    """
+    save_json(state.json_export, path)

@@ -53,7 +53,7 @@ class BancorDapp:
         price_feeds_path: str = DEFAULT_PRICE_FEEDS_PATH,
         price_feeds: PandasDataFrame = DEFAULT_PRICE_FEEDS,
         active_users: list = DEFAULT_USERS,
-        transaction_id: int = 0
+        transaction_id: int = 0,
     ):
 
         self.json_data = None

@@ -1,6 +1,8 @@
 # coding=utf-8
 # --------------------------------------------------------------------------
-# Licensed under the Bprotocol Foundation (Bancor) LICENSE. See License.txt in the project root for license information.
+# Licensed under the MIT LICENSE. See License.txt in the project root for license information.
+# --------------------------------------------------------------------------
+
 """
 Generalized behavior for random walking, one grid cell at a time.
 """

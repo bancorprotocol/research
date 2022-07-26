@@ -186,7 +186,7 @@ def format_json(val: Any, integer: bool = False, percentage: bool = False) -> An
         if type(val) == dict:
             return val
         else:
-            return str(val.quantize(DEFAULT_QDECIMALS)).replace("0E-18", "0")
+            return str(val).replace("0E-18", "0")
 
 
 def enable_trading(state: State, tkn_name: str) -> State:
@@ -251,7 +251,7 @@ def shutdown_pool(state: State, tkn_name: str) -> State:
 
     bnt_trading_liquidity = state.tokens[
         tkn_name
-    ].bnt_trading_liquidity.balance.quantize(DEFAULT_QDECIMALS)
+    ].bnt_trading_liquidity.balance
     bnbnt_renounced = compute_bnbnt_amt(state, bnt_trading_liquidity)
 
     # adjust balances
@@ -460,24 +460,20 @@ def init_json_simulation(state: State) -> State:
             state.withdrawal_fee, percentage=True
         )
         state.json_export["epVaultBalance"] = format_json(
-            state.tokens[tkn_name].external_protection_vault.balance.quantize(
-                DEFAULT_QDECIMALS
-            )
+            state.tokens[tkn_name].external_protection_vault.balance
         )
 
         if tkn_name in state.standard_reward_programs:
             state.json_export["tknRewardsamt"] = format_json(
                 state.standard_reward_programs[
                     tkn_name
-                ].staked_reward_amt.balance.quantize(DEFAULT_QDECIMALS)
+                ].staked_reward_amt.balance
             )
             state.json_export["tknRewardsDuration"] = format_json(
                 state.standard_reward_programs[tkn_name].end_time, integer=True
             )
             state.json_export["bntRewardsamt"] = format_json(
-                state.standard_reward_programs["bnt"].total_staked.balance.quantize(
-                    DEFAULT_QDECIMALS
-                )
+                state.standard_reward_programs["bnt"].total_staked.balance
             )
             state.json_export["bntRewardsDuration"] = format_json(
                 state.standard_reward_programs["bnt"].end_time, integer=True
@@ -494,7 +490,7 @@ def init_json_simulation(state: State) -> State:
                 user[f"{tkn_name}Balance"] = format_json(
                     state.users[user_name]
                     .wallet[tkn_name]
-                    .balance.quantize(DEFAULT_QDECIMALS)
+                    .balance
                 )
             users.append(user)
 
@@ -642,14 +638,12 @@ def build_json_operation(
     if "tkn" in state.standard_reward_programs:
         er_vault_tkn = state.tokens[
             tkn_name
-        ].protocol_wallet_pooltokens.balance.quantize(DEFAULT_QDECIMALS)
+        ].protocol_wallet_pooltokens.balance
     else:
         er_vault_tkn = Decimal("0")
 
     if "bnt" in state.autocompounding_reward_programs:
-        er_vault_bnt = state.tokens["bnt"].protocol_wallet_pooltokens.balance.quantize(
-            DEFAULT_QDECIMALS
-        )
+        er_vault_bnt = state.tokens["bnt"].protocol_wallet_pooltokens.balance
     else:
         er_vault_bnt = Decimal("0")
 
@@ -867,3 +861,56 @@ def generate_emulator_expected_results(
         state, tkn_name, tkn_amt, transaction_type, user_name, timestamp
     )
     return json_operation["expected"]
+
+
+def load_json(path, **kwargs):
+    """
+    Loads json files for convenient simulation.
+    """
+    with open(path, "r") as f:
+        return json.load(f, **kwargs)
+
+
+def save_json(x, path, indent=True, **kwargs):
+    """
+    Saves json for convenience.
+    """
+    with open(path, "w") as f:
+        if indent:
+            json.dump(x, f, indent="\t", **kwargs)
+        else:
+            json.dump(x, f, **kwargs)
+    print("Saved to", path)
+
+
+def load_pickle(path):
+    """
+    Loads a pickled state from a file path.
+    """
+    print("Unpickling from", path)
+    with open(path, "rb") as f:
+        return pickle.load(f)
+
+
+def save_pickle(x, path):
+    """
+    Saves a serialized state at file path.
+    """
+    print("Pickling to", path)
+    with open(path, "wb") as f:
+        return pickle.dump(x, f)
+
+
+def load(file_path):
+    """
+    Loads saved file via cloudpickle.
+    """
+    with open(file_path, "rb") as f:
+        return cloudpickle.load(f)
+
+
+def export_test_scenarios(state: State, path: str = "test_scenarios.json"):
+        """
+        Exports the auto-generated json scenarios file to a given path.
+        """
+        save_json(state.json_export, path)

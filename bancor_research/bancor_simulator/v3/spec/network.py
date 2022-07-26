@@ -53,9 +53,7 @@ class BancorDapp:
         price_feeds_path: str = DEFAULT_PRICE_FEEDS_PATH,
         price_feeds: PandasDataFrame = DEFAULT_PRICE_FEEDS,
         active_users: list = DEFAULT_USERS,
-        transaction_id: int = 0,
-        generate_json_tests: bool = False,
-        emulate_solidity_results: bool = False,
+        transaction_id: int = 0
     ):
 
         self.json_data = None
@@ -117,52 +115,6 @@ class BancorDapp:
     def global_state(self, value):
         self._global_state = value
 
-    @staticmethod
-    def load_json(path, **kwargs):
-        """
-        Loads json files for convenient simulation.
-        """
-        with open(path, "r") as f:
-            return json.load(f, **kwargs)
-
-    @staticmethod
-    def save_json(x, path, indent=True, **kwargs):
-        """
-        Saves json for convenience.
-        """
-        with open(path, "w") as f:
-            if indent:
-                json.dump(x, f, indent="\t", **kwargs)
-            else:
-                json.dump(x, f, **kwargs)
-        print("Saved to", path)
-
-    @staticmethod
-    def load_pickle(path):
-        """
-        Loads a pickled BancorDapp state from a file path.
-        """
-        print("Unpickling from", path)
-        with open(path, "rb") as f:
-            return pickle.load(f)
-
-    @staticmethod
-    def save_pickle(x, path):
-        """
-        Saves a pickled BancorDapp state at file path.
-        """
-        print("Pickling to", path)
-        with open(path, "wb") as f:
-            return pickle.dump(x, f)
-
-    @staticmethod
-    def load(file_path):
-        """
-        Loads pickled BancorDapp state at file path via cloudpickle.
-        """
-        with open(file_path, "rb") as f:
-            return cloudpickle.load(f)
-
     def copy_state(self, copy_type: str, state: State = None, timestamp: int = 0):
         """
         Saves a backup of the current global state to revert_state back to if desired.
@@ -208,13 +160,6 @@ class BancorDapp:
         """
         self.global_state = self._backup_states[timestamp]
 
-    def save(self, file_path, pickle_protocol=cloudpickle.DEFAULT_PROTOCOL):
-        """
-        Saves state at file path.
-        """
-        with open(file_path, "wb") as f:
-            cloudpickle.dump(self, f, protocol=pickle_protocol)
-
     def show_history(self):
         """
         Displays the history of the bancor network in a dataframe.
@@ -225,12 +170,6 @@ class BancorDapp:
                 for i in range(len(self.global_state.history))
             ]
         )
-
-    def export_test_scenarios(self, path: str = "test_scenarios.json"):
-        """
-        Exports the auto-generated json scenarios file to a given path.
-        """
-        BancorDapp.save_json(self.global_state.json_export, path)
 
     def deposit(
         self,
@@ -887,3 +826,10 @@ class BancorDapp:
             )
             self.global_state.json_export["operations"].append(json_operation)
         return self
+
+    def save(self, file_path, pickle_protocol=cloudpickle.DEFAULT_PROTOCOL):
+        """
+        Saves state at file path.
+        """
+        with open(file_path, "wb") as f:
+            cloudpickle.dump(self, f, protocol=pickle_protocol)

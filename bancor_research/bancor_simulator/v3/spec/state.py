@@ -52,9 +52,9 @@ DEFAULT_NETWORK_FEE = Decimal("0.2")
 DEFAULT_BNT_FUNDING_LIMIT = Decimal("1000000")
 DEFAULT_BNT_MIN_LIQUIDITY = Decimal("10000")
 DEFAULT_COOLDOWN_TIME = SECONDS_PER_DAY * 7
-DEFAULT_ALPHA = Decimal("0.2").quantize(DEFAULT_QDECIMALS)
-DEFAULT_LOWER_EMA_LIMIT = Decimal("0.99").quantize(DEFAULT_QDECIMALS)
-DEFAULT_UPPER_EMA_LIMIT = Decimal("1.01").quantize(DEFAULT_QDECIMALS)
+DEFAULT_ALPHA = Decimal("0.2")
+DEFAULT_LOWER_EMA_LIMIT = Decimal("0.99")
+DEFAULT_UPPER_EMA_LIMIT = Decimal("1.01")
 DEFAULT_NUM_TIMESTAMPS = SECONDS_PER_DAY * 30
 DEFAULT_ACCOUNT_BALANCE = Decimal(np.nan)
 DEFAULT_PRICE_FEEDS = pd.DataFrame(
@@ -104,7 +104,7 @@ class Token(object):
     def validate_value(self, value) -> Decimal:
         if pd.isnull(value):
             value = Decimal("0")
-        return Decimal(str(value)).quantize(self.qdecimals)
+        return Decimal(str(value))
 
 
 # Containers
@@ -203,7 +203,7 @@ class AutocompoundingProgram:
         Returns the rate per second of the distribution.
         """
         return (
-            self.total_rewards.balance.quantize(DEFAULT_QDECIMALS)
+            self.total_rewards.balance
             / self.total_duration_in_seconds
         )
 
@@ -286,9 +286,7 @@ class Tokens(GlobalSettings):
         """
         Computes the BNT funding remaining for the pool.
         """
-        return self.bnt_funding_limit - self.bnt_funding_amt.balance.quantize(
-            DEFAULT_QDECIMALS
-        )
+        return self.bnt_funding_limit - self.bnt_funding_amt.balance
 
     @property
     def vbnt_price(self):
@@ -317,7 +315,7 @@ class Tokens(GlobalSettings):
         The tkn trading liquidity adjusted by the ema.
         """
         return (
-            self.bnt_trading_liquidity.balance.quantize(DEFAULT_QDECIMALS)
+            self.bnt_trading_liquidity.balance
             / self.ema_rate
             if self.ema_rate > 0
             else 0
@@ -329,7 +327,7 @@ class Tokens(GlobalSettings):
         The difference between the master_vault balance and the average trading liquidity.
         """
         return (
-            self.master_vault.balance.quantize(DEFAULT_QDECIMALS)
+            self.master_vault.balance
             - self.avg_tkn_trading_liquidity
         )
 
@@ -534,15 +532,15 @@ class State(GlobalSettings):
         Returns the inverse of the bnt price feed at the current timestamp
         """
         if (
-            self.tokens["bnt"].staking_ledger.balance.quantize(DEFAULT_QDECIMALS) == 0
-            and self.tokens["bnt"].pooltoken_supply.balance.quantize(DEFAULT_QDECIMALS)
+            self.tokens["bnt"].staking_ledger.balance == 0
+            and self.tokens["bnt"].pooltoken_supply.balance
             == 0
         ):
             bnbnt_rate = Decimal("1")
         else:
             bnbnt_rate = Decimal(
-                self.tokens["bnt"].pooltoken_supply.balance.quantize(DEFAULT_QDECIMALS)
-                / self.tokens["bnt"].staking_ledger.balance.quantize(DEFAULT_QDECIMALS)
+                self.tokens["bnt"].pooltoken_supply.balance
+                / self.tokens["bnt"].staking_ledger.balance
             )
         return bnbnt_rate
 
@@ -1038,9 +1036,7 @@ def get_unclaimed_rewards(state: State, tkn_name: str) -> Decimal:
     """
     Returns the rewards vault balance for a given tkn_name.
     """
-    return state.tokens[tkn_name].standard_rewards_vault.balance.quantize(
-        DEFAULT_QDECIMALS
-    )
+    return state.tokens[tkn_name].standard_rewards_vault.balance
 
 
 def get_total_standard_rewards_staked(state, id: int) -> Decimal:
@@ -1053,9 +1049,7 @@ def get_total_standard_rewards_staked(state, id: int) -> Decimal:
     ]
     return sum(
         [
-            provider.pending_standard_rewards[id].staked_reward_amt.balance.quantize(
-                DEFAULT_QDECIMALS
-            )
+            provider.pending_standard_rewards[id].staked_reward_amt.balance
             for provider in providers
         ]
     )
@@ -1102,23 +1096,21 @@ def get_staked_balance(state: State, tkn_name: str) -> Decimal:
     """
     The current balance of the staking ledger for a given tkn_name.
     """
-    return state.tokens[tkn_name].staking_ledger.balance.quantize(DEFAULT_QDECIMALS)
+    return state.tokens[tkn_name].staking_ledger.balance
 
 
 def get_vault_balance(state: State, tkn_name: str) -> Decimal:
     """
     The current balance of the master master_vault for a given tkn_name.
     """
-    return state.tokens[tkn_name].master_vault.balance.quantize(DEFAULT_QDECIMALS)
+    return state.tokens[tkn_name].master_vault.balance
 
 
 def get_bnt_trading_liquidity(state: State, tkn_name: str) -> Decimal:
     """
     The current bnt trading liquidity for a given tkn_name.
     """
-    return state.tokens[tkn_name].bnt_trading_liquidity.balance.quantize(
-        DEFAULT_QDECIMALS
-    )
+    return state.tokens[tkn_name].bnt_trading_liquidity.balance
 
 
 def get_standard_reward_providers(state: State, id: int) -> list:
@@ -1164,7 +1156,7 @@ def get_user_pending_rewards_staked_balance(
     return (
         state.users[user_name]
         .pending_standard_rewards[id]
-        .staked.balance.quantize(DEFAULT_QDECIMALS)
+        .staked.balance
     )
 
 
@@ -1172,7 +1164,7 @@ def get_user_pending_standard_rewards(state: State, id: int, user_name: str) -> 
     return (
         state.users[user_name]
         .pending_standard_rewards[id]
-        .pending_rewards.balance.quantize(DEFAULT_QDECIMALS)
+        .pending_rewards.balance
     )
 
 
@@ -1180,7 +1172,7 @@ def get_user_reward_per_token_paid(state: State, id: int, user_name: str) -> Dec
     return (
         state.users[user_name]
         .pending_standard_rewards[id]
-        .reward_per_token_paid.balance.quantize(DEFAULT_QDECIMALS)
+        .reward_per_token_paid.balance
     )
 
 
@@ -1189,9 +1181,9 @@ def get_user_wallet_tokens(state: State, user_name: str) -> list:
     List of all tokens for a given user.
     """
     return [
-        state.users[user_name].wallet[tkn_name].balance.quantize(DEFAULT_QDECIMALS)
+        state.users[user_name].wallet[tkn_name].balance
         for tkn_name in state.whitelisted_tokens
-        if state.users[user_name].wallet[tkn_name].balance.quantize(DEFAULT_QDECIMALS)
+        if state.users[user_name].wallet[tkn_name].balance
         > 0
     ]
 
@@ -1200,62 +1192,58 @@ def get_tkn_trading_liquidity(state: State, tkn_name: str) -> Decimal:
     """
     The current tkn trading liquidity for a given tkn_name.
     """
-    return state.tokens[tkn_name].tkn_trading_liquidity.balance.quantize(
-        DEFAULT_QDECIMALS
-    )
+    return state.tokens[tkn_name].tkn_trading_liquidity.balance
 
 
 def get_bnt_funding_amt(state: State, tkn_name: str) -> Decimal:
     """
     The current bnt amount funded for a given tkn_name.
     """
-    return state.tokens[tkn_name].bnt_funding_amt.balance.quantize(DEFAULT_QDECIMALS)
+    return state.tokens[tkn_name].bnt_funding_amt.balance
 
 
 def get_external_protection_vault(state: State, tkn_name: str) -> Decimal:
     """
     The current external protection master_vault balance for a given tkn_name.
     """
-    return state.tokens[tkn_name].external_protection_vault.balance.quantize(
-        DEFAULT_QDECIMALS
-    )
+    return state.tokens[tkn_name].external_protection_vault.balance
+
 
 
 def get_pooltoken_balance(state: State, tkn_name: str) -> Decimal:
     """
     The current erc20 contracts staked_amt supply for a given tkn_name.
     """
-    return state.tokens[tkn_name].pooltoken_supply.balance.quantize(DEFAULT_QDECIMALS)
+    return state.tokens[tkn_name].pooltoken_supply.balance
 
 
 def get_protocol_wallet_balance(state: State, tkn_name: str) -> Decimal:
     """
     The current protocol owned liquidity (when tkn_name==bnt) or the current autocompounding rewards remaining.
     """
-    return state.tokens[tkn_name].protocol_wallet_pooltokens.balance.quantize(
-        DEFAULT_QDECIMALS
-    )
+    return state.tokens[tkn_name].protocol_wallet_pooltokens.balance
+
 
 
 def get_vortex_balance(state: State, tkn_name: str) -> Decimal:
     """
     The current vortex_ledger balance for a given tkn_name.
     """
-    return state.tokens[tkn_name].vortex_ledger.balance.quantize(DEFAULT_QDECIMALS)
+    return state.tokens[tkn_name].vortex_ledger.balance
 
 
 def get_user_balance(state: State, user_name: str, tkn_name: str) -> Decimal:
     """
     The current external protection master_vault balance for a given tkn_name.
     """
-    return state.users[user_name].wallet[tkn_name].balance.quantize(DEFAULT_QDECIMALS)
+    return state.users[user_name].wallet[tkn_name].balance
 
 
 def get_bnbnt_rate(state: State) -> Decimal:
     """
     The current bnbnt rate.
     """
-    return state.bnbnt_rate.quantize(DEFAULT_QDECIMALS)
+    return state.bnbnt_rate
 
 
 def get_total_rewards(state: State, tkn_name: str) -> Decimal:
@@ -1264,7 +1252,7 @@ def get_total_rewards(state: State, tkn_name: str) -> Decimal:
     """
     return state.autocompounding_reward_programs[
         tkn_name
-    ].total_rewards.balance.quantize(DEFAULT_QDECIMALS)
+    ].total_rewards.balance
 
 
 def get_distribution_type(state: State, tkn_name: str) -> str:
@@ -1280,7 +1268,7 @@ def get_prev_token_amt_distributed(state: State, tkn_name: str) -> Decimal:
     """
     return state.autocompounding_reward_programs[
         tkn_name
-    ].prev_token_amt_distributed.balance.quantize(DEFAULT_QDECIMALS)
+    ].prev_token_amt_distributed.balance
 
 
 def get_autocompounding_start_time(state: State, tkn_name: str) -> int:
@@ -1423,7 +1411,7 @@ def get_tkn_price(state: State, tkn_name: str) -> Decimal:
     Gets the tkn price from the price feed.
     """
     return (
-        state.tokens[tkn_name].vbnt_price.quantize(DEFAULT_QDECIMALS)
+        state.tokens[tkn_name].vbnt_price
         if tkn_name == "vbnt"
         else Decimal(state.price_feeds.at[state.timestamp, tkn_name])
     )
@@ -1461,7 +1449,7 @@ def get_total_bnt_trading_liquidity(state: State) -> Decimal:
     """
     return sum(
         [
-            state.tokens[name].bnt_trading_liquidity.balance.quantize(DEFAULT_QDECIMALS)
+            state.tokens[name].bnt_trading_liquidity.balance
             for name in state.whitelisted_tokens
             if name != "bnt"
         ]
@@ -1480,8 +1468,8 @@ def get_rate_report(state: State, tkn_name: str, qdecimals: Decimal) -> list:
     Builds a structured list for current state information display.
     """
     return [
-        f"Spot Rate={state.tokens[tkn_name].spot_rate.quantize(qdecimals)}, "
-        f"EMA Rate={state.tokens[tkn_name].ema_rate.quantize(qdecimals)}"
+        f"Spot Rate={state.tokens[tkn_name].spot_rate}"
+        f"EMA Rate={state.tokens[tkn_name].ema_rate}"
     ]
 
 
@@ -1490,8 +1478,8 @@ def get_trading_liquidity_description(state: State, qdecimals: Decimal) -> list:
     Builds a structured list for current state information display.
     """
     return [
-        f"bnt={get_bnt_trading_liquidity(state, tkn_name).quantize(qdecimals)} {tkn_name}="
-        + str(get_tkn_trading_liquidity(state, tkn_name).quantize(qdecimals))
+        f"bnt={get_bnt_trading_liquidity(state, tkn_name)} {tkn_name}="
+        + str(get_tkn_trading_liquidity(state, tkn_name))
         for tkn_name in state.whitelisted_tokens
         if tkn_name != "bnt"
     ]
@@ -1501,8 +1489,8 @@ def get_vault_description(state: State, qdecimals: Decimal) -> list:
     """
     Builds a structured list for current state information display.
     """
-    return [f"bnt={get_vault_balance(state, 'bnt').quantize(qdecimals)}"] + [
-        f"{tkn_name}=" + str(get_vault_balance(state, tkn_name).quantize(qdecimals))
+    return [f"bnt={get_vault_balance(state, 'bnt')}"] + [
+        f"{tkn_name}=" + str(get_vault_balance(state, tkn_name))
         for tkn_name in state.whitelisted_tokens
         if tkn_name != "bnt"
     ]
@@ -1512,8 +1500,8 @@ def get_staking_description(state: State, qdecimals: Decimal) -> list:
     """
     Builds a structured list for current state information display.
     """
-    return [f"bnt={get_staked_balance(state, 'bnt').quantize(qdecimals)}"] + [
-        f"{tkn_name}=" + str(get_staked_balance(state, tkn_name).quantize(qdecimals))
+    return [f"bnt={get_staked_balance(state, 'bnt')}"] + [
+        f"{tkn_name}=" + str(get_staked_balance(state, tkn_name))
         for tkn_name in state.whitelisted_tokens
         if tkn_name != "bnt"
     ]
@@ -1523,9 +1511,9 @@ def get_pooltoken_description(state: State, qdecimals: Decimal) -> list:
     """
     Builds a structured list for current state information display.
     """
-    return [f"bnbnt={get_pooltoken_balance(state, 'bnt').quantize(qdecimals)}"] + [
+    return [f"bnbnt={get_pooltoken_balance(state, 'bnt')}"] + [
         f"bn{tkn_name}="
-        + str(get_pooltoken_balance(state, tkn_name).quantize(qdecimals))
+        + str(get_pooltoken_balance(state, tkn_name))
         for tkn_name in state.whitelisted_tokens
         if tkn_name != "bnt"
     ]
@@ -1535,7 +1523,7 @@ def get_vortex_description(state: State, qdecimals: Decimal) -> list:
     """
     Builds a structured list for current state information display.
     """
-    return ["bnt=" + str(get_vortex_balance(state, "bnt").quantize(qdecimals))] + [
+    return ["bnt=" + str(get_vortex_balance(state, "bnt"))] + [
         "" for x in range(len(state.whitelisted_tokens[:-1]))
     ]
 
@@ -1546,7 +1534,7 @@ def get_external_protection_description(state: State, qdecimals: Decimal) -> lis
     """
     return [
         f"{tkn_name}="
-        + str(get_external_protection_vault(state, tkn_name).quantize(qdecimals))
+        + str(get_external_protection_vault(state, tkn_name))
         for tkn_name in state.whitelisted_tokens
     ]
 
@@ -1556,7 +1544,7 @@ def get_protocol_wallet_description(state: State, qdecimals: Decimal) -> list:
     Builds a structured list for current state information display.
     """
     return [
-        f"bnbnt=" + str(get_protocol_wallet_balance(state, "bnt").quantize(qdecimals))
+        f"bnbnt=" + str(get_protocol_wallet_balance(state, "bnt"))
     ] + ["" for tkn_name in state.whitelisted_tokens[:-1]]
 
 
@@ -1637,16 +1625,15 @@ def get_autocompounding_remaining_rewards(state: State, tkn_name: str) -> Decima
     """
     return state.autocompounding_reward_programs[
         tkn_name
-    ].remaining_rewards.balance.quantize(DEFAULT_QDECIMALS)
+    ].remaining_rewards.balance
 
 
 def get_remaining_standard_rewards(state: State, id: int) -> Decimal:
     """
     Get the remaining rewards for a given program.
     """
-    return state.standard_reward_programs[id].remaining_rewards.balance.quantize(
-        DEFAULT_QDECIMALS
-    )
+    return state.standard_reward_programs[id].remaining_rewards.balance
+
 
 
 def get_standard_program(state: State, tkn_name: str) -> Decimal:
@@ -1655,4 +1642,4 @@ def get_standard_program(state: State, tkn_name: str) -> Decimal:
     """
     return state.autocompounding_reward_programs[
         tkn_name
-    ].remaining_rewards.balance.quantize(DEFAULT_QDECIMALS)
+    ].remaining_rewards.balance

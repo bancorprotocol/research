@@ -52,12 +52,7 @@ class BancorDapp:
         whitelisted_tokens=DEFAULT_WHITELIST,
         price_feeds_path: str = DEFAULT_PRICE_FEEDS_PATH,
         price_feeds: PandasDataFrame = DEFAULT_PRICE_FEEDS,
-<<<<<<< Updated upstream
-        active_users: list = DEFAULT_USERS,
-        transaction_id: int = 0,
-=======
         transaction_id: int = 0
->>>>>>> Stashed changes
     ):
 
         self.json_data = None

@@ -1,6 +1,6 @@
 # coding=utf-8
 # --------------------------------------------------------------------------------------------------------------------
-# Licensed under the Bprotocol Foundation (Bancor) LICENSE. See License.txt in the project root for license information.
+# Licensed under the MIT LICENSE. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------------------------------
 """Utility functions."""
 from bancor_research.bancor_simulator.v3.spec.state import *

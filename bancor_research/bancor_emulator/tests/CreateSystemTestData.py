@@ -43,11 +43,11 @@ def execute(fileName):
     bntknDecimals = DEFAULT_DECIMALS
     bnbntDecimals = DEFAULT_DECIMALS
 
-    epVaultBalance   = decimalToInteger(flow['epVaultBalance']  , tknDecimals)
-    tknRewardsAmount = decimalToInteger(flow['tknRewardsAmount'], tknDecimals)
-    bntRewardsAmount = decimalToInteger(flow['bntRewardsAmount'], bntDecimals)
-    tknAmount = sum([decimalToInteger(user['tknBalance'], tknDecimals) for user in flow['users']], uint256()) + tknRewardsAmount + epVaultBalance
-    bntAmount = sum([decimalToInteger(user['bntBalance'], bntDecimals) for user in flow['users']], uint256()) + bntRewardsAmount
+    epVaultBalance = decimalToInteger(flow['epVaultBalance'], tknDecimals)
+    bntknAmount = decimalToInteger(flow['tknRewardsAmount'], bntknDecimals)
+    bnbntAmount = decimalToInteger(flow['bntRewardsAmount'], bnbntDecimals)
+    tknAmount = sum([decimalToInteger(user['tknBalance'], tknDecimals) for user in flow['users']], uint256()) + epVaultBalance
+    bntAmount = sum([decimalToInteger(user['bntBalance'], bntDecimals) for user in flow['users']], uint256())
 
     bnt   = ReserveToken('BNT'  , 'BNT'  , bntDecimals)
     vbnt  = ReserveToken('VBNT' , 'VBNT' , bntDecimals)
@@ -58,8 +58,8 @@ def execute(fileName):
     vbntGovernance     = TokenGovernance(vbnt)
     networkSettings    = NetworkSettings(bnt)
     masterVault        = Vault(bntGovernance, vbntGovernance)
-    erVault            = Vault(bntGovernance, vbntGovernance)
     epVault            = Vault(bntGovernance, vbntGovernance)
+    erVault            = Vault(bntGovernance, vbntGovernance)
     network            = BancorNetwork(bntGovernance, vbntGovernance, networkSettings, masterVault, epVault, bnbnt)
     bntPool            = BNTPool(network, bntGovernance, vbntGovernance, networkSettings, masterVault, bnbnt)
     pendingWithdrawals = PendingWithdrawals(network, bnt, bntPool)
@@ -91,10 +91,7 @@ def execute(fileName):
 
     tkn.issue(DEPLOYER, tknAmount);
     bntGovernance.mint(DEPLOYER, bntAmount);
-
     tkn.connect(DEPLOYER).transfer(epVault, epVaultBalance);
-    tkn.connect(DEPLOYER).transfer(erVault, tknRewardsAmount);
-    bnt.connect(DEPLOYER).transfer(erVault, bntRewardsAmount);
 
     for user in flow['users']:
         assert user['id'] != DEPLOYER
@@ -104,8 +101,8 @@ def execute(fileName):
         tkn.connect(DEPLOYER).transfer(user['id'], decimalToInteger(user['tknBalance'], tknDecimals));
         bnt.connect(DEPLOYER).transfer(user['id'], decimalToInteger(user['bntBalance'], bntDecimals));
 
-    tknProgramId = standardRewards.createProgram(tkn, tknRewardsAmount, block.timestamp, block.timestamp + flow['tknRewardsDuration']);
-    bntProgramId = standardRewards.createProgram(bnt, bntRewardsAmount, block.timestamp, block.timestamp + flow['bntRewardsDuration']);
+    tknProgramId = standardRewards.createProgram(tkn, bntknAmount, block.timestamp, block.timestamp + flow['tknRewardsDuration']);
+    bntProgramId = standardRewards.createProgram(bnt, bnbntAmount, block.timestamp, block.timestamp + flow['bntRewardsDuration']);
 
     for token in [vbnt, tkn, bnt, bntkn, bnbnt]:
         assert token.balanceOf(DEPLOYER) == 0;
@@ -202,10 +199,9 @@ def execute(fileName):
             state['bnbntBalances'][user['id']] = integerToDecimalToStr(bnbnt.balanceOf(user['id']), bnbntDecimals);
 
         state['tknBalances']['masterVault'] = integerToDecimalToStr(tkn.balanceOf(masterVault), tknDecimals);
-        state['tknBalances']['erVault'] = integerToDecimalToStr(tkn.balanceOf(erVault), tknDecimals);
         state['tknBalances']['epVault'] = integerToDecimalToStr(tkn.balanceOf(epVault), tknDecimals);
         state['bntBalances']['masterVault'] = integerToDecimalToStr(bnt.balanceOf(masterVault), bntDecimals);
-        state['bntBalances']['erVault'] = integerToDecimalToStr(bnt.balanceOf(erVault), bntDecimals);
+        state['bntknBalances']['erVault'] = integerToDecimalToStr(bntkn.balanceOf(erVault), bntknDecimals);
         state['bnbntBalances']['bntPool'] = integerToDecimalToStr(bnbnt.balanceOf(bntPool), bnbntDecimals);
 
         poolData = poolCollection.poolData(tkn);

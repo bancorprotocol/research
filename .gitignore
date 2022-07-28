@@ -140,6 +140,3 @@ artifacts
 .netlify
 .idea/sonarlint/issuestore/index.pb
 /.run/
-
-# Emulator Test Configuration Files
-bancor_research/bancor_emulator/tests/project/tests/data/

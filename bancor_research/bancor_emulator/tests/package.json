@@ -1,6 +1,5 @@
 {
     "scripts": {
-        "install": "node download.js",
         "build": "hardhat compile",
         "test": "hardhat test --bail"
     },

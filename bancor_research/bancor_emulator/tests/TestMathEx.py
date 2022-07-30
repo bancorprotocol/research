@@ -22,16 +22,21 @@ TEST_ARRAY = [
 def mulDivF(x, y, z): return x * y // z
 def mulDivC(x, y, z): return (x * y + z - 1) // z
 
+def gt512(x, y): return x > y
+def lt512(x, y): return x < y
+def gte512(x, y): return x >= y
+def lte512(x, y): return x <= y
+
 mulDivFuncs = {
     'mulDivF': {'expected': mulDivF, 'actual': MathEx.mulDivF},
     'mulDivC': {'expected': mulDivC, 'actual': MathEx.mulDivC},
 };
 
 comp512Funcs = {
-    'gt512' : MathEx.gt512,
-    'lt512' : MathEx.lt512,
-    'gte512': MathEx.gte512,
-    'lte512': MathEx.lte512,
+    'gt512' : {'expected': gt512 , 'actual': MathEx.gt512 },
+    'lt512' : {'expected': lt512 , 'actual': MathEx.lt512 },
+    'gte512': {'expected': gte512, 'actual': MathEx.gte512},
+    'lte512': {'expected': lte512, 'actual': MathEx.lte512},
 };
 
 def toUint512(x):
@@ -71,17 +76,17 @@ def testTruncatedFraction(f, maxVal, maxErr):
 
 def testWeightedAverage(f1, f2, w1, w2, maxErr):
     print('weightedAverage({} / {}, {} / {}, {}, {})'.format(f1.n, f1.d, f2.n, f2.d, w1, w2));
-    actual = MathEx.weightedAverage(f1, f2, w1, w2);
     expected = sum([toDecimal(f) * w for f, w in zip([f1, f2], [w1, w2])]) / sum([w1, w2]); 
+    actual = MathEx.weightedAverage(f1, f2, w1, w2);
     assertAlmostEqual(expected, actual, maxErr);
     print('{} / {}'.format(actual.n, actual.d));
 
 def testIsInRange(f1, f2, maxDeviation):
     print('isInRange({} / {}, {} / {}, {}%)'.format(f1.n, f1.d, f2.n, f2.d, maxDeviation));
-    actual = MathEx.isInRange(f1, f2, maxDeviation * 10000);
     midVal = toDecimal(f1);
     minVal = toDecimal(f2) * (100 - maxDeviation) / 100;
     maxVal = toDecimal(f2) * (100 + maxDeviation) / 100;
+    actual = MathEx.isInRange(f1, f2, maxDeviation * 10000);
     assert actual == (minVal <= midVal <= maxVal)
     print('true' if actual else 'false');
 
@@ -104,13 +109,13 @@ def testMulDiv(x, y, z):
 def testSubMax0(x, y):
     print('subMax0({}, {})'.format(x, y));
     actual = MathEx.subMax0(x, y);
-    expected = max(int(x - y), 0);
-    assert actual == expected
+    assert actual == max(int(x - y), 0)
     print(actual);
 
 def testMul512(x, y):
     print('mul512({}, {})'.format(x, y));
     actual = MathEx.mul512(x, y);
+    assert int(actual.hi) << 256 | int(actual.lo) == x * y
     print('{},{}'.format(actual.hi, actual.lo));
 
 def testComp512(a, b):
@@ -118,7 +123,9 @@ def testComp512(a, b):
         for y in [b, (b + 1) * a]:
             for funcName in comp512Funcs.keys():
                 print('{}({}, {})'.format(funcName, x, y));
-                actual = comp512Funcs[funcName](toUint512(x), toUint512(y));
+                expected = comp512Funcs[funcName]['expected'](x, y);
+                actual = comp512Funcs[funcName]['actual'](toUint512(x), toUint512(y));
+                assert actual == expected
                 print('true' if actual else 'false');
 
 for n in range(10):

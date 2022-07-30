@@ -37,6 +37,15 @@ comp512Funcs = {
 def toUint512(x):
     return Uint512({'hi': x >> 256, 'lo': x & MAX_UINT256})
 
+def toDecimal(f):
+    return Decimal(int(f.n)) / Decimal(int(f.d))
+
+def assertAlmostEqual(expected, actual, maxError):
+    actual = toDecimal(actual)
+    if actual != expected:
+        error = abs(actual - expected) / expected
+        assert error <= Decimal(maxError), '\n- error = {}\n- maxError = {}'.format(error, maxError)
+
 def testExp(f, maxError):
     print('exp2({} / {})'.format(f.n, f.d));
     try:
@@ -111,15 +120,6 @@ def testComp512(a, b):
                 print('{}({}, {})'.format(funcName, x, y));
                 actual = comp512Funcs[funcName](toUint512(x), toUint512(y));
                 print('true' if actual else 'false');
-
-def toDecimal(fraction):
-    return Decimal(int(fraction.n)) / Decimal(int(fraction.d))
-
-def assertAlmostEqual(expected, actual, maxError):
-    actual = toDecimal(actual)
-    if actual != expected:
-        error = abs(actual - expected) / expected
-        assert error <= Decimal(maxError), '\n- error = {}\n- maxError = {}'.format(error, maxError)
 
 for n in range(10):
     for d in range(1, 10):

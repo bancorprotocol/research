@@ -61,9 +61,11 @@ def testTruncatedFraction(f, max, maxError):
         assert str(error) == 'InvalidFraction'
         print('InvalidFraction');
 
-def testWeightedAverage(f1, f2, w1, w2):
+def testWeightedAverage(f1, f2, w1, w2, maxError):
     print('weightedAverage({} / {}, {} / {}, {}, {})'.format(f1.n, f1.d, f2.n, f2.d, w1, w2));
     actual = MathEx.weightedAverage(f1, f2, w1, w2);
+    expected = sum([Decimal(int(f.n)) / Decimal(int(f.d)) * w for f, w in zip([f1, f2], [w1, w2])]) / sum([w1, w2]); 
+    assertAlmostEqual(expected, actual, maxError);
     print('{} / {}'.format(actual.n, actual.d));
 
 def testIsInRange(f1, f2, maxDeviation):
@@ -155,7 +157,7 @@ for n1 in [MAX_UINT64, MAX_UINT96]:
                 fraction2 = Fraction256({ 'n': n2, 'd': d2 });
                 for weight1 in [2, 8]:
                     for weight2 in [2, 8]:
-                        testWeightedAverage(fraction1, fraction2, weight1, weight2);
+                        testWeightedAverage(fraction1, fraction2, weight1, weight2, '5e-155');
 
 for n1 in [MAX_UINT64, MAX_UINT96]:
     for d1 in [MAX_UINT64, MAX_UINT96]:
@@ -236,7 +238,7 @@ for n1 in [0, 1, 2, 3]:
                 fraction2 = Fraction256({ 'n': n2, 'd': d2 });
                 for weight1 in [1, 2, 4, 8]:
                     for weight2 in [1, 2, 4, 8]:
-                        testWeightedAverage(fraction1, fraction2, weight1, weight2);
+                        testWeightedAverage(fraction1, fraction2, weight1, weight2, '1e-154');
 
 for n1 in [MAX_UINT32, MAX_UINT64, MAX_UINT96, MAX_UINT112]:
     for d1 in [MAX_UINT32, MAX_UINT64, MAX_UINT96, MAX_UINT112]:
@@ -246,7 +248,7 @@ for n1 in [MAX_UINT32, MAX_UINT64, MAX_UINT96, MAX_UINT112]:
                 fraction2 = Fraction256({ 'n': n2, 'd': d2 });
                 for weight1 in [1, 2, 4, 8]:
                     for weight2 in [1, 2, 4, 8]:
-                        testWeightedAverage(fraction1, fraction2, weight1, weight2);
+                        testWeightedAverage(fraction1, fraction2, weight1, weight2, '2e-154');
 
 for n1 in [0, 1, 2, 3]:
     for d1 in [1, 2, 3, 4]:

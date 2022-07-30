@@ -40,49 +40,49 @@ def toUint512(x):
 def toDecimal(f):
     return Decimal(int(f.n)) / Decimal(int(f.d))
 
-def assertAlmostEqual(expected, actual, maxError):
+def assertAlmostEqual(expected, actual, maxErr):
     actual = toDecimal(actual)
     if actual != expected:
         error = abs(actual - expected) / expected
-        assert error <= Decimal(maxError), '\n- error = {}\n- maxError = {}'.format(error, maxError)
+        assert error <= Decimal(maxErr), '\n- error = {}\n- maxErr = {}'.format(error, maxErr)
 
-def testExp(f, maxError):
+def testExp(f, maxErr):
     print('exp2({} / {})'.format(f.n, f.d));
     try:
         actual = MathEx.exp2(f);
         expected = Decimal(2) ** toDecimal(f);
         assert toDecimal(actual) <= expected
-        assertAlmostEqual(expected, actual, maxError);
+        assertAlmostEqual(expected, actual, maxErr);
         print('{} / {}'.format(actual.n, actual.d));
     except AssertionError as error:
         assert str(error) == 'Overflow'
         print('Overflow');
 
-def testTruncatedFraction(f, max, maxError):
-    print('truncatedFraction({} / {}, {})'.format(f.n, f.d, max));
+def testTruncatedFraction(f, maxVal, maxErr):
+    print('truncatedFraction({} / {}, {})'.format(f.n, f.d, maxVal));
     try:
-        actual = MathEx.truncatedFraction(f, max);
-        assert actual.n <= max and actual.d <= max
-        assertAlmostEqual(toDecimal(f), actual, maxError);
+        actual = MathEx.truncatedFraction(f, maxVal);
+        assert actual.n <= maxVal and actual.d <= maxVal
+        assertAlmostEqual(toDecimal(f), actual, maxErr);
         print('{} / {}'.format(actual.n, actual.d));
     except AssertionError as error:
         assert str(error) == 'InvalidFraction'
         print('InvalidFraction');
 
-def testWeightedAverage(f1, f2, w1, w2, maxError):
+def testWeightedAverage(f1, f2, w1, w2, maxErr):
     print('weightedAverage({} / {}, {} / {}, {}, {})'.format(f1.n, f1.d, f2.n, f2.d, w1, w2));
     actual = MathEx.weightedAverage(f1, f2, w1, w2);
     expected = sum([toDecimal(f) * w for f, w in zip([f1, f2], [w1, w2])]) / sum([w1, w2]); 
-    assertAlmostEqual(expected, actual, maxError);
+    assertAlmostEqual(expected, actual, maxErr);
     print('{} / {}'.format(actual.n, actual.d));
 
 def testIsInRange(f1, f2, maxDeviation):
     print('isInRange({} / {}, {} / {}, {}%)'.format(f1.n, f1.d, f2.n, f2.d, maxDeviation));
     actual = MathEx.isInRange(f1, f2, maxDeviation * 10000);
-    mid = toDecimal(f1);
-    min = toDecimal(f2) * (100 - maxDeviation) / 100;
-    max = toDecimal(f2) * (100 + maxDeviation) / 100;
-    assert actual == (min <= mid <= max)
+    midVal = toDecimal(f1);
+    minVal = toDecimal(f2) * (100 - maxDeviation) / 100;
+    maxVal = toDecimal(f2) * (100 + maxDeviation) / 100;
+    assert actual == (minVal <= midVal <= maxVal)
     print('true' if actual else 'false');
 
 def testMulDiv(x, y, z):
@@ -145,18 +145,18 @@ for d in [10 ** i for i in range(3, 9)]:
     for n in range(2 * d + 1, 2 * d + 11):
         testExp(Fraction256({ 'n': n, 'd': d }), '0.00000000000000000000000000000000000003');
 
-for max in [MAX_UINT128]:
+for m in [MAX_UINT128]:
     for n in range(10):
         for d in range(10):
-            testTruncatedFraction(Fraction256({ 'n': max - (n), 'd': max - (d) }), max, '0.0');
-            testTruncatedFraction(Fraction256({ 'n': max - (n), 'd': max + (d) }), max, '0.000000000000000000000000000000000000003');
-            testTruncatedFraction(Fraction256({ 'n': max + (n), 'd': max - (d) }), max, '0.000000000000000000000000000000000000003');
-            testTruncatedFraction(Fraction256({ 'n': max + (n), 'd': max + (d) }), max, '0.000000000000000000000000000000000000003');
+            testTruncatedFraction(Fraction256({ 'n': m - (n), 'd': m - (d) }), m, '0.0');
+            testTruncatedFraction(Fraction256({ 'n': m - (n), 'd': m + (d) }), m, '0.000000000000000000000000000000000000003');
+            testTruncatedFraction(Fraction256({ 'n': m + (n), 'd': m - (d) }), m, '0.000000000000000000000000000000000000003');
+            testTruncatedFraction(Fraction256({ 'n': m + (n), 'd': m + (d) }), m, '0.000000000000000000000000000000000000003');
 
 for n in [100, 200]:
     for d in [2, 3]:
-        for max in [3, 5]:
-            testTruncatedFraction(Fraction256({ 'n': n, 'd': d }), max, '0.0');
+        for m in [3, 5]:
+            testTruncatedFraction(Fraction256({ 'n': n, 'd': d }), m, '0.0');
 
 for n1 in [MAX_UINT64, MAX_UINT96]:
     for d1 in [MAX_UINT64, MAX_UINT96]:
@@ -198,26 +198,26 @@ for n in range(100):
     for d in range(1, 100):
         testExp(Fraction256({ 'n': n, 'd': d }), '0.000000000000000000000000000000000002');
 
-for max in [MAX_UINT96, MAX_UINT112, MAX_UINT128]:
+for m in [MAX_UINT96, MAX_UINT112, MAX_UINT128]:
     for n in range(10):
         for d in range(10):
-            testTruncatedFraction(Fraction256({ 'n': max - (n), 'd': max - (d) }), max, '0.0');
-            testTruncatedFraction(Fraction256({ 'n': max - (n), 'd': max + (d) }), max, '0.00000000000000000000000000002');
-            testTruncatedFraction(Fraction256({ 'n': max + (n), 'd': max - (d) }), max, '0.00000000000000000000000000002');
-            testTruncatedFraction(Fraction256({ 'n': max + (n), 'd': max + (d) }), max, '0.00000000000000000000000000002');
+            testTruncatedFraction(Fraction256({ 'n': m - (n), 'd': m - (d) }), m, '0.0');
+            testTruncatedFraction(Fraction256({ 'n': m - (n), 'd': m + (d) }), m, '0.00000000000000000000000000002');
+            testTruncatedFraction(Fraction256({ 'n': m + (n), 'd': m - (d) }), m, '0.00000000000000000000000000002');
+            testTruncatedFraction(Fraction256({ 'n': m + (n), 'd': m + (d) }), m, '0.00000000000000000000000000002');
 
-for max in [MAX_UINT112]:
+for m in [MAX_UINT112]:
     i = 1
-    while i <= max:
+    while i <= m:
         j = 1
-        while j <= max:
-            n = MAX_UINT256 // (max) * (i) + (1);
-            d = MAX_UINT256 // (max) * (j) + (1);
-            testTruncatedFraction(Fraction256({ 'n': n, 'd': d }), max, '0.04');
+        while j <= m:
+            n = MAX_UINT256 // (m) * (i) + (1);
+            d = MAX_UINT256 // (m) * (j) + (1);
+            testTruncatedFraction(Fraction256({ 'n': n, 'd': d }), m, '0.04');
             j *= 10
         i *= 10
 
-for max in [MAX_UINT96, MAX_UINT112, MAX_UINT128]:
+for m in [MAX_UINT96, MAX_UINT112, MAX_UINT128]:
     for i in range(96, 257, 16):
         for j in range(i - 64, i + 65, 16):
             iMax = 2 ** i - 1
@@ -237,7 +237,7 @@ for max in [MAX_UINT96, MAX_UINT112, MAX_UINT128]:
             ]:
                 for d in [jMax - (1), jMax, jMax + (1)]:
                     if (n <= MAX_UINT256 and d <= MAX_UINT256):
-                        testTruncatedFraction(Fraction256({ 'n': n, 'd': d }), max, '0.0000000005');
+                        testTruncatedFraction(Fraction256({ 'n': n, 'd': d }), m, '0.0000000005');
 
 for n1 in [0, 1, 2, 3]:
     for d1 in [1, 2, 3, 4]:

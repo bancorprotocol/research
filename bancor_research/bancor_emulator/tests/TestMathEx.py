@@ -2,6 +2,8 @@ from bancor_research.bancor_emulator.solidity.uint.float import Decimal
 from bancor_research.bancor_emulator.MathEx import MathEx, Uint512
 from bancor_research.bancor_emulator.Fraction import Fraction256
 
+from common import assertAlmostEqual, LesserOrEqual
+
 MAX_UINT32 = 2 ** 32 - 1
 MAX_UINT64 = 2 ** 64 - 1
 MAX_UINT96 = 2 ** 96 - 1
@@ -45,19 +47,12 @@ def toUint512(x):
 def toDecimal(f):
     return Decimal(int(f.n)) / Decimal(int(f.d))
 
-def assertAlmostEqual(expected, actual, maxErr):
-    actual = toDecimal(actual)
-    if actual != expected:
-        error = abs(actual - expected) / expected
-        assert error <= Decimal(maxErr), '\n- error = {}\n- maxErr = {}'.format(error, maxErr)
-
 def testExp(f, maxErr):
     print('exp2({} / {})'.format(f.n, f.d));
     try:
         actual = MathEx.exp2(f);
         expected = Decimal(2) ** toDecimal(f);
-        assert toDecimal(actual) <= expected
-        assertAlmostEqual(expected, actual, maxErr);
+        assertAlmostEqual(expected, toDecimal(actual), 0, maxErr, LesserOrEqual);
         print('{} / {}'.format(actual.n, actual.d));
     except AssertionError as error:
         assert str(error) == 'Overflow'
@@ -66,9 +61,10 @@ def testExp(f, maxErr):
 def testTruncatedFraction(f, maxVal, maxErr):
     print('truncatedFraction({} / {}, {})'.format(f.n, f.d, maxVal));
     try:
+        expected = toDecimal(f)
         actual = MathEx.truncatedFraction(f, maxVal);
         assert actual.n <= maxVal and actual.d <= maxVal
-        assertAlmostEqual(toDecimal(f), actual, maxErr);
+        assertAlmostEqual(expected, toDecimal(actual), 0, maxErr, None);
         print('{} / {}'.format(actual.n, actual.d));
     except AssertionError as error:
         assert str(error) == 'InvalidFraction'
@@ -78,7 +74,7 @@ def testWeightedAverage(f1, f2, w1, w2, maxErr):
     print('weightedAverage({} / {}, {} / {}, {}, {})'.format(f1.n, f1.d, f2.n, f2.d, w1, w2));
     expected = sum([toDecimal(f) * w for f, w in zip([f1, f2], [w1, w2])]) / sum([w1, w2]); 
     actual = MathEx.weightedAverage(f1, f2, w1, w2);
-    assertAlmostEqual(expected, actual, maxErr);
+    assertAlmostEqual(expected, toDecimal(actual), 0, maxErr, None);
     print('{} / {}'.format(actual.n, actual.d));
 
 def testIsInRange(f1, f2, maxDeviation):
@@ -108,14 +104,17 @@ def testMulDiv(x, y, z):
 
 def testSubMax0(x, y):
     print('subMax0({}, {})'.format(x, y));
+    expected = max(int(x - y), 0);
     actual = MathEx.subMax0(x, y);
-    assert actual == max(int(x - y), 0)
+    assert actual == expected
     print(actual);
 
 def testMul512(x, y):
     print('mul512({}, {})'.format(x, y));
+    expected = toUint512(x * y);
     actual = MathEx.mul512(x, y);
-    assert int(actual.hi) << 256 | int(actual.lo) == x * y
+    assert actual.hi == expected.hi
+    assert actual.lo == expected.lo
     print('{},{}'.format(actual.hi, actual.lo));
 
 def testComp512(a, b):

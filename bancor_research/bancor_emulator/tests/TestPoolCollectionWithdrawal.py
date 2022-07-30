@@ -1,106 +1,88 @@
-from common import read
+from common import read, assertAlmostEqual, LesserOrEqual, GreaterOrEqual
 
-from bancor_research.bancor_emulator.solidity.uint.float import Decimal
 from bancor_research.bancor_emulator.PoolCollectionWithdrawal import PoolCollectionWithdrawal
-
-class Relation:
-    LesserOrEqual = 1
-    GreaterOrEqual = 2
 
 maxErrors = {
     'PoolCollectionWithdrawalCoverage1': {
-        'p': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.0000002') },
-        'q': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.0000002') },
-        'r': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0') },
-        's': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0'), 'relation': Relation.LesserOrEqual },
-        't': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.00000008') },
-        'u': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.0000000003') },
-        'v': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0'), 'relation': Relation.GreaterOrEqual }
+        'p': { 'maxAbsoluteError': 1, 'maxRelativeError': '0.0000002' },
+        'q': { 'maxAbsoluteError': 1, 'maxRelativeError': '0.0000002' },
+        'r': { 'maxAbsoluteError': 1, 'maxRelativeError': '0' },
+        's': { 'maxAbsoluteError': 1, 'maxRelativeError': '0', 'relation': LesserOrEqual },
+        't': { 'maxAbsoluteError': 1, 'maxRelativeError': '0.00000008' },
+        'u': { 'maxAbsoluteError': 1, 'maxRelativeError': '0.0000000003' },
+        'v': { 'maxAbsoluteError': 1, 'maxRelativeError': '0', 'relation': GreaterOrEqual }
     },
 
     'PoolCollectionWithdrawalCoverage2': {
-        'p': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.00000000000000002') },
-        'q': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.00000000000000002') },
-        'r': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0') },
-        's': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0'), 'relation': Relation.LesserOrEqual },
-        't': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.000000000000000008') },
-        'u': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.00000000000000000003') },
-        'v': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0'), 'relation': Relation.GreaterOrEqual }
+        'p': { 'maxAbsoluteError': 1, 'maxRelativeError': '0.00000000000000002' },
+        'q': { 'maxAbsoluteError': 1, 'maxRelativeError': '0.00000000000000002' },
+        'r': { 'maxAbsoluteError': 1, 'maxRelativeError': '0' },
+        's': { 'maxAbsoluteError': 1, 'maxRelativeError': '0', 'relation': LesserOrEqual },
+        't': { 'maxAbsoluteError': 1, 'maxRelativeError': '0.000000000000000008' },
+        'u': { 'maxAbsoluteError': 1, 'maxRelativeError': '0.00000000000000000003' },
+        'v': { 'maxAbsoluteError': 1, 'maxRelativeError': '0', 'relation': GreaterOrEqual }
     },
 
     'PoolCollectionWithdrawalCoverage3': {
-        'p': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.00000000000000000000000006') },
-        'q': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.00000000000000000000000006') },
-        'r': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0') },
-        's': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0'), 'relation': Relation.LesserOrEqual },
-        't': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.0000000000000000002') },
-        'u': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.0000000000000000002') },
-        'v': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0'), 'relation': Relation.GreaterOrEqual }
+        'p': { 'maxAbsoluteError': 1, 'maxRelativeError': '0.00000000000000000000000006' },
+        'q': { 'maxAbsoluteError': 1, 'maxRelativeError': '0.00000000000000000000000006' },
+        'r': { 'maxAbsoluteError': 1, 'maxRelativeError': '0' },
+        's': { 'maxAbsoluteError': 1, 'maxRelativeError': '0', 'relation': LesserOrEqual },
+        't': { 'maxAbsoluteError': 1, 'maxRelativeError': '0.0000000000000000002' },
+        'u': { 'maxAbsoluteError': 1, 'maxRelativeError': '0.0000000000000000002' },
+        'v': { 'maxAbsoluteError': 1, 'maxRelativeError': '0', 'relation': GreaterOrEqual }
     },
 
     'PoolCollectionWithdrawalCoverage4': {
-        'p': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.00000002') },
-        'q': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.00000002') },
-        'r': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0') },
-        's': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0'), 'relation': Relation.LesserOrEqual },
-        't': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.003') },
-        'u': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.003') },
-        'v': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0'), 'relation': Relation.GreaterOrEqual }
+        'p': { 'maxAbsoluteError': 1, 'maxRelativeError': '0.00000002' },
+        'q': { 'maxAbsoluteError': 1, 'maxRelativeError': '0.00000002' },
+        'r': { 'maxAbsoluteError': 1, 'maxRelativeError': '0' },
+        's': { 'maxAbsoluteError': 1, 'maxRelativeError': '0', 'relation': LesserOrEqual },
+        't': { 'maxAbsoluteError': 1, 'maxRelativeError': '0.003' },
+        'u': { 'maxAbsoluteError': 1, 'maxRelativeError': '0.003' },
+        'v': { 'maxAbsoluteError': 1, 'maxRelativeError': '0', 'relation': GreaterOrEqual }
     },
 
     'PoolCollectionWithdrawalCoverage5': {
-        'p': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.000000000002') },
-        'q': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.000000000002') },
-        'r': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0') },
-        's': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0'), 'relation': Relation.LesserOrEqual },
-        't': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.0000004') },
-        'u': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.0000004') },
-        'v': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0'), 'relation': Relation.GreaterOrEqual }
+        'p': { 'maxAbsoluteError': 1, 'maxRelativeError': '0.000000000002' },
+        'q': { 'maxAbsoluteError': 1, 'maxRelativeError': '0.000000000002' },
+        'r': { 'maxAbsoluteError': 1, 'maxRelativeError': '0' },
+        's': { 'maxAbsoluteError': 1, 'maxRelativeError': '0', 'relation': LesserOrEqual },
+        't': { 'maxAbsoluteError': 1, 'maxRelativeError': '0.0000004' },
+        'u': { 'maxAbsoluteError': 1, 'maxRelativeError': '0.0000004' },
+        'v': { 'maxAbsoluteError': 1, 'maxRelativeError': '0', 'relation': GreaterOrEqual }
     },
 
     'PoolCollectionWithdrawalCoverage6': {
-        'p': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.00000000000000002') },
-        'q': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.00000000000000002') },
-        'r': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0') },
-        's': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0'), 'relation': Relation.LesserOrEqual },
-        't': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.00000000000003') },
-        'u': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.00000000000003') },
-        'v': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0'), 'relation': Relation.GreaterOrEqual }
+        'p': { 'maxAbsoluteError': 1, 'maxRelativeError': '0.00000000000000002' },
+        'q': { 'maxAbsoluteError': 1, 'maxRelativeError': '0.00000000000000002' },
+        'r': { 'maxAbsoluteError': 1, 'maxRelativeError': '0' },
+        's': { 'maxAbsoluteError': 1, 'maxRelativeError': '0', 'relation': LesserOrEqual },
+        't': { 'maxAbsoluteError': 1, 'maxRelativeError': '0.00000000000003' },
+        'u': { 'maxAbsoluteError': 1, 'maxRelativeError': '0.00000000000003' },
+        'v': { 'maxAbsoluteError': 1, 'maxRelativeError': '0', 'relation': GreaterOrEqual }
     },
 
     'PoolCollectionWithdrawalCoverage7': {
-        'p': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.0000000006') },
-        'q': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.0000000006') },
-        'r': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.000000000000000000000000000005') },
-        's': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.00000003'), 'relation': Relation.LesserOrEqual },
-        't': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.003') },
-        'u': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.003') },
-        'v': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0'), 'relation': Relation.GreaterOrEqual }
+        'p': { 'maxAbsoluteError': 1, 'maxRelativeError': '0.0000000006' },
+        'q': { 'maxAbsoluteError': 1, 'maxRelativeError': '0.0000000006' },
+        'r': { 'maxAbsoluteError': 1, 'maxRelativeError': '0.000000000000000000000000000005' },
+        's': { 'maxAbsoluteError': 1, 'maxRelativeError': '0.00000003', 'relation': LesserOrEqual },
+        't': { 'maxAbsoluteError': 1, 'maxRelativeError': '0.003' },
+        'u': { 'maxAbsoluteError': 1, 'maxRelativeError': '0.003' },
+        'v': { 'maxAbsoluteError': 1, 'maxRelativeError': '0', 'relation': GreaterOrEqual }
     },
 
     'PoolCollectionWithdrawalCoverage8': {
-        'p': { 'maxAbsoluteError': Decimal(0), 'maxRelativeError': Decimal('0') },
-        'q': { 'maxAbsoluteError': Decimal(0), 'maxRelativeError': Decimal('0') },
-        'r': { 'maxAbsoluteError': Decimal(0), 'maxRelativeError': Decimal('0') },
-        's': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0'), 'relation': Relation.LesserOrEqual },
-        't': { 'maxAbsoluteError': Decimal(0), 'maxRelativeError': Decimal('0') },
-        'u': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0.0000002') },
-        'v': { 'maxAbsoluteError': Decimal(1), 'maxRelativeError': Decimal('0'), 'relation': Relation.GreaterOrEqual }
+        'p': { 'maxAbsoluteError': 0, 'maxRelativeError': '0' },
+        'q': { 'maxAbsoluteError': 0, 'maxRelativeError': '0' },
+        'r': { 'maxAbsoluteError': 0, 'maxRelativeError': '0' },
+        's': { 'maxAbsoluteError': 1, 'maxRelativeError': '0', 'relation': LesserOrEqual },
+        't': { 'maxAbsoluteError': 0, 'maxRelativeError': '0' },
+        'u': { 'maxAbsoluteError': 1, 'maxRelativeError': '0.0000002' },
+        'v': { 'maxAbsoluteError': 1, 'maxRelativeError': '0', 'relation': GreaterOrEqual }
     }
 }
-
-def assertAlmostEqual(expected, actual, maxError):
-    actual = Decimal(actual);
-    expected = Decimal(expected);
-    if actual != expected:
-        if 'relation' in maxError:
-            if maxError['relation'] == Relation.LesserOrEqual:
-                assert actual <= expected
-            if maxError['relation'] == Relation.GreaterOrEqual:
-                assert actual >= expected
-        absoluteError = abs(actual - expected);
-        relativeError = absoluteError / expected;
-        assert absoluteError <= maxError['maxAbsoluteError'] or relativeError <= maxError['maxRelativeError']
 
 for fileName in maxErrors:
     table = read(fileName)
@@ -126,10 +108,10 @@ for fileName in maxErrors:
             actual.u,
             actual.v
         );
-        assertAlmostEqual(p, actual.p, maxErrors[fileName]['p'])
-        assertAlmostEqual(q, actual.q, maxErrors[fileName]['q'])
-        assertAlmostEqual(r, actual.r, maxErrors[fileName]['r'])
-        assertAlmostEqual(s, actual.s, maxErrors[fileName]['s'])
-        assertAlmostEqual(t, actual.t, maxErrors[fileName]['t'])
-        assertAlmostEqual(u, actual.u, maxErrors[fileName]['u'])
-        assertAlmostEqual(v, actual.v, maxErrors[fileName]['v'])
+        assertAlmostEqual(p, actual.p, **maxErrors[fileName]['p'])
+        assertAlmostEqual(q, actual.q, **maxErrors[fileName]['q'])
+        assertAlmostEqual(r, actual.r, **maxErrors[fileName]['r'])
+        assertAlmostEqual(s, actual.s, **maxErrors[fileName]['s'])
+        assertAlmostEqual(t, actual.t, **maxErrors[fileName]['t'])
+        assertAlmostEqual(u, actual.u, **maxErrors[fileName]['u'])
+        assertAlmostEqual(v, actual.v, **maxErrors[fileName]['v'])

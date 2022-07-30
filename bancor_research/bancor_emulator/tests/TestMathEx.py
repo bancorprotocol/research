@@ -64,7 +64,7 @@ def testTruncatedFraction(f, maxVal, maxErr):
         expected = toDecimal(f)
         actual = MathEx.truncatedFraction(f, maxVal);
         assert actual.n <= maxVal and actual.d <= maxVal
-        assertAlmostEqual(expected, toDecimal(actual), 0, maxErr, None);
+        assertAlmostEqual(expected, toDecimal(actual), 0, maxErr);
         print('{} / {}'.format(actual.n, actual.d));
     except AssertionError as error:
         assert str(error) == 'InvalidFraction'
@@ -74,7 +74,7 @@ def testWeightedAverage(f1, f2, w1, w2, maxErr):
     print('weightedAverage({} / {}, {} / {}, {}, {})'.format(f1.n, f1.d, f2.n, f2.d, w1, w2));
     expected = sum([toDecimal(f) * w for f, w in zip([f1, f2], [w1, w2])]) / sum([w1, w2]); 
     actual = MathEx.weightedAverage(f1, f2, w1, w2);
-    assertAlmostEqual(expected, toDecimal(actual), 0, maxErr, None);
+    assertAlmostEqual(expected, toDecimal(actual), 0, maxErr);
     print('{} / {}'.format(actual.n, actual.d));
 
 def testIsInRange(f1, f2, maxDeviation):

@@ -1,3 +1,4 @@
+from bancor_research.bancor_emulator.solidity.uint.float import Decimal
 from bancor_research.bancor_emulator.MathEx import MathEx, Uint512
 from bancor_research.bancor_emulator.Fraction import Fraction256
 
@@ -36,19 +37,25 @@ comp512Funcs = {
 def toUint512(x):
     return Uint512({'hi': x >> 256, 'lo': x & MAX_UINT256})
 
-def testExp(f):
+def testExp(f, maxError):
     print('exp2({} / {})'.format(f.n, f.d));
     try:
         actual = MathEx.exp2(f);
+        expected = Decimal(2) ** (Decimal(int(f.n)) / Decimal(int(f.d)));
+        assert Decimal(int(actual.n)) / Decimal(int(actual.d)) <= expected
+        assertAlmostEqual(expected, actual, maxError);
         print('{} / {}'.format(actual.n, actual.d));
     except AssertionError as error:
         assert str(error) == 'Overflow'
         print('Overflow');
 
-def testReducedFraction(f, max):
+def testTruncatedFraction(f, max, maxError):
     print('truncatedFraction({} / {}, {})'.format(f.n, f.d, max));
     try:
         actual = MathEx.truncatedFraction(f, max);
+        expected = Decimal(int(f.n)) / Decimal(int(f.d));
+        assert actual.n <= max and actual.d <= max
+        assertAlmostEqual(expected, actual, maxError);
         print('{} / {}'.format(actual.n, actual.d));
     except AssertionError as error:
         assert str(error) == 'InvalidFraction'
@@ -97,42 +104,48 @@ def testComp512(a, b):
                 actual = comp512Funcs[funcName](toUint512(x), toUint512(y));
                 print('true' if actual else 'false');
 
+def assertAlmostEqual(expected, actual, maxError):
+    actual = Decimal(int(actual.n)) / Decimal(int(actual.d))
+    if actual != expected:
+        error = abs(actual - expected) / expected
+        assert error <= Decimal(maxError), '\n- error = {}\n- maxError = {}'.format(error, maxError)
+
 for n in range(10):
     for d in range(1, 10):
-        testExp(Fraction256({ 'n': n, 'd': d }));
+        testExp(Fraction256({ 'n': n, 'd': d }), '0.00000000000000000000000000000000000006');
 
 for d in [10 ** i for i in range(3, 9)]:
     for n in range(1, 11):
-        testExp(Fraction256({ 'n': n, 'd': d }));
+        testExp(Fraction256({ 'n': n, 'd': d }), '0.00000000000000000000000000000000000002');
 
 for d in [10 ** i for i in range(3, 9)]:
     for n in range(d - 10, d):
-        testExp(Fraction256({ 'n': n, 'd': d }));
+        testExp(Fraction256({ 'n': n, 'd': d }), '0.00000000000000000000000000000000000003');
 
 for d in [10 ** i for i in range(3, 9)]:
     for n in range(d + 1, d + 11):
-        testExp(Fraction256({ 'n': n, 'd': d }));
+        testExp(Fraction256({ 'n': n, 'd': d }), '0.00000000000000000000000000000000000003');
 
 for d in [10 ** i for i in range(3, 9)]:
     for n in range(2 * d - 10, 2 * d):
-        testExp(Fraction256({ 'n': n, 'd': d }));
+        testExp(Fraction256({ 'n': n, 'd': d }), '0.00000000000000000000000000000000000004');
 
 for d in [10 ** i for i in range(3, 9)]:
     for n in range(2 * d + 1, 2 * d + 11):
-        testExp(Fraction256({ 'n': n, 'd': d }));
+        testExp(Fraction256({ 'n': n, 'd': d }), '0.00000000000000000000000000000000000003');
 
 for max in [MAX_UINT128]:
     for n in range(10):
         for d in range(10):
-            testReducedFraction(Fraction256({ 'n': max - (n), 'd': max - (d) }), max);
-            testReducedFraction(Fraction256({ 'n': max - (n), 'd': max + (d) }), max);
-            testReducedFraction(Fraction256({ 'n': max + (n), 'd': max - (d) }), max);
-            testReducedFraction(Fraction256({ 'n': max + (n), 'd': max + (d) }), max);
+            testTruncatedFraction(Fraction256({ 'n': max - (n), 'd': max - (d) }), max, '0.0');
+            testTruncatedFraction(Fraction256({ 'n': max - (n), 'd': max + (d) }), max, '0.000000000000000000000000000000000000003');
+            testTruncatedFraction(Fraction256({ 'n': max + (n), 'd': max - (d) }), max, '0.000000000000000000000000000000000000003');
+            testTruncatedFraction(Fraction256({ 'n': max + (n), 'd': max + (d) }), max, '0.000000000000000000000000000000000000003');
 
 for n in [100, 200]:
     for d in [2, 3]:
         for max in [3, 5]:
-            testReducedFraction(Fraction256({ 'n': n, 'd': d }), max);
+            testTruncatedFraction(Fraction256({ 'n': n, 'd': d }), max, '0.0');
 
 for n1 in [MAX_UINT64, MAX_UINT96]:
     for d1 in [MAX_UINT64, MAX_UINT96]:
@@ -172,15 +185,15 @@ for x in TEST_ARRAY:
 
 for n in range(100):
     for d in range(1, 100):
-        testExp(Fraction256({ 'n': n, 'd': d }));
+        testExp(Fraction256({ 'n': n, 'd': d }), '0.000000000000000000000000000000000002');
 
 for max in [MAX_UINT96, MAX_UINT112, MAX_UINT128]:
     for n in range(10):
         for d in range(10):
-            testReducedFraction(Fraction256({ 'n': max - (n), 'd': max - (d) }), max);
-            testReducedFraction(Fraction256({ 'n': max - (n), 'd': max + (d) }), max);
-            testReducedFraction(Fraction256({ 'n': max + (n), 'd': max - (d) }), max);
-            testReducedFraction(Fraction256({ 'n': max + (n), 'd': max + (d) }), max);
+            testTruncatedFraction(Fraction256({ 'n': max - (n), 'd': max - (d) }), max, '0.0');
+            testTruncatedFraction(Fraction256({ 'n': max - (n), 'd': max + (d) }), max, '0.00000000000000000000000000002');
+            testTruncatedFraction(Fraction256({ 'n': max + (n), 'd': max - (d) }), max, '0.00000000000000000000000000002');
+            testTruncatedFraction(Fraction256({ 'n': max + (n), 'd': max + (d) }), max, '0.00000000000000000000000000002');
 
 for max in [MAX_UINT112]:
     i = 1
@@ -189,7 +202,7 @@ for max in [MAX_UINT112]:
         while j <= max:
             n = MAX_UINT256 // (max) * (i) + (1);
             d = MAX_UINT256 // (max) * (j) + (1);
-            testReducedFraction(Fraction256({ 'n': n, 'd': d }), max);
+            testTruncatedFraction(Fraction256({ 'n': n, 'd': d }), max, '0.04');
             j *= 10
         i *= 10
 
@@ -213,7 +226,7 @@ for max in [MAX_UINT96, MAX_UINT112, MAX_UINT128]:
             ]:
                 for d in [jMax - (1), jMax, jMax + (1)]:
                     if (n <= MAX_UINT256 and d <= MAX_UINT256):
-                        testReducedFraction(Fraction256({ 'n': n, 'd': d }), max);
+                        testTruncatedFraction(Fraction256({ 'n': n, 'd': d }), max, '0.0000000005');
 
 for n1 in [0, 1, 2, 3]:
     for d1 in [1, 2, 3, 4]:

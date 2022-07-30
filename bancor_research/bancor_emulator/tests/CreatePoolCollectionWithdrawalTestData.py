@@ -1,7 +1,7 @@
 from common import read, write
 
 from bancor_research.bancor_emulator import config
-config.mode = 'float'
+config.set_mode(config.FLOAT_POINT_MODE)
 
 from bancor_research.bancor_emulator.PoolCollectionWithdrawal import PoolCollectionWithdrawal
 

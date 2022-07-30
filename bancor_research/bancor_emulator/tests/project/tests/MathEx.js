@@ -52,7 +52,7 @@ contract('MathEx', () => {
         }
     };
 
-    const testReducedFraction = async (f, max) => {
+    const testTruncatedFraction = async (f, max) => {
         console.log(`truncatedFraction(${f.n} / ${f.d}, ${max})`);
         try {
             const actual = await mathEx.truncatedFraction([f.n, f.d], max);
@@ -164,10 +164,10 @@ contract('MathEx', () => {
         for (const max of [MAX_UINT128]) {
             for (let n = 0; n < 10; n++) {
                 for (let d = 0; d < 10; d++) {
-                    await testReducedFraction({ n: max.subn(n), d: max.subn(d) }, max);
-                    await testReducedFraction({ n: max.subn(n), d: max.addn(d) }, max);
-                    await testReducedFraction({ n: max.addn(n), d: max.subn(d) }, max);
-                    await testReducedFraction({ n: max.addn(n), d: max.addn(d) }, max);
+                    await testTruncatedFraction({ n: max.subn(n), d: max.subn(d) }, max);
+                    await testTruncatedFraction({ n: max.subn(n), d: max.addn(d) }, max);
+                    await testTruncatedFraction({ n: max.addn(n), d: max.subn(d) }, max);
+                    await testTruncatedFraction({ n: max.addn(n), d: max.addn(d) }, max);
                 }
             }
         }
@@ -175,7 +175,7 @@ contract('MathEx', () => {
         for (const n of [100, 200]) {
             for (const d of [2, 3]) {
                 for (const max of [3, 5]) {
-                    await testReducedFraction({ n, d }, max);
+                    await testTruncatedFraction({ n, d }, max);
                 }
             }
         }
@@ -244,10 +244,10 @@ contract('MathEx', () => {
         for (const max of [MAX_UINT96, MAX_UINT112, MAX_UINT128]) {
             for (let n = 0; n < 10; n++) {
                 for (let d = 0; d < 10; d++) {
-                    await testReducedFraction({ n: max.subn(n), d: max.subn(d) }, max);
-                    await testReducedFraction({ n: max.subn(n), d: max.addn(d) }, max);
-                    await testReducedFraction({ n: max.addn(n), d: max.subn(d) }, max);
-                    await testReducedFraction({ n: max.addn(n), d: max.addn(d) }, max);
+                    await testTruncatedFraction({ n: max.subn(n), d: max.subn(d) }, max);
+                    await testTruncatedFraction({ n: max.subn(n), d: max.addn(d) }, max);
+                    await testTruncatedFraction({ n: max.addn(n), d: max.subn(d) }, max);
+                    await testTruncatedFraction({ n: max.addn(n), d: max.addn(d) }, max);
                 }
             }
         }
@@ -257,7 +257,7 @@ contract('MathEx', () => {
                 for (let j = new BN(1); j.lte(max); j = j.muln(10)) {
                     const n = MAX_UINT256.div(max).mul(i).addn(1);
                     const d = MAX_UINT256.div(max).mul(j).addn(1);
-                    await testReducedFraction({ n, d }, max);
+                    await testTruncatedFraction({ n, d }, max);
                 }
             }
         }
@@ -282,7 +282,7 @@ contract('MathEx', () => {
                     ]) {
                         for (const d of [jMax.subn(1), jMax, jMax.addn(1)]) {
                             if (n.lte(MAX_UINT256) && d.lte(MAX_UINT256)) {
-                                await testReducedFraction({ n, d }, max);
+                                await testTruncatedFraction({ n, d }, max);
                             }
                         }
                     }

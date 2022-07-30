@@ -14,8 +14,8 @@ TEST_ARRAY = [
     100,
     10_000,
     MAX_UINT128,
-    MAX_UINT256 // (2),
-    MAX_UINT256 - (MAX_UINT128),
+    MAX_UINT256 // 2,
+    MAX_UINT256 - MAX_UINT128,
     MAX_UINT256
 ];
 
@@ -148,10 +148,10 @@ for d in [10 ** i for i in range(3, 9)]:
 for m in [MAX_UINT128]:
     for n in range(10):
         for d in range(10):
-            testTruncatedFraction(Fraction256({ 'n': m - (n), 'd': m - (d) }), m, '0.0');
-            testTruncatedFraction(Fraction256({ 'n': m - (n), 'd': m + (d) }), m, '0.000000000000000000000000000000000000003');
-            testTruncatedFraction(Fraction256({ 'n': m + (n), 'd': m - (d) }), m, '0.000000000000000000000000000000000000003');
-            testTruncatedFraction(Fraction256({ 'n': m + (n), 'd': m + (d) }), m, '0.000000000000000000000000000000000000003');
+            testTruncatedFraction(Fraction256({ 'n': m - n, 'd': m - d }), m, '0.0');
+            testTruncatedFraction(Fraction256({ 'n': m - n, 'd': m + d }), m, '0.000000000000000000000000000000000000003');
+            testTruncatedFraction(Fraction256({ 'n': m + n, 'd': m - d }), m, '0.000000000000000000000000000000000000003');
+            testTruncatedFraction(Fraction256({ 'n': m + n, 'd': m + d }), m, '0.000000000000000000000000000000000000003');
 
 for n in [100, 200]:
     for d in [2, 3]:
@@ -183,9 +183,9 @@ for px in [128, 192, 256]:
             for ax in [3, 5, 7]:
                 for ay in [3, 5, 7]:
                     for az in [3, 5, 7]:
-                        x = 2 ** (px) // (ax);
-                        y = 2 ** (py) // (ay);
-                        z = 2 ** (pz) // (az);
+                        x = 2 ** px // ax;
+                        y = 2 ** py // ay;
+                        z = 2 ** pz // az;
                         testMulDiv(x, y, z);
 
 for x in TEST_ARRAY:
@@ -201,18 +201,18 @@ for n in range(100):
 for m in [MAX_UINT96, MAX_UINT112, MAX_UINT128]:
     for n in range(10):
         for d in range(10):
-            testTruncatedFraction(Fraction256({ 'n': m - (n), 'd': m - (d) }), m, '0.0');
-            testTruncatedFraction(Fraction256({ 'n': m - (n), 'd': m + (d) }), m, '0.00000000000000000000000000002');
-            testTruncatedFraction(Fraction256({ 'n': m + (n), 'd': m - (d) }), m, '0.00000000000000000000000000002');
-            testTruncatedFraction(Fraction256({ 'n': m + (n), 'd': m + (d) }), m, '0.00000000000000000000000000002');
+            testTruncatedFraction(Fraction256({ 'n': m - n, 'd': m - d }), m, '0.0');
+            testTruncatedFraction(Fraction256({ 'n': m - n, 'd': m + d }), m, '0.00000000000000000000000000002');
+            testTruncatedFraction(Fraction256({ 'n': m + n, 'd': m - d }), m, '0.00000000000000000000000000002');
+            testTruncatedFraction(Fraction256({ 'n': m + n, 'd': m + d }), m, '0.00000000000000000000000000002');
 
 for m in [MAX_UINT112]:
     i = 1
     while i <= m:
         j = 1
         while j <= m:
-            n = MAX_UINT256 // (m) * (i) + (1);
-            d = MAX_UINT256 // (m) * (j) + (1);
+            n = MAX_UINT256 // m * i + 1;
+            d = MAX_UINT256 // m * j + 1;
             testTruncatedFraction(Fraction256({ 'n': n, 'd': d }), m, '0.04');
             j *= 10
         i *= 10
@@ -223,19 +223,19 @@ for m in [MAX_UINT96, MAX_UINT112, MAX_UINT128]:
             iMax = 2 ** i - 1
             jMax = 2 ** j - 1
             for n in [
-                iMax // (3),
-                iMax // (2),
-                iMax * (2) // (3),
-                iMax * (3) // (4),
-                iMax - (1),
+                iMax // 3,
+                iMax // 2,
+                iMax * 2 // 3,
+                iMax * 3 // 4,
+                iMax - 1,
                 iMax,
-                iMax + (1),
-                iMax * (4) // (3),
-                iMax * (3) // (2),
-                iMax * (2),
-                iMax * (3)
+                iMax + 1,
+                iMax * 4 // 3,
+                iMax * 3 // 2,
+                iMax * 2,
+                iMax * 3
             ]:
-                for d in [jMax - (1), jMax, jMax + (1)]:
+                for d in [jMax - 1, jMax, jMax + 1]:
                     if (n <= MAX_UINT256 and d <= MAX_UINT256):
                         testTruncatedFraction(Fraction256({ 'n': n, 'd': d }), m, '0.0000000005');
 
@@ -283,9 +283,9 @@ for px in [0, 64, 128, 192, 255, 256]:
             for ax in [-1, 0, +1] if px < 256 else [-1]:
                 for ay in [-1, 0, +1] if py < 256 else [-1]:
                     for az in [-1, 0, +1] if pz < 256 else [-1]:
-                        x = 2 ** (px) + (ax);
-                        y = 2 ** (py) + (ay);
-                        z = 2 ** (pz) + (az);
+                        x = 2 ** px + ax;
+                        y = 2 ** py + ay;
+                        z = 2 ** pz + az;
                         testMulDiv(x, y, z);
 
 for px in [64, 128, 192, 256]:
@@ -294,9 +294,9 @@ for px in [64, 128, 192, 256]:
             for ax in [2 ** (px >> 1), 1]:
                 for ay in [2 ** (py >> 1), 1]:
                     for az in [2 ** (pz >> 1), 1]:
-                        x = 2 ** (px) - (ax);
-                        y = 2 ** (py) - (ay);
-                        z = 2 ** (pz) - (az);
+                        x = 2 ** px - ax;
+                        y = 2 ** py - ay;
+                        z = 2 ** pz - az;
                         testMulDiv(x, y, z);
 
 for px in [128, 192, 256]:
@@ -305,7 +305,7 @@ for px in [128, 192, 256]:
             for ax in [3, 5, 7]:
                 for ay in [3, 5, 7]:
                     for az in [3, 5, 7]:
-                        x = 2 ** (px) // (ax);
-                        y = 2 ** (py) // (ay);
-                        z = 2 ** (pz) // (az);
+                        x = 2 ** px // ax;
+                        y = 2 ** py // ay;
+                        z = 2 ** pz // az;
                         testMulDiv(x, y, z);

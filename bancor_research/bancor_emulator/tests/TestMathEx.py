@@ -82,6 +82,7 @@ def testMulDiv(x, y, z):
         expected = mulDivFuncs[funcName]['expected'](x, y, z);
         if (expected <= MAX_UINT256):
             actual = mulDivFuncs[funcName]['actual'](x, y, z);
+            assert actual == expected
             print(actual);
         else:
             try:
@@ -94,6 +95,8 @@ def testMulDiv(x, y, z):
 def testSubMax0(x, y):
     print('subMax0({}, {})'.format(x, y));
     actual = MathEx.subMax0(x, y);
+    expected = max(int(x - y), 0);
+    assert actual == expected
     print(actual);
 
 def testMul512(x, y):

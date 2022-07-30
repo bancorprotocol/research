@@ -41,8 +41,8 @@ def testExp(f, maxError):
     print('exp2({} / {})'.format(f.n, f.d));
     try:
         actual = MathEx.exp2(f);
-        expected = Decimal(2) ** (Decimal(int(f.n)) / Decimal(int(f.d)));
-        assert Decimal(int(actual.n)) / Decimal(int(actual.d)) <= expected
+        expected = Decimal(2) ** toDecimal(f);
+        assert toDecimal(actual) <= expected
         assertAlmostEqual(expected, actual, maxError);
         print('{} / {}'.format(actual.n, actual.d));
     except AssertionError as error:
@@ -53,9 +53,8 @@ def testTruncatedFraction(f, max, maxError):
     print('truncatedFraction({} / {}, {})'.format(f.n, f.d, max));
     try:
         actual = MathEx.truncatedFraction(f, max);
-        expected = Decimal(int(f.n)) / Decimal(int(f.d));
         assert actual.n <= max and actual.d <= max
-        assertAlmostEqual(expected, actual, maxError);
+        assertAlmostEqual(toDecimal(f), actual, maxError);
         print('{} / {}'.format(actual.n, actual.d));
     except AssertionError as error:
         assert str(error) == 'InvalidFraction'
@@ -64,13 +63,17 @@ def testTruncatedFraction(f, max, maxError):
 def testWeightedAverage(f1, f2, w1, w2, maxError):
     print('weightedAverage({} / {}, {} / {}, {}, {})'.format(f1.n, f1.d, f2.n, f2.d, w1, w2));
     actual = MathEx.weightedAverage(f1, f2, w1, w2);
-    expected = sum([Decimal(int(f.n)) / Decimal(int(f.d)) * w for f, w in zip([f1, f2], [w1, w2])]) / sum([w1, w2]); 
+    expected = sum([toDecimal(f) * w for f, w in zip([f1, f2], [w1, w2])]) / sum([w1, w2]); 
     assertAlmostEqual(expected, actual, maxError);
     print('{} / {}'.format(actual.n, actual.d));
 
 def testIsInRange(f1, f2, maxDeviation):
     print('isInRange({} / {}, {} / {}, {}%)'.format(f1.n, f1.d, f2.n, f2.d, maxDeviation));
     actual = MathEx.isInRange(f1, f2, maxDeviation * 10000);
+    mid = toDecimal(f1);
+    min = toDecimal(f2) * (100 - maxDeviation) / 100;
+    max = toDecimal(f2) * (100 + maxDeviation) / 100;
+    assert actual == (min <= mid <= max)
     print('true' if actual else 'false');
 
 def testMulDiv(x, y, z):
@@ -106,8 +109,11 @@ def testComp512(a, b):
                 actual = comp512Funcs[funcName](toUint512(x), toUint512(y));
                 print('true' if actual else 'false');
 
+def toDecimal(fraction):
+    return Decimal(int(fraction.n)) / Decimal(int(fraction.d))
+
 def assertAlmostEqual(expected, actual, maxError):
-    actual = Decimal(int(actual.n)) / Decimal(int(actual.d))
+    actual = toDecimal(actual)
     if actual != expected:
         error = abs(actual - expected) / expected
         assert error <= Decimal(maxError), '\n- error = {}\n- maxError = {}'.format(error, maxError)

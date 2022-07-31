@@ -90,14 +90,14 @@ for fileName in maxErrors:
     for row in table:
         a, b, c, e, w, m, n, x = [row[z] for z in 'a, b, c, e, w, m, n, x'.split(', ')]
         p, q, r, s, t, u, v = [row[z] for z in 'p, q, r, s, t, u, v'.split(', ')]
-        actual = PoolCollectionWithdrawal.calculateWithdrawalAmounts(a, b, c, e, w, m, n, x);
-        actual.p = actual.p.value.data * (-1 if actual.p.isNeg else 1);
-        actual.q = actual.q.value.data * (-1 if actual.q.isNeg else 1);
-        actual.r = actual.r.value.data * (-1 if actual.r.isNeg else 1);
-        actual.s = actual.s.data;
-        actual.t = actual.t.data;
-        actual.u = actual.u.data;
-        actual.v = actual.v.data;
+        actual = PoolCollectionWithdrawal.calculateWithdrawalAmounts(a, b, c, e, w, m, n, x)
+        actual.p = actual.p.value.data * (-1 if actual.p.isNeg else 1)
+        actual.q = actual.q.value.data * (-1 if actual.q.isNeg else 1)
+        actual.r = actual.r.value.data * (-1 if actual.r.isNeg else 1)
+        actual.s = actual.s.data
+        actual.t = actual.t.data
+        actual.u = actual.u.data
+        actual.v = actual.v.data
         print(
             fileName + ':',
             actual.p,
@@ -107,7 +107,7 @@ for fileName in maxErrors:
             actual.t,
             actual.u,
             actual.v
-        );
+        )
         assertAlmostEqual(p, actual.p, **maxErrors[fileName]['p'])
         assertAlmostEqual(q, actual.q, **maxErrors[fileName]['q'])
         assertAlmostEqual(r, actual.r, **maxErrors[fileName]['r'])

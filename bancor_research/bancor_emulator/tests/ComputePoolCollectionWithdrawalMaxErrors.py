@@ -1,6 +1,5 @@
-from common import read
+from common import read, Decimal
 
-from bancor_research.bancor_emulator.solidity.uint.float import Decimal
 from bancor_research.bancor_emulator.PoolCollectionWithdrawal import PoolCollectionWithdrawal
 
 maxErrors = {}

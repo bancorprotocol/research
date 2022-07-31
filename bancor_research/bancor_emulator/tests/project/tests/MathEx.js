@@ -24,7 +24,7 @@ const mulDivFuncs = {
     mulDivC: (x, y, z) => x.mul(y).add(z).subn(1).div(z)
 };
 
-const comp512Funcs = {
+const cmp512Funcs = {
     gt512: (x, y) => x.gt(y),
     lt512: (x, y) => x.lt(y),
     gte512: (x, y) => x.gte(y),
@@ -110,10 +110,10 @@ contract('MathEx', () => {
         console.log(actual.toString());
     };
 
-    const testComp512 = async (a, b) => {
+    const testCmp512 = async (a, b) => {
         for (const x of [a, a.addn(1).mul(b)]) {
             for (const y of [b, b.addn(1).mul(a)]) {
-                for (const funcName in comp512Funcs) {
+                for (const funcName in cmp512Funcs) {
                     console.log(`${funcName}(${x}, ${y})`);
                     const actual = await mathEx[funcName](toUint512(x), toUint512(y));
                     console.log(actual);
@@ -231,7 +231,7 @@ contract('MathEx', () => {
             for (const y of TEST_ARRAY) {
                 await testSubMax0(x, y);
                 await testMul512(x, y);
-                await testComp512(x, y);
+                await testCmp512(x, y);
             }
         }
 

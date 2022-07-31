@@ -33,7 +33,7 @@ mulDivFuncs = {
     'mulDivC': {'expected': mulDivC, 'actual': MathEx.mulDivC},
 };
 
-comp512Funcs = {
+cmp512Funcs = {
     'gt512' : {'expected': gt512 , 'actual': MathEx.gt512 },
     'lt512' : {'expected': lt512 , 'actual': MathEx.lt512 },
     'gte512': {'expected': gte512, 'actual': MathEx.gte512},
@@ -116,13 +116,13 @@ def testMul512(x, y):
     assert actual.lo == expected.lo
     print('{},{}'.format(actual.hi, actual.lo));
 
-def testComp512(a, b):
+def testCmp512(a, b):
     for x in [a, (a + 1) * b]:
         for y in [b, (b + 1) * a]:
-            for funcName in comp512Funcs.keys():
+            for funcName in cmp512Funcs.keys():
                 print('{}({}, {})'.format(funcName, x, y));
-                expected = comp512Funcs[funcName]['expected'](x, y);
-                actual = comp512Funcs[funcName]['actual'](toUint512(x), toUint512(y));
+                expected = cmp512Funcs[funcName]['expected'](x, y);
+                actual = cmp512Funcs[funcName]['actual'](toUint512(x), toUint512(y));
                 assert actual == expected
                 print('true' if actual else 'false');
 
@@ -197,7 +197,7 @@ for x in TEST_ARRAY:
     for y in TEST_ARRAY:
         testSubMax0(x, y);
         testMul512(x, y);
-        testComp512(x, y);
+        testCmp512(x, y);
 
 for n in range(100):
     for d in range(1, 100):

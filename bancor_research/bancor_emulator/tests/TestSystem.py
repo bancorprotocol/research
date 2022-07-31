@@ -1,6 +1,5 @@
-from common import read, assertAlmostEqual
+from common import read, assertAlmostEqual, Decimal
 
-from bancor_research.bancor_emulator.solidity.uint.float import Decimal
 from bancor_research.bancor_emulator.solidity import uint32, uint256, block
 
 from bancor_research.bancor_emulator.BancorNetwork import BancorNetwork

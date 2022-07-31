@@ -1,9 +1,8 @@
-from common import read, write
+from common import read, write, Decimal
 
 from bancor_research.bancor_emulator import config
 config.enable_full_precision_mode(True)
 
-from bancor_research.bancor_emulator.solidity.uint.float import Decimal
 from bancor_research.bancor_emulator.solidity import uint32, uint256, block
 
 from bancor_research.bancor_emulator.BancorNetwork import BancorNetwork

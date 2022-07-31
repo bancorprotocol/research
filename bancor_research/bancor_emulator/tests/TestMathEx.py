@@ -1,8 +1,7 @@
-from bancor_research.bancor_emulator.solidity.uint.float import Decimal
+from common import assertAlmostEqual, LesserOrEqual, Decimal
+
 from bancor_research.bancor_emulator.MathEx import MathEx, Uint512
 from bancor_research.bancor_emulator.Fraction import Fraction256
-
-from common import assertAlmostEqual, LesserOrEqual
 
 MAX_UINT32 = 2 ** 32 - 1
 MAX_UINT64 = 2 ** 64 - 1

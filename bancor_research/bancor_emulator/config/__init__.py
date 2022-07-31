@@ -1,13 +1,10 @@
 from sys import modules
 
-FIXED_POINT_MODE = 0
-FLOAT_POINT_MODE = 1
+full_precision_mode = False
 
-mode = FIXED_POINT_MODE
-
-def set_mode(new_mode):
-    global mode
-    if mode != new_mode:
-        mode = new_mode
+def enable_full_precision_mode(state):
+    global full_precision_mode
+    if full_precision_mode != state:
+        full_precision_mode = state
         for name in [name for name in modules if 'bancor_emulator' in name and 'config' not in name]:
             del modules[name]

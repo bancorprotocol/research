@@ -327,7 +327,7 @@ def _mulMod(
 
 from bancor_research.bancor_emulator import config
 
-if config.mode == config.FLOAT_POINT_MODE:
+if config.full_precision_mode:
     def exp2(f: Fraction256) -> (Fraction256):
         return Fraction256({ 'n': uint256(2) ** (f.n / f.d), 'd': 1 });
     def truncatedFraction(fraction: Fraction256, max: int) -> (Fraction256):

@@ -28,7 +28,7 @@ def toPPM(percent: str):
     return uint32(Decimal(str(PPM_RESOLUTION)) * Decimal(percent[:-1]) / 100)
 
 def toInt(value, decimals: int):
-    return uint256(Decimal(str(value)) * 10 ** decimals)
+    return uint256(Decimal(value) * 10 ** decimals)
 
 def toDec(value, decimals: int):
     return Decimal(str(value)) / 10 ** decimals

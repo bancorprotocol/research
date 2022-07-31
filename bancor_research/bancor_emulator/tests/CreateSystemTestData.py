@@ -1,7 +1,9 @@
 from common import read, write
 
-from bancor_research.bancor_emulator.solidity.uint.float import Decimal
-from bancor_research.bancor_emulator.solidity import uint32, uint256, block
+from bancor_research.bancor_emulator import config
+config.set_mode(config.FLOAT_POINT_MODE)
+
+from bancor_research.bancor_emulator.solidity import uint32, uint256, block, Decimal
 
 from bancor_research.bancor_emulator.BancorNetwork import BancorNetwork
 from bancor_research.bancor_emulator.BNTPool import BNTPool
@@ -21,17 +23,17 @@ DEPLOYER = 'DEPLOYER'
 DEFAULT_DECIMALS = 18
 MAX_UINT256 = 2 ** 256 - 1
 
-def toPPM(percentStr):
-    return uint32(Decimal(percentStr[:-1]) / 100 * int(PPM_RESOLUTION))
+def toPPM(percent: str):
+    return PPM_RESOLUTION * percent[:-1] / 100
 
-def decimalToInteger(value, decimals: int):
-    return uint256(Decimal(value) * 10 ** decimals)
+def toInt(value, decimals: int):
+    return uint256(str(value))
 
-def integerToDecimal(value, decimals: int):
-    return Decimal(int(value)) / 10 ** decimals
+def toDec(value, decimals: int):
+    return Decimal(str(value))
 
-def integerToDecimalToStr(value, decimals: int):
-    return str(integerToDecimal(value, decimals))
+def toStr(value, decimals: int):
+    return '{{:.{}f}}'.format(decimals).format(toDec(value, decimals)).rstrip('0').rstrip('.')
 
 def execute(fileName):
     print(fileName)
@@ -43,11 +45,11 @@ def execute(fileName):
     bntknDecimals = DEFAULT_DECIMALS
     bnbntDecimals = DEFAULT_DECIMALS
 
-    epVaultBalance = decimalToInteger(flow['epVaultBalance'], tknDecimals)
-    bntknAmount = decimalToInteger(flow['tknRewardsAmount'], bntknDecimals)
-    bnbntAmount = decimalToInteger(flow['bntRewardsAmount'], bnbntDecimals)
-    tknAmount = sum([decimalToInteger(user['tknBalance'], tknDecimals) for user in flow['users']], uint256()) + epVaultBalance
-    bntAmount = sum([decimalToInteger(user['bntBalance'], bntDecimals) for user in flow['users']], uint256())
+    epVaultBalance = toInt(flow['epVaultBalance'], tknDecimals)
+    bntknAmount = toInt(flow['tknRewardsAmount'], bntknDecimals)
+    bnbntAmount = toInt(flow['bntRewardsAmount'], bnbntDecimals)
+    tknAmount = sum([toInt(user['tknBalance'], tknDecimals) for user in flow['users']], uint256()) + epVaultBalance
+    bntAmount = sum([toInt(user['bntBalance'], bntDecimals) for user in flow['users']], uint256())
 
     bnt   = ReserveToken('BNT'  , 'BNT'  , bntDecimals)
     vbnt  = ReserveToken('VBNT' , 'VBNT' , bntDecimals)
@@ -77,8 +79,8 @@ def execute(fileName):
 
     networkSettings.addTokenToWhitelist(tkn);
     networkSettings.setWithdrawalFeePPM(toPPM(flow['withdrawalFee']));
-    networkSettings.setMinLiquidityForTrading(decimalToInteger(flow['bntMinLiquidity'], bntDecimals));
-    networkSettings.setFundingLimit(tkn, decimalToInteger(flow['bntFundingLimit'], bntDecimals));
+    networkSettings.setMinLiquidityForTrading(toInt(flow['bntMinLiquidity'], bntDecimals));
+    networkSettings.setFundingLimit(tkn, toInt(flow['bntFundingLimit'], bntDecimals));
 
     pendingWithdrawals.setLockDuration(0);
 
@@ -98,8 +100,8 @@ def execute(fileName):
         for contract in [network, standardRewards]:
             for token in [vbnt, tkn, bnt, bntkn, bnbnt]:
                 token.connect(user['id']).approve(contract, MAX_UINT256);
-        tkn.connect(DEPLOYER).transfer(user['id'], decimalToInteger(user['tknBalance'], tknDecimals));
-        bnt.connect(DEPLOYER).transfer(user['id'], decimalToInteger(user['bntBalance'], bntDecimals));
+        tkn.connect(DEPLOYER).transfer(user['id'], toInt(user['tknBalance'], tknDecimals));
+        bnt.connect(DEPLOYER).transfer(user['id'], toInt(user['bntBalance'], bntDecimals));
 
     tknProgramId = standardRewards.createProgram(tkn, bntknAmount, block.timestamp, block.timestamp + flow['tknRewardsDuration']);
     bntProgramId = standardRewards.createProgram(bnt, bnbntAmount, block.timestamp, block.timestamp + flow['bntRewardsDuration']);
@@ -110,8 +112,8 @@ def execute(fileName):
     def toWei(userId: str, amount: str, decimals: int, token: IERC20):
         if (amount.endswith('%')):
             balance = token.balanceOf(userId);
-            return balance * (toPPM(amount)) / (PPM_RESOLUTION);
-        return decimalToInteger(amount, decimals);
+            return balance * toPPM(amount) / PPM_RESOLUTION;
+        return toInt(amount, decimals);
 
     def depositTKN(userId: str, amount: str):
         wei = toWei(userId, amount, tknDecimals, tkn);
@@ -170,7 +172,7 @@ def execute(fileName):
         standardRewards.connect(userId).claimRewards([bntProgramId]);
 
     def setFundingLimit(amount: str):
-        networkSettings.setFundingLimit(tkn, decimalToInteger(amount, bntDecimals));
+        networkSettings.setFundingLimit(tkn, toInt(amount, bntDecimals));
 
     def enableTrading(bntVirtualBalance: int, tknVirtualBalance: int):
         poolCollection.enableTrading(tkn, uint256(bntVirtualBalance), uint256(tknVirtualBalance));
@@ -186,34 +188,30 @@ def execute(fileName):
             'bntStakedBalance': '0',
             'tknTradingLiquidity': '0',
             'bntTradingLiquidity': '0',
-            'averageRateN': '0',
-            'averageRateD': '0',
-            'averageInvRateN': '0',
-            'averageInvRateD': '0'
+            'averageRate': '0',
+            'averageInvRate': '0'
         };
 
         for user in flow['users']:
-            state['tknBalances'][user['id']] = integerToDecimalToStr(tkn.balanceOf(user['id']), tknDecimals);
-            state['bntBalances'][user['id']] = integerToDecimalToStr(bnt.balanceOf(user['id']), bntDecimals);
-            state['bntknBalances'][user['id']] = integerToDecimalToStr(bntkn.balanceOf(user['id']), bntknDecimals);
-            state['bnbntBalances'][user['id']] = integerToDecimalToStr(bnbnt.balanceOf(user['id']), bnbntDecimals);
+            state['tknBalances'][user['id']] = toStr(tkn.balanceOf(user['id']), tknDecimals);
+            state['bntBalances'][user['id']] = toStr(bnt.balanceOf(user['id']), bntDecimals);
+            state['bntknBalances'][user['id']] = toStr(bntkn.balanceOf(user['id']), bntknDecimals);
+            state['bnbntBalances'][user['id']] = toStr(bnbnt.balanceOf(user['id']), bnbntDecimals);
 
-        state['tknBalances']['masterVault'] = integerToDecimalToStr(tkn.balanceOf(masterVault), tknDecimals);
-        state['tknBalances']['epVault'] = integerToDecimalToStr(tkn.balanceOf(epVault), tknDecimals);
-        state['bntBalances']['masterVault'] = integerToDecimalToStr(bnt.balanceOf(masterVault), bntDecimals);
-        state['bntknBalances']['erVault'] = integerToDecimalToStr(bntkn.balanceOf(erVault), bntknDecimals);
-        state['bnbntBalances']['bntPool'] = integerToDecimalToStr(bnbnt.balanceOf(bntPool), bnbntDecimals);
+        state['tknBalances']['masterVault'] = toStr(tkn.balanceOf(masterVault), tknDecimals);
+        state['tknBalances']['epVault'] = toStr(tkn.balanceOf(epVault), tknDecimals);
+        state['bntBalances']['masterVault'] = toStr(bnt.balanceOf(masterVault), bntDecimals);
+        state['bntknBalances']['erVault'] = toStr(bntkn.balanceOf(erVault), bntknDecimals);
+        state['bnbntBalances']['bntPool'] = toStr(bnbnt.balanceOf(bntPool), bnbntDecimals);
 
         poolData = poolCollection.poolData(tkn);
-        state['bntCurrentPoolFunding'] = integerToDecimalToStr(bntPool.currentPoolFunding(tkn), bntDecimals);
-        state['tknStakedBalance'] = integerToDecimalToStr(poolData.liquidity.stakedBalance, tknDecimals);
-        state['bntStakedBalance'] = integerToDecimalToStr(bntPool.stakedBalance(), bntDecimals);
-        state['tknTradingLiquidity'] = integerToDecimalToStr(poolData.liquidity.baseTokenTradingLiquidity, tknDecimals);
-        state['bntTradingLiquidity'] = integerToDecimalToStr(poolData.liquidity.bntTradingLiquidity, bntDecimals);
-        state['averageRateN'] = integerToDecimalToStr(poolData.averageRates.rate.n, 0);
-        state['averageRateD'] = integerToDecimalToStr(poolData.averageRates.rate.d, 0);
-        state['averageInvRateN'] = integerToDecimalToStr(poolData.averageRates.invRate.n, 0);
-        state['averageInvRateD'] = integerToDecimalToStr(poolData.averageRates.invRate.d, 0);
+        state['bntCurrentPoolFunding'] = toStr(bntPool.currentPoolFunding(tkn), bntDecimals);
+        state['tknStakedBalance'] = toStr(poolData.liquidity.stakedBalance, tknDecimals);
+        state['bntStakedBalance'] = toStr(bntPool.stakedBalance(), bntDecimals);
+        state['tknTradingLiquidity'] = toStr(poolData.liquidity.baseTokenTradingLiquidity, tknDecimals);
+        state['bntTradingLiquidity'] = toStr(poolData.liquidity.bntTradingLiquidity, bntDecimals);
+        state['averageRate'] = toStr(toInt(poolData.averageRates.rate.n / poolData.averageRates.rate.d, 12), 12);
+        state['averageInvRate'] = toStr(toInt(poolData.averageRates.invRate.n / poolData.averageRates.invRate.d, 12), 12);
 
         return state;
 

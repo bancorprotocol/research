@@ -1,4 +1,4 @@
-from common import read
+from common import read, assertAlmostEqual
 
 from bancor_research.bancor_emulator.solidity.uint.float import Decimal
 from bancor_research.bancor_emulator.solidity import uint32, uint256, block
@@ -38,10 +38,8 @@ class State:
         self.bntStakedBalance      = data['bntStakedBalance     '.strip()]
         self.tknTradingLiquidity   = data['tknTradingLiquidity  '.strip()]
         self.bntTradingLiquidity   = data['bntTradingLiquidity  '.strip()]
-        self.averageRateN          = data['averageRateN         '.strip()]
-        self.averageRateD          = data['averageRateD         '.strip()]
-        self.averageInvRateN       = data['averageInvRateN      '.strip()]
-        self.averageInvRateD       = data['averageInvRateD      '.strip()]
+        self.averageRate           = data['averageRate          '.strip()]
+        self.averageInvRate        = data['averageInvRate       '.strip()]
     def __str__(self): 
         return \
             'tknBalances           = {}\n'.format(self.tknBalances          ) + \
@@ -53,10 +51,8 @@ class State:
             'bntStakedBalance      = {}\n'.format(self.bntStakedBalance     ) + \
             'tknTradingLiquidity   = {}\n'.format(self.tknTradingLiquidity  ) + \
             'bntTradingLiquidity   = {}\n'.format(self.bntTradingLiquidity  ) + \
-            'averageRateN          = {}\n'.format(self.averageRateN         ) + \
-            'averageRateD          = {}\n'.format(self.averageRateD         ) + \
-            'averageInvRateN       = {}\n'.format(self.averageInvRateN      ) + \
-            'averageInvRateD       = {}\n'.format(self.averageInvRateD      )
+            'averageRate           = {}\n'.format(self.averageRate          ) + \
+            'averageInvRate        = {}\n'.format(self.averageInvRate       )
     def __eq__(self, other): 
         return str(self) == str(other)
 
@@ -84,17 +80,14 @@ class Flow:
         self.users              = [User     (user     ) for user      in data['users     '.strip()]]
         self.operations         = [Operation(operation) for operation in data['operations'.strip()]]
 
-def toPPM(percentStr):
-    return uint32(Decimal(percentStr[:-1]) / 100 * int(PPM_RESOLUTION))
+def toPPM(percent: str):
+    return uint32(Decimal(int(PPM_RESOLUTION)) * Decimal(percent[:-1]) / 100)
 
-def decimalToInteger(value, decimals: int):
+def toInt(value, decimals: int):
     return uint256(Decimal(value) * 10 ** decimals)
 
-def integerToDecimal(value, decimals: int):
+def toDec(value, decimals: int):
     return Decimal(int(value)) / 10 ** decimals
-
-def integerToDecimalToStr(value, decimals: int):
-    return str(integerToDecimal(value, decimals))
 
 def execute(fileName):
     print(fileName)
@@ -106,11 +99,11 @@ def execute(fileName):
     bntknDecimals = DEFAULT_DECIMALS
     bnbntDecimals = DEFAULT_DECIMALS
 
-    epVaultBalance = decimalToInteger(flow.epVaultBalance, tknDecimals)
-    bntknAmount = decimalToInteger(flow.tknRewardsAmount, bntknDecimals)
-    bnbntAmount = decimalToInteger(flow.bntRewardsAmount, bnbntDecimals)
-    tknAmount = sum([decimalToInteger(user.tknBalance, tknDecimals) for user in flow.users], uint256()) + epVaultBalance
-    bntAmount = sum([decimalToInteger(user.bntBalance, bntDecimals) for user in flow.users], uint256())
+    epVaultBalance = toInt(flow.epVaultBalance, tknDecimals)
+    bntknAmount = toInt(flow.tknRewardsAmount, bntknDecimals)
+    bnbntAmount = toInt(flow.bntRewardsAmount, bnbntDecimals)
+    tknAmount = sum([toInt(user.tknBalance, tknDecimals) for user in flow.users], uint256()) + epVaultBalance
+    bntAmount = sum([toInt(user.bntBalance, bntDecimals) for user in flow.users], uint256())
 
     bnt   = ReserveToken('BNT'  , 'BNT'  , bntDecimals)
     vbnt  = ReserveToken('VBNT' , 'VBNT' , bntDecimals)
@@ -140,8 +133,8 @@ def execute(fileName):
 
     networkSettings.addTokenToWhitelist(tkn);
     networkSettings.setWithdrawalFeePPM(toPPM(flow.withdrawalFee));
-    networkSettings.setMinLiquidityForTrading(decimalToInteger(flow.bntMinLiquidity, bntDecimals));
-    networkSettings.setFundingLimit(tkn, decimalToInteger(flow.bntFundingLimit, bntDecimals));
+    networkSettings.setMinLiquidityForTrading(toInt(flow.bntMinLiquidity, bntDecimals));
+    networkSettings.setFundingLimit(tkn, toInt(flow.bntFundingLimit, bntDecimals));
 
     pendingWithdrawals.setLockDuration(0);
 
@@ -161,8 +154,8 @@ def execute(fileName):
         for contract in [network, standardRewards]:
             for token in [vbnt, tkn, bnt, bntkn, bnbnt]:
                 token.connect(user.id).approve(contract, MAX_UINT256);
-        tkn.connect(DEPLOYER).transfer(user.id, decimalToInteger(user.tknBalance, tknDecimals));
-        bnt.connect(DEPLOYER).transfer(user.id, decimalToInteger(user.bntBalance, bntDecimals));
+        tkn.connect(DEPLOYER).transfer(user.id, toInt(user.tknBalance, tknDecimals));
+        bnt.connect(DEPLOYER).transfer(user.id, toInt(user.bntBalance, bntDecimals));
 
     tknProgramId = standardRewards.createProgram(tkn, bntknAmount, block.timestamp, block.timestamp + flow.tknRewardsDuration);
     bntProgramId = standardRewards.createProgram(bnt, bnbntAmount, block.timestamp, block.timestamp + flow.bntRewardsDuration);
@@ -173,8 +166,8 @@ def execute(fileName):
     def toWei(userId: str, amount: str, decimals: int, token: IERC20):
         if (amount.endswith('%')):
             balance = token.balanceOf(userId);
-            return balance * (toPPM(amount)) / (PPM_RESOLUTION);
-        return decimalToInteger(amount, decimals);
+            return balance * toPPM(amount) / PPM_RESOLUTION;
+        return toInt(amount, decimals);
 
     def depositTKN(userId: str, amount: str):
         wei = toWei(userId, amount, tknDecimals, tkn);
@@ -233,52 +226,32 @@ def execute(fileName):
         standardRewards.connect(userId).claimRewards([bntProgramId]);
 
     def setFundingLimit(amount: str):
-        networkSettings.setFundingLimit(tkn, decimalToInteger(amount, bntDecimals));
+        networkSettings.setFundingLimit(tkn, toInt(amount, bntDecimals));
 
     def enableTrading(bntVirtualBalance: int, tknVirtualBalance: int):
         poolCollection.enableTrading(tkn, uint256(bntVirtualBalance), uint256(tknVirtualBalance));
 
     def verifyState(expected):
-        actual = State({
-            'tknBalances': {},
-            'bntBalances': {},
-            'bntknBalances': {},
-            'bnbntBalances': {},
-            'bntCurrentPoolFunding': '0',
-            'tknStakedBalance': '0',
-            'bntStakedBalance': '0',
-            'tknTradingLiquidity': '0',
-            'bntTradingLiquidity': '0',
-            'averageRateN': '0',
-            'averageRateD': '0',
-            'averageInvRateN': '0',
-            'averageInvRateD': '0'
-        });
-
         for user in flow.users:
-            actual.tknBalances[user.id] = integerToDecimalToStr(tkn.balanceOf(user.id), tknDecimals);
-            actual.bntBalances[user.id] = integerToDecimalToStr(bnt.balanceOf(user.id), bntDecimals);
-            actual.bntknBalances[user.id] = integerToDecimalToStr(bntkn.balanceOf(user.id), bntknDecimals);
-            actual.bnbntBalances[user.id] = integerToDecimalToStr(bnbnt.balanceOf(user.id), bnbntDecimals);
+            assertAlmostEqual(expected.tknBalances[user.id], toDec(tkn.balanceOf(user.id), tknDecimals), 0, '0.000000000001');
+            assertAlmostEqual(expected.bntBalances[user.id], toDec(bnt.balanceOf(user.id), bntDecimals), 0, '0.000000000001');
+            assertAlmostEqual(expected.bntknBalances[user.id], toDec(bntkn.balanceOf(user.id), bntknDecimals), 0, '0.000000000001');
+            assertAlmostEqual(expected.bnbntBalances[user.id], toDec(bnbnt.balanceOf(user.id), bnbntDecimals), 0, '0.000000000001');
 
-        actual.tknBalances['masterVault'] = integerToDecimalToStr(tkn.balanceOf(masterVault), tknDecimals);
-        actual.tknBalances['epVault'] = integerToDecimalToStr(tkn.balanceOf(epVault), tknDecimals);
-        actual.bntBalances['masterVault'] = integerToDecimalToStr(bnt.balanceOf(masterVault), bntDecimals);
-        actual.bntknBalances['erVault'] = integerToDecimalToStr(bntkn.balanceOf(erVault), bntknDecimals);
-        actual.bnbntBalances['bntPool'] = integerToDecimalToStr(bnbnt.balanceOf(bntPool), bnbntDecimals);
+        assertAlmostEqual(expected.tknBalances['masterVault'], toDec(tkn.balanceOf(masterVault), tknDecimals), 0, '0.000000000001');
+        assertAlmostEqual(expected.tknBalances['epVault'], toDec(tkn.balanceOf(epVault), tknDecimals), 0, '0.000000000001');
+        assertAlmostEqual(expected.bntBalances['masterVault'], toDec(bnt.balanceOf(masterVault), bntDecimals), 0, '0.000000000001');
+        assertAlmostEqual(expected.bntknBalances['erVault'], toDec(bntkn.balanceOf(erVault), bntknDecimals), 0, '0.000000000001');
+        assertAlmostEqual(expected.bnbntBalances['bntPool'], toDec(bnbnt.balanceOf(bntPool), bnbntDecimals), 0, '0.000000000001');
 
         poolData = poolCollection.poolData(tkn);
-        actual.bntCurrentPoolFunding = integerToDecimalToStr(bntPool.currentPoolFunding(tkn), bntDecimals);
-        actual.tknStakedBalance = integerToDecimalToStr(poolData.liquidity.stakedBalance, tknDecimals);
-        actual.bntStakedBalance = integerToDecimalToStr(bntPool.stakedBalance(), bntDecimals);
-        actual.tknTradingLiquidity = integerToDecimalToStr(poolData.liquidity.baseTokenTradingLiquidity, tknDecimals);
-        actual.bntTradingLiquidity = integerToDecimalToStr(poolData.liquidity.bntTradingLiquidity, bntDecimals);
-        actual.averageRateN = integerToDecimalToStr(poolData.averageRates.rate.n, 0);
-        actual.averageRateD = integerToDecimalToStr(poolData.averageRates.rate.d, 0);
-        actual.averageInvRateN = integerToDecimalToStr(poolData.averageRates.invRate.n, 0);
-        actual.averageInvRateD = integerToDecimalToStr(poolData.averageRates.invRate.d, 0);
-
-        assert actual == expected, 'expected:\n{}but got:\n{}'.format(expected, actual);
+        assertAlmostEqual(expected.bntCurrentPoolFunding, toDec(bntPool.currentPoolFunding(tkn), bntDecimals), 0, '0.000000000001');
+        assertAlmostEqual(expected.tknStakedBalance, toDec(poolData.liquidity.stakedBalance, tknDecimals), 0, '0.000000000001');
+        assertAlmostEqual(expected.bntStakedBalance, toDec(bntPool.stakedBalance(), bntDecimals), 0, '0.000000000001');
+        assertAlmostEqual(expected.tknTradingLiquidity, toDec(poolData.liquidity.baseTokenTradingLiquidity, tknDecimals), 0, '0.000000000001');
+        assertAlmostEqual(expected.bntTradingLiquidity, toDec(poolData.liquidity.bntTradingLiquidity, bntDecimals), 0, '0.000000000001');
+        assertAlmostEqual(expected.averageRate, toDec(poolData.averageRates.rate.n, 0) / toDec(poolData.averageRates.rate.d, 0), 0, '0.00000000001');
+        assertAlmostEqual(expected.averageInvRate, toDec(poolData.averageRates.invRate.n, 0) / toDec(poolData.averageRates.invRate.d, 0), 0, '0.00000000001');
 
     for n in range(len(flow.operations)):
         operation = flow.operations[n]

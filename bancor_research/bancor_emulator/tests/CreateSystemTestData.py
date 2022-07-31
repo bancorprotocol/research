@@ -3,7 +3,8 @@ from common import read, write
 from bancor_research.bancor_emulator import config
 config.set_mode(config.FLOAT_POINT_MODE)
 
-from bancor_research.bancor_emulator.solidity import uint32, uint256, block, Decimal
+from bancor_research.bancor_emulator.solidity.uint.float import Decimal
+from bancor_research.bancor_emulator.solidity import uint32, uint256, block
 
 from bancor_research.bancor_emulator.BancorNetwork import BancorNetwork
 from bancor_research.bancor_emulator.BNTPool import BNTPool
@@ -24,13 +25,13 @@ DEFAULT_DECIMALS = 18
 MAX_UINT256 = 2 ** 256 - 1
 
 def toPPM(percent: str):
-    return PPM_RESOLUTION * percent[:-1] / 100
+    return uint32(Decimal(str(PPM_RESOLUTION)) * Decimal(percent[:-1]) / 100)
 
 def toInt(value, decimals: int):
-    return uint256(str(value))
+    return uint256(Decimal(str(value)) * 10 ** decimals)
 
 def toDec(value, decimals: int):
-    return Decimal(str(value))
+    return Decimal(str(value)) / 10 ** decimals
 
 def toStr(value, decimals: int):
     return '{{:.{}f}}'.format(decimals).format(toDec(value, decimals)).rstrip('0').rstrip('.')
@@ -210,8 +211,8 @@ def execute(fileName):
         state['bntStakedBalance'] = toStr(bntPool.stakedBalance(), bntDecimals);
         state['tknTradingLiquidity'] = toStr(poolData.liquidity.baseTokenTradingLiquidity, tknDecimals);
         state['bntTradingLiquidity'] = toStr(poolData.liquidity.bntTradingLiquidity, bntDecimals);
-        state['averageRate'] = toStr(toInt(poolData.averageRates.rate.n / poolData.averageRates.rate.d, 12), 12);
-        state['averageInvRate'] = toStr(toInt(poolData.averageRates.invRate.n / poolData.averageRates.invRate.d, 12), 12);
+        state['averageRate'] = toStr(toInt(toDec(poolData.averageRates.rate.n, 0) / toDec(poolData.averageRates.rate.d, 0), 12), 12);
+        state['averageInvRate'] = toStr(toInt(toDec(poolData.averageRates.invRate.n, 0) / toDec(poolData.averageRates.invRate.d, 0), 12), 12);
 
         return state;
 

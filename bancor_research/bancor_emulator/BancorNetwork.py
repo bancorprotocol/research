@@ -591,7 +591,7 @@ class BancorNetwork(contract, Time):
         # update the pending network fee amount to be burned by the vortex
         self._pendingNetworkFeeAmount += networkFeeAmount;
 
-        return lastHopTradeResult.targetAmount if params.bySourceAmount else lastHopTradeResult.sourceAmount;
+        return lastHopTradeResult.targetAmount if params.bySourceAmount else firstHopTradeResult.sourceAmount;
 
     '''
      * @dev performs a single hop between BNT and a base token trade by providing either the source or the target amount

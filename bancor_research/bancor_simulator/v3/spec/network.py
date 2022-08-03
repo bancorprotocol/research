@@ -306,14 +306,17 @@ class BancorDapp:
         state = self.global_state
 
         # Iterate all reserve tokens and all pool tokens
+        all_tokens = [tkn for tkn in state.whitelisted_tokens] + ["bnt"]
         all_tokens = (
-            [tkn for tkn in state.whitelisted_tokens]
-            + ["bnt"]
-            + ["bn" + tkn_name for tkn_name in state.whitelisted_tokens]
+            all_tokens + ["bn" + tkn_name for tkn_name in all_tokens]
         )
+        all_tokens = all_tokens + ["vbnt"]
+
         for tkn_name in all_tokens:
             table[tkn_name] = {}
-            for account in state.usernames:
+            for account in state.users:
+                if tkn_name not in state.users[account].wallet:
+                    state.users[account].wallet[tkn_name] = Token(balance=DEFAULT_ACCOUNT_BALANCE)
                 table[tkn_name][tuple([1, "Account", account])] = (
                     state.users[account].wallet[tkn_name].balance
                 )

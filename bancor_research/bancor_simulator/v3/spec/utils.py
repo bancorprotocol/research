@@ -443,49 +443,6 @@ def init_protocol(
     return state
 
 
-# TODO: Remove unused function
-def init_json_simulation(state: State) -> State:
-    """
-    Initializes pre-formatted JSON file containing simulation modules to run and report on.
-    """
-
-    tkn_name = [tkn for tkn in state.whitelisted_tokens if tkn != "bnt"][0]
-
-    if len(state.json_export["users"]) == 0:
-        state.json_export["networkFee"] = format_json(
-            state.network_fee, percentage=True
-        )
-        state.json_export["withdrawalFee"] = format_json(
-            state.withdrawal_fee, percentage=True
-        )
-        state.json_export["epVaultBalance"] = format_json(
-            state.tokens[tkn_name].external_protection_vault.balance
-        )
-
-        if tkn_name in state.standard_reward_programs:
-            state.json_export["tknRewardsamt"] = format_json(
-                state.standard_reward_programs[tkn_name].staked_reward_amt.balance
-            )
-            state.json_export["tknRewardsDuration"] = format_json(
-                state.standard_reward_programs[tkn_name].end_time, integer=True
-            )
-
-        state.json_export["tknDecimals"] = format_json(state.decimals, integer=True)
-        state.json_export["bntMinLiquidity"] = format_json(state.bnt_min_liquidity)
-        users = []
-        for user_name in state.usernames:
-            user = {}
-            user["id"] = user_name
-            for tkn_name in state.whitelisted_tokens:
-                user[f"{tkn_name}Balance"] = format_json(
-                    state.users[user_name].wallet[tkn_name].balance
-                )
-            users.append(user)
-
-        state.json_export["users"] = users
-    return state
-
-
 def handle_logging(
     tkn_name: str,
     tkn_amt: Decimal,

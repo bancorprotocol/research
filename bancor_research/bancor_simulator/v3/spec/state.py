@@ -76,9 +76,7 @@ class Token(object):
     Represents a token balance with common math operations to increase, decrease, and set the balance.
     """
 
-    def __init__(
-        self, balance: Decimal = Decimal("0")
-    ):
+    def __init__(self, balance: Decimal = Decimal("0")):
         self.balance = balance
 
     def add(self, value: Decimal):

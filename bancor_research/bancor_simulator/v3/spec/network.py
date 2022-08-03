@@ -41,7 +41,7 @@ class BancorDapp:
         network_fee: Decimal = DEFAULT_NETWORK_FEE,
         whitelisted_tokens=DEFAULT_WHITELIST,
         price_feeds_path: str = DEFAULT_PRICE_FEEDS_PATH,
-        price_feeds: PandasDataFrame = DEFAULT_PRICE_FEEDS
+        price_feeds: PandasDataFrame = DEFAULT_PRICE_FEEDS,
     ):
 
         transaction_id = 0
@@ -54,9 +54,11 @@ class BancorDapp:
             price_feeds.columns = [col.lower() for col in price_feeds.columns]
 
         for tkn_name in whitelisted_tokens:
-            assert tkn_name in price_feeds.columns, f"Whitelisted token `{tkn_name}` not found in price feed. " \
-                                                    f"Add `{tkn_name}` to the price feed, " \
-                                                    f"or remove `{tkn_name}` from the whitelisted tokens."
+            assert tkn_name in price_feeds.columns, (
+                f"Whitelisted token `{tkn_name}` not found in price feed. "
+                f"Add `{tkn_name}` to the price feed, "
+                f"or remove `{tkn_name}` from the whitelisted tokens."
+            )
 
         state = State(
             transaction_id=transaction_id,
@@ -304,9 +306,11 @@ class BancorDapp:
         state = self.global_state
 
         # Iterate all reserve tokens and all pool tokens
-        all_tokens = [tkn for tkn in state.whitelisted_tokens] + ['bnt'] + [
-            "bn" + tkn_name for tkn_name in state.whitelisted_tokens
-        ]
+        all_tokens = (
+            [tkn for tkn in state.whitelisted_tokens]
+            + ["bnt"]
+            + ["bn" + tkn_name for tkn_name in state.whitelisted_tokens]
+        )
         for tkn_name in all_tokens:
             table[tkn_name] = {}
             for account in state.usernames:
@@ -315,9 +319,7 @@ class BancorDapp:
                 )
 
         # Iterate all reserve tokens except bnt
-        for tkn_name in [
-            tkn_name for tkn_name in all_tokens if tkn_name != "bnt"
-        ]:
+        for tkn_name in [tkn_name for tkn_name in all_tokens if tkn_name != "bnt"]:
             table[tkn_name][tuple([2, "Pool", "a: TKN Staked Balance"])] = state.tokens[
                 tkn_name
             ].staking_ledger.balance

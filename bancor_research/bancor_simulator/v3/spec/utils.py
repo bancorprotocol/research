@@ -405,8 +405,8 @@ def init_protocol(
         # Get tokens not yet initialized.
         if tkn_name not in state.tokens:
 
-            trading_fee = whitelisted_tokens[tkn_name]['trading_fee']
-            bnt_funding_limit = whitelisted_tokens[tkn_name]['bnt_funding_limit']
+            trading_fee = whitelisted_tokens[tkn_name]["trading_fee"]
+            bnt_funding_limit = whitelisted_tokens[tkn_name]["bnt_funding_limit"]
 
             # initialize tokens
             state.tokens[tkn_name] = Tokens(
@@ -571,9 +571,7 @@ def handle_ema(state: State, tkn_name: str) -> State:
     return state
 
 
-def describe_rates(
-    state: State, report={}
-) -> pd.DataFrame:
+def describe_rates(state: State, report={}) -> pd.DataFrame:
     """
     Return a dataframe of the current system EMA & spot rates.
     """
@@ -767,7 +765,9 @@ def validate_input(
 
     pooltkn_name = get_pooltoken_name(tkn_name)
     if pooltkn_name not in state.users[user_name].wallet:
-        state.users[user_name].wallet[pooltkn_name] = Token(balance=DEFAULT_ACCOUNT_BALANCE)
+        state.users[user_name].wallet[pooltkn_name] = Token(
+            balance=DEFAULT_ACCOUNT_BALANCE
+        )
 
     if timestamp is not None:
         state.timestamp = timestamp

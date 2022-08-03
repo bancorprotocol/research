@@ -31,7 +31,7 @@ class Epoch(int):
 MODEL = "Bancor Network"
 GENESIS_EPOCH = Epoch(0)
 SECONDS_PER_DAY = 86400
-MAX_UINT112 = 2 ** 112 - 1
+MAX_UINT112 = 2**112 - 1
 PRECISION = 155
 
 # Configurable Genesis Variables
@@ -68,20 +68,20 @@ DEFAULT_PRICE_FEEDS = pd.DataFrame(
 DEFAULT_WHITELIST = {
     "eth": {
         "trading_fee": DEFAULT_TRADING_FEE,
-        "bnt_funding_limit": DEFAULT_BNT_FUNDING_LIMIT
+        "bnt_funding_limit": DEFAULT_BNT_FUNDING_LIMIT,
     },
     "link": {
         "trading_fee": DEFAULT_TRADING_FEE,
-        "bnt_funding_limit": DEFAULT_BNT_FUNDING_LIMIT
+        "bnt_funding_limit": DEFAULT_BNT_FUNDING_LIMIT,
     },
     "tkn": {
         "trading_fee": DEFAULT_TRADING_FEE,
-        "bnt_funding_limit": DEFAULT_BNT_FUNDING_LIMIT
+        "bnt_funding_limit": DEFAULT_BNT_FUNDING_LIMIT,
     },
     "wbtc": {
         "trading_fee": DEFAULT_TRADING_FEE,
-        "bnt_funding_limit": DEFAULT_BNT_FUNDING_LIMIT
-    }
+        "bnt_funding_limit": DEFAULT_BNT_FUNDING_LIMIT,
+    },
 }
 
 
@@ -262,6 +262,7 @@ class Tokens(GlobalSettings):
     """
     Represents all ledger and other configuration balances associated with a particular token's current state.
     """
+
     tkn_name: str = None
     timestamp: int = DEFAULT_TIMESTAMP
     master_vault: Any = field(default_factory=Token)
@@ -411,7 +412,7 @@ class Tokens(GlobalSettings):
         Returns the price of the current vbnt token. Only valid when name==bnt
         """
         assert (
-                self.tkn_name == "bnt"
+            self.tkn_name == "bnt"
         ), f"vbnt_price attempted to be accessed in {self.tkn_name} state, call bnt state instead"
         return self._vbnt_price
 
@@ -958,8 +959,8 @@ class State(GlobalSettings):
         """
         if tkn_name not in self.whitelisted_tokens:
             self.whitelisted_tokens[tkn_name] = {
-                'trading_fee': DEFAULT_TRADING_FEE,
-                'bnt_funding_limit': DEFAULT_BNT_FUNDING_LIMIT
+                "trading_fee": DEFAULT_TRADING_FEE,
+                "bnt_funding_limit": DEFAULT_BNT_FUNDING_LIMIT,
             }
 
     def create_user(self, user_name: str):
@@ -979,9 +980,7 @@ class State(GlobalSettings):
                     balance=DEFAULT_ACCOUNT_BALANCE
                 )
         if "bnt" not in self.users[user_name].wallet:
-            self.users[user_name].wallet["bnt"] = Token(
-                balance=DEFAULT_ACCOUNT_BALANCE
-            )
+            self.users[user_name].wallet["bnt"] = Token(balance=DEFAULT_ACCOUNT_BALANCE)
         if "vbnt" not in self.users[user_name].wallet:
             self.users[user_name].wallet["vbnt"] = Token(
                 balance=DEFAULT_ACCOUNT_BALANCE
@@ -1030,8 +1029,8 @@ def get_vault_tvl(state: State) -> Decimal:
     return sum(
         [
             (
-                    get_tkn_price(state, tkn_name)
-                    * state.tokens[tkn_name].master_vault.balance
+                get_tkn_price(state, tkn_name)
+                * state.tokens[tkn_name].master_vault.balance
             )
             for tkn_name in state.whitelisted_tokens
         ]
@@ -1157,7 +1156,7 @@ def get_standard_reward_rate(state: State, id: int) -> int:
 
 
 def get_user_pending_rewards_staked_balance(
-        state: State, id: int, user_name: str
+    state: State, id: int, user_name: str
 ) -> Decimal:
     return state.users[user_name].pending_standard_rewards[id].staked.balance
 
@@ -1169,8 +1168,8 @@ def get_user_pending_standard_rewards(state: State, id: int, user_name: str) -> 
 def get_user_reward_per_token_paid(state: State, id: int, user_name: str) -> Decimal:
     return (
         state.users[user_name]
-            .pending_standard_rewards[id]
-            .reward_per_token_paid.balance
+        .pending_standard_rewards[id]
+        .reward_per_token_paid.balance
     )
 
 
@@ -1418,7 +1417,7 @@ def get_user_pending_withdrawals(state: State, user_name: str, tkn_name: str) ->
         id
         for id in state.users[user_name].pending_withdrawals
         if state.users[user_name].pending_withdrawals[id].tkn_name == tkn_name
-           and state.users[user_name].pending_withdrawals[id].is_complete
+        and state.users[user_name].pending_withdrawals[id].is_complete
     ]
 
 
@@ -1579,8 +1578,8 @@ def get_json_virtual_balances(state: State, tkn_name: str) -> dict:
 
 
 def get_max_bnt_deposit(
-        state: State,
-        user_bnt: Decimal,
+    state: State,
+    user_bnt: Decimal,
 ) -> Decimal:
     """
     Used in simulation only.
@@ -1596,7 +1595,7 @@ def get_network_fee(state: State, tkn_name: str) -> Decimal:
 
 
 def get_trade_inputs(
-        state: State, tkn_name: str
+    state: State, tkn_name: str
 ) -> Tuple[str, Decimal, Decimal, Decimal, Decimal]:
     """
     Gets all input data required to process trade action.

@@ -77,10 +77,9 @@ class Token(object):
     """
 
     def __init__(
-        self, balance: Decimal = Decimal("0"), qdecimals: Decimal = DEFAULT_QDECIMALS
+        self, balance: Decimal = Decimal("0")
     ):
         self.balance = balance
-        self.qdecimals = qdecimals
 
     def add(self, value: Decimal):
         self.validate_balance()

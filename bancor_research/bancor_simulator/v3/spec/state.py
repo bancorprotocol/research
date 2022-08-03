@@ -29,23 +29,20 @@ class Epoch(int):
 
 # Non-Configurable Constants
 MODEL = "Bancor Network"
-VERSION = "1.0.0"
 GENESIS_EPOCH = Epoch(0)
 SECONDS_PER_DAY = 86400
-MAX_UINT112 = 2**112 - 1
+MAX_UINT112 = 2 ** 112 - 1
 PRECISION = 155
 
 # Configurable Genesis Variables
 DEFAULT_TIMESTAMP = 0
-DEFAULT_WHITELIST = ["dai", "eth", "link", "bnt", "tkn", "wbtc"]
 DEFAULT_USERS = ["Alice", "Bob", "Charlie", "Trader"]
-DEFAULT_DECIMALS = 18
-DEFAULT_QDECIMALS = Decimal(10) ** -DEFAULT_DECIMALS
 DEFAULT_PRICE_FEEDS_PATH = (
     "https://bancorml.s3.us-east-2.amazonaws.com/price_feeds.parquet"
 )
 DEFAULT_EXP_DECAY_DISTRIBUTION = 1
 DEFAULT_FLAT_DISTRIBUTION = 0
+DEFAULT_DECIMALS = 18
 DEFAULT_WITHDRAWAL_FEE = Decimal("0.0025")
 DEFAULT_TRADING_FEE = Decimal("0.01")
 DEFAULT_NETWORK_FEE = Decimal("0.2")
@@ -68,6 +65,24 @@ DEFAULT_PRICE_FEEDS = pd.DataFrame(
         "wbtc": (40000.00 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
     }
 )
+DEFAULT_WHITELIST = {
+    "eth": {
+        "trading_fee": DEFAULT_TRADING_FEE,
+        "bnt_funding_limit": DEFAULT_BNT_FUNDING_LIMIT
+    },
+    "link": {
+        "trading_fee": DEFAULT_TRADING_FEE,
+        "bnt_funding_limit": DEFAULT_BNT_FUNDING_LIMIT
+    },
+    "tkn": {
+        "trading_fee": DEFAULT_TRADING_FEE,
+        "bnt_funding_limit": DEFAULT_BNT_FUNDING_LIMIT
+    },
+    "wbtc": {
+        "trading_fee": DEFAULT_TRADING_FEE,
+        "bnt_funding_limit": DEFAULT_BNT_FUNDING_LIMIT
+    }
+}
 
 
 # Misc dependencies for `State`
@@ -117,19 +132,15 @@ class GlobalSettings:
     """
 
     timestamp: int = DEFAULT_TIMESTAMP
-    model: str = MODEL
-    version: str = VERSION
     max_uint112: int = MAX_UINT112
     precision: int = PRECISION
-    whitelisted_tokens: List[str] = field(default_factory=lambda: DEFAULT_WHITELIST)
+    whitelisted_tokens: dict = field(default_factory=dict)
     active_users: List[str] = field(default_factory=lambda: DEFAULT_USERS)
     price_feeds_path: str = DEFAULT_PRICE_FEEDS_PATH
     cooldown_time: int = DEFAULT_COOLDOWN_TIME
     network_fee: Decimal = DEFAULT_NETWORK_FEE
     withdrawal_fee: Decimal = DEFAULT_WITHDRAWAL_FEE
     bnt_min_liquidity: Decimal = DEFAULT_BNT_MIN_LIQUIDITY
-    trading_fee: Decimal = DEFAULT_TRADING_FEE
-    bnt_funding_limit: Decimal = DEFAULT_BNT_FUNDING_LIMIT
     alpha: Decimal = DEFAULT_ALPHA
 
 
@@ -251,7 +262,7 @@ class Tokens(GlobalSettings):
     """
     Represents all ledger and other configuration balances associated with a particular token's current state.
     """
-
+    tkn_name: str = None
     timestamp: int = DEFAULT_TIMESTAMP
     master_vault: Any = field(default_factory=Token)
     staking_ledger: Any = field(default_factory=Token)
@@ -263,15 +274,16 @@ class Tokens(GlobalSettings):
     standard_rewards_vault: Any = field(default_factory=Token)
     bnt_trading_liquidity: Any = field(default_factory=Token)
     tkn_trading_liquidity: Any = field(default_factory=Token)
-    bnt_funding_limit: Decimal = DEFAULT_BNT_FUNDING_LIMIT
     bnt_funding_amt: Any = field(default_factory=Token)
-    _vbnt_price: Any = field(default_factory=Token)
     spot_rate: Decimal = Decimal("0")
     inv_spot_rate: Decimal = Decimal("0")
     ema_rate: Decimal = Decimal("0")
     ema_last_updated: Decimal = Decimal("0")
     _inv_ema_rate: Decimal = Decimal("0")
     is_trading_enabled: bool = False
+    bnt_funding_limit: Decimal = DEFAULT_BNT_FUNDING_LIMIT
+    trading_fee: Decimal = DEFAULT_TRADING_FEE
+    decimals: Decimal = DEFAULT_DECIMALS
 
     @property
     def bnt_remaining_funding(self):
@@ -279,16 +291,6 @@ class Tokens(GlobalSettings):
         Computes the BNT funding remaining for the pool.
         """
         return self.bnt_funding_limit - self.bnt_funding_amt.balance
-
-    @property
-    def vbnt_price(self):
-        """
-        Returns the price of the current vbnt token. Only valid when name==bnt
-        """
-        assert (
-            self.name == "bnt"
-        ), f"vbnt_price attempted to be accessed in {self.name} state, call bnt state instead"
-        return self._vbnt_price
 
     @property
     def is_price_stable(self):
@@ -403,6 +405,16 @@ class Tokens(GlobalSettings):
         else:
             return Decimal("0")
 
+    @property
+    def vbnt_price(self):
+        """
+        Returns the price of the current vbnt token. Only valid when name==bnt
+        """
+        assert (
+                self.tkn_name == "bnt"
+        ), f"vbnt_price attempted to be accessed in {self.tkn_name} state, call bnt state instead"
+        return self._vbnt_price
+
 
 @dataclass(config=Config)
 class State(GlobalSettings):
@@ -413,7 +425,6 @@ class State(GlobalSettings):
     transaction_id: int = 0
     timestamp: int = DEFAULT_TIMESTAMP
     price_feeds: PandasDataFrame = None
-    whitelisted_tokens: list = field(default_factory=list)
     tokens: Dict[str, Tokens] = field(default_factory=lambda: defaultdict(Tokens))
     users: Dict[str, User] = field(default_factory=lambda: defaultdict(User))
     standard_reward_programs: Dict[int, StandardProgram] = field(
@@ -425,6 +436,7 @@ class State(GlobalSettings):
     history: list = field(default_factory=list)
     logger: Any = logger
     json_export: dict = field(default_factory=dict)
+    whitelisted_tokens: dict = field(default_factory=dict)
 
     @property
     def valid_rewards_programs(self):
@@ -945,13 +957,16 @@ class State(GlobalSettings):
         Adds a new tkn_name to the whitelisted_tokens
         """
         if tkn_name not in self.whitelisted_tokens:
-            self.whitelisted_tokens.append(tkn_name)
+            self.whitelisted_tokens[tkn_name] = {
+                'trading_fee': DEFAULT_TRADING_FEE,
+                'bnt_funding_limit': DEFAULT_BNT_FUNDING_LIMIT
+            }
 
     def create_user(self, user_name: str):
         """
         Creates a new system user agent.
         """
-        if user_name not in self.usernames:
+        if user_name not in self.users:
             self.users[user_name] = User(user_name=user_name)
 
         for tkn_name in self.whitelisted_tokens:
@@ -963,11 +978,15 @@ class State(GlobalSettings):
                 self.users[user_name].wallet[get_pooltoken_name(tkn_name)] = Token(
                     balance=DEFAULT_ACCOUNT_BALANCE
                 )
-            if tkn_name == "bnt":
-                if "vbnt" not in self.users[user_name].wallet:
-                    self.users[user_name].wallet["vbnt"] = Token(
-                        balance=DEFAULT_ACCOUNT_BALANCE
-                    )
+        if "bnt" not in self.users[user_name].wallet:
+            self.users[user_name].wallet["bnt"] = Token(
+                balance=DEFAULT_ACCOUNT_BALANCE
+            )
+        if "vbnt" not in self.users[user_name].wallet:
+            self.users[user_name].wallet["vbnt"] = Token(
+                balance=DEFAULT_ACCOUNT_BALANCE
+            )
+        return self
 
     def update_inv_spot_rate(self, tkn_name: str):
         """
@@ -1011,8 +1030,8 @@ def get_vault_tvl(state: State) -> Decimal:
     return sum(
         [
             (
-                get_tkn_price(state, tkn_name)
-                * state.tokens[tkn_name].master_vault.balance
+                    get_tkn_price(state, tkn_name)
+                    * state.tokens[tkn_name].master_vault.balance
             )
             for tkn_name in state.whitelisted_tokens
         ]
@@ -1138,7 +1157,7 @@ def get_standard_reward_rate(state: State, id: int) -> int:
 
 
 def get_user_pending_rewards_staked_balance(
-    state: State, id: int, user_name: str
+        state: State, id: int, user_name: str
 ) -> Decimal:
     return state.users[user_name].pending_standard_rewards[id].staked.balance
 
@@ -1150,8 +1169,8 @@ def get_user_pending_standard_rewards(state: State, id: int, user_name: str) -> 
 def get_user_reward_per_token_paid(state: State, id: int, user_name: str) -> Decimal:
     return (
         state.users[user_name]
-        .pending_standard_rewards[id]
-        .reward_per_token_paid.balance
+            .pending_standard_rewards[id]
+            .reward_per_token_paid.balance
     )
 
 
@@ -1399,7 +1418,7 @@ def get_user_pending_withdrawals(state: State, user_name: str, tkn_name: str) ->
         id
         for id in state.users[user_name].pending_withdrawals
         if state.users[user_name].pending_withdrawals[id].tkn_name == tkn_name
-        and state.users[user_name].pending_withdrawals[id].is_complete
+           and state.users[user_name].pending_withdrawals[id].is_complete
     ]
 
 
@@ -1560,8 +1579,8 @@ def get_json_virtual_balances(state: State, tkn_name: str) -> dict:
 
 
 def get_max_bnt_deposit(
-    state: State,
-    user_bnt: Decimal,
+        state: State,
+        user_bnt: Decimal,
 ) -> Decimal:
     """
     Used in simulation only.
@@ -1577,7 +1596,7 @@ def get_network_fee(state: State, tkn_name: str) -> Decimal:
 
 
 def get_trade_inputs(
-    state: State, tkn_name: str
+        state: State, tkn_name: str
 ) -> Tuple[str, Decimal, Decimal, Decimal, Decimal]:
     """
     Gets all input data required to process trade action.

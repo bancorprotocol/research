@@ -385,13 +385,11 @@ def external_protection(
 
 def init_protocol(
     state: State,
-    whitelisted_tokens: List[str],
+    whitelisted_tokens: dict,
     usernames: List[str],
     cooldown_time: int,
     network_fee: Decimal,
-    trading_fee: Decimal,
     bnt_min_liquidity: Decimal,
-    bnt_funding_limit: Decimal,
     withdrawal_fee: Decimal,
 ) -> State:
     """
@@ -407,8 +405,12 @@ def init_protocol(
         # Get tokens not yet initialized.
         if tkn_name not in state.tokens:
 
+            trading_fee = whitelisted_tokens[tkn_name]['trading_fee']
+            bnt_funding_limit = whitelisted_tokens[tkn_name]['bnt_funding_limit']
+
             # initialize tokens
             state.tokens[tkn_name] = Tokens(
+                tkn_name=tkn_name,
                 trading_fee=trading_fee,
                 bnt_min_liquidity=bnt_min_liquidity,
                 network_fee=network_fee,
@@ -417,16 +419,17 @@ def init_protocol(
                 cooldown_time=cooldown_time,
             )
 
-            if tkn_name == "bnt":
-                # initialize vbnt tokens
-                state.tokens["vbnt"] = Tokens(
-                    trading_fee=trading_fee,
-                    bnt_min_liquidity=bnt_min_liquidity,
-                    network_fee=network_fee,
-                    bnt_funding_limit=bnt_funding_limit,
-                    withdrawal_fee=withdrawal_fee,
-                    cooldown_time=cooldown_time,
-                )
+            # initialize pooltoken
+            pooltkn_name = get_pooltoken_name(tkn_name)
+            state.tokens[pooltkn_name] = Tokens(
+                tkn_name=pooltkn_name,
+                trading_fee=trading_fee,
+                bnt_min_liquidity=bnt_min_liquidity,
+                network_fee=network_fee,
+                bnt_funding_limit=bnt_funding_limit,
+                withdrawal_fee=withdrawal_fee,
+                cooldown_time=cooldown_time,
+            )
 
     for usr in usernames:
 
@@ -440,6 +443,7 @@ def init_protocol(
     return state
 
 
+# TODO: Remove unused function
 def init_json_simulation(state: State) -> State:
     """
     Initializes pre-formatted JSON file containing simulation modules to run and report on.
@@ -448,9 +452,6 @@ def init_json_simulation(state: State) -> State:
     tkn_name = [tkn for tkn in state.whitelisted_tokens if tkn != "bnt"][0]
 
     if len(state.json_export["users"]) == 0:
-        state.json_export["tradingFee"] = format_json(
-            state.trading_fee, percentage=True
-        )
         state.json_export["networkFee"] = format_json(
             state.network_fee, percentage=True
         )
@@ -468,16 +469,9 @@ def init_json_simulation(state: State) -> State:
             state.json_export["tknRewardsDuration"] = format_json(
                 state.standard_reward_programs[tkn_name].end_time, integer=True
             )
-            state.json_export["bntRewardsamt"] = format_json(
-                state.standard_reward_programs["bnt"].total_staked.balance
-            )
-            state.json_export["bntRewardsDuration"] = format_json(
-                state.standard_reward_programs["bnt"].end_time, integer=True
-            )
 
         state.json_export["tknDecimals"] = format_json(state.decimals, integer=True)
         state.json_export["bntMinLiquidity"] = format_json(state.bnt_min_liquidity)
-        state.json_export["bntFundingLimit"] = format_json(state.bnt_funding_limit)
         users = []
         for user_name in state.usernames:
             user = {}
@@ -578,7 +572,7 @@ def handle_ema(state: State, tkn_name: str) -> State:
 
 
 def describe_rates(
-    state: State, qdecimals: Decimal = DEFAULT_QDECIMALS, report={}
+    state: State, report={}
 ) -> pd.DataFrame:
     """
     Return a dataframe of the current system EMA & spot rates.
@@ -586,7 +580,7 @@ def describe_rates(
     for tkn in state.whitelisted_tokens:
         if state.tokens[tkn].spot_rate == Decimal(0):
             state.tokens[tkn].spot_rate = state.tokens[tkn].ema_rate
-        report[tkn] = get_rate_report(state, tkn, qdecimals)
+        report[tkn] = get_rate_report(state, tkn)
     return pd.DataFrame(report).T.reset_index()
 
 
@@ -765,8 +759,15 @@ def validate_input(
         print(e)
 
     if user_name not in state.users:
-        wallet_test = state.users[user_name].wallet
         state = state.create_user(user_name)
+        wallet_test = state.users[user_name].wallet
+
+    if tkn_name not in state.users[user_name].wallet:
+        state.users[user_name].wallet[tkn_name] = Token(balance=DEFAULT_ACCOUNT_BALANCE)
+
+    pooltkn_name = get_pooltoken_name(tkn_name)
+    if pooltkn_name not in state.users[user_name].wallet:
+        state.users[user_name].wallet[pooltkn_name] = Token(balance=DEFAULT_ACCOUNT_BALANCE)
 
     if timestamp is not None:
         state.timestamp = timestamp

@@ -6,7 +6,7 @@
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 
-**Bancor Simulator** is an open-source python package developed by the **Bancor Research Team**. It aims to assist the design, testing, and validation of Bancor v3 tokenomics.
+**Bancor Simulator** is an open-source python package developed by the **Bancor Research**. It aims to assist the design, testing, and validation of Bancor v3 tokenomics.
 
 See [official documentation](https://simulator.bancor.network/chapters/bancor-research.html) for complete details.
 

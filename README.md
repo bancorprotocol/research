@@ -11,7 +11,7 @@
 [![Netlify Status](https://api.netlify.com/api/v1/badges/b4173988-e380-443b-94b1-78918e13a013/deploy-status)](https://app.netlify.com/sites/incandescent-kelpie-250f0e/deploys)
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 
-**Bancor Simulator** is an open-source python package developed by the **Bancor Research Team**. It aims to assist the design, testing, and validation of Bancor v3 tokenomics.
+**Bancor Simulator** is an open-source python package developed by **Bancor Research**. It aims to assist the design, testing, and validation of Bancor v3 tokenomics.
 
 See [official documentation](https://simulator.bancor.network/chapters/bancor-research.html) for complete details.
 

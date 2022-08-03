@@ -67,9 +67,12 @@ class BancorDapp:
             price_feeds=price_feeds,
         )
 
+        self.all_tokens = get_all_tokens(state)
+
         state = init_protocol(
             state=state,
             whitelisted_tokens=whitelisted_tokens,
+            all_tokens=self.all_tokens,
             usernames=[],
             cooldown_time=cooldown_time,
             network_fee=network_fee,
@@ -306,23 +309,15 @@ class BancorDapp:
         state = self.global_state
 
         # Iterate all reserve tokens and all pool tokens
-        all_tokens = [tkn for tkn in state.whitelisted_tokens] + ["bnt"]
-        all_tokens = (
-            all_tokens + ["bn" + tkn_name for tkn_name in all_tokens]
-        )
-        all_tokens = all_tokens + ["vbnt"]
-
-        for tkn_name in all_tokens:
+        for tkn_name in self.all_tokens:
             table[tkn_name] = {}
             for account in state.users:
-                if tkn_name not in state.users[account].wallet:
-                    state.users[account].wallet[tkn_name] = Token(balance=DEFAULT_ACCOUNT_BALANCE)
                 table[tkn_name][tuple([1, "Account", account])] = (
                     state.users[account].wallet[tkn_name].balance
                 )
 
         # Iterate all reserve tokens except bnt
-        for tkn_name in [tkn_name for tkn_name in all_tokens if tkn_name != "bnt"]:
+        for tkn_name in [tkn_name for tkn_name in self.all_tokens if tkn_name != "bnt"]:
             table[tkn_name][tuple([2, "Pool", "a: TKN Staked Balance"])] = state.tokens[
                 tkn_name
             ].staking_ledger.balance

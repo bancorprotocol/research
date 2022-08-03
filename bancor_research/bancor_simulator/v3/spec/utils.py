@@ -387,6 +387,7 @@ def init_protocol(
     state: State,
     whitelisted_tokens: dict,
     usernames: List[str],
+    all_tokens: List[str],
     cooldown_time: int,
     network_fee: Decimal,
     bnt_min_liquidity: Decimal,
@@ -725,6 +726,12 @@ def validate_input(
         state.users[user_name].wallet[pooltkn_name] = Token(
             balance=DEFAULT_ACCOUNT_BALANCE
         )
+
+    if 'vbnt' not in state.users[user_name].wallet:
+        state.users[user_name].wallet['vbnt'] = Token(balance=DEFAULT_ACCOUNT_BALANCE)
+
+    if 'bnbnt' not in state.users[user_name].wallet:
+        state.users[user_name].wallet['bnbnt'] = Token(balance=DEFAULT_ACCOUNT_BALANCE)
 
     if timestamp is not None:
         state.timestamp = timestamp

@@ -11,10 +11,10 @@ def using(libraryHandle, classHandle):
             setattr(classHandle, varName, getattr(libraryHandle, varName))
 
 def parse(cast, var, attr):
-    if hasattr(var, attr):
-        return cast(getattr(var, attr))
     if type(var) is dict:
         return cast(var[attr])
+    if hasattr(var, attr):
+        return cast(getattr(var, attr))
     if var is not None:
         return cast(var)
     return cast(0)

@@ -1,3 +1,6 @@
 from bancor_research.bancor_emulator import config
 
-exec('from . {} import *'.format(config.mode))
+if config.full_precision_mode:
+    from . float import *
+else:
+    from . fixed import *

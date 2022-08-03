@@ -98,7 +98,7 @@ class uint:
 
     @staticmethod
     def _size(other):
-        return other.size if type(other) is uint else (len(hex(int(other))) - 1) // 2 * 8
+        return other.size if type(other) is uint else 0
 
 class unchecked:
 

@@ -604,17 +604,3 @@ class StandardRewards(contract, Time):
                     return False;
 
         return True;
-
-    '''
-     * @dev post upgrade callback
-    '''
-    def _postUpgrade(self,
-        data
-    ) -> None:
-        # since we have renamed the "isEnabled" field to "isPaused", we need to manually inverse all exiting programs
-        # values (which is still manageable, as at the time of this upgrade - there were only 8 programs)
-        length = self._nextProgramId - self.INITIAL_PROGRAM_ID;
-        for i in range(length):
-            id = uint256(i) + self.INITIAL_PROGRAM_ID;
-
-            self._programs[id].isPaused = False;

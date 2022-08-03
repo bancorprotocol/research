@@ -121,10 +121,8 @@ class GlobalSettings:
     timestamp: int = DEFAULT_TIMESTAMP
     model: str = MODEL
     version: str = VERSION
-    eightee_places: int = DEFAULT_QDECIMALS
     max_uint112: int = MAX_UINT112
     precision: int = PRECISION
-    decimals: int = DEFAULT_DECIMALS
     whitelisted_tokens: List[str] = field(default_factory=lambda: DEFAULT_WHITELIST)
     active_users: List[str] = field(default_factory=lambda: DEFAULT_USERS)
     price_feeds_path: str = DEFAULT_PRICE_FEEDS_PATH

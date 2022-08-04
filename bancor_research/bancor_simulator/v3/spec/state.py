@@ -1628,3 +1628,13 @@ def get_standard_program(state: State, tkn_name: str) -> Decimal:
     Get the remaining rewards for a given program.
     """
     return state.autocompounding_reward_programs[tkn_name].remaining_rewards.balance
+
+
+def get_all_tokens(state: State) -> List[str]:
+    """
+    Get the remaining rewards for a given program.
+    """
+    all_tokens = [tkn for tkn in state.whitelisted_tokens] + ["bnt"]
+    all_tokens = all_tokens + ["bn" + tkn_name for tkn_name in all_tokens]
+    all_tokens += ["vbnt"]
+    return all_tokens

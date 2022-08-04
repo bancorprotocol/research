@@ -271,10 +271,9 @@ class BancorDapp:
             tkn_name, tkn_amt, transaction_type, user_name, self.transaction_id, state
         )
 
-    def dao_msig_init_pools(
+    def enable_trading(
         self,
-        pools: list,
-        tkn_name: str = None,
+        tkn_name: str,
         timestamp: int = 0,
         transaction_type: str = "enableTrading",
         user_name: str = "protocol",
@@ -285,14 +284,13 @@ class BancorDapp:
         state = self.get_state(copy_type="initial", timestamp=timestamp)
         state.timestamp = timestamp
         tkn_name = tkn_name.lower()
-        state = dao_msig_init_pools(state, pools)
-        amt = get_json_virtual_balances(state, tkn_name)
+        state = enable_trading(state, tkn_name)
         self.next_transaction(state)
         handle_logging(
             tkn_name,
             Decimal("0"),
-            "Enable Trading (DAO msig)",
-            "Protocol",
+            transaction_type,
+            user_name,
             state.transaction_id,
             state,
         )

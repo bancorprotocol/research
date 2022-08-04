@@ -23,7 +23,6 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 PandasDataFrame = TypeVar("pandas.core.frame.DataFrame")
 
 DEFAULT_TIMESTAMP = 0
-DEFAULT_WHITELIST = ["dai", "eth", "link", "bnt", "tkn", "wbtc"]
 DEFAULT_USERS = ["Alice", "Bob", "Charlie", "Trader", "protocol"]
 DEFAULT_DECIMALS = 18
 DEFAULT_QDECIMALS = Decimal(10) ** -DEFAULT_DECIMALS
@@ -50,6 +49,24 @@ DEFAULT_PRICE_FEEDS = pd.DataFrame(
         "wbtc": (40000.00 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
     }
 )
+DEFAULT_WHITELIST = {
+    "eth": {
+        "trading_fee": DEFAULT_TRADING_FEE,
+        "bnt_funding_limit": DEFAULT_BNT_FUNDING_LIMIT,
+    },
+    "link": {
+        "trading_fee": DEFAULT_TRADING_FEE,
+        "bnt_funding_limit": DEFAULT_BNT_FUNDING_LIMIT,
+    },
+    "tkn": {
+        "trading_fee": DEFAULT_TRADING_FEE,
+        "bnt_funding_limit": DEFAULT_BNT_FUNDING_LIMIT,
+    },
+    "wbtc": {
+        "trading_fee": DEFAULT_TRADING_FEE,
+        "bnt_funding_limit": DEFAULT_BNT_FUNDING_LIMIT,
+    },
+}
 
 def toPPM(value: Decimal):
     return uint32(value * PPM_RESOLUTION.data)
@@ -74,20 +91,13 @@ class BancorDapp:
     def __init__(
         self,
         timestamp: int = DEFAULT_TIMESTAMP,
-        alpha: Decimal = DEFAULT_ALPHA,
         bnt_min_liquidity: Decimal = DEFAULT_BNT_MIN_LIQUIDITY,
         withdrawal_fee: Decimal = DEFAULT_WITHDRAWAL_FEE,
         cooldown_time: int = DEFAULT_COOLDOWN_TIME,
-        bnt_funding_limit: Decimal = DEFAULT_BNT_FUNDING_LIMIT,
         network_fee: Decimal = DEFAULT_NETWORK_FEE,
-        trading_fee: Decimal = DEFAULT_TRADING_FEE,
         whitelisted_tokens=DEFAULT_WHITELIST,
         price_feeds_path: str = DEFAULT_PRICE_FEEDS_PATH,
         price_feeds: PandasDataFrame = DEFAULT_PRICE_FEEDS,
-        active_users: list = DEFAULT_USERS,
-        transaction_id: int = 0,
-        generate_json_tests: bool = False,
-        emulate_solidity_results: bool = False,
     ):
         block.timestamp = 0
         block.number = 0
@@ -131,12 +141,12 @@ class BancorDapp:
 
         self.reserveTokens = {self.bnt.symbol(): self.bnt}
         self.poolTokens = {self.bnbnt.symbol(): self.bnbnt}
-        for tkn_name in [tkn_name for tkn_name in whitelisted_tokens if tkn_name not in self.reserveTokens]:
+        for tkn_name, pool_params in whitelisted_tokens.items():
             tkn = ReserveToken(tkn_name, tkn_name, DEFAULT_DECIMALS) # TODO: support decimals per reserve token
             self.networkSettings.addTokenToWhitelist(tkn)
-            self.networkSettings.setFundingLimit(tkn, toWei(bnt_funding_limit, DEFAULT_DECIMALS))
+            self.networkSettings.setFundingLimit(tkn, toWei(pool_params['bnt_funding_limit'], DEFAULT_DECIMALS))
             self.network.createPools([tkn], self.poolCollection)
-            self.poolCollection.setTradingFeePPM(tkn, toPPM(trading_fee))
+            self.poolCollection.setTradingFeePPM(tkn, toPPM(pool_params['trading_fee']))
             self.reserveTokens[tkn_name] = tkn
             self.poolTokens[tkn_name] = self.network.collectionByPool(tkn).poolToken(tkn)
 
@@ -357,8 +367,8 @@ class BancorDapp:
         reserveTokens = list(self.reserveTokens.values())
         poolTokens = list(self.poolTokens.values())
 
-        # Iterate all reserve tokens and all pool tokens
-        for token in reserveTokens + poolTokens:
+        # Iterate all tokens
+        for token in reserveTokens + poolTokens + [self.vbnt]:
             table[token.symbol()] = {}
             for account in [user for user in token._balances.keys() if type(user) is str]:
                 table[token.symbol()][tuple([1, 'Account', account])] = fromWei(token.balanceOf(account), token.decimals())

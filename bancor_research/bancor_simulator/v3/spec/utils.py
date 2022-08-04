@@ -387,7 +387,6 @@ def init_protocol(
     state: State,
     whitelisted_tokens: dict,
     usernames: List[str],
-    all_tokens: List[str],
     cooldown_time: int,
     network_fee: Decimal,
     bnt_min_liquidity: Decimal,

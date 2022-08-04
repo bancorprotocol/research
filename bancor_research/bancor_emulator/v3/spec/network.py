@@ -340,23 +340,20 @@ class BancorDapp:
         amt = toWei(value, self.bnt.decimals())
         self.networkSettings.setFundingLimit(tkn, amt)
 
-    def dao_msig_init_pools(
+    def enable_trading(
         self,
-        pools: list,
-        tkn_name: str = None,
+        tkn_name: str,
         timestamp: int = 0,
         transaction_type: str = "enableTrading",
         user_name: str = "protocol",
     ) -> None:
         updateBlock(timestamp)
-        bntPriceInitialValue = self.price_feeds.at[timestamp, self.bnt.symbol()]
-        for pool in [pool for pool in pools if self.reserveTokens[pool] is not self.bnt]:
-            tknPrice = self.price_feeds.at[timestamp, pool]
-            bntPrice = bntPriceInitialValue
-            while tknPrice != int(tknPrice) or bntPrice != int(bntPrice):
-                tknPrice *= 10
-                bntPrice *= 10
-            self.poolCollection.enableTrading(self.reserveTokens[pool], tknPrice, bntPrice)
+        tknPrice = self.price_feeds.at[timestamp, tkn_name]
+        bntPrice = self.price_feeds.at[timestamp, self.bnt.symbol()]
+        while tknPrice != int(tknPrice) or bntPrice != int(bntPrice):
+            tknPrice *= 10
+            bntPrice *= 10
+        self.poolCollection.enableTrading(self.reserveTokens[tkn_name], tknPrice, bntPrice)
 
     def create_user(self, user_name: str, timestamp: int = 0):
         pass

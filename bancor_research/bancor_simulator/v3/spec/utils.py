@@ -222,16 +222,6 @@ def enable_trading(state: State, tkn_name: str) -> State:
     return state
 
 
-def dao_msig_init_pools(state: State, pools: list) -> State:
-    """
-    DAO msig initilizes new tokens to allow trading once specified conditions are met.
-    """
-    for token_name in pools:
-        if token_name != "bnt":
-            state = enable_trading(state, token_name)
-    return state
-
-
 def mint_protocol_bnt(state: State, tkn_amt: Decimal) -> State:
     """
     Handles adjustments to the system resulting from the v3 minting BNT.

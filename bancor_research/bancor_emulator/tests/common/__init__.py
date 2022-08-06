@@ -13,7 +13,7 @@ def write(fileName, data):
     file.close()
 
 def _getPath(fileName):
-    return join(dirname(__file__), '..', 'project', 'tests', 'data', fileName + '.json')
+    return join(dirname(__file__), '..', '..', '..', '..', 'regression', 'data', fileName + '.json')
 
 from bancor_research.bancor_emulator.solidity.uint.float import Decimal
 

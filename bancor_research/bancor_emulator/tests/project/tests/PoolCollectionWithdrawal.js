@@ -3,6 +3,8 @@ const PoolCollectionWithdrawal = artifacts.require("TestPoolCollectionWithdrawal
 const fs = require("fs");
 const path = require("path");
 
+const filePath = path.join(__dirname, '..', '..', '..', '..', '..', 'regression', 'data');
+
 contract('PoolCollectionWithdrawal', () => {
     let poolCollectionWithdrawal;
 
@@ -15,7 +17,7 @@ contract('PoolCollectionWithdrawal', () => {
 
         for (let n = 1; n <=8; n++) {
             const fileName = `PoolCollectionWithdrawalCoverage${n}`;
-            const table = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', fileName + '.json'), { encoding: 'utf8' }));
+            const table = JSON.parse(fs.readFileSync(path.join(filePath, fileName + '.json'), { encoding: 'utf8' }));
             for (const { a, b, c, e, w, m, n, x } of table) {
                 const actual = await poolCollectionWithdrawal.calculateWithdrawalAmountsT(a, b, c, e, w, m, n, x);
                 const actualZp = actual.p.isNeg && actual.p.value !== '0' ? '-' + actual.p.value : actual.p.value;

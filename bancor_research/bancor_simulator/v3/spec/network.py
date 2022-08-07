@@ -12,13 +12,16 @@ from bancor_research.bancor_simulator.v3.spec.state import *
 
 from bancor_research import DEFAULT, PandasDataFrame, read_price_feeds, pd
 
+
 def toDecimal(percent: str):
     return Decimal(percent[:-1]) / 100
+
 
 def userAmount(state: State, tkn_name: str, user_name: str, amount: str):
     if amount.endswith("%"):
         return get_user_balance(state, user_name, tkn_name) * toDecimal(amount)
     return Decimal(amount)
+
 
 class BancorDapp:
     """Main BancorDapp class and simulator module interface."""
@@ -46,7 +49,7 @@ class BancorDapp:
         withdrawal_fee: str = DEFAULT.WITHDRAWAL_FEE,
         cooldown_time: int = DEFAULT.COOLDOWN_TIME,
         network_fee: str = DEFAULT.NETWORK_FEE,
-        whitelisted_tokens = DEFAULT.WHITELIST,
+        whitelisted_tokens=DEFAULT.WHITELIST,
         price_feeds_path: str = DEFAULT.PRICE_FEEDS_PATH,
         price_feeds: PandasDataFrame = DEFAULT.PRICE_FEEDS,
     ):
@@ -56,7 +59,11 @@ class BancorDapp:
         self.json_data = None
         self.transaction_id = transaction_id
 
-        self.price_feeds = price_feeds if price_feeds is not None else read_price_feeds(price_feeds_path)
+        self.price_feeds = (
+            price_feeds
+            if price_feeds is not None
+            else read_price_feeds(price_feeds_path)
+        )
 
         for tkn_name in whitelisted_tokens:
             assert tkn_name in price_feeds.columns, (
@@ -68,7 +75,7 @@ class BancorDapp:
         whitelisted_tokens = {
             k: {
                 "trading_fee": toDecimal(v["trading_fee"]),
-                "bnt_funding_limit": Decimal(v["bnt_funding_limit"])
+                "bnt_funding_limit": Decimal(v["bnt_funding_limit"]),
             }
             for k, v in whitelisted_tokens.items()
         }

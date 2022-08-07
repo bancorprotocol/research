@@ -14,6 +14,12 @@ from bancor_research.bancor_simulator.v3.spec.rewards import *
 from bancor_research.bancor_simulator.v3.spec.state import *
 
 
+def userAmount(state: State, tkn_name: str, user_name: str, amount: str):
+    if amount.endswith("%"):
+        return get_user_balance(state, user_name, tkn_name) * Decimal(amount[:-1]) / 100
+    return Decimal(amount)
+
+
 class BancorDapp:
     """Main BancorDapp class and simulator module interface."""
 
@@ -158,7 +164,7 @@ class BancorDapp:
     def deposit(
         self,
         tkn_name: str,
-        tkn_amt: Decimal,
+        tkn_amt_abs_or_rel: str,
         user_name: str,
         timestamp: int = 0,
         bntkn: Decimal = Decimal("0"),
@@ -168,10 +174,10 @@ class BancorDapp:
         Top level logic for deposit actions.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
+        tkn_amt = userAmount(state, tkn_name, user_name, tkn_amt_abs_or_rel)
         state, tkn_name, tkn_amt, user_name = validate_input(
             state, tkn_name, tkn_amt, user_name, timestamp
         )
-
         if tkn_name == "bnt":
             state = deposit_bnt(
                 state=state, tkn_name=tkn_name, tkn_amt=tkn_amt, user_name=user_name
@@ -194,7 +200,7 @@ class BancorDapp:
 
     def trade(
         self,
-        tkn_amt: Decimal,
+        tkn_amt_abs_or_rel: str,
         source_token: str,
         target_token: str,
         user_name: str,
@@ -205,10 +211,11 @@ class BancorDapp:
         Main logic for trade actions.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        state, tkn_name, tkn_amt, user_name = validate_input(
+        tkn_amt = userAmount(state, source_token, user_name, tkn_amt_abs_or_rel)
+        state, source_token, tkn_amt, user_name = validate_input(
             state, source_token, tkn_amt, user_name, timestamp
         )
-        state, tkn_name, tkn_amt, user_name = validate_input(
+        state, target_token, tkn_amt, user_name = validate_input(
             state, target_token, tkn_amt, user_name, timestamp
         )
         state = process_trade(
@@ -226,7 +233,7 @@ class BancorDapp:
 
     def begin_cooldown(
         self,
-        tkn_amt: Decimal,
+        tkn_amt_abs_or_rel: str,
         tkn_name: str,
         user_name: str,
         timestamp: int = 0,
@@ -236,6 +243,7 @@ class BancorDapp:
         Begin the withdrawal cooldown operation.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
+        tkn_amt = userAmount(state, tkn_name, user_name, tkn_amt_abs_or_rel)
         state, tkn_name, tkn_amt, user_name = validate_input(
             state, tkn_name, tkn_amt, user_name, timestamp
         )
@@ -254,7 +262,6 @@ class BancorDapp:
         id_number: int,
         timestamp: int = 0,
         tkn_name: str = None,
-        tkn_amt: Decimal = None,
         transaction_type: str = "withdraw",
     ):
         """
@@ -262,13 +269,16 @@ class BancorDapp:
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
         tkn_name = tkn_name.lower()
-        state = process_withdrawal(
-            state, user_name, id_number, timestamp, tkn_name, tkn_amt
-        )
+        state = process_withdrawal(state, user_name, id_number, timestamp, tkn_name)
 
         self.next_transaction(state)
         state = handle_logging(
-            tkn_name, tkn_amt, transaction_type, user_name, self.transaction_id, state
+            tkn_name,
+            Decimal(0),
+            transaction_type,
+            user_name,
+            self.transaction_id,
+            state,
         )
 
     def enable_trading(
@@ -484,10 +494,10 @@ class BancorDapp:
             state=state,
         )
 
-    def burn(
+    def burn_pool_tokens(
         self,
         tkn_name: str,
-        tkn_amt: Decimal,
+        tkn_amt_abs_or_rel: str,
         user_name: str,
         timestamp: int = 0,
         transaction_type: str = "burnPoolTokenTKN",
@@ -496,6 +506,7 @@ class BancorDapp:
         Used for testing vandalism attack.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
+        tkn_amt = userAmount(state, tkn_name, user_name, tkn_amt_abs_or_rel)
         state, tkn_name, tkn_amt, user_name = validate_input(
             state, tkn_name, tkn_amt, user_name, timestamp
         )
@@ -517,7 +528,7 @@ class BancorDapp:
     def create_standard_rewards_program(
         self,
         tkn_name: str,
-        tkn_amt: Decimal,
+        rewards_amt: str,
         start_time: int,
         end_time: int,
         user_name: str,
@@ -528,6 +539,7 @@ class BancorDapp:
         Create a standard rewards program for a given token.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
+        tkn_amt = Decimal(rewards_amt)
         state, tkn_name, tkn_amt, user_name = validate_input(
             state, tkn_name, tkn_amt, user_name, timestamp
         )
@@ -548,7 +560,7 @@ class BancorDapp:
     def join_standard_rewards_program(
         self,
         tkn_name: str,
-        tkn_amt: Decimal,
+        tkn_amt_abs_or_rel: str,
         user_name: str,
         program_id: int,
         timestamp: int = 0,
@@ -558,6 +570,7 @@ class BancorDapp:
         Join the standard rewards program for a given user.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
+        tkn_amt = userAmount(state, tkn_name, user_name, tkn_amt_abs_or_rel)
         state, tkn_name, tkn_amt, user_name = validate_input(
             state, tkn_name, tkn_amt, user_name, timestamp
         )
@@ -576,7 +589,7 @@ class BancorDapp:
     def leave_standard_rewards_program(
         self,
         tkn_name: str,
-        tkn_amt: Decimal,
+        tkn_amt_abs_or_rel: str,
         user_name: str,
         program_id: int,
         timestamp: int = 0,
@@ -586,6 +599,7 @@ class BancorDapp:
         Leave the standard rewards program for a given user.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
+        tkn_amt = userAmount(state, tkn_name, user_name, tkn_amt_abs_or_rel)
         state, tkn_name, tkn_amt, user_name = validate_input(
             state, tkn_name, tkn_amt, user_name, timestamp
         )
@@ -604,7 +618,6 @@ class BancorDapp:
     def claim_standard_rewards(
         self,
         tkn_name: str,
-        tkn_amt: Decimal,
         user_name: str,
         program_ids: List[int],
         timestamp: int = 0,
@@ -615,7 +628,7 @@ class BancorDapp:
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
         state, tkn_name, tkn_amt, user_name = validate_input(
-            state, tkn_name, tkn_amt, user_name, timestamp
+            state, tkn_name, Decimal(0), user_name, timestamp
         )
         state = claim_standard_rewards(
             state=state,
@@ -632,7 +645,7 @@ class BancorDapp:
         self,
         user_name: str,
         tkn_name: str,
-        tkn_amt: Decimal,
+        tkn_amt_abs: str,
         timestamp: int = 0,
         transaction_type: str = "set user balance",
     ):
@@ -640,6 +653,7 @@ class BancorDapp:
         Sets user balance at the network interface level for convenience.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
+        tkn_amt = Decimal(tkn_amt_abs)
         state, tkn_name, tkn_amt, user_name = validate_input(
             state, tkn_name, tkn_amt, user_name, timestamp
         )

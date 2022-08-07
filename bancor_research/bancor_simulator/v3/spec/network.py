@@ -211,9 +211,12 @@ class BancorDapp:
         Main logic for trade actions.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        tkn_amt = userAmount(state, tkn_name, user_name, tkn_amt_abs_or_rel)
-        state, tkn_name, tkn_amt, user_name = validate_input(
+        tkn_amt = userAmount(state, source_token, user_name, tkn_amt_abs_or_rel)
+        state, source_token, tkn_amt, user_name = validate_input(
             state, source_token, tkn_amt, user_name, timestamp
+        )
+        state, target_token, tkn_amt, user_name = validate_input(
+            state, target_token, tkn_amt, user_name, timestamp
         )
         state = process_trade(
             state, tkn_amt, source_token, target_token, user_name, timestamp

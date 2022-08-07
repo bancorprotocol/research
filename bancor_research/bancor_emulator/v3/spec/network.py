@@ -1,5 +1,5 @@
 from bancor_research.bancor_emulator.solidity.uint.float import Decimal
-from bancor_research.bancor_emulator.solidity import uint, uint32, uint256, time, block
+from bancor_research.bancor_emulator.solidity import uint, uint32, uint256, block
 
 from bancor_research.bancor_emulator.BancorNetwork      import BancorNetwork     
 from bancor_research.bancor_emulator.BancorNetworkInfo  import BancorNetworkInfo 
@@ -16,67 +16,16 @@ from bancor_research.bancor_emulator.StandardRewards    import StandardRewards
 from bancor_research.bancor_emulator.TokenGovernance    import TokenGovernance   
 from bancor_research.bancor_emulator.Vault              import Vault             
 
-import pandas as pd
-import warnings
-from pydantic.fields import TypeVar
+from bancor_research import DEFAULT, PandasDataFrame, read_price_feeds, pd
 
-warnings.filterwarnings("ignore", category=RuntimeWarning)
-PandasDataFrame = TypeVar("pandas.core.frame.DataFrame")
+def toPPM(percent: str):
+    return uint32(PPM_RESOLUTION.data * Decimal(percent[:-1]) / 100)
 
-DEFAULT_TIMESTAMP = 0
-DEFAULT_USERS = ["Alice", "Bob", "Charlie", "Trader", "protocol"]
-DEFAULT_DECIMALS = 18
-DEFAULT_QDECIMALS = Decimal(10) ** -DEFAULT_DECIMALS
-DEFAULT_WITHDRAWAL_FEE = Decimal("0.0025")
-DEFAULT_TRADING_FEE = Decimal("0.01")
-DEFAULT_NETWORK_FEE = Decimal("0.2")
-DEFAULT_BNT_FUNDING_LIMIT = Decimal("1000000")
-DEFAULT_BNT_MIN_LIQUIDITY = Decimal("10000")
-DEFAULT_COOLDOWN_TIME = time.days * 7
-DEFAULT_ALPHA = Decimal("0.2").quantize(DEFAULT_QDECIMALS)
-SECONDS_PER_DAY = 86400
-DEFAULT_NUM_TIMESTAMPS = SECONDS_PER_DAY * 30
-DEFAULT_PRICE_FEEDS_PATH = (
-    "https://bancorml.s3.us-east-2.amazonaws.com/price_feeds.parquet"
-)
-DEFAULT_PRICE_FEEDS = pd.DataFrame(
-    {
-        "INDX": (0 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
-        "vbnt": (1.0 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
-        "tkn": (2.5 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
-        "bnt": (2.5 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
-        "link": (15.00 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
-        "eth": (2500.00 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
-        "wbtc": (40000.00 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
-    }
-)
-DEFAULT_WHITELIST = {
-    "eth": {
-        "trading_fee": DEFAULT_TRADING_FEE,
-        "bnt_funding_limit": DEFAULT_BNT_FUNDING_LIMIT,
-    },
-    "link": {
-        "trading_fee": DEFAULT_TRADING_FEE,
-        "bnt_funding_limit": DEFAULT_BNT_FUNDING_LIMIT,
-    },
-    "tkn": {
-        "trading_fee": DEFAULT_TRADING_FEE,
-        "bnt_funding_limit": DEFAULT_BNT_FUNDING_LIMIT,
-    },
-    "wbtc": {
-        "trading_fee": DEFAULT_TRADING_FEE,
-        "bnt_funding_limit": DEFAULT_BNT_FUNDING_LIMIT,
-    },
-}
+def toWei(amount: str, decimals: int):
+    return uint256(Decimal(amount) * 10 ** decimals)
 
-def toPPM(value: Decimal):
-    return uint32(value * PPM_RESOLUTION.data)
-
-def toWei(value: Decimal, decimals: int):
-    return uint256(value * 10 ** decimals)
-
-def fromWei(value: uint, decimals: int):
-    return Decimal(value.data) / 10 ** decimals
+def fromWei(amount: uint, decimals: int):
+    return Decimal(amount.data) / 10 ** decimals
 
 def fromFraction(n: uint, d: uint):
     return Decimal('nan') if n == d == 0 else Decimal(n.data) / Decimal(d.data)
@@ -85,7 +34,7 @@ def userAmount(token: ERC20, userId: str, amount: str):
     if (amount.endswith('%')):
         n, d = Decimal(amount[:-1]).as_integer_ratio()
         return token.balanceOf(userId) * n / (d * 100)
-    return toWei(Decimal(amount), token.decimals())
+    return toWei(amount, token.decimals())
 
 def updateBlock(timestamp):
     if block.timestamp < timestamp:
@@ -97,22 +46,22 @@ def updateBlock(timestamp):
 class BancorDapp:
     def __init__(
         self,
-        timestamp: int = DEFAULT_TIMESTAMP,
-        bnt_min_liquidity: Decimal = DEFAULT_BNT_MIN_LIQUIDITY,
-        withdrawal_fee: Decimal = DEFAULT_WITHDRAWAL_FEE,
-        cooldown_time: int = DEFAULT_COOLDOWN_TIME,
-        network_fee: Decimal = DEFAULT_NETWORK_FEE,
-        whitelisted_tokens=DEFAULT_WHITELIST,
-        price_feeds_path: str = DEFAULT_PRICE_FEEDS_PATH,
-        price_feeds: PandasDataFrame = DEFAULT_PRICE_FEEDS,
+        timestamp: int = DEFAULT.TIMESTAMP,
+        bnt_min_liquidity: str = DEFAULT.BNT_MIN_LIQUIDITY,
+        withdrawal_fee: str = DEFAULT.WITHDRAWAL_FEE,
+        cooldown_time: int = DEFAULT.COOLDOWN_TIME,
+        network_fee: str = DEFAULT.NETWORK_FEE,
+        whitelisted_tokens = DEFAULT.WHITELIST,
+        price_feeds_path: str = DEFAULT.PRICE_FEEDS_PATH,
+        price_feeds: PandasDataFrame = DEFAULT.PRICE_FEEDS,
     ):
         block.timestamp = 0
         block.number = 0
         updateBlock(timestamp)
 
-        self.bnt   = ReserveToken('bnt'  , 'bnt'  , DEFAULT_DECIMALS)
-        self.vbnt  = ReserveToken('vbnt' , 'vbnt' , DEFAULT_DECIMALS)
-        self.bnbnt = PoolToken   ('bnbnt', 'bnbnt', DEFAULT_DECIMALS, self.bnt)
+        self.bnt   = ReserveToken('bnt'  , 'bnt'  , DEFAULT.DECIMALS)
+        self.vbnt  = ReserveToken('vbnt' , 'vbnt' , DEFAULT.DECIMALS)
+        self.bnbnt = PoolToken   ('bnbnt', 'bnbnt', DEFAULT.DECIMALS, self.bnt)
 
         self.bntGovernance      = TokenGovernance(self.bnt)
         self.vbntGovernance     = TokenGovernance(self.vbnt)
@@ -149,7 +98,7 @@ class BancorDapp:
         self.reserveTokens = {self.bnt.symbol(): self.bnt}
         self.poolTokens = {self.bnt.symbol(): self.bnbnt}
         for tkn_name, pool_params in whitelisted_tokens.items():
-            tkn = ReserveToken(tkn_name, tkn_name, DEFAULT_DECIMALS) # TODO: support decimals per reserve token
+            tkn = ReserveToken(tkn_name, tkn_name, DEFAULT.DECIMALS) # TODO: support decimals per reserve token
             self.networkSettings.addTokenToWhitelist(tkn)
             self.networkSettings.setFundingLimit(tkn, toWei(pool_params['bnt_funding_limit'], self.bnt.decimals()))
             self.network.createPools([tkn], self.poolCollection)
@@ -157,18 +106,14 @@ class BancorDapp:
             self.reserveTokens[tkn_name] = tkn
             self.poolTokens[tkn_name] = self.network.collectionByPool(tkn).poolToken(tkn)
 
-        if price_feeds is None:
-            price_feeds = pd.read_parquet(price_feeds_path)
-            price_feeds.columns = [col.lower() for col in price_feeds.columns]
-        self.price_feeds = price_feeds
+        self.price_feeds = price_feeds if price_feeds is not None else read_price_feeds(price_feeds_path)
 
     def deposit(
         self,
         tkn_name: str,
-        tkn_amt: Decimal,
+        tkn_amt: str,
         user_name: str,
         timestamp: int = 0,
-        bntkn: Decimal = Decimal("0"),
         action_name="deposit",
     ):
         updateBlock(timestamp)
@@ -179,7 +124,7 @@ class BancorDapp:
 
     def trade(
         self,
-        tkn_amt: Decimal,
+        tkn_amt: str,
         source_token: str,
         target_token: str,
         user_name: str,
@@ -195,7 +140,7 @@ class BancorDapp:
 
     def begin_cooldown(
         self,
-        tkn_amt: Decimal,
+        tkn_amt: str,
         tkn_name: str,
         user_name: str,
         timestamp: int = 0,
@@ -212,8 +157,6 @@ class BancorDapp:
         user_name: str,
         id_number: int,
         timestamp: int = 0,
-        tkn_name: str = None,
-        tkn_amt: Decimal = None,
         transaction_type: str = "withdraw",
     ):
         updateBlock(timestamp)
@@ -222,7 +165,7 @@ class BancorDapp:
     def burn_pool_tokens(
         self,
         tkn_name: str,
-        tkn_amt: Decimal,
+        tkn_amt: str,
         user_name: str,
         timestamp: int = 0,
         transaction_type: str = "burnPoolTokenTKN",
@@ -235,7 +178,7 @@ class BancorDapp:
     def create_standard_rewards_program(
         self,
         tkn_name: str,
-        rewards_amt: Decimal,
+        rewards_amt: str,
         start_time: int,
         end_time: int,
         timestamp: int = 0,
@@ -249,7 +192,7 @@ class BancorDapp:
     def join_standard_rewards_program(
         self,
         tkn_name: str,
-        tkn_amt: Decimal,
+        tkn_amt: str,
         user_name: str,
         program_id: int,
         timestamp: int = 0,
@@ -264,7 +207,7 @@ class BancorDapp:
     def leave_standard_rewards_program(
         self,
         tkn_name: str,
-        tkn_amt: Decimal,
+        tkn_amt: str,
         user_name: str,
         program_id: int,
         timestamp: int = 0,
@@ -278,7 +221,6 @@ class BancorDapp:
     def claim_standard_rewards(
         self,
         tkn_name: str,
-        tkn_amt: Decimal,
         user_name: str,
         rewards_ids: list[int],
         timestamp: int = 0,
@@ -291,7 +233,7 @@ class BancorDapp:
         self,
         user_name: str,
         tkn_name: str,
-        tkn_amt: Decimal,
+        tkn_amt: str,
         timestamp: int = 0,
         transaction_type: str = "set user balance",
     ):
@@ -313,47 +255,47 @@ class BancorDapp:
     def set_trading_fee(
         self,
         tkn_name: str,
-        value: Decimal,
+        percent: str,
         timestamp: int = 0,
         transaction_type: str = "set trading fee",
         user_name: str = "protocol",
     ):
         updateBlock(timestamp)
-        self.poolCollection.setTradingFeePPM(self.reserveTokens[tkn_name], toPPM(value))
+        self.poolCollection.setTradingFeePPM(self.reserveTokens[tkn_name], toPPM(percent))
 
     def set_network_fee(
         self,
         tkn_name: str,
-        value: Decimal,
+        percent: str,
         timestamp: int = 0,
         transaction_type: str = "set network fee",
         user_name: str = "protocol",
     ):
         updateBlock(timestamp)
-        self.poolCollection.setNetworkFeePPM(toPPM(value))
+        self.poolCollection.setNetworkFeePPM(toPPM(percent))
 
     def set_withdrawal_fee(
         self,
         tkn_name: str,
-        value: Decimal,
+        percent: str,
         timestamp: int = 0,
         transaction_type: str = "set withdrawal fee",
         user_name: str = "protocol",
     ):
         updateBlock(timestamp)
-        self.networkSettings.setWithdrawalFeePPM(toPPM(value))
+        self.networkSettings.setWithdrawalFeePPM(toPPM(percent))
 
-    def set_bnt_funding_limit(
+    def set_funding_limit(
         self,
         tkn_name: str,
-        value: Decimal,
+        amount: str,
         timestamp: int = 0,
         transaction_type: str = "set bnt funding limit",
         user_name: str = "protocol",
     ):
         updateBlock(timestamp)
         tkn = self.reserveTokens[tkn_name]
-        amt = toWei(value, self.bnt.decimals())
+        amt = toWei(amount, self.bnt.decimals())
         self.networkSettings.setFundingLimit(tkn, amt)
 
     def enable_trading(

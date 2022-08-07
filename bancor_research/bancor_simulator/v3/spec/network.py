@@ -4,21 +4,21 @@
 # --------------------------------------------------------------------------------------------------------------------
 """Main BancorDapp class and simulator module interface."""
 
-import json
-import pickle
 import cloudpickle
-import pandas as pd
 
 from bancor_research.bancor_simulator.v3.spec.actions import *
 from bancor_research.bancor_simulator.v3.spec.rewards import *
 from bancor_research.bancor_simulator.v3.spec.state import *
 
+from bancor_research import DEFAULT, PandasDataFrame, read_price_feeds, pd
+
+def toDecimal(percent: str):
+    return Decimal(percent[:-1]) / 100
 
 def userAmount(state: State, tkn_name: str, user_name: str, amount: str):
     if amount.endswith("%"):
-        return get_user_balance(state, user_name, tkn_name) * Decimal(amount[:-1]) / 100
+        return get_user_balance(state, user_name, tkn_name) * toDecimal(amount)
     return Decimal(amount)
-
 
 class BancorDapp:
     """Main BancorDapp class and simulator module interface."""
@@ -27,27 +27,28 @@ class BancorDapp:
 
     """
     Args:
-        timestamp (int): The Ethereum block number to begin with. (default=1)
-        bnt_min_liquidity (Decimal): The minimum liquidity needed to bootstrap a pool.
-        withdrawal_fee (Decimal): The global exit (withdrawal) fee. (default=0.002)
-        coolown_time (int): The cooldown period in days. (default=7)
-        network_fee (Decimal): The global network fee. (default=1.002)
-        whitelisted_tokens (Dict[str]): List of token tickernames indicating whitelist status approval.
-                                        (default=["dai", "eth", "link", "bnt", "tkn", "wbtc"])
-        price_feeds_path (str): Path to a file containing price feeds.
-        price_feeds (pandas.DataFrame): A pandas.DataFrame containing the price feed information.
+        timestamp (integer, default = 0): The Ethereum block number to begin the simulation with
+        bnt_min_liquidity (numeric string, default = 10000): The minimum BNT liquidity needed to bootstrap a pool
+        withdrawal_fee (percentage string, default = 0.25%): The global exit (withdrawal) fee
+        coolown_time (integer, default = 7 days): The cooldown period in seconds
+        network_fee (percentage string, default = 20%): The global network fee
+        whitelisted_tokens (dictionary): The configuration of each pool (default = ["eth", "link", "tkn", "wbtc"]):
+        - trading_fee (percentage string, default = 1%): The trading fee of the pool
+        - bnt_funding_limit (numeric string, default = 1000000): The BNT funding limit of the pool
+        price_feeds_path (string): The path to a file containing price feeds
+        price_feeds (dictionary): The price feeds to use instead of the file
     """
 
     def __init__(
         self,
-        timestamp: int = DEFAULT_TIMESTAMP,
-        bnt_min_liquidity: Decimal = DEFAULT_BNT_MIN_LIQUIDITY,
-        withdrawal_fee: Decimal = DEFAULT_WITHDRAWAL_FEE,
-        cooldown_time: int = DEFAULT_COOLDOWN_TIME,
-        network_fee: Decimal = DEFAULT_NETWORK_FEE,
-        whitelisted_tokens=DEFAULT_WHITELIST,
-        price_feeds_path: str = DEFAULT_PRICE_FEEDS_PATH,
-        price_feeds: PandasDataFrame = DEFAULT_PRICE_FEEDS,
+        timestamp: int = DEFAULT.TIMESTAMP,
+        bnt_min_liquidity: str = DEFAULT.BNT_MIN_LIQUIDITY,
+        withdrawal_fee: str = DEFAULT.WITHDRAWAL_FEE,
+        cooldown_time: int = DEFAULT.COOLDOWN_TIME,
+        network_fee: str = DEFAULT.NETWORK_FEE,
+        whitelisted_tokens = DEFAULT.WHITELIST,
+        price_feeds_path: str = DEFAULT.PRICE_FEEDS_PATH,
+        price_feeds: PandasDataFrame = DEFAULT.PRICE_FEEDS,
     ):
 
         transaction_id = 0
@@ -55,9 +56,7 @@ class BancorDapp:
         self.json_data = None
         self.transaction_id = transaction_id
 
-        if price_feeds is None:
-            price_feeds = pd.read_parquet(price_feeds_path)
-            price_feeds.columns = [col.lower() for col in price_feeds.columns]
+        self.price_feeds = price_feeds if price_feeds is not None else read_price_feeds(price_feeds_path)
 
         for tkn_name in whitelisted_tokens:
             assert tkn_name in price_feeds.columns, (
@@ -65,6 +64,14 @@ class BancorDapp:
                 f"Add `{tkn_name}` to the price feed, "
                 f"or remove `{tkn_name}` from the whitelisted tokens."
             )
+
+        whitelisted_tokens = {
+            k: {
+                "trading_fee": toDecimal(v["trading_fee"]),
+                "bnt_funding_limit": Decimal(v["bnt_funding_limit"])
+            }
+            for k, v in whitelisted_tokens.items()
+        }
 
         state = State(
             transaction_id=transaction_id,
@@ -78,9 +85,9 @@ class BancorDapp:
             whitelisted_tokens=whitelisted_tokens,
             usernames=[],
             cooldown_time=cooldown_time,
-            network_fee=network_fee,
-            bnt_min_liquidity=bnt_min_liquidity,
-            withdrawal_fee=withdrawal_fee,
+            network_fee=toDecimal(network_fee),
+            bnt_min_liquidity=Decimal(bnt_min_liquidity),
+            withdrawal_fee=toDecimal(withdrawal_fee),
         )
 
         # initialize bnt

@@ -16,7 +16,11 @@ from bancor_research.bancor_simulator.v3.spec.state import *
 
 def userAmount(state: State, tkn_name: str, user_name: str, amount: str):
     if str(amount).endswith("%"):
-        return get_user_balance(state, user_name, tkn_name) * Decimal(str(amount)[:-1]) / 100
+        return (
+            get_user_balance(state, user_name, tkn_name)
+            * Decimal(str(amount)[:-1])
+            / 100
+        )
     return Decimal(amount)
 
 

@@ -13,10 +13,12 @@ from bancor_research.bancor_simulator.v3.spec.actions import *
 from bancor_research.bancor_simulator.v3.spec.rewards import *
 from bancor_research.bancor_simulator.v3.spec.state import *
 
+
 def userAmount(state: State, tkn_name: str, user_name: str, amount: str):
-    if (amount.endswith('%')):
+    if amount.endswith("%"):
         return get_user_balance(state, user_name, tkn_name) * Decimal(amount[:-1]) / 100
     return Decimal(amount)
+
 
 class BancorDapp:
     """Main BancorDapp class and simulator module interface."""
@@ -264,13 +266,16 @@ class BancorDapp:
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
         tkn_name = tkn_name.lower()
-        state = process_withdrawal(
-            state, user_name, id_number, timestamp, tkn_name
-        )
+        state = process_withdrawal(state, user_name, id_number, timestamp, tkn_name)
 
         self.next_transaction(state)
         state = handle_logging(
-            tkn_name, Decimal(0), transaction_type, user_name, self.transaction_id, state
+            tkn_name,
+            Decimal(0),
+            transaction_type,
+            user_name,
+            self.transaction_id,
+            state,
         )
 
     def enable_trading(

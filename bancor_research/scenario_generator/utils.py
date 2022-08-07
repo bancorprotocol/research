@@ -3,6 +3,8 @@
 # Licensed under the MIT LICENSE. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------------------------------
 """Simulation utility functions."""
+from decimal import Decimal
+from typing import Tuple
 
 
 def trade_tkn_to_ema(

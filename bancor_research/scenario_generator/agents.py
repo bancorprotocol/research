@@ -3,16 +3,23 @@
 # Licensed under the MIT LICENSE. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------------------------------
 """Mesa Agent-based implementations of the Bancor protocol."""
+from decimal import Decimal
+from typing import Tuple
 
 import mesa
 
+from bancor_research.bancor_simulator.v3.spec import get_prices, State, get_bnt_trading_liquidity, \
+    get_tkn_trading_liquidity, get_trading_fee, get_user_balance, get_is_trading_enabled, get_network_fee, get_ema_rate, \
+    get_spot_rate, get_vault_balance, get_pooltoken_balance, get_staked_balance, get_external_protection_vault, \
+    get_protocol_wallet_balance, get_vortex_balance, get_bnt_funding_limit, get_bnbnt_rate, get_max_bnt_deposit, \
+    get_user_pending_withdrawals
 from bancor_research.bancor_simulator.v3.spec.actions import (
     unpack_withdrawal_cooldown,
     vortex_burner,
 )
 from bancor_research.bancor_simulator.v3.spec.network import BancorDapp
-from bancor_research.bancor_simulator.v3.simulation.random_walk import RandomWalker
-from bancor_research.bancor_simulator.v3.simulation.utils import (
+from bancor_research.scenario_generator.monte_carlo import MonteCarlo
+from bancor_research.scenario_generator.utils import (
     trade_tkn_to_ema,
     trade_bnt_to_ema,
     process_arbitrage_trade,
@@ -26,7 +33,7 @@ from bancor_research.bancor_simulator.v3.spec.utils import (
 )
 
 
-class Trader(RandomWalker):
+class Trader(MonteCarlo):
     """
     Represents a Bancor dapp user (trader and/or arbitrageur). Subclass to Mesa Agent
     """
@@ -328,7 +335,7 @@ class Trader(RandomWalker):
         self.transact()
 
 
-class LP(RandomWalker):
+class LP(MonteCarlo):
     """
     Represents a Bancor dapp liquidity provider. Subclass to Mesa Agent
     """

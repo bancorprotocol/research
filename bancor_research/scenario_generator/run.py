@@ -1,3 +1,4 @@
-from bancor_research.bancor_simulator.v3.simulation.server import server
+# coding=utf-8
+from bancor_research.scenario_generator.server import server
 
 server.launch()

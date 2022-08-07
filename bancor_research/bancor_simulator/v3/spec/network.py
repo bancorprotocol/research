@@ -14,72 +14,61 @@ from bancor_research.bancor_simulator.v3.spec.rewards import *
 from bancor_research.bancor_simulator.v3.spec.state import *
 
 
+def userAmount(state: State, tkn_name: str, user_name: str, amount: str):
+    if amount.endswith("%"):
+        return get_user_balance(state, user_name, tkn_name) * Decimal(amount[:-1]) / 100
+    return Decimal(amount)
+
+
 class BancorDapp:
     """Main BancorDapp class and simulator module interface."""
 
     name = MODEL
-    version = VERSION
 
     """
     Args:
         timestamp (int): The Ethereum block number to begin with. (default=1)
-        alpha (Decimal): Alpha value in the EMA equation. (default=1.1)
         bnt_min_liquidity (Decimal): The minimum liquidity needed to bootstrap a pool.
         withdrawal_fee (Decimal): The global exit (withdrawal) fee. (default=0.002)
         coolown_time (int): The cooldown period in days. (default=7)
-        bnt_funding_limit (Decimal): The BancorDAO determines the available liquidity for trading, through adjustment
-                                    of the 'BNT funding limit' parameter. (default=100000)
         network_fee (Decimal): The global network fee. (default=1.002)
-        trading_fee (Decimal): This value is set on a per pool basis, however, for convenience a single input is offered
-                                here which will be used upon system genesis, and can be changed at the pool level later.
-        whitelisted_tokens (List[str]): List of token tickernames indicating whitelist status approval.
+        whitelisted_tokens (Dict[str]): List of token tickernames indicating whitelist status approval.
                                         (default=["dai", "eth", "link", "bnt", "tkn", "wbtc"])
-        bnt_virtual_balance (Decimal): BNT value provided for testing Barak's solidity output. (default=0)
-        base_token_virtual_balance (Decimal): BNT value provided for testing Barak's solidity output. (default=2)
-
+        price_feeds_path (str): Path to a file containing price feeds.
+        price_feeds (pandas.DataFrame): A pandas.DataFrame containing the price feed information.
     """
 
     def __init__(
         self,
         timestamp: int = DEFAULT_TIMESTAMP,
-        alpha: Decimal = DEFAULT_ALPHA,
         bnt_min_liquidity: Decimal = DEFAULT_BNT_MIN_LIQUIDITY,
         withdrawal_fee: Decimal = DEFAULT_WITHDRAWAL_FEE,
         cooldown_time: int = DEFAULT_COOLDOWN_TIME,
-        bnt_funding_limit: Decimal = DEFAULT_BNT_FUNDING_LIMIT,
         network_fee: Decimal = DEFAULT_NETWORK_FEE,
-        trading_fee: Decimal = DEFAULT_TRADING_FEE,
         whitelisted_tokens=DEFAULT_WHITELIST,
         price_feeds_path: str = DEFAULT_PRICE_FEEDS_PATH,
         price_feeds: PandasDataFrame = DEFAULT_PRICE_FEEDS,
-        active_users: list = DEFAULT_USERS,
-        transaction_id: int = 0,
-        generate_json_tests: bool = False,
-        emulate_solidity_results: bool = False,
     ):
+
+        transaction_id = 0
 
         self.json_data = None
         self.transaction_id = transaction_id
-        self.generate_json_tests = generate_json_tests
-        self.emulate_solidity_results = emulate_solidity_results
-
-        if active_users is None:
-            active_users = BancorDapp.global_settings.active_users
 
         if price_feeds is None:
             price_feeds = pd.read_parquet(price_feeds_path)
             price_feeds.columns = [col.lower() for col in price_feeds.columns]
 
+        for tkn_name in whitelisted_tokens:
+            assert tkn_name in price_feeds.columns, (
+                f"Whitelisted token `{tkn_name}` not found in price feed. "
+                f"Add `{tkn_name}` to the price feed, "
+                f"or remove `{tkn_name}` from the whitelisted tokens."
+            )
+
         state = State(
             transaction_id=transaction_id,
-            withdrawal_fee=withdrawal_fee,
             timestamp=timestamp,
-            network_fee=network_fee,
-            trading_fee=trading_fee,
-            bnt_min_liquidity=bnt_min_liquidity,
-            cooldown_time=cooldown_time,
-            bnt_funding_limit=bnt_funding_limit,
-            alpha=alpha,
             whitelisted_tokens=whitelisted_tokens,
             price_feeds=price_feeds,
         )
@@ -87,18 +76,17 @@ class BancorDapp:
         state = init_protocol(
             state=state,
             whitelisted_tokens=whitelisted_tokens,
-            usernames=active_users,
+            usernames=[],
             cooldown_time=cooldown_time,
             network_fee=network_fee,
-            trading_fee=trading_fee,
             bnt_min_liquidity=bnt_min_liquidity,
-            bnt_funding_limit=bnt_funding_limit,
             withdrawal_fee=withdrawal_fee,
         )
 
-        for tkn_name in whitelisted_tokens:
-            state.set_trading_fee(tkn_name, trading_fee)
-            state.set_bnt_funding_limit(tkn_name, bnt_funding_limit)
+        # initialize bnt
+        state.tokens["bnt"] = Tokens(tkn_name="bnt")
+        state.tokens["bnbnt"] = Tokens(tkn_name="bnbnt")
+        state.tokens["vbnt"] = Tokens(tkn_name="vbnt")
 
         state.json_export = {"users": [], "operations": []}
         self._backup_states = {}
@@ -116,52 +104,6 @@ class BancorDapp:
     @global_state.setter
     def global_state(self, value):
         self._global_state = value
-
-    @staticmethod
-    def load_json(path, **kwargs):
-        """
-        Loads json files for convenient simulation.
-        """
-        with open(path, "r") as f:
-            return json.load(f, **kwargs)
-
-    @staticmethod
-    def save_json(x, path, indent=True, **kwargs):
-        """
-        Saves json for convenience.
-        """
-        with open(path, "w") as f:
-            if indent:
-                json.dump(x, f, indent="\t", **kwargs)
-            else:
-                json.dump(x, f, **kwargs)
-        print("Saved to", path)
-
-    @staticmethod
-    def load_pickle(path):
-        """
-        Loads a pickled BancorDapp state from a file path.
-        """
-        print("Unpickling from", path)
-        with open(path, "rb") as f:
-            return pickle.load(f)
-
-    @staticmethod
-    def save_pickle(x, path):
-        """
-        Saves a pickled BancorDapp state at file path.
-        """
-        print("Pickling to", path)
-        with open(path, "wb") as f:
-            return pickle.dump(x, f)
-
-    @staticmethod
-    def load(file_path):
-        """
-        Loads pickled BancorDapp state at file path via cloudpickle.
-        """
-        with open(file_path, "rb") as f:
-            return cloudpickle.load(f)
 
     def copy_state(self, copy_type: str, state: State = None, timestamp: int = 0):
         """
@@ -208,13 +150,6 @@ class BancorDapp:
         """
         self.global_state = self._backup_states[timestamp]
 
-    def save(self, file_path, pickle_protocol=cloudpickle.DEFAULT_PROTOCOL):
-        """
-        Saves state at file path.
-        """
-        with open(file_path, "wb") as f:
-            cloudpickle.dump(self, f, protocol=pickle_protocol)
-
     def show_history(self):
         """
         Displays the history of the bancor network in a dataframe.
@@ -226,16 +161,10 @@ class BancorDapp:
             ]
         )
 
-    def export_test_scenarios(self, path: str = "test_scenarios.json"):
-        """
-        Exports the auto-generated json scenarios file to a given path.
-        """
-        BancorDapp.save_json(self.global_state.json_export, path)
-
     def deposit(
         self,
         tkn_name: str,
-        tkn_amt: Decimal,
+        tkn_amt_abs_or_rel: str,
         user_name: str,
         timestamp: int = 0,
         bntkn: Decimal = Decimal("0"),
@@ -245,10 +174,10 @@ class BancorDapp:
         Top level logic for deposit actions.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
+        tkn_amt = userAmount(state, tkn_name, user_name, tkn_amt_abs_or_rel)
         state, tkn_name, tkn_amt, user_name = validate_input(
             state, tkn_name, tkn_amt, user_name, timestamp
         )
-
         if tkn_name == "bnt":
             state = deposit_bnt(
                 state=state, tkn_name=tkn_name, tkn_amt=tkn_amt, user_name=user_name
@@ -271,7 +200,7 @@ class BancorDapp:
 
     def trade(
         self,
-        tkn_amt: Decimal,
+        tkn_amt_abs_or_rel: str,
         source_token: str,
         target_token: str,
         user_name: str,
@@ -282,10 +211,11 @@ class BancorDapp:
         Main logic for trade actions.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        state, tkn_name, tkn_amt, user_name = validate_input(
+        tkn_amt = userAmount(state, source_token, user_name, tkn_amt_abs_or_rel)
+        state, source_token, tkn_amt, user_name = validate_input(
             state, source_token, tkn_amt, user_name, timestamp
         )
-        state, tkn_name, tkn_amt, user_name = validate_input(
+        state, target_token, tkn_amt, user_name = validate_input(
             state, target_token, tkn_amt, user_name, timestamp
         )
         state = process_trade(
@@ -300,15 +230,10 @@ class BancorDapp:
             self.transaction_id,
             state,
         )
-        if self.generate_json_tests:
-            json_operation = build_json_operation(
-                state, target_token, tkn_amt, transaction_type, user_name, timestamp
-            )
-            self.global_state.json_export["operations"].append(json_operation)
 
     def begin_cooldown(
         self,
-        tkn_amt: Decimal,
+        tkn_amt_abs_or_rel: str,
         tkn_name: str,
         user_name: str,
         timestamp: int = 0,
@@ -318,6 +243,7 @@ class BancorDapp:
         Begin the withdrawal cooldown operation.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
+        tkn_amt = userAmount(state, tkn_name, user_name, tkn_amt_abs_or_rel)
         state, tkn_name, tkn_amt, user_name = validate_input(
             state, tkn_name, tkn_amt, user_name, timestamp
         )
@@ -336,7 +262,6 @@ class BancorDapp:
         id_number: int,
         timestamp: int = 0,
         tkn_name: str = None,
-        tkn_amt: Decimal = None,
         transaction_type: str = "withdraw",
     ):
         """
@@ -344,24 +269,21 @@ class BancorDapp:
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
         tkn_name = tkn_name.lower()
-        state = process_withdrawal(
-            state, user_name, id_number, timestamp, tkn_name, tkn_amt
-        )
+        state = process_withdrawal(state, user_name, id_number, timestamp, tkn_name)
 
         self.next_transaction(state)
         state = handle_logging(
-            tkn_name, tkn_amt, transaction_type, user_name, self.transaction_id, state
+            tkn_name,
+            Decimal(0),
+            transaction_type,
+            user_name,
+            self.transaction_id,
+            state,
         )
-        if self.generate_json_tests:
-            json_operation = build_json_operation(
-                state, tkn_name, tkn_amt, transaction_type, user_name, timestamp
-            )
-            self.global_state.json_export["operations"].append(json_operation)
 
-    def dao_msig_init_pools(
+    def enable_trading(
         self,
-        pools: list,
-        tkn_name: str = None,
+        tkn_name: str,
         timestamp: int = 0,
         transaction_type: str = "enableTrading",
         user_name: str = "protocol",
@@ -372,22 +294,16 @@ class BancorDapp:
         state = self.get_state(copy_type="initial", timestamp=timestamp)
         state.timestamp = timestamp
         tkn_name = tkn_name.lower()
-        state = dao_msig_init_pools(state, pools)
-        amt = get_json_virtual_balances(state, tkn_name)
+        state = enable_trading(state, tkn_name)
         self.next_transaction(state)
         handle_logging(
             tkn_name,
             Decimal("0"),
-            "Enable Trading (DAO msig)",
-            "Protocol",
+            transaction_type,
+            user_name,
             state.transaction_id,
             state,
         )
-        if self.generate_json_tests:
-            json_operation = build_json_operation(
-                state, tkn_name, Decimal(0), transaction_type, user_name, timestamp
-            )
-            self.global_state.json_export["operations"].append(json_operation)
 
     def describe(self, decimals: int = -1):
         """
@@ -397,20 +313,19 @@ class BancorDapp:
 
         state = self.global_state
 
-        # Iterate all reserve tokens and all pool tokens
-        for tkn_name in state.whitelisted_tokens + [
-            "bn" + tkn_name for tkn_name in state.whitelisted_tokens
-        ]:
+        reserve_tokens = ["bnt"] + [tkn for tkn in state.whitelisted_tokens]
+        pool_tokens = ["bnbnt"] + ["bn" + tkn for tkn in state.whitelisted_tokens]
+
+        # Iterate all tokens
+        for tkn_name in reserve_tokens + pool_tokens + ["vbnt"]:
             table[tkn_name] = {}
-            for account in state.usernames:
+            for account in state.users:
                 table[tkn_name][tuple([1, "Account", account])] = (
                     state.users[account].wallet[tkn_name].balance
                 )
 
         # Iterate all reserve tokens except bnt
-        for tkn_name in [
-            tkn_name for tkn_name in state.whitelisted_tokens if tkn_name != "bnt"
-        ]:
+        for tkn_name in [tkn_name for tkn_name in reserve_tokens if tkn_name != "bnt"]:
             table[tkn_name][tuple([2, "Pool", "a: TKN Staked Balance"])] = state.tokens[
                 tkn_name
             ].staking_ledger.balance
@@ -434,7 +349,7 @@ class BancorDapp:
             ] = state.tokens[tkn_name].inv_ema_rate
 
         # Iterate all reserve tokens
-        for tkn_name in state.whitelisted_tokens:
+        for tkn_name in reserve_tokens:
             table[tkn_name][tuple([3, "Network", "Master Vault"])] = state.tokens[
                 tkn_name
             ].master_vault.balance
@@ -501,11 +416,6 @@ class BancorDapp:
             state=state, tkn_name=tkn_name, timestamp=timestamp
         )
         self.next_transaction(state)
-        if self.generate_json_tests:
-            json_operation = build_json_operation(
-                state, tkn_name, Decimal(0), transaction_type, user_name, timestamp
-            )
-            self.global_state.json_export["operations"].append(json_operation)
 
     def load_json_simulation(self, path, tkn_name="tkn", timestamp: int = 0):
         """
@@ -583,16 +493,11 @@ class BancorDapp:
             transaction_id=self.transaction_id,
             state=state,
         )
-        if self.generate_json_tests:
-            json_operation = build_json_operation(
-                state, tkn_name, total_rewards, transaction_type, user_name, timestamp
-            )
-            self.global_state.json_export["operations"].append(json_operation)
 
-    def burn(
+    def burn_pool_tokens(
         self,
         tkn_name: str,
-        tkn_amt: Decimal,
+        tkn_amt_abs_or_rel: str,
         user_name: str,
         timestamp: int = 0,
         transaction_type: str = "burnPoolTokenTKN",
@@ -601,6 +506,7 @@ class BancorDapp:
         Used for testing vandalism attack.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
+        tkn_amt = userAmount(state, tkn_name, user_name, tkn_amt_abs_or_rel)
         state, tkn_name, tkn_amt, user_name = validate_input(
             state, tkn_name, tkn_amt, user_name, timestamp
         )
@@ -618,16 +524,11 @@ class BancorDapp:
                 self.transaction_id,
                 state,
             )
-            if self.generate_json_tests:
-                json_operation = build_json_operation(
-                    state, tkn_name, tkn_amt, transaction_type, user_name, timestamp
-                )
-                self.global_state.json_export["operations"].append(json_operation)
 
     def create_standard_rewards_program(
         self,
         tkn_name: str,
-        tkn_amt: Decimal,
+        rewards_amt: str,
         start_time: int,
         end_time: int,
         user_name: str,
@@ -638,6 +539,7 @@ class BancorDapp:
         Create a standard rewards program for a given token.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
+        tkn_amt = Decimal(rewards_amt)
         state, tkn_name, tkn_amt, user_name = validate_input(
             state, tkn_name, tkn_amt, user_name, timestamp
         )
@@ -654,16 +556,11 @@ class BancorDapp:
         handle_logging(
             tkn_name, tkn_amt, transaction_type, user_name, self.transaction_id, state
         )
-        if self.generate_json_tests:
-            json_operation = build_json_operation(
-                state, tkn_name, tkn_amt, transaction_type, user_name, timestamp
-            )
-            self.global_state.json_export["operations"].append(json_operation)
 
     def join_standard_rewards_program(
         self,
         tkn_name: str,
-        tkn_amt: Decimal,
+        tkn_amt_abs_or_rel: str,
         user_name: str,
         program_id: int,
         timestamp: int = 0,
@@ -673,6 +570,7 @@ class BancorDapp:
         Join the standard rewards program for a given user.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
+        tkn_amt = userAmount(state, tkn_name, user_name, tkn_amt_abs_or_rel)
         state, tkn_name, tkn_amt, user_name = validate_input(
             state, tkn_name, tkn_amt, user_name, timestamp
         )
@@ -687,16 +585,11 @@ class BancorDapp:
         handle_logging(
             tkn_name, tkn_amt, transaction_type, user_name, self.transaction_id, state
         )
-        if self.generate_json_tests:
-            json_operation = build_json_operation(
-                state, tkn_name, tkn_amt, transaction_type, user_name, timestamp
-            )
-            self.global_state.json_export["operations"].append(json_operation)
 
     def leave_standard_rewards_program(
         self,
         tkn_name: str,
-        tkn_amt: Decimal,
+        tkn_amt_abs_or_rel: str,
         user_name: str,
         program_id: int,
         timestamp: int = 0,
@@ -706,6 +599,7 @@ class BancorDapp:
         Leave the standard rewards program for a given user.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
+        tkn_amt = userAmount(state, tkn_name, user_name, tkn_amt_abs_or_rel)
         state, tkn_name, tkn_amt, user_name = validate_input(
             state, tkn_name, tkn_amt, user_name, timestamp
         )
@@ -720,16 +614,10 @@ class BancorDapp:
         handle_logging(
             tkn_name, tkn_amt, transaction_type, user_name, self.transaction_id, state
         )
-        if self.generate_json_tests:
-            json_operation = build_json_operation(
-                state, tkn_name, tkn_amt, transaction_type, user_name, timestamp
-            )
-            self.global_state.json_export["operations"].append(json_operation)
 
     def claim_standard_rewards(
         self,
         tkn_name: str,
-        tkn_amt: Decimal,
         user_name: str,
         program_ids: List[int],
         timestamp: int = 0,
@@ -740,7 +628,7 @@ class BancorDapp:
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
         state, tkn_name, tkn_amt, user_name = validate_input(
-            state, tkn_name, tkn_amt, user_name, timestamp
+            state, tkn_name, Decimal(0), user_name, timestamp
         )
         state = claim_standard_rewards(
             state=state,
@@ -752,17 +640,12 @@ class BancorDapp:
         handle_logging(
             tkn_name, tkn_amt, transaction_type, user_name, self.transaction_id, state
         )
-        if self.generate_json_tests:
-            json_operation = build_json_operation(
-                state, tkn_name, tkn_amt, transaction_type, user_name, timestamp
-            )
-            self.global_state.json_export["operations"].append(json_operation)
 
     def set_user_balance(
         self,
         user_name: str,
         tkn_name: str,
-        tkn_amt: Decimal,
+        tkn_amt_abs: str,
         timestamp: int = 0,
         transaction_type: str = "set user balance",
     ):
@@ -770,17 +653,15 @@ class BancorDapp:
         Sets user balance at the network interface level for convenience.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        tkn_name = tkn_name.lower()
+        tkn_amt = Decimal(tkn_amt_abs)
+        state, tkn_name, tkn_amt, user_name = validate_input(
+            state, tkn_name, tkn_amt, user_name, timestamp
+        )
         state.set_user_balance(user_name, tkn_name, tkn_amt)
         self.next_transaction(state)
         handle_logging(
             tkn_name, tkn_amt, transaction_type, user_name, self.transaction_id, state
         )
-        if self.generate_json_tests:
-            json_operation = build_json_operation(
-                state, tkn_name, tkn_amt, transaction_type, user_name, state.timestamp
-            )
-            self.global_state.json_export["operations"].append(json_operation)
 
     def step(self):
         self.global_state.step()
@@ -806,11 +687,6 @@ class BancorDapp:
         handle_logging(
             tkn_name, value, transaction_type, user_name, self.transaction_id, state
         )
-        if self.generate_json_tests:
-            json_operation = build_json_operation(
-                state, tkn_name, value, transaction_type, user_name, state.timestamp
-            )
-            self.global_state.json_export["operations"].append(json_operation)
         return self
 
     def set_network_fee(
@@ -831,11 +707,6 @@ class BancorDapp:
         handle_logging(
             tkn_name, value, transaction_type, user_name, self.transaction_id, state
         )
-        if self.generate_json_tests:
-            json_operation = build_json_operation(
-                state, tkn_name, value, transaction_type, user_name, state.timestamp
-            )
-            self.global_state.json_export["operations"].append(json_operation)
         return self
 
     def set_withdrawal_fee(
@@ -856,11 +727,6 @@ class BancorDapp:
         handle_logging(
             tkn_name, value, transaction_type, user_name, self.transaction_id, state
         )
-        if self.generate_json_tests:
-            json_operation = build_json_operation(
-                state, tkn_name, value, transaction_type, user_name, state.timestamp
-            )
-            self.global_state.json_export["operations"].append(json_operation)
         return self
 
     def set_bnt_funding_limit(
@@ -881,9 +747,11 @@ class BancorDapp:
         handle_logging(
             tkn_name, value, transaction_type, user_name, self.transaction_id, state
         )
-        if self.generate_json_tests:
-            json_operation = build_json_operation(
-                state, tkn_name, value, transaction_type, user_name, state.timestamp
-            )
-            self.global_state.json_export["operations"].append(json_operation)
         return self
+
+    def save(self, file_path, pickle_protocol=cloudpickle.DEFAULT_PROTOCOL):
+        """
+        Saves state at file path.
+        """
+        with open(file_path, "wb") as f:
+            cloudpickle.dump(self, f, protocol=pickle_protocol)

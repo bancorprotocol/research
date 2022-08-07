@@ -279,7 +279,6 @@ def process_withdrawal(
     id_number: int,
     timestamp: int = 0,
     tkn_name: str = None,
-    tkn_amt: Decimal = None,
 ):
     """
     Main withdrawal logic based on the withdraw algorithm of the BIP15 spec.

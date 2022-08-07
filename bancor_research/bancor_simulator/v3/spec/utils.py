@@ -186,7 +186,7 @@ def format_json(val: Any, integer: bool = False, percentage: bool = False) -> An
         if type(val) == dict:
             return val
         else:
-            return str(val.quantize(DEFAULT_QDECIMALS)).replace("0E-18", "0")
+            return str(val).replace("0E-18", "0")
 
 
 def enable_trading(state: State, tkn_name: str) -> State:
@@ -222,16 +222,6 @@ def enable_trading(state: State, tkn_name: str) -> State:
     return state
 
 
-def dao_msig_init_pools(state: State, pools: list) -> State:
-    """
-    DAO msig initilizes new tokens to allow trading once specified conditions are met.
-    """
-    for token_name in pools:
-        if token_name != "bnt":
-            state = enable_trading(state, token_name)
-    return state
-
-
 def mint_protocol_bnt(state: State, tkn_amt: Decimal) -> State:
     """
     Handles adjustments to the system resulting from the v3 minting BNT.
@@ -249,9 +239,7 @@ def shutdown_pool(state: State, tkn_name: str) -> State:
     Shutdown pool when the bnt_min_trading_liquidity threshold is breached.
     """
 
-    bnt_trading_liquidity = state.tokens[
-        tkn_name
-    ].bnt_trading_liquidity.balance.quantize(DEFAULT_QDECIMALS)
+    bnt_trading_liquidity = state.tokens[tkn_name].bnt_trading_liquidity.balance
     bnbnt_renounced = compute_bnbnt_amt(state, bnt_trading_liquidity)
 
     # adjust balances
@@ -387,13 +375,11 @@ def external_protection(
 
 def init_protocol(
     state: State,
-    whitelisted_tokens: List[str],
+    whitelisted_tokens: dict,
     usernames: List[str],
     cooldown_time: int,
     network_fee: Decimal,
-    trading_fee: Decimal,
     bnt_min_liquidity: Decimal,
-    bnt_funding_limit: Decimal,
     withdrawal_fee: Decimal,
 ) -> State:
     """
@@ -409,8 +395,12 @@ def init_protocol(
         # Get tokens not yet initialized.
         if tkn_name not in state.tokens:
 
+            trading_fee = whitelisted_tokens[tkn_name]["trading_fee"]
+            bnt_funding_limit = whitelisted_tokens[tkn_name]["bnt_funding_limit"]
+
             # initialize tokens
             state.tokens[tkn_name] = Tokens(
+                tkn_name=tkn_name,
                 trading_fee=trading_fee,
                 bnt_min_liquidity=bnt_min_liquidity,
                 network_fee=network_fee,
@@ -419,16 +409,17 @@ def init_protocol(
                 cooldown_time=cooldown_time,
             )
 
-            if tkn_name == "bnt":
-                # initialize vbnt tokens
-                state.tokens["vbnt"] = Tokens(
-                    trading_fee=trading_fee,
-                    bnt_min_liquidity=bnt_min_liquidity,
-                    network_fee=network_fee,
-                    bnt_funding_limit=bnt_funding_limit,
-                    withdrawal_fee=withdrawal_fee,
-                    cooldown_time=cooldown_time,
-                )
+            # initialize pooltoken
+            pooltkn_name = get_pooltoken_name(tkn_name)
+            state.tokens[pooltkn_name] = Tokens(
+                tkn_name=pooltkn_name,
+                trading_fee=trading_fee,
+                bnt_min_liquidity=bnt_min_liquidity,
+                network_fee=network_fee,
+                bnt_funding_limit=bnt_funding_limit,
+                withdrawal_fee=withdrawal_fee,
+                cooldown_time=cooldown_time,
+            )
 
     for usr in usernames:
 
@@ -439,66 +430,6 @@ def init_protocol(
 
     state.whitelisted_tokens = whitelisted_tokens
     state.active_users = usernames
-    return state
-
-
-def init_json_simulation(state: State) -> State:
-    """
-    Initializes pre-formatted JSON file containing simulation modules to run and report on.
-    """
-
-    tkn_name = [tkn for tkn in state.whitelisted_tokens if tkn != "bnt"][0]
-
-    if len(state.json_export["users"]) == 0:
-        state.json_export["tradingFee"] = format_json(
-            state.trading_fee, percentage=True
-        )
-        state.json_export["networkFee"] = format_json(
-            state.network_fee, percentage=True
-        )
-        state.json_export["withdrawalFee"] = format_json(
-            state.withdrawal_fee, percentage=True
-        )
-        state.json_export["epVaultBalance"] = format_json(
-            state.tokens[tkn_name].external_protection_vault.balance.quantize(
-                DEFAULT_QDECIMALS
-            )
-        )
-
-        if tkn_name in state.standard_reward_programs:
-            state.json_export["tknRewardsamt"] = format_json(
-                state.standard_reward_programs[
-                    tkn_name
-                ].staked_reward_amt.balance.quantize(DEFAULT_QDECIMALS)
-            )
-            state.json_export["tknRewardsDuration"] = format_json(
-                state.standard_reward_programs[tkn_name].end_time, integer=True
-            )
-            state.json_export["bntRewardsamt"] = format_json(
-                state.standard_reward_programs["bnt"].total_staked.balance.quantize(
-                    DEFAULT_QDECIMALS
-                )
-            )
-            state.json_export["bntRewardsDuration"] = format_json(
-                state.standard_reward_programs["bnt"].end_time, integer=True
-            )
-
-        state.json_export["tknDecimals"] = format_json(state.decimals, integer=True)
-        state.json_export["bntMinLiquidity"] = format_json(state.bnt_min_liquidity)
-        state.json_export["bntFundingLimit"] = format_json(state.bnt_funding_limit)
-        users = []
-        for user_name in state.usernames:
-            user = {}
-            user["id"] = user_name
-            for tkn_name in state.whitelisted_tokens:
-                user[f"{tkn_name}Balance"] = format_json(
-                    state.users[user_name]
-                    .wallet[tkn_name]
-                    .balance.quantize(DEFAULT_QDECIMALS)
-                )
-            users.append(user)
-
-        state.json_export["users"] = users
     return state
 
 
@@ -587,16 +518,14 @@ def handle_ema(state: State, tkn_name: str) -> State:
     return state
 
 
-def describe_rates(
-    state: State, qdecimals: Decimal = DEFAULT_QDECIMALS, report={}
-) -> pd.DataFrame:
+def describe_rates(state: State, report={}) -> pd.DataFrame:
     """
     Return a dataframe of the current system EMA & spot rates.
     """
     for tkn in state.whitelisted_tokens:
         if state.tokens[tkn].spot_rate == Decimal(0):
             state.tokens[tkn].spot_rate = state.tokens[tkn].ema_rate
-        report[tkn] = get_rate_report(state, tkn, qdecimals)
+        report[tkn] = get_rate_report(state, tkn)
     return pd.DataFrame(report).T.reset_index()
 
 
@@ -640,16 +569,12 @@ def build_json_operation(
         bnt_remaining_rewards = Decimal("0")
 
     if "tkn" in state.standard_reward_programs:
-        er_vault_tkn = state.tokens[
-            tkn_name
-        ].protocol_wallet_pooltokens.balance.quantize(DEFAULT_QDECIMALS)
+        er_vault_tkn = state.tokens[tkn_name].protocol_wallet_pooltokens.balance
     else:
         er_vault_tkn = Decimal("0")
 
     if "bnt" in state.autocompounding_reward_programs:
-        er_vault_bnt = state.tokens["bnt"].protocol_wallet_pooltokens.balance.quantize(
-            DEFAULT_QDECIMALS
-        )
+        er_vault_bnt = state.tokens["bnt"].protocol_wallet_pooltokens.balance
     else:
         er_vault_bnt = Decimal("0")
 
@@ -779,8 +704,23 @@ def validate_input(
         print(e)
 
     if user_name not in state.users:
-        wallet_test = state.users[user_name].wallet
         state = state.create_user(user_name)
+        wallet_test = state.users[user_name].wallet
+
+    if tkn_name not in state.users[user_name].wallet:
+        state.users[user_name].wallet[tkn_name] = Token(balance=DEFAULT_ACCOUNT_BALANCE)
+
+    pooltkn_name = get_pooltoken_name(tkn_name)
+    if pooltkn_name not in state.users[user_name].wallet:
+        state.users[user_name].wallet[pooltkn_name] = Token(
+            balance=DEFAULT_ACCOUNT_BALANCE
+        )
+
+    if "vbnt" not in state.users[user_name].wallet:
+        state.users[user_name].wallet["vbnt"] = Token(balance=DEFAULT_ACCOUNT_BALANCE)
+
+    if "bnbnt" not in state.users[user_name].wallet:
+        state.users[user_name].wallet["bnbnt"] = Token(balance=DEFAULT_ACCOUNT_BALANCE)
 
     if timestamp is not None:
         state.timestamp = timestamp
@@ -867,3 +807,56 @@ def generate_emulator_expected_results(
         state, tkn_name, tkn_amt, transaction_type, user_name, timestamp
     )
     return json_operation["expected"]
+
+
+def load_json(path, **kwargs):
+    """
+    Loads json files for convenient simulation.
+    """
+    with open(path, "r") as f:
+        return json.load(f, **kwargs)
+
+
+def save_json(x, path, indent=True, **kwargs):
+    """
+    Saves json for convenience.
+    """
+    with open(path, "w") as f:
+        if indent:
+            json.dump(x, f, indent="\t", **kwargs)
+        else:
+            json.dump(x, f, **kwargs)
+    print("Saved to", path)
+
+
+def load_pickle(path):
+    """
+    Loads a pickled state from a file path.
+    """
+    print("Unpickling from", path)
+    with open(path, "rb") as f:
+        return pickle.load(f)
+
+
+def save_pickle(x, path):
+    """
+    Saves a serialized state at file path.
+    """
+    print("Pickling to", path)
+    with open(path, "wb") as f:
+        return pickle.dump(x, f)
+
+
+def load(file_path):
+    """
+    Loads saved file via cloudpickle.
+    """
+    with open(file_path, "rb") as f:
+        return cloudpickle.load(f)
+
+
+def export_test_scenarios(state: State, path: str = "test_scenarios.json"):
+    """
+    Exports the auto-generated json scenarios file to a given path.
+    """
+    save_json(state.json_export, path)

@@ -5,6 +5,7 @@ from bancor_research.bancor_emulator.BancorNetwork      import BancorNetwork
 from bancor_research.bancor_emulator.BancorNetworkInfo  import BancorNetworkInfo 
 from bancor_research.bancor_emulator.BNTPool            import BNTPool           
 from bancor_research.bancor_emulator.Constants          import PPM_RESOLUTION    
+from bancor_research.bancor_emulator.ERC20              import ERC20             
 from bancor_research.bancor_emulator.NetworkSettings    import NetworkSettings   
 from bancor_research.bancor_emulator.PendingWithdrawals import PendingWithdrawals
 from bancor_research.bancor_emulator.PoolCollection     import PoolCollection    
@@ -23,7 +24,6 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 PandasDataFrame = TypeVar("pandas.core.frame.DataFrame")
 
 DEFAULT_TIMESTAMP = 0
-DEFAULT_WHITELIST = ["dai", "eth", "link", "bnt", "tkn", "wbtc"]
 DEFAULT_USERS = ["Alice", "Bob", "Charlie", "Trader", "protocol"]
 DEFAULT_DECIMALS = 18
 DEFAULT_QDECIMALS = Decimal(10) ** -DEFAULT_DECIMALS
@@ -50,6 +50,24 @@ DEFAULT_PRICE_FEEDS = pd.DataFrame(
         "wbtc": (40000.00 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
     }
 )
+DEFAULT_WHITELIST = {
+    "eth": {
+        "trading_fee": DEFAULT_TRADING_FEE,
+        "bnt_funding_limit": DEFAULT_BNT_FUNDING_LIMIT,
+    },
+    "link": {
+        "trading_fee": DEFAULT_TRADING_FEE,
+        "bnt_funding_limit": DEFAULT_BNT_FUNDING_LIMIT,
+    },
+    "tkn": {
+        "trading_fee": DEFAULT_TRADING_FEE,
+        "bnt_funding_limit": DEFAULT_BNT_FUNDING_LIMIT,
+    },
+    "wbtc": {
+        "trading_fee": DEFAULT_TRADING_FEE,
+        "bnt_funding_limit": DEFAULT_BNT_FUNDING_LIMIT,
+    },
+}
 
 def toPPM(value: Decimal):
     return uint32(value * PPM_RESOLUTION.data)
@@ -63,6 +81,12 @@ def fromWei(value: uint, decimals: int):
 def fromFraction(n: uint, d: uint):
     return Decimal('nan') if n == d == 0 else Decimal(n.data) / Decimal(d.data)
 
+def userAmount(token: ERC20, userId: str, amount: str):
+    if (amount.endswith('%')):
+        n, d = Decimal(amount[:-1]).as_integer_ratio()
+        return token.balanceOf(userId) * n / (d * 100)
+    return toWei(Decimal(amount), token.decimals())
+
 def updateBlock(timestamp):
     if block.timestamp < timestamp:
         block.timestamp = timestamp
@@ -74,20 +98,13 @@ class BancorDapp:
     def __init__(
         self,
         timestamp: int = DEFAULT_TIMESTAMP,
-        alpha: Decimal = DEFAULT_ALPHA,
         bnt_min_liquidity: Decimal = DEFAULT_BNT_MIN_LIQUIDITY,
         withdrawal_fee: Decimal = DEFAULT_WITHDRAWAL_FEE,
         cooldown_time: int = DEFAULT_COOLDOWN_TIME,
-        bnt_funding_limit: Decimal = DEFAULT_BNT_FUNDING_LIMIT,
         network_fee: Decimal = DEFAULT_NETWORK_FEE,
-        trading_fee: Decimal = DEFAULT_TRADING_FEE,
         whitelisted_tokens=DEFAULT_WHITELIST,
         price_feeds_path: str = DEFAULT_PRICE_FEEDS_PATH,
         price_feeds: PandasDataFrame = DEFAULT_PRICE_FEEDS,
-        active_users: list = DEFAULT_USERS,
-        transaction_id: int = 0,
-        generate_json_tests: bool = False,
-        emulate_solidity_results: bool = False,
     ):
         block.timestamp = 0
         block.number = 0
@@ -121,7 +138,7 @@ class BancorDapp:
         self.networkInfo.initialize()
 
         self.networkSettings.setWithdrawalFeePPM(toPPM(withdrawal_fee))
-        self.networkSettings.setMinLiquidityForTrading(toWei(bnt_min_liquidity, DEFAULT_DECIMALS))
+        self.networkSettings.setMinLiquidityForTrading(toWei(bnt_min_liquidity, self.bnt.decimals()))
 
         self.pendingWithdrawals.setLockDuration(cooldown_time)
 
@@ -130,13 +147,13 @@ class BancorDapp:
         self.network.registerPoolCollection(self.poolCollection)
 
         self.reserveTokens = {self.bnt.symbol(): self.bnt}
-        self.poolTokens = {self.bnbnt.symbol(): self.bnbnt}
-        for tkn_name in [tkn_name for tkn_name in whitelisted_tokens if tkn_name not in self.reserveTokens]:
+        self.poolTokens = {self.bnt.symbol(): self.bnbnt}
+        for tkn_name, pool_params in whitelisted_tokens.items():
             tkn = ReserveToken(tkn_name, tkn_name, DEFAULT_DECIMALS) # TODO: support decimals per reserve token
             self.networkSettings.addTokenToWhitelist(tkn)
-            self.networkSettings.setFundingLimit(tkn, toWei(bnt_funding_limit, DEFAULT_DECIMALS))
+            self.networkSettings.setFundingLimit(tkn, toWei(pool_params['bnt_funding_limit'], self.bnt.decimals()))
             self.network.createPools([tkn], self.poolCollection)
-            self.poolCollection.setTradingFeePPM(tkn, toPPM(trading_fee))
+            self.poolCollection.setTradingFeePPM(tkn, toPPM(pool_params['trading_fee']))
             self.reserveTokens[tkn_name] = tkn
             self.poolTokens[tkn_name] = self.network.collectionByPool(tkn).poolToken(tkn)
 
@@ -156,7 +173,7 @@ class BancorDapp:
     ):
         updateBlock(timestamp)
         tkn = self.reserveTokens[tkn_name]
-        amt = toWei(tkn_amt, tkn.decimals())
+        amt = userAmount(tkn, user_name, tkn_amt)
         tkn.connect(user_name).approve(self.network, amt)
         return self.network.connect(user_name).deposit(tkn, amt)
 
@@ -172,7 +189,7 @@ class BancorDapp:
         updateBlock(timestamp)
         src_tkn = self.reserveTokens[source_token]
         trg_tkn = self.reserveTokens[target_token]
-        src_amt = toWei(tkn_amt, src_tkn.decimals())
+        src_amt = userAmount(src_tkn, user_name, tkn_amt)
         src_tkn.connect(user_name).approve(self.network, src_amt)
         return self.network.connect(user_name).tradeBySourceAmount(src_tkn, trg_tkn, src_amt, 1, uint256.max, user_name)
 
@@ -186,7 +203,7 @@ class BancorDapp:
     ):
         updateBlock(timestamp)
         tkn = self.poolTokens[tkn_name]
-        amt = toWei(tkn_amt, tkn.decimals())
+        amt = userAmount(tkn, user_name, tkn_amt)
         tkn.connect(user_name).approve(self.network, amt)
         return self.network.connect(user_name).initWithdrawal(tkn, amt)
 
@@ -202,7 +219,7 @@ class BancorDapp:
         updateBlock(timestamp)
         return self.network.connect(user_name).withdraw(id_number)
 
-    def burn(
+    def burn_pool_tokens(
         self,
         tkn_name: str,
         tkn_amt: Decimal,
@@ -212,13 +229,13 @@ class BancorDapp:
     ):
         updateBlock(timestamp)
         tkn = self.poolTokens[tkn_name]
-        amt = toWei(tkn_amt, tkn.decimals())
+        amt = userAmount(tkn, user_name, tkn_amt)
         tkn.connect(user_name).burn(amt)
 
     def create_standard_rewards_program(
         self,
         tkn_name: str,
-        tkn_amt: Decimal,
+        rewards_amt: Decimal,
         start_time: int,
         end_time: int,
         timestamp: int = 0,
@@ -226,7 +243,7 @@ class BancorDapp:
     ):
         updateBlock(timestamp)
         tkn = self.reserveTokens[tkn_name]
-        amt = toWei(tkn_amt, tkn.decimals())
+        amt = toWei(rewards_amt, self.bnt.decimals())
         return self.standardRewards.createProgram(tkn, amt, start_time, end_time)
 
     def join_standard_rewards_program(
@@ -240,7 +257,7 @@ class BancorDapp:
     ):
         updateBlock(timestamp)
         tkn = self.poolTokens[tkn_name]
-        amt = toWei(tkn_amt, tkn.decimals())
+        amt = userAmount(tkn, user_name, tkn_amt)
         tkn.connect(user_name).approve(self.standardRewards, amt)
         return self.standardRewards.connect(user_name).join(program_id, amt)
 
@@ -255,7 +272,7 @@ class BancorDapp:
     ):
         updateBlock(timestamp)
         tkn = self.poolTokens[tkn_name]
-        amt = toWei(tkn_amt, tkn.decimals())
+        amt = userAmount(tkn, user_name, tkn_amt)
         return self.standardRewards.connect(user_name).leave(program_id, amt)
 
     def claim_standard_rewards(
@@ -280,9 +297,18 @@ class BancorDapp:
     ):
         updateBlock(timestamp)
         tkn = self.reserveTokens[tkn_name]
-        amt = toWei(tkn_amt, tkn.decimals())
-        func = self.bntGovernance.mint if tkn == self.bnt else tkn.issue
-        func(user_name, amt)
+        balance = tkn.balanceOf(user_name)
+        amount = toWei(tkn_amt, tkn.decimals())
+        if tkn is self.bnt:
+            if amount > balance:
+                self.bntGovernance.mint(user_name, amount - balance)
+            elif balance > amount:
+                self.bntGovernance.burn(user_name, balance - amount)
+        else:
+            if amount > balance:
+                tkn.issue(user_name, amount - balance)
+            elif balance > amount:
+                tkn.destroy(user_name, balance - amount)
 
     def set_trading_fee(
         self,
@@ -330,23 +356,20 @@ class BancorDapp:
         amt = toWei(value, self.bnt.decimals())
         self.networkSettings.setFundingLimit(tkn, amt)
 
-    def dao_msig_init_pools(
+    def enable_trading(
         self,
-        pools: list,
-        tkn_name: str = None,
+        tkn_name: str,
         timestamp: int = 0,
         transaction_type: str = "enableTrading",
         user_name: str = "protocol",
     ) -> None:
         updateBlock(timestamp)
-        bntPriceInitialValue = self.price_feeds.at[timestamp, self.bnt.symbol()]
-        for pool in [pool for pool in pools if self.reserveTokens[pool] is not self.bnt]:
-            tknPrice = self.price_feeds.at[timestamp, pool]
-            bntPrice = bntPriceInitialValue
-            while tknPrice != int(tknPrice) or bntPrice != int(bntPrice):
-                tknPrice *= 10
-                bntPrice *= 10
-            self.poolCollection.enableTrading(self.reserveTokens[pool], tknPrice, bntPrice)
+        tknPrice = self.price_feeds.at[timestamp, tkn_name]
+        bntPrice = self.price_feeds.at[timestamp, self.bnt.symbol()]
+        while tknPrice != int(tknPrice) or bntPrice != int(bntPrice):
+            tknPrice *= 10
+            bntPrice *= 10
+        self.poolCollection.enableTrading(self.reserveTokens[tkn_name], tknPrice, bntPrice)
 
     def create_user(self, user_name: str, timestamp: int = 0):
         pass
@@ -357,8 +380,8 @@ class BancorDapp:
         reserveTokens = list(self.reserveTokens.values())
         poolTokens = list(self.poolTokens.values())
 
-        # Iterate all reserve tokens and all pool tokens
-        for token in reserveTokens + poolTokens:
+        # Iterate all tokens
+        for token in reserveTokens + poolTokens + [self.vbnt]:
             table[token.symbol()] = {}
             for account in [user for user in token._balances.keys() if type(user) is str]:
                 table[token.symbol()][tuple([1, 'Account', account])] = fromWei(token.balanceOf(account), token.decimals())

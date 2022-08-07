@@ -558,28 +558,24 @@ class LP(RandomWalker):
         distribution_type = self.random.choice(["flat", "exp"])
 
         if distribution_type == "flat":
-            reward_total = Decimal("86400")
-
             self.protocol.v3.create_autocompounding_program(
                 state=state,
                 tkn_name=tkn_name,
                 user_name=self.user_name,
                 distribution_type=distribution_type,
-                total_rewards=reward_total,
+                total_rewards="86400",
                 total_duration_in_days=365,
                 start_time=start_time,
                 timestamp=timestamp,
             )
         else:
-            reward_total = Decimal("360000")
-
             self.protocol.v3.create_autocompounding_program(
                 state=state,
                 tkn_name=tkn_name,
                 user_name=self.user_name,
                 distribution_type=distribution_type,
                 half_life_days=1,
-                total_rewards=reward_total,
+                total_rewards="360000",
                 start_time=start_time,
                 timestamp=timestamp,
             )

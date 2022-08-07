@@ -285,7 +285,7 @@ class BancorDapp:
         updateBlock(timestamp)
         self.networkSettings.setWithdrawalFeePPM(toPPM(percent))
 
-    def set_funding_limit(
+    def set_bnt_funding_limit(
         self,
         tkn_name: str,
         amount: str,

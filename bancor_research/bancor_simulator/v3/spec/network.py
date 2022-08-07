@@ -273,14 +273,13 @@ class BancorDapp:
         user_name: str,
         id_number: int,
         timestamp: int = 0,
-        tkn_name: str = None,
         transaction_type: str = "withdraw",
     ):
         """
         Main withdrawal logic based on the withdraw algorithm of the BIP15 spec.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        tkn_name = tkn_name.lower()
+        tkn_name = state.users[user_name].pending_withdrawals[id_number].tkn_name
         state = process_withdrawal(state, user_name, id_number, timestamp, tkn_name)
 
         self.next_transaction(state)

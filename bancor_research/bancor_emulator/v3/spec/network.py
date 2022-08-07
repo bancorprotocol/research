@@ -140,7 +140,7 @@ class BancorDapp:
         self.network.registerPoolCollection(self.poolCollection)
 
         self.reserveTokens = {self.bnt.symbol(): self.bnt}
-        self.poolTokens = {self.bnbnt.symbol(): self.bnbnt}
+        self.poolTokens = {self.bnt.symbol(): self.bnbnt}
         for tkn_name, pool_params in whitelisted_tokens.items():
             tkn = ReserveToken(tkn_name, tkn_name, DEFAULT_DECIMALS) # TODO: support decimals per reserve token
             self.networkSettings.addTokenToWhitelist(tkn)
@@ -290,9 +290,18 @@ class BancorDapp:
     ):
         updateBlock(timestamp)
         tkn = self.reserveTokens[tkn_name]
-        amt = toWei(tkn_amt, tkn.decimals())
-        func = self.bntGovernance.mint if tkn == self.bnt else tkn.issue
-        func(user_name, amt)
+        balance = tkn.balanceOf(user_name)
+        amount = toWei(tkn_amt, tkn.decimals())
+        if tkn is self.bnt:
+            if amount > balance:
+                self.bntGovernance.mint(user_name, amount - balance)
+            elif balance > amount:
+                self.bntGovernance.burn(user_name, balance - amount)
+        else:
+            if amount > balance:
+                tkn.issue(user_name, amount - balance)
+            elif balance > amount:
+                tkn.destroy(user_name, balance - amount)
 
     def set_trading_fee(
         self,

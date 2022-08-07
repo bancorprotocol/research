@@ -15,8 +15,8 @@ from bancor_research.bancor_simulator.v3.spec.state import *
 
 
 def userAmount(state: State, tkn_name: str, user_name: str, amount: str):
-    if amount.endswith("%"):
-        return get_user_balance(state, user_name, tkn_name) * Decimal(amount[:-1]) / 100
+    if str(amount).endswith("%"):
+        return get_user_balance(state, user_name, tkn_name) * Decimal(str(amount)[:-1]) / 100
     return Decimal(amount)
 
 
@@ -164,17 +164,16 @@ class BancorDapp:
     def deposit(
         self,
         tkn_name: str,
-        tkn_amt_abs_or_rel: str,
+        tkn_amt: str,
         user_name: str,
         timestamp: int = 0,
-        bntkn: Decimal = Decimal("0"),
         action_name="deposit",
     ):
         """
         Top level logic for deposit actions.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        tkn_amt = userAmount(state, tkn_name, user_name, tkn_amt_abs_or_rel)
+        tkn_amt = userAmount(state, tkn_name, user_name, tkn_amt)
         state, tkn_name, tkn_amt, user_name = validate_input(
             state, tkn_name, tkn_amt, user_name, timestamp
         )
@@ -196,11 +195,11 @@ class BancorDapp:
             transaction_id=self.transaction_id,
             state=state,
         )
-        return bntkn
+        # return bntkn
 
     def trade(
         self,
-        tkn_amt_abs_or_rel: str,
+        tkn_amt: str,
         source_token: str,
         target_token: str,
         user_name: str,
@@ -211,7 +210,7 @@ class BancorDapp:
         Main logic for trade actions.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        tkn_amt = userAmount(state, source_token, user_name, tkn_amt_abs_or_rel)
+        tkn_amt = userAmount(state, source_token, user_name, tkn_amt)
         state, source_token, tkn_amt, user_name = validate_input(
             state, source_token, tkn_amt, user_name, timestamp
         )
@@ -233,7 +232,7 @@ class BancorDapp:
 
     def begin_cooldown(
         self,
-        tkn_amt_abs_or_rel: str,
+        tkn_amt: str,
         tkn_name: str,
         user_name: str,
         timestamp: int = 0,
@@ -243,7 +242,7 @@ class BancorDapp:
         Begin the withdrawal cooldown operation.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        tkn_amt = userAmount(state, tkn_name, user_name, tkn_amt_abs_or_rel)
+        tkn_amt = userAmount(state, tkn_name, user_name, tkn_amt)
         state, tkn_name, tkn_amt, user_name = validate_input(
             state, tkn_name, tkn_amt, user_name, timestamp
         )

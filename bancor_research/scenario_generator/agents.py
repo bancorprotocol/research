@@ -274,7 +274,7 @@ class Trader(MonteCarlo):
         return self
 
     def get_random_tkn_names(self, state: State) -> Tuple[str, str]:
-        tokens = state.whitelisted_tokens
+        tokens = [tkn for tkn in state.whitelisted_tokens]
         source_tkn = self.random.choice(tokens)
         target_tkn = self.random.choice([tkn for tkn in tokens if tkn != source_tkn])
         return source_tkn, target_tkn
@@ -439,7 +439,7 @@ class LP(MonteCarlo):
     def set_random_trading_fee(self):
         state = self.protocol.v3.global_state
         for i in range(self.random.randint(1, 3)):
-            tkn_name = self.random.choice(state.whitelisted_tokens)
+            tkn_name = self.random.choice([tkn for tkn in state.whitelisted_tokens])
             trading_fee = get_trading_fee(state, tkn_name)
             trading_fee = self.get_random_trading_fee(trading_fee)
             state.set_trading_fee(tkn_name, trading_fee)
@@ -448,7 +448,7 @@ class LP(MonteCarlo):
 
     def set_random_network_fee(self):
         state = self.protocol.v3.global_state
-        tkn_name = self.random.choice(state.whitelisted_tokens)
+        tkn_name = self.random.choice([tkn for tkn in state.whitelisted_tokens])
         network_fee = get_network_fee(state, tkn_name)
         network_fee = self.get_random_network_fee(network_fee)
         state.set_network_fee(tkn_name, network_fee)
@@ -458,7 +458,7 @@ class LP(MonteCarlo):
     def set_random_withdrawal_fee(self):
         state = self.protocol.v3.global_state
         withdrawal_fee = state.withdrawal_fee
-        tkn_name = self.random.choice(state.whitelisted_tokens)
+        tkn_name = self.random.choice([tkn for tkn in state.whitelisted_tokens])
         withdrawal_fee = self.get_random_withdrawal_fee(withdrawal_fee)
         state.set_withdrawal_fee(tkn_name, withdrawal_fee)
         self.protocol.v3.set_state(state)
@@ -466,7 +466,7 @@ class LP(MonteCarlo):
 
     def set_random_bnt_funding_limit(self):
         state = self.protocol.v3.global_state
-        tkn_name = self.random.choice(state.whitelisted_tokens)
+        tkn_name = self.random.choice([tkn for tkn in state.whitelisted_tokens])
         bnt_funding_limit = get_bnt_funding_limit(state, tkn_name)
         updated_bnt_funding_limit = self.get_random_bnt_funding_limit(bnt_funding_limit)
         state.set_bnt_funding_limit(tkn_name, updated_bnt_funding_limit)
@@ -474,9 +474,10 @@ class LP(MonteCarlo):
         return self
 
     def perform_random_enable_trading(self):
-        self.protocol.v3.dao_msig_init_pools(
-            self.protocol.v3.global_state.whitelisted_tokens, "bnt"
-        )
+        state = self.protocol.v3.global_state
+        tokens = [tkn for tkn in state.whitelisted_tokens]
+        for tkn in tokens:
+            self.protocol.v3.enable_trading(tkn)
         return self
 
     def get_random_withdrawal_amt(self, tkn_name: str) -> Decimal:
@@ -504,7 +505,7 @@ class LP(MonteCarlo):
         return Decimal(self.random.uniform(float(min_amt), float(max_amt)))
 
     def get_random_tkn_names(self, state: State) -> Tuple[str, str]:
-        tokens = state.whitelisted_tokens
+        tokens = [tkn for tkn in state.whitelisted_tokens]
         source_tkn = self.random.choice(tokens)
         target_tkn = self.random.choice([tkn for tkn in tokens if tkn != source_tkn])
         return source_tkn, target_tkn
@@ -561,7 +562,7 @@ class LP(MonteCarlo):
         timestamp = state.timestamp
         start_time = 1 + timestamp
 
-        tkn_name = self.random.choice(state.whitelisted_tokens)
+        tkn_name = self.random.choice([tkn for tkn in state.whitelisted_tokens])
         distribution_type = self.random.choice(["flat", "exp"])
 
         if distribution_type == "flat":
@@ -782,7 +783,7 @@ class LP(MonteCarlo):
         state = self.protocol.v3.global_state
         timestamp = state.timestamp
         user_name = self.random.choice(state.usernames)
-        tkn_name = self.random.choice(state.whitelisted_tokens)
+        tkn_name = self.random.choice([tkn for tkn in state.whitelisted_tokens])
         pending_withdrawals = get_user_pending_withdrawals(state, user_name, tkn_name)
         if len(pending_withdrawals) > 0:
             id_number = self.random.choice(pending_withdrawals)
@@ -978,10 +979,8 @@ class Protocol(mesa.Agent):
         self.v3 = BancorDapp(
             price_feeds=price_feeds,
             whitelisted_tokens=whitelisted_tokens,
-            trading_fee=trading_fee,
             network_fee=network_fee,
             withdrawal_fee=withdrawal_fee,
-            bnt_funding_limit=bnt_funding_limit,
             bnt_min_liquidity=bnt_min_liquidity,
         )
 

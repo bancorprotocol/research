@@ -6,13 +6,11 @@
 from decimal import Decimal
 
 import mesa
+from bancor_research.scenario_generator.constants import *
 
 # The colors here are taken from Matplotlib's tab10 palette
 from bancor_research.scenario_generator.model import BancorSimulation
 
-from bancor_research.scenario_generator.constants import SIMULATION_WHALE_THRESHOLD
-
-from bancor_research.bancor_simulator.v3.spec import DEFAULT_TRADING_FEE, DEFAULT_NETWORK_FEE, DEFAULT_WITHDRAWAL_FEE
 from bancor_research.scenario_generator.agents import Trader, LP
 
 RICH_COLOR = "#2ca02c"  # Green

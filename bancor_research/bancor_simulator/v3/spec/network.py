@@ -452,9 +452,7 @@ class BancorDapp:
         Creates a new autocompounding program.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        state, tkn_name, user_name = validate_input(
-            state, tkn_name, "", timestamp
-        )
+        state, tkn_name, user_name = validate_input(state, tkn_name, "", timestamp)
         if total_duration_in_seconds == 0 and total_duration_in_days != 0:
             total_duration_in_seconds = Decimal(f"{SECONDS_PER_DAY}") * Decimal(
                 total_duration_in_days

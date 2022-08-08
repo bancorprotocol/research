@@ -275,8 +275,7 @@ class Trader(MonteCarlo):
 
     def get_random_tkn_names(self, state: State) -> Tuple[str, str]:
         tokens = [tkn for tkn in state.whitelisted_tokens]
-        source_tkn = self.random.choice(tokens)
-        target_tkn = self.random.choice([tkn for tkn in tokens if tkn != source_tkn])
+        source_tkn, target_tkn = self.random.sample(tokens, 2)
         return source_tkn, target_tkn
 
     def get_average_trading_fee(self):
@@ -475,8 +474,7 @@ class LP(MonteCarlo):
 
     def perform_random_enable_trading(self):
         state = self.protocol.v3.global_state
-        tokens = [tkn for tkn in state.whitelisted_tokens]
-        for tkn in tokens:
+        for tkn in [tkn for tkn in state.whitelisted_tokens]:
             self.protocol.v3.enable_trading(tkn)
         return self
 
@@ -506,8 +504,7 @@ class LP(MonteCarlo):
 
     def get_random_tkn_names(self, state: State) -> Tuple[str, str]:
         tokens = [tkn for tkn in state.whitelisted_tokens]
-        source_tkn = self.random.choice(tokens)
-        target_tkn = self.random.choice([tkn for tkn in tokens if tkn != source_tkn])
+        source_tkn, target_tkn = self.random.sample(tokens, 2)
         return source_tkn, target_tkn
 
     def is_protocol_bnbnt_healthy(

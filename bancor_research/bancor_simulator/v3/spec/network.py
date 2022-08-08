@@ -328,7 +328,7 @@ class BancorDapp:
         # Iterate all tokens
         for tkn_name in reserve_tokens + pool_tokens + ["vbnt"]:
             table[tkn_name] = {}
-            for account in state.users:
+            for account in [user for user in state.users if user != protocol_user]:
                 table[tkn_name][tuple([1, "Account", account])] = (
                     state.users[account].wallet[tkn_name].balance
                 )
@@ -439,7 +439,6 @@ class BancorDapp:
         self,
         state: State,
         tkn_name: str,
-        user_name: str,
         total_rewards: str,
         start_time: int,
         distribution_type: str,
@@ -454,7 +453,7 @@ class BancorDapp:
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
         state, tkn_name, user_name = validate_input(
-            state, tkn_name, user_name, timestamp
+            state, tkn_name, "", timestamp
         )
         if total_duration_in_seconds == 0 and total_duration_in_days != 0:
             total_duration_in_seconds = Decimal(f"{SECONDS_PER_DAY}") * Decimal(
@@ -467,7 +466,7 @@ class BancorDapp:
             program_wallet_bntkn = self.deposit(
                 tkn_name=tkn_name,
                 tkn_amt=total_rewards,
-                user_name=user_name,
+                user_name="",
                 timestamp=timestamp,
             )
             state.decrease_protocol_wallet_balance(tkn_name, program_wallet_bntkn)

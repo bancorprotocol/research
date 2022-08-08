@@ -195,7 +195,6 @@ class BancorDapp:
         state, tkn_name, tkn_amt, user_name = validate_input(
             state, tkn_name, tkn_amt, user_name, timestamp
         )
-        tkn_amt = get_user_amount(state, tkn_name, user_name, tkn_amt)
         if tkn_name == "bnt":
             state = deposit_bnt(
                 state=state, tkn_name=tkn_name, tkn_amt=tkn_amt, user_name=user_name
@@ -232,10 +231,6 @@ class BancorDapp:
         state, source_token, tkn_amt, user_name = validate_input(
             state, source_token, tkn_amt, user_name, timestamp
         )
-        state, target_token, user_name = validate_input(
-            state, target_token, user_name, timestamp
-        )
-        tkn_amt = get_user_amount(state, source_token, user_name, tkn_amt)
         state = process_trade(
             state, tkn_amt, source_token, target_token, user_name, timestamp
         )
@@ -265,7 +260,6 @@ class BancorDapp:
         state, tkn_name, tkn_amt, user_name = validate_input(
             state, tkn_name, tkn_amt, user_name, timestamp
         )
-        tkn_amt = get_user_amount(state, tkn_name, user_name, tkn_amt)
         state, id_number = begin_withdrawal_cooldown(
             state, tkn_amt, tkn_name, user_name
         )

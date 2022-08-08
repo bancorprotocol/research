@@ -302,9 +302,7 @@ class BancorDapp:
         DAO msig initilizes new tokens to allow trading once specified conditions are met.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        state, tkn_name, user_name = validate_input(
-            state, tkn_name, "", timestamp
-        )
+        state, tkn_name, user_name = validate_input(state, tkn_name, "", timestamp)
         state = enable_trading(state, tkn_name)
         self.next_transaction(state)
         handle_logging(
@@ -421,9 +419,7 @@ class BancorDapp:
         Distribute auto-compounding program.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        state, tkn_name, user_name = validate_input(
-            state, tkn_name, "", timestamp
-        )
+        state, tkn_name, user_name = validate_input(state, tkn_name, "", timestamp)
         state = distribute_autocompounding_program(
             state=state, tkn_name=tkn_name, timestamp=timestamp
         )
@@ -701,9 +697,7 @@ class BancorDapp:
         Sets the system trading fee at the network interface level for convenience.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        state, tkn_name, user_name = validate_input(
-            state, tkn_name, "", timestamp
-        )
+        state, tkn_name, user_name = validate_input(state, tkn_name, "", timestamp)
         value = toDecimal(percent)
         state.set_trading_fee(tkn_name, value)
         self.next_transaction(state)
@@ -723,9 +717,7 @@ class BancorDapp:
         Sets the system network fee at the network interface level for convenience.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        state, tkn_name, user_name = validate_input(
-            state, tkn_name, "", timestamp
-        )
+        state, tkn_name, user_name = validate_input(state, tkn_name, "", timestamp)
         value = toDecimal(percent)
         state.set_network_fee(tkn_name, value)
         self.next_transaction(state)
@@ -745,9 +737,7 @@ class BancorDapp:
         Sets the system withdrawal fee at the network interface level for convenience.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        state, tkn_name, user_name = validate_input(
-            state, tkn_name, "", timestamp
-        )
+        state, tkn_name, user_name = validate_input(state, tkn_name, "", timestamp)
         value = toDecimal(percent)
         state.set_withdrawal_fee(tkn_name, value)
         self.next_transaction(state)
@@ -767,9 +757,7 @@ class BancorDapp:
         Sets the system withdrawal fee at the network interface level for convenience.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        state, tkn_name, user_name = validate_input(
-            state, tkn_name, "", timestamp
-        )
+        state, tkn_name, user_name = validate_input(state, tkn_name, "", timestamp)
         value = toDecimal(amount)
         state.set_bnt_funding_limit(tkn_name, value)
         self.next_transaction(state)

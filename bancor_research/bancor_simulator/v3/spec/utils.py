@@ -682,10 +682,7 @@ def log_json_operation(state, transaction_type, user_name, amt, timestamp):
 
 
 def validate_input(
-    state: State,
-    tkn_name: str,
-    user_name: str,
-    timestamp: int
+    state: State, tkn_name: str, user_name: str, timestamp: int
 ) -> Tuple[State, str, str]:
     """
     Validates the input for all agent actions.
@@ -693,7 +690,9 @@ def validate_input(
 
     assert type(tkn_name) is str, "tkn_name must be of type string"
     assert type(user_name) is str, "tkn_name must be of type string"
-    assert user_name != protocol_user_name, "user_name {} is reserved".format(protocol_user_name)
+    assert user_name != protocol_user_name, "user_name {} is reserved".format(
+        protocol_user_name
+    )
 
     tkn_name = tkn_name.lower()
     user_name = user_name if user_name else protocol_user_name
@@ -703,7 +702,9 @@ def validate_input(
 
     if user_name != protocol_user_name:
         if tkn_name not in state.users[user_name].wallet:
-            state.users[user_name].wallet[tkn_name] = Token(balance=DEFAULT_ACCOUNT_BALANCE)
+            state.users[user_name].wallet[tkn_name] = Token(
+                balance=DEFAULT_ACCOUNT_BALANCE
+            )
 
         pooltkn_name = get_pooltoken_name(tkn_name)
         if pooltkn_name not in state.users[user_name].wallet:
@@ -712,10 +713,14 @@ def validate_input(
             )
 
         if "vbnt" not in state.users[user_name].wallet:
-            state.users[user_name].wallet["vbnt"] = Token(balance=DEFAULT_ACCOUNT_BALANCE)
+            state.users[user_name].wallet["vbnt"] = Token(
+                balance=DEFAULT_ACCOUNT_BALANCE
+            )
 
         if "bnbnt" not in state.users[user_name].wallet:
-            state.users[user_name].wallet["bnbnt"] = Token(balance=DEFAULT_ACCOUNT_BALANCE)
+            state.users[user_name].wallet["bnbnt"] = Token(
+                balance=DEFAULT_ACCOUNT_BALANCE
+            )
 
     state.tokens[tkn_name].timestamp = timestamp
 

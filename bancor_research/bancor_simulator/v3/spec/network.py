@@ -280,7 +280,7 @@ class BancorDapp:
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
         tkn_name = state.users[user_name].pending_withdrawals[id_number].tkn_name
-        state = process_withdrawal(state, user_name, id_number, timestamp, tkn_name)
+        state = process_withdrawal(state, user_name, id_number, timestamp)
 
         self.next_transaction(state)
         state = handle_logging(

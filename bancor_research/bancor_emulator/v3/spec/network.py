@@ -258,7 +258,6 @@ class BancorDapp:
         percent: str,
         timestamp: int = 0,
         transaction_type: str = "set trading fee",
-        user_name: str = "protocol",
     ):
         updateBlock(timestamp)
         self.poolCollection.setTradingFeePPM(self.reserveTokens[tkn_name], toPPM(percent))
@@ -269,7 +268,6 @@ class BancorDapp:
         percent: str,
         timestamp: int = 0,
         transaction_type: str = "set network fee",
-        user_name: str = "protocol",
     ):
         updateBlock(timestamp)
         self.poolCollection.setNetworkFeePPM(toPPM(percent))
@@ -280,7 +278,6 @@ class BancorDapp:
         percent: str,
         timestamp: int = 0,
         transaction_type: str = "set withdrawal fee",
-        user_name: str = "protocol",
     ):
         updateBlock(timestamp)
         self.networkSettings.setWithdrawalFeePPM(toPPM(percent))
@@ -291,7 +288,6 @@ class BancorDapp:
         amount: str,
         timestamp: int = 0,
         transaction_type: str = "set bnt funding limit",
-        user_name: str = "protocol",
     ):
         updateBlock(timestamp)
         tkn = self.reserveTokens[tkn_name]
@@ -303,7 +299,6 @@ class BancorDapp:
         tkn_name: str,
         timestamp: int = 0,
         transaction_type: str = "enableTrading",
-        user_name: str = "protocol",
     ) -> None:
         updateBlock(timestamp)
         tknPrice = self.price_feeds.at[timestamp, tkn_name]

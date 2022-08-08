@@ -1,7 +1,5 @@
 from decimal import Decimal
 from decimal import getcontext
-from decimal import ROUND_FLOOR
-from decimal import ROUND_CEILING
 
 getcontext().prec = len(str(Decimal(2 ** 512 - 1)))
 
@@ -15,12 +13,6 @@ class uint:
 
     def clone(self):
         return uint(self.size, self.data)
-
-    def floor(self):
-        return self.data.to_integral_exact(rounding=ROUND_FLOOR)
-
-    def ceil(self):
-        return self.data.to_integral_exact(rounding=ROUND_CEILING)
 
     def __add__(self, other):
         return self._new(other, Decimal.__add__)

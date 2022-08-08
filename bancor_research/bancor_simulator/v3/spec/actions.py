@@ -278,7 +278,6 @@ def process_withdrawal(
     user_name: str,
     id_number: int,
     timestamp: int = 0,
-    tkn_name: str = None,
 ):
     """
     Main withdrawal logic based on the withdraw algorithm of the BIP15 spec.

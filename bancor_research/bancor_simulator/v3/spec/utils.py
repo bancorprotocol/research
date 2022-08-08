@@ -682,7 +682,7 @@ def validate_input(
     tkn_name: str,
     user_name: str,
     timestamp: int = 0,
-) -> Tuple[State, str, Decimal, str]:
+) -> Tuple[State, str, str]:
     """
     Validates the input for all agent actions.
     """
@@ -716,7 +716,6 @@ def validate_input(
     if "bnbnt" not in state.users[user_name].wallet:
         state.users[user_name].wallet["bnbnt"] = Token(balance=DEFAULT_ACCOUNT_BALANCE)
 
-    state.timestamp = timestamp
     state.tokens[tkn_name].timestamp = timestamp
 
     return state, tkn_name, user_name

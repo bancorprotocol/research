@@ -4,6 +4,10 @@
 # --------------------------------------------------------------------------------------------------------------------
 """Utility functions."""
 from bancor_research.bancor_simulator.v3.spec.state import *
+import json, pickle, cloudpickle
+
+
+protocol_user_name = "protocol"
 
 
 def check_if_program_enabled(start_time: int, end_time: int, timestamp: int):
@@ -678,43 +682,45 @@ def log_json_operation(state, transaction_type, user_name, amt, timestamp):
 
 
 def validate_input(
-    state: State,
-    tkn_name: str,
-    user_name: str,
-    timestamp: int = 0,
+    state: State, tkn_name: str, user_name: str, timestamp: int
 ) -> Tuple[State, str, str]:
     """
     Validates the input for all agent actions.
     """
 
-    try:
-        tkn_name = tkn_name.lower()
-    except ValueError("tkn_name must be type String") as e:
-        print(e)
+    assert type(tkn_name) is str, "tkn_name must be of type string"
+    assert type(user_name) is str, "tkn_name must be of type string"
+    assert user_name != protocol_user_name, "user_name {} is reserved".format(
+        protocol_user_name
+    )
 
-    try:
-        assert type(user_name) is str
-    except AssertionError:
-        print("user_name must be type String")
+    tkn_name = tkn_name.lower()
+    user_name = user_name if user_name else protocol_user_name
 
     if user_name not in state.users:
         state = state.create_user(user_name)
-        wallet_test = state.users[user_name].wallet
 
-    if tkn_name not in state.users[user_name].wallet:
-        state.users[user_name].wallet[tkn_name] = Token(balance=DEFAULT_ACCOUNT_BALANCE)
+    if user_name != protocol_user_name:
+        if tkn_name not in state.users[user_name].wallet:
+            state.users[user_name].wallet[tkn_name] = Token(
+                balance=DEFAULT_ACCOUNT_BALANCE
+            )
 
-    pooltkn_name = get_pooltoken_name(tkn_name)
-    if pooltkn_name not in state.users[user_name].wallet:
-        state.users[user_name].wallet[pooltkn_name] = Token(
-            balance=DEFAULT_ACCOUNT_BALANCE
-        )
+        pooltkn_name = get_pooltoken_name(tkn_name)
+        if pooltkn_name not in state.users[user_name].wallet:
+            state.users[user_name].wallet[pooltkn_name] = Token(
+                balance=DEFAULT_ACCOUNT_BALANCE
+            )
 
-    if "vbnt" not in state.users[user_name].wallet:
-        state.users[user_name].wallet["vbnt"] = Token(balance=DEFAULT_ACCOUNT_BALANCE)
+        if "vbnt" not in state.users[user_name].wallet:
+            state.users[user_name].wallet["vbnt"] = Token(
+                balance=DEFAULT_ACCOUNT_BALANCE
+            )
 
-    if "bnbnt" not in state.users[user_name].wallet:
-        state.users[user_name].wallet["bnbnt"] = Token(balance=DEFAULT_ACCOUNT_BALANCE)
+        if "bnbnt" not in state.users[user_name].wallet:
+            state.users[user_name].wallet["bnbnt"] = Token(
+                balance=DEFAULT_ACCOUNT_BALANCE
+            )
 
     state.tokens[tkn_name].timestamp = timestamp
 

@@ -716,7 +716,6 @@ def validate_input(
     if "bnbnt" not in state.users[user_name].wallet:
         state.users[user_name].wallet["bnbnt"] = Token(balance=DEFAULT_ACCOUNT_BALANCE)
 
-    state.timestamp = timestamp
     state.tokens[tkn_name].timestamp = timestamp
 
     return state, tkn_name, user_name

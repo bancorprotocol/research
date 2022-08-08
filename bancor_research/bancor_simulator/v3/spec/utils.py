@@ -680,7 +680,6 @@ def log_json_operation(state, transaction_type, user_name, amt, timestamp):
 def validate_input(
     state: State,
     tkn_name: str,
-    tkn_amt: Decimal,
     user_name: str,
     timestamp: int = 0,
 ) -> Tuple[State, str, Decimal, str]:
@@ -697,11 +696,6 @@ def validate_input(
         assert type(user_name) is str
     except AssertionError:
         print("user_name must be type String")
-
-    try:
-        tkn_amt = Decimal(tkn_amt)
-    except ValueError("tkn_amt must be convertable to type Decimal") as e:
-        print(e)
 
     if user_name not in state.users:
         state = state.create_user(user_name)
@@ -722,14 +716,10 @@ def validate_input(
     if "bnbnt" not in state.users[user_name].wallet:
         state.users[user_name].wallet["bnbnt"] = Token(balance=DEFAULT_ACCOUNT_BALANCE)
 
-    if timestamp is not None:
-        state.timestamp = timestamp
-        state.tokens[tkn_name].timestamp = timestamp
-    else:
-        state.timestamp = 0
-        state.tokens[tkn_name].timestamp = 0
+    state.timestamp = timestamp
+    state.tokens[tkn_name].timestamp = timestamp
 
-    return state, tkn_name, tkn_amt, user_name
+    return state, tkn_name, user_name
 
 
 def setup_json_simulation(

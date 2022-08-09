@@ -3,16 +3,23 @@
 # Licensed under the MIT LICENSE. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------------------------------
 """Mesa Agent-based implementations of the Bancor protocol."""
+from decimal import Decimal
+from typing import Tuple
 
 import mesa
 
+from bancor_research.bancor_simulator.v3.spec import get_prices, State, get_bnt_trading_liquidity, \
+    get_tkn_trading_liquidity, get_trading_fee, get_user_balance, get_is_trading_enabled, get_network_fee, get_ema_rate, \
+    get_spot_rate, get_vault_balance, get_pooltoken_balance, get_staked_balance, get_external_protection_vault, \
+    get_protocol_wallet_balance, get_vortex_balance, get_bnt_funding_limit, get_bnbnt_rate, get_max_bnt_deposit, \
+    get_user_pending_withdrawals
 from bancor_research.bancor_simulator.v3.spec.actions import (
     unpack_withdrawal_cooldown,
     vortex_burner,
 )
 from bancor_research.bancor_simulator.v3.spec.network import BancorDapp
-from bancor_research.bancor_simulator.v3.simulation.random_walk import RandomWalker
-from bancor_research.bancor_simulator.v3.simulation.utils import (
+from bancor_research.scenario_generator.monte_carlo import MonteCarlo
+from bancor_research.scenario_generator.utils import (
     trade_tkn_to_ema,
     trade_bnt_to_ema,
     process_arbitrage_trade,
@@ -26,7 +33,7 @@ from bancor_research.bancor_simulator.v3.spec.utils import (
 )
 
 
-class Trader(RandomWalker):
+class Trader(MonteCarlo):
     """
     Represents a Bancor dapp user (trader and/or arbitrageur). Subclass to Mesa Agent
     """
@@ -267,9 +274,8 @@ class Trader(RandomWalker):
         return self
 
     def get_random_tkn_names(self, state: State) -> Tuple[str, str]:
-        tokens = state.whitelisted_tokens
-        source_tkn = self.random.choice(tokens)
-        target_tkn = self.random.choice([tkn for tkn in tokens if tkn != source_tkn])
+        tokens = [tkn for tkn in state.whitelisted_tokens]
+        source_tkn, target_tkn = self.random.sample(tokens, 2)
         return source_tkn, target_tkn
 
     def get_average_trading_fee(self):
@@ -328,7 +334,7 @@ class Trader(RandomWalker):
         self.transact()
 
 
-class LP(RandomWalker):
+class LP(MonteCarlo):
     """
     Represents a Bancor dapp liquidity provider. Subclass to Mesa Agent
     """
@@ -432,7 +438,7 @@ class LP(RandomWalker):
     def set_random_trading_fee(self):
         state = self.protocol.v3.global_state
         for i in range(self.random.randint(1, 3)):
-            tkn_name = self.random.choice(state.whitelisted_tokens)
+            tkn_name = self.random.choice([tkn for tkn in state.whitelisted_tokens])
             trading_fee = get_trading_fee(state, tkn_name)
             trading_fee = self.get_random_trading_fee(trading_fee)
             state.set_trading_fee(tkn_name, trading_fee)
@@ -441,7 +447,7 @@ class LP(RandomWalker):
 
     def set_random_network_fee(self):
         state = self.protocol.v3.global_state
-        tkn_name = self.random.choice(state.whitelisted_tokens)
+        tkn_name = self.random.choice([tkn for tkn in state.whitelisted_tokens])
         network_fee = get_network_fee(state, tkn_name)
         network_fee = self.get_random_network_fee(network_fee)
         state.set_network_fee(tkn_name, network_fee)
@@ -451,7 +457,7 @@ class LP(RandomWalker):
     def set_random_withdrawal_fee(self):
         state = self.protocol.v3.global_state
         withdrawal_fee = state.withdrawal_fee
-        tkn_name = self.random.choice(state.whitelisted_tokens)
+        tkn_name = self.random.choice([tkn for tkn in state.whitelisted_tokens])
         withdrawal_fee = self.get_random_withdrawal_fee(withdrawal_fee)
         state.set_withdrawal_fee(tkn_name, withdrawal_fee)
         self.protocol.v3.set_state(state)
@@ -459,7 +465,7 @@ class LP(RandomWalker):
 
     def set_random_bnt_funding_limit(self):
         state = self.protocol.v3.global_state
-        tkn_name = self.random.choice(state.whitelisted_tokens)
+        tkn_name = self.random.choice([tkn for tkn in state.whitelisted_tokens])
         bnt_funding_limit = get_bnt_funding_limit(state, tkn_name)
         updated_bnt_funding_limit = self.get_random_bnt_funding_limit(bnt_funding_limit)
         state.set_bnt_funding_limit(tkn_name, updated_bnt_funding_limit)
@@ -467,9 +473,9 @@ class LP(RandomWalker):
         return self
 
     def perform_random_enable_trading(self):
-        self.protocol.v3.dao_msig_init_pools(
-            self.protocol.v3.global_state.whitelisted_tokens, "bnt"
-        )
+        state = self.protocol.v3.global_state
+        for tkn in [tkn for tkn in state.whitelisted_tokens]:
+            self.protocol.v3.enable_trading(tkn)
         return self
 
     def get_random_withdrawal_amt(self, tkn_name: str) -> Decimal:
@@ -497,9 +503,8 @@ class LP(RandomWalker):
         return Decimal(self.random.uniform(float(min_amt), float(max_amt)))
 
     def get_random_tkn_names(self, state: State) -> Tuple[str, str]:
-        tokens = state.whitelisted_tokens
-        source_tkn = self.random.choice(tokens)
-        target_tkn = self.random.choice([tkn for tkn in tokens if tkn != source_tkn])
+        tokens = [tkn for tkn in state.whitelisted_tokens]
+        source_tkn, target_tkn = self.random.sample(tokens, 2)
         return source_tkn, target_tkn
 
     def is_protocol_bnbnt_healthy(
@@ -554,7 +559,7 @@ class LP(RandomWalker):
         timestamp = state.timestamp
         start_time = 1 + timestamp
 
-        tkn_name = self.random.choice(state.whitelisted_tokens)
+        tkn_name = self.random.choice([tkn for tkn in state.whitelisted_tokens])
         distribution_type = self.random.choice(["flat", "exp"])
 
         if distribution_type == "flat":
@@ -769,7 +774,7 @@ class LP(RandomWalker):
         state = self.protocol.v3.global_state
         timestamp = state.timestamp
         user_name = self.random.choice(state.usernames)
-        tkn_name = self.random.choice(state.whitelisted_tokens)
+        tkn_name = self.random.choice([tkn for tkn in state.whitelisted_tokens])
         pending_withdrawals = get_user_pending_withdrawals(state, user_name, tkn_name)
         if len(pending_withdrawals) > 0:
             id_number = self.random.choice(pending_withdrawals)
@@ -965,10 +970,8 @@ class Protocol(mesa.Agent):
         self.v3 = BancorDapp(
             price_feeds=price_feeds,
             whitelisted_tokens=whitelisted_tokens,
-            trading_fee=trading_fee,
             network_fee=network_fee,
             withdrawal_fee=withdrawal_fee,
-            bnt_funding_limit=bnt_funding_limit,
             bnt_min_liquidity=bnt_min_liquidity,
         )
 

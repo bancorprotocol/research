@@ -4,15 +4,15 @@
 # --------------------------------------------------------------------------
 
 """
-Generalized behavior for random walking, one grid cell at a time.
+Generalized behavior for monte carlo simulation
 """
 
 import mesa
 
 
-class RandomWalker(mesa.Agent):
+class MonteCarlo(mesa.Agent):
     """
-    Class implementing random walker methods in a generalized manner.
+    Class implementing monte carlo methods in a generalized manner.
     """
 
     grid = None

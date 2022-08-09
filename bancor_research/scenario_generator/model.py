@@ -2,20 +2,20 @@
 # --------------------------------------------------------------------------------------------------------------------
 # Licensed under the MIT LICENSE. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------------------------------
-"""Main Bancor Simulation module interface."""
-
-import mesa
-import itertools
-from decimal import Decimal
-from mesa.datacollection import DataCollector
-from pydantic.types import Any
-
-from bancor_research.bancor_simulator.v3.simulation.agents import Trader, LP, Protocol
-
-"""
+"""Main Bancor Simulation module interface.
 If you want to perform a parameter sweep, call batch_run.py instead of run.py.
 For details see batch_run.py in the same directory as run.py.
 """
+import mesa
+import itertools
+from decimal import Decimal
+
+from bancor_research.scenario_generator.agents import Protocol, Trader, LP
+
+from bancor_research.bancor_simulator.v3.spec import *
+from bancor_research.scenario_generator.constants import *
+from mesa.datacollection import DataCollector
+from pydantic.types import Any
 
 
 def track_params(model):
@@ -53,22 +53,22 @@ class BancorSimulation(mesa.Model):
     max_steps = SIMULATION_MAX_STEPS
 
     def __init__(
-        self,
-        height=grid_h,
-        width=grid_w,
-        init_traders=SIMULATION_NUM_TRADERS,
-        init_lps=SIMULATION_NUM_LPs,
-        whale_threshold=SIMULATION_WHALE_THRESHOLD,
-        trading_fee=float(DEFAULT_TRADING_FEE),
-        network_fee=float(DEFAULT_NETWORK_FEE),
-        withdrawal_fee=float(DEFAULT_WITHDRAWAL_FEE),
-        whitelisted_tokens=None,
-        target_tvl=SIMULATION_TARGET_TVL,
-        price_feeds=DEFAULT_PRICE_FEEDS,
-        bnt_funding_limit=float(DEFAULT_BNT_FUNDING_LIMIT),
-        bnt_min_liquidity=float(DEFAULT_BNT_MIN_LIQUIDITY),
-        *args: Any,
-        **kwargs: Any
+            self,
+            height=grid_h,
+            width=grid_w,
+            init_traders=SIMULATION_NUM_TRADERS,
+            init_lps=SIMULATION_NUM_LPs,
+            whale_threshold=SIMULATION_WHALE_THRESHOLD,
+            trading_fee=float(DEFAULT_TRADING_FEE),
+            network_fee=float(DEFAULT_NETWORK_FEE),
+            withdrawal_fee=float(DEFAULT_WITHDRAWAL_FEE),
+            whitelisted_tokens=None,
+            target_tvl=SIMULATION_TARGET_TVL,
+            price_feeds=DEFAULT_PRICE_FEEDS,
+            bnt_funding_limit=float(DEFAULT_BNT_FUNDING_LIMIT),
+            bnt_min_liquidity=float(DEFAULT_BNT_MIN_LIQUIDITY),
+            *args: Any,
+            **kwargs: Any
     ):
 
         if whitelisted_tokens is None:

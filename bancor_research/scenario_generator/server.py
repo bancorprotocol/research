@@ -3,8 +3,16 @@
 # Licensed under the MIT LICENSE. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------------------------------
 """Sets up the interactive visualization server for the Mesa Agent-based simulation."""
+from decimal import Decimal
+
+import mesa
+from bancor_research.scenario_generator.constants import *
 
 # The colors here are taken from Matplotlib's tab10 palette
+from bancor_research.scenario_generator.model import BancorSimulation
+
+from bancor_research.scenario_generator.agents import Trader, LP
+
 RICH_COLOR = "#2ca02c"  # Green
 POOR_COLOR = "#d62728"  # Red
 MID_COLOR = "#1f77b4"  # Blue

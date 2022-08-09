@@ -540,7 +540,6 @@ class BancorDapp:
         rewards_amt: str,
         start_time: int,
         end_time: int,
-        user_name: str,
         timestamp: int,
         transaction_type="create_standard_rewards_program",
     ):
@@ -548,9 +547,7 @@ class BancorDapp:
         Create a standard rewards program for a given token.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        state, tkn_name, user_name = validate_input(
-            state, tkn_name, user_name, timestamp
-        )
+        state, tkn_name, user_name = validate_input(state, tkn_name, "", timestamp)
         tkn_amt = Decimal(rewards_amt)
         state = create_standard_reward_program(
             state=state,
@@ -626,7 +623,6 @@ class BancorDapp:
 
     def claim_standard_rewards(
         self,
-        tkn_name: str,
         user_name: str,
         program_ids: List[int],
         timestamp: int = 0,
@@ -636,9 +632,7 @@ class BancorDapp:
         Claim standard rewards for a given reward program and user.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        state, tkn_name, user_name = validate_input(
-            state, tkn_name, user_name, timestamp
-        )
+        state, tkn_name, user_name = validate_input(state, "", user_name, timestamp)
         state = claim_standard_rewards(
             state=state,
             user_name=user_name,

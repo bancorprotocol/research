@@ -221,14 +221,13 @@ class BancorDapp:
 
     def claim_standard_rewards(
         self,
-        tkn_name: str,
         user_name: str,
-        rewards_ids: list[int],
+        program_ids: list[int],
         timestamp: int = 0,
         transaction_type: str = "claim_standard_rewards",
     ):
         updateBlock(timestamp)
-        return self.standardRewards.connect(user_name).claimRewards(rewards_ids)
+        return self.standardRewards.connect(user_name).claimRewards(program_ids)
 
     def set_user_balance(
         self,

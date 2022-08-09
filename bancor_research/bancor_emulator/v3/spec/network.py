@@ -150,6 +150,7 @@ class BancorDapp:
         tkn = self.poolTokens[tkn_name]
         amt = userAmount(tkn, user_name, tkn_amt)
         tkn.connect(user_name).approve(self.network, amt)
+        if tkn is self.bnbnt: self.vbnt.connect(user_name).approve(self.network, amt)
         return self.network.connect(user_name).initWithdrawal(tkn, amt)
 
     def withdraw(
@@ -243,13 +244,17 @@ class BancorDapp:
         amount = toWei(tkn_amt, tkn.decimals())
         if tkn is self.bnt:
             if amount > balance:
+                print('user {}: mint {} bnt'.format(user_name, amount - balance))
                 self.bntGovernance.mint(user_name, amount - balance)
             elif balance > amount:
+                print('user {}: burn {} bnt'.format(user_name, balance - amount))
                 self.bntGovernance.burn(user_name, balance - amount)
         else:
             if amount > balance:
+                print('user {}: mint {} tkn'.format(user_name, amount - balance))
                 tkn.issue(user_name, amount - balance)
             elif balance > amount:
+                print('user {}: burn {} tkn'.format(user_name, balance - amount))
                 tkn.destroy(user_name, balance - amount)
 
     def set_trading_fee(

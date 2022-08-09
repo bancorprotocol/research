@@ -150,6 +150,7 @@ class BancorDapp:
         tkn = self.poolTokens[tkn_name]
         amt = userAmount(tkn, user_name, tkn_amt)
         tkn.connect(user_name).approve(self.network, amt)
+        if tkn is self.bnbnt: self.vbnt.connect(user_name).approve(self.network, amt)
         return self.network.connect(user_name).initWithdrawal(tkn, amt)
 
     def withdraw(

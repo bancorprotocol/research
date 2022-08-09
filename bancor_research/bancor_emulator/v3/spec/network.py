@@ -244,17 +244,13 @@ class BancorDapp:
         amount = toWei(tkn_amt, tkn.decimals())
         if tkn is self.bnt:
             if amount > balance:
-                print('user {}: mint {} bnt'.format(user_name, amount - balance))
                 self.bntGovernance.mint(user_name, amount - balance)
             elif balance > amount:
-                print('user {}: burn {} bnt'.format(user_name, balance - amount))
                 self.bntGovernance.burn(user_name, balance - amount)
         else:
             if amount > balance:
-                print('user {}: mint {} tkn'.format(user_name, amount - balance))
                 tkn.issue(user_name, amount - balance)
             elif balance > amount:
-                print('user {}: burn {} tkn'.format(user_name, balance - amount))
                 tkn.destroy(user_name, balance - amount)
 
     def set_trading_fee(

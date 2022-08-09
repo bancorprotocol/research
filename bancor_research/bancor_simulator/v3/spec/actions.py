@@ -367,7 +367,7 @@ def process_withdrawal(
 
     else:
 
-        sufficient_vbnt = get_user_balance(state, "vbnt") >= pool_token_amt
+        sufficient_vbnt = get_user_balance(state, user_name, "vbnt") >= pool_token_amt
 
         if cool_down_complete and sufficient_vbnt:
             state.set_pending_withdrawals_status(user_name, tkn_name, id_number, True)

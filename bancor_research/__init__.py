@@ -29,6 +29,7 @@ class DEFAULT:
 
     BNT_FUNDING_LIMIT = "1000000"
     BNT_MIN_LIQUIDITY = "10000"
+    EP_VAULT_BALANCE  = "0"
 
     COOLDOWN_TIME  = 7 * 24 * 60 * 60
     NUM_TIMESTAMPS = 30 * 24 * 60 * 60
@@ -49,27 +50,25 @@ class DEFAULT:
         "Alice",
         "Bob",
         "Charlie",
-        "Trader"
+        "Trader",
     ]
 
-    WHITELIST = {
-        "eth": {
-            "trading_fee": TRADING_FEE,
-            "bnt_funding_limit": BNT_FUNDING_LIMIT,
-        },
-        "link": {
-            "trading_fee": TRADING_FEE,
-            "bnt_funding_limit": BNT_FUNDING_LIMIT,
-        },
-        "tkn": {
-            "trading_fee": TRADING_FEE,
-            "bnt_funding_limit": BNT_FUNDING_LIMIT,
-        },
-        "wbtc": {
-            "trading_fee": TRADING_FEE,
-            "bnt_funding_limit": BNT_FUNDING_LIMIT,
-        },
+    TOKENS = [
+        "eth",
+        "link",
+        "tkn",
+        "wbtc",
+    ]
+
+DEFAULT.WHITELIST = {
+    token : {
+        "decimals": DEFAULT.DECIMALS,
+        "trading_fee": DEFAULT.TRADING_FEE,
+        "ep_vault_balance": DEFAULT.EP_VAULT_BALANCE,
+        "bnt_funding_limit": DEFAULT.BNT_FUNDING_LIMIT,
     }
+    for token in DEFAULT.TOKENS
+}
 
 def read_price_feeds(price_feeds_path: str):
     price_feeds = pd.read_parquet(price_feeds_path)

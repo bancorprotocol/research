@@ -9,7 +9,7 @@ def read(fileName):
 
 def write(fileName, data):
     file = open(_getPath(fileName), mode = 'w', newline = '\n')
-    file.write(dumps(data, indent = 2))
+    file.write(dumps(data, indent = 4))
     file.close()
 
 def _getPath(fileName):
@@ -20,7 +20,7 @@ from bancor_research.bancor_emulator.solidity.uint.float import Decimal
 def assertAlmostEqual(expected, actual, maxAbsoluteError = 0, maxRelativeError = 0, relation = None):
     expected = Decimal(expected)
     actual = Decimal(actual)
-    if actual != expected:
+    if actual.compare_total(expected):
         absoluteError = abs(actual - expected)
         relativeError = absoluteError / expected
         maxAbsoluteError = Decimal(maxAbsoluteError)

@@ -98,7 +98,8 @@ class BancorDapp:
         self.reserveTokens = {self.bnt.symbol(): self.bnt}
         self.poolTokens = {self.bnt.symbol(): self.bnbnt}
         for tkn_name, pool_params in whitelisted_tokens.items():
-            tkn = ReserveToken(tkn_name, tkn_name, DEFAULT.DECIMALS) # TODO: support decimals per reserve token
+            tkn = ReserveToken(tkn_name, tkn_name, pool_params['decimals'])
+            tkn.issue(self.epVault, toWei(pool_params['ep_vault_balance'], tkn.decimals()))
             self.networkSettings.addTokenToWhitelist(tkn)
             self.networkSettings.setFundingLimit(tkn, toWei(pool_params['bnt_funding_limit'], self.bnt.decimals()))
             self.network.createPools([tkn], self.poolCollection)

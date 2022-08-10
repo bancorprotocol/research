@@ -3,9 +3,10 @@ from common import read, write, Decimal
 from bancor_research.bancor_emulator import config
 config.enable_full_precision_mode(True)
 
-from bancor_research.bancor_emulator.solidity import uint32, uint256, block
+from bancor_research.bancor_emulator.solidity import uint, uint32, uint256, block
 
 from bancor_research.bancor_emulator.BancorNetwork import BancorNetwork
+from bancor_research.bancor_emulator.BancorNetworkInfo import BancorNetworkInfo
 from bancor_research.bancor_emulator.BNTPool import BNTPool
 from bancor_research.bancor_emulator.Constants import PPM_RESOLUTION
 from bancor_research.bancor_emulator.ERC20 import ERC20 as IERC20
@@ -19,42 +20,41 @@ from bancor_research.bancor_emulator.StandardRewards import StandardRewards
 from bancor_research.bancor_emulator.TokenGovernance import TokenGovernance
 from bancor_research.bancor_emulator.Vault import Vault
 
-DEPLOYER = 'DEPLOYER'
-DEFAULT_DECIMALS = 18
-MAX_UINT256 = 2 ** 256 - 1
+DEFAULT_TOKEN_DECIMALS = 18
+DEFAULT_RATIO_DECIMALS = 12
 
 def toPPM(percent: str):
     return uint32(Decimal(str(PPM_RESOLUTION)) * Decimal(percent[:-1]) / 100)
 
-def toInt(value, decimals: int):
-    return uint256(Decimal(value) * 10 ** decimals)
+def toInt(token: IERC20, amount: str):
+    return uint256(Decimal(amount) * 10 ** token.decimals())
 
-def toDec(value, decimals: int):
-    return Decimal(str(value)) / 10 ** decimals
+def toDec(token: IERC20, amount: uint):
+    return Decimal(str(amount)) / 10 ** token.decimals()
 
-def toStr(value, decimals: int):
-    return '{{:.{}f}}'.format(decimals).format(toDec(value, decimals)).rstrip('0').rstrip('.')
+def toValue(token: IERC20, amount: uint):
+    return toString(toDec(token, amount), token.decimals())
+
+def toRatio(n: uint, d: uint, decimals: int = DEFAULT_RATIO_DECIMALS):
+    return 'NaN' if n == d == 0 else toString(Decimal(str(n)) / Decimal(str(d)), decimals)
+
+def toString(amount: Decimal, decimals: int):
+    return '{{:.{}f}}'.format(decimals).format(amount).rstrip('0').rstrip('.')
+
+def userAmount(token: IERC20, userId: str, amount: str):
+    if (amount.endswith('%')):
+        balance = token.balanceOf(userId)
+        return balance * toPPM(amount) / PPM_RESOLUTION
+    return toInt(token, amount)
 
 def execute(fileName):
     print(fileName)
 
     flow = read(fileName)
 
-    tknDecimals   = flow['tknDecimals']
-    bntDecimals   = DEFAULT_DECIMALS
-    bntknDecimals = DEFAULT_DECIMALS
-    bnbntDecimals = DEFAULT_DECIMALS
-
-    epVaultBalance = toInt(flow['epVaultBalance'], tknDecimals)
-    bntknAmount = toInt(flow['tknRewardsAmount'], bntknDecimals)
-    bnbntAmount = toInt(flow['bntRewardsAmount'], bnbntDecimals)
-    tknAmount = sum([toInt(user['tknBalance'], tknDecimals) for user in flow['users']], uint256()) + epVaultBalance
-    bntAmount = sum([toInt(user['bntBalance'], bntDecimals) for user in flow['users']], uint256())
-
-    bnt   = ReserveToken('BNT'  , 'BNT'  , bntDecimals)
-    vbnt  = ReserveToken('VBNT' , 'VBNT' , bntDecimals)
-    tkn   = ReserveToken('TKN'  , 'TKN'  , tknDecimals)
-    bnbnt = PoolToken   ('bnBNT', 'bnBNT', bnbntDecimals, bnt)
+    bnt   = ReserveToken('bnt'  , 'bnt'  , DEFAULT_TOKEN_DECIMALS)
+    vbnt  = ReserveToken('vbnt' , 'vbnt' , DEFAULT_TOKEN_DECIMALS)
+    bnbnt = PoolToken   ('bnbnt', 'bnbnt', DEFAULT_TOKEN_DECIMALS, bnt)
 
     bntGovernance      = TokenGovernance(bnt)
     vbntGovernance     = TokenGovernance(vbnt)
@@ -69,6 +69,7 @@ def execute(fileName):
     poolMigrator       = None
     poolCollection     = PoolCollection(network, bnt, networkSettings, masterVault, bntPool, epVault, poolTokenFactory, poolMigrator)
     standardRewards    = StandardRewards(network, networkSettings, bntGovernance, vbnt, bntPool)
+    networkInfo        = BancorNetworkInfo(network, bntGovernance, vbntGovernance, networkSettings, masterVault, epVault, erVault, bntPool, pendingWithdrawals, poolMigrator)
 
     networkSettings.initialize()
     network.initialize(bntPool, pendingWithdrawals, poolMigrator)
@@ -76,142 +77,133 @@ def execute(fileName):
     pendingWithdrawals.initialize()
     poolTokenFactory.initialize()
     standardRewards.initialize()
+    networkInfo.initialize()
 
-    networkSettings.addTokenToWhitelist(tkn)
-    networkSettings.setWithdrawalFeePPM(toPPM(flow['withdrawalFee']))
-    networkSettings.setMinLiquidityForTrading(toInt(flow['bntMinLiquidity'], bntDecimals))
-    networkSettings.setFundingLimit(tkn, toInt(flow['bntFundingLimit'], bntDecimals))
+    networkSettings.setWithdrawalFeePPM(toPPM(flow['withdrawal_fee']))
+    networkSettings.setMinLiquidityForTrading(toInt(bnt, flow['bnt_min_liquidity']))
 
     pendingWithdrawals.setLockDuration(0)
 
+    poolCollection.setNetworkFeePPM(toPPM(flow['network_fee']))
+
     network.registerPoolCollection(poolCollection)
-    network.createPools([tkn], poolCollection)
-    bntkn = network.collectionByPool(tkn).poolToken(tkn)
 
-    poolCollection.setNetworkFeePPM(toPPM(flow['networkFee']))
-    poolCollection.setTradingFeePPM(tkn, toPPM(flow['tradingFee']))
+    reserveTokens = {bnt.symbol(): bnt}
+    poolTokens = {bnt.symbol(): bnbnt}
+    for tkn_name, pool_params in flow['pools'].items():
+        token = ReserveToken(tkn_name, tkn_name, pool_params['decimals'])
+        token.issue(epVault, toInt(token, pool_params['ep_vault_balance']))
+        networkSettings.addTokenToWhitelist(token)
+        networkSettings.setFundingLimit(token, toInt(bnt, pool_params['bnt_funding_limit']))
+        network.createPools([token], poolCollection)
+        poolCollection.setTradingFeePPM(token, toPPM(pool_params['trading_fee']))
+        reserveTokens[tkn_name] = token
+        poolTokens[tkn_name] = network.collectionByPool(token).poolToken(token)
 
-    tkn.issue(DEPLOYER, tknAmount)
-    bntGovernance.mint(DEPLOYER, bntAmount)
-    tkn.connect(DEPLOYER).transfer(epVault, epVaultBalance)
+    for userId, balances in flow['users'].items():
+        for tokenId, balance in balances.items():
+            token = reserveTokens[tokenId]
+            amount = toInt(token, balance)
+            (bntGovernance.mint if token is bnt else token.issue)(userId, amount)
 
-    for user in flow['users']:
-        assert user['id'] != DEPLOYER
-        for contract in [network, standardRewards]:
-            for token in [vbnt, tkn, bnt, bntkn, bnbnt]:
-                token.connect(user['id']).approve(contract, MAX_UINT256)
-        tkn.connect(DEPLOYER).transfer(user['id'], toInt(user['tknBalance'], tknDecimals))
-        bnt.connect(DEPLOYER).transfer(user['id'], toInt(user['bntBalance'], bntDecimals))
+    programIds = {}
+    for poolId, programsParams in flow['programs'].items():
+        programIds[poolId] = standardRewards.createProgram(
+            reserveTokens[poolId],
+            toInt(bnt, programsParams['rewards']),
+            block.timestamp,
+            block.timestamp + programsParams['duration'],
+        )
 
-    tknProgramId = standardRewards.createProgram(tkn, bntknAmount, block.timestamp, block.timestamp + flow['tknRewardsDuration'])
-    bntProgramId = standardRewards.createProgram(bnt, bnbntAmount, block.timestamp, block.timestamp + flow['bntRewardsDuration'])
+    def deposit(poolId: str, userId: str, amount: str):
+        token = reserveTokens[poolId]
+        amount = userAmount(token, userId, amount)
+        token.connect(userId).approve(network, amount)
+        network.connect(userId).deposit(token, amount)
 
-    for token in [vbnt, tkn, bnt, bntkn, bnbnt]:
-        assert token.balanceOf(DEPLOYER) == 0
+    def withdraw(poolId: str, userId: str, amount: str):
+        token = poolTokens[poolId]
+        amount = userAmount(token, userId, amount)
+        token.connect(userId).approve(network, amount)
+        if token is bnbnt: vbnt.connect(userId).approve(network, amount)
+        network.connect(userId).withdraw(network.connect(userId).initWithdrawal(token, amount))
 
-    def toWei(userId: str, amount: str, decimals: int, token: IERC20):
-        if (amount.endswith('%')):
-            balance = token.balanceOf(userId)
-            return balance * toPPM(amount) / PPM_RESOLUTION
-        return toInt(amount, decimals)
+    def trade(sourcePoolId: str, targetPoolId: str, userId: str, amount: str):
+        token = reserveTokens[sourcePoolId]
+        amount = userAmount(token, userId, amount)
+        token.connect(userId).approve(network, amount)
+        network.connect(userId).tradeBySourceAmount(token, reserveTokens[targetPoolId], amount, 1, uint256.max, userId)
 
-    def depositTKN(userId: str, amount: str):
-        wei = toWei(userId, amount, tknDecimals, tkn)
-        network.connect(userId).deposit(tkn, wei)
+    def burnPoolToken(poolId: str, userId: str, amount: str):
+        token = poolTokens[poolId]
+        amount = userAmount(token, userId, amount)
+        token.connect(userId).burn(amount)
 
-    def depositBNT(userId: str, amount: str):
-        wei = toWei(userId, amount, bntDecimals, bnt)
-        network.connect(userId).deposit(bnt, wei)
+    def joinProgram(poolId: str, userId: str, amount: str):
+        token = poolTokens[poolId]
+        amount = userAmount(token, userId, amount)
+        token.connect(userId).approve(standardRewards, amount)
+        standardRewards.connect(userId).join(programIds[poolId], amount)
 
-    def withdrawTKN(userId: str, amount: str):
-        wei = toWei(userId, amount, bntknDecimals, bntkn)
-        id = network.connect(userId).initWithdrawal(bntkn, wei)
-        network.connect(userId).withdraw(id)
+    def leaveProgram(poolId: str, userId: str, amount: str):
+        token = poolTokens[poolId]
+        amount = userAmount(token, userId, amount)
+        standardRewards.connect(userId).leave(programIds[poolId], amount)
 
-    def withdrawBNT(userId: str, amount: str):
-        wei = toWei(userId, amount, bnbntDecimals, bnbnt)
-        id = network.connect(userId).initWithdrawal(bnbnt, wei)
-        network.connect(userId).withdraw(id)
+    def claimRewards(poolId: str, userId: str):
+        standardRewards.connect(userId).claimRewards([programIds[poolId]])
 
-    def tradeTKN(userId: str, amount: str):
-        wei = toWei(userId, amount, tknDecimals, tkn)
-        network.connect(userId).tradeBySourceAmount(tkn, bnt, wei, 1, MAX_UINT256, userId)
+    def setFundingLimit(poolId: str, amount: str):
+        token = reserveTokens[poolId]
+        amount = userAmount(bnt, None, amount)
+        networkSettings.setFundingLimit(token, amount)
 
-    def tradeBNT(userId: str, amount: str):
-        wei = toWei(userId, amount, bntDecimals, bnt)
-        network.connect(userId).tradeBySourceAmount(bnt, tkn, wei, 1, MAX_UINT256, userId)
-
-    def burnPoolTokenTKN(userId: str, amount: str):
-        wei = toWei(userId, amount, tknDecimals, tkn)
-        bntkn.connect(userId).burn(wei)
-
-    def burnPoolTokenBNT(userId: str, amount: str):
-        wei = toWei(userId, amount, bntDecimals, bnt)
-        bnbnt.connect(userId).burn(wei)
-
-    def joinTKN(userId: str, amount: str):
-        wei = toWei(userId, amount, tknDecimals, tkn)
-        standardRewards.connect(userId).join(tknProgramId, wei)
-
-    def joinBNT(userId: str, amount: str):
-        wei = toWei(userId, amount, bntDecimals, bnt)
-        standardRewards.connect(userId).join(bntProgramId, wei)
-
-    def leaveTKN(userId: str, amount: str):
-        wei = toWei(userId, amount, tknDecimals, tkn)
-        standardRewards.connect(userId).leave(tknProgramId, wei)
-
-    def leaveBNT(userId: str, amount: str):
-        wei = toWei(userId, amount, bntDecimals, bnt)
-        standardRewards.connect(userId).leave(bntProgramId, wei)
-
-    def claimRewardsTKN(userId: str):
-        standardRewards.connect(userId).claimRewards([tknProgramId])
-
-    def claimRewardsBNT(userId: str):
-        standardRewards.connect(userId).claimRewards([bntProgramId])
-
-    def setFundingLimit(amount: str):
-        networkSettings.setFundingLimit(tkn, toInt(amount, bntDecimals))
-
-    def enableTrading(bntVirtualBalance: int, tknVirtualBalance: int):
-        poolCollection.enableTrading(tkn, uint256(bntVirtualBalance), uint256(tknVirtualBalance))
+    def enableTrading(poolId: str, bntVirtualBalance: int, tknVirtualBalance: int):
+        token = reserveTokens[poolId]
+        poolCollection.enableTrading(token, uint256(bntVirtualBalance), uint256(tknVirtualBalance))
 
     def getState():
-        state = {
-            'tknBalances': {},
-            'bntBalances': {},
-            'bntknBalances': {},
-            'bnbntBalances': {},
-            'bntCurrentPoolFunding': '0',
-            'tknStakedBalance': '0',
-            'bntStakedBalance': '0',
-            'tknTradingLiquidity': '0',
-            'bntTradingLiquidity': '0',
-            'averageRate': '0',
-            'averageInvRate': '0'
-        }
+        state = {}
 
-        for user in flow['users']:
-            state['tknBalances'][user['id']] = toStr(tkn.balanceOf(user['id']), tknDecimals)
-            state['bntBalances'][user['id']] = toStr(bnt.balanceOf(user['id']), bntDecimals)
-            state['bntknBalances'][user['id']] = toStr(bntkn.balanceOf(user['id']), bntknDecimals)
-            state['bnbntBalances'][user['id']] = toStr(bnbnt.balanceOf(user['id']), bnbntDecimals)
+        reserveTokenValues = list(reserveTokens.values())
+        poolTokenValues = list(poolTokens.values())
 
-        state['tknBalances']['masterVault'] = toStr(tkn.balanceOf(masterVault), tknDecimals)
-        state['tknBalances']['epVault'] = toStr(tkn.balanceOf(epVault), tknDecimals)
-        state['bntBalances']['masterVault'] = toStr(bnt.balanceOf(masterVault), bntDecimals)
-        state['bntknBalances']['erVault'] = toStr(bntkn.balanceOf(erVault), bntknDecimals)
-        state['bnbntBalances']['bntPool'] = toStr(bnbnt.balanceOf(bntPool), bnbntDecimals)
+        # Iterate all tokens
+        for token in reserveTokenValues + poolTokenValues + [vbnt]:
+            state[token.symbol()] = {}
+            for account in [user for user in token._balances.keys() if type(user) is str]:
+                state[token.symbol()]['account_' + account] = toValue(token, token.balanceOf(account))
 
-        poolData = poolCollection.poolData(tkn)
-        state['bntCurrentPoolFunding'] = toStr(bntPool.currentPoolFunding(tkn), bntDecimals)
-        state['tknStakedBalance'] = toStr(poolData.liquidity.stakedBalance, tknDecimals)
-        state['bntStakedBalance'] = toStr(bntPool.stakedBalance(), bntDecimals)
-        state['tknTradingLiquidity'] = toStr(poolData.liquidity.baseTokenTradingLiquidity, tknDecimals)
-        state['bntTradingLiquidity'] = toStr(poolData.liquidity.bntTradingLiquidity, bntDecimals)
-        state['averageRate'] = toStr(toInt(toDec(poolData.averageRates.rate.n, 0) / toDec(poolData.averageRates.rate.d, 0), 12), 12)
-        state['averageInvRate'] = toStr(toInt(toDec(poolData.averageRates.invRate.n, 0) / toDec(poolData.averageRates.invRate.d, 0), 12), 12)
+        # Iterate all reserve tokens except bnt
+        for token in [reserveToken for reserveToken in reserveTokenValues if reserveToken is not bnt]:
+            stakedBalance = networkInfo.stakedBalance(token)
+            tradingLiquidity = networkInfo.tradingLiquidity(token)
+            currentPoolFunding = bntPool.currentPoolFunding(token)
+
+            spotRateN       = poolCollection._poolData[token].liquidity.bntTradingLiquidity
+            spotRateD       = poolCollection._poolData[token].liquidity.baseTokenTradingLiquidity
+            averageRateN    = poolCollection._poolData[token].averageRates.rate.n
+            averageRateD    = poolCollection._poolData[token].averageRates.rate.d
+            averageInvRateN = poolCollection._poolData[token].averageRates.invRate.n
+            averageInvRateD = poolCollection._poolData[token].averageRates.invRate.d
+
+            state[token.symbol()]['pool_tknStakedBalance'   ] = toValue(token, stakedBalance)
+            state[token.symbol()]['pool_tknTradingLiquidity'] = toValue(token, tradingLiquidity.baseTokenTradingLiquidity)
+            state[token.symbol()]['pool_bntTradingLiquidity'] = toValue(bnt  , tradingLiquidity.bntTradingLiquidity)
+            state[token.symbol()]['pool_bntCurrentFunding'  ] = toValue(bnt  , currentPoolFunding)
+            state[token.symbol()]['pool_spotRate'           ] = toRatio(spotRateN      , spotRateD      )
+            state[token.symbol()]['pool_averageRate'        ] = toRatio(averageRateN   , averageRateD   )
+            state[token.symbol()]['pool_averageInverseRate' ] = toRatio(averageInvRateN, averageInvRateD)
+
+        # Iterate all reserve tokens
+        for token in reserveTokenValues:
+            state[token.symbol()]['contract_masterVault'] = toValue(token, token.balanceOf(masterVault))
+            state[token.symbol()]['contract_epVault'    ] = toValue(token, token.balanceOf(epVault    ))
+
+        # Iterate all pool tokens
+        for token in poolTokenValues:
+            state[token.symbol()]['contract_erVault'] = toValue(token, token.balanceOf(erVault))
+            state[token.symbol()]['contract_bntPool'] = toValue(token, token.balanceOf(bntPool))
 
         return state
 
@@ -224,89 +216,30 @@ def execute(fileName):
             block.number += 1
             block.timestamp += operation['elapsed']
 
-        if operation['type'] == 'depositTKN':
-            depositTKN(operation['userId'], operation['amount'])
-            operation['expected'] = getState()
-            continue
+        if operation['type'] == 'deposit':
+            deposit(operation['poolId'], operation['userId'], operation['amount'])
+        elif operation['type'] == 'withdraw':
+            withdraw(operation['poolId'], operation['userId'], operation['amount'])
+        elif operation['type'] == 'trade':
+            trade(operation['sourcePoolId'], operation['targetPoolId'], operation['userId'], operation['amount'])
+        elif operation['type'] == 'burnPoolToken':
+            burnPoolToken(operation['poolId'], operation['userId'], operation['amount'])
+        elif operation['type'] == 'joinProgram':
+            joinProgram(operation['poolId'], operation['userId'], operation['amount'])
+        elif operation['type'] == 'leaveProgram':
+            leaveProgram(operation['poolId'], operation['userId'], operation['amount'])
+        elif operation['type'] == 'claimRewards':
+            claimRewards(operation['poolId'], operation['userId'])
+        elif operation['type'] == 'setFundingLimit':
+            setFundingLimit(operation['poolId'], operation['amount'])
+        elif operation['type'] == 'enableTrading':
+            enableTrading(operation['poolId'], operation['amount']['bntVirtualBalance'], operation['amount']['baseTokenVirtualBalance'])
+        else:
+            raise Exception('unsupported operation `{}` encountered'.format(operation['type']))
 
-        if operation['type'] == 'depositBNT':
-            depositBNT(operation['userId'], operation['amount'])
-            operation['expected'] = getState()
-            continue
+        operation['expected'] = getState()
 
-        if operation['type'] == 'withdrawTKN':
-            withdrawTKN(operation['userId'], operation['amount'])
-            operation['expected'] = getState()
-            continue
-
-        if operation['type'] == 'withdrawBNT':
-            withdrawBNT(operation['userId'], operation['amount'])
-            operation['expected'] = getState()
-            continue
-
-        if operation['type'] == 'tradeTKN':
-            tradeTKN(operation['userId'], operation['amount'])
-            operation['expected'] = getState()
-            continue
-
-        if operation['type'] == 'tradeBNT':
-            tradeBNT(operation['userId'], operation['amount'])
-            operation['expected'] = getState()
-            continue
-
-        if operation['type'] == 'burnPoolTokenTKN':
-            burnPoolTokenTKN(operation['userId'], operation['amount'])
-            operation['expected'] = getState()
-            continue
-
-        if operation['type'] == 'burnPoolTokenBNT':
-            burnPoolTokenBNT(operation['userId'], operation['amount'])
-            operation['expected'] = getState()
-            continue
-
-        if operation['type'] == 'joinTKN':
-            joinTKN(operation['userId'], operation['amount'])
-            operation['expected'] = getState()
-            continue
-
-        if operation['type'] == 'joinBNT':
-            joinBNT(operation['userId'], operation['amount'])
-            operation['expected'] = getState()
-            continue
-
-        if operation['type'] == 'leaveTKN':
-            leaveTKN(operation['userId'], operation['amount'])
-            operation['expected'] = getState()
-            continue
-
-        if operation['type'] == 'leaveBNT':
-            leaveBNT(operation['userId'], operation['amount'])
-            operation['expected'] = getState()
-            continue
-
-        if operation['type'] == 'claimRewardsTKN':
-            claimRewardsTKN(operation['userId'])
-            operation['expected'] = getState()
-            continue
-
-        if operation['type'] == 'claimRewardsBNT':
-            claimRewardsBNT(operation['userId'])
-            operation['expected'] = getState()
-            continue
-
-        if operation['type'] == 'setFundingLimit':
-            setFundingLimit(operation['amount'])
-            operation['expected'] = getState()
-            continue
-
-        if operation['type'] == 'enableTrading':
-            enableTrading(operation['amount']['bntVirtualBalance'], operation['amount']['baseTokenVirtualBalance'])
-            operation['expected'] = getState()
-            continue
-
-        raise Exception('unsupported operation `{}` encountered'.format(operation['type']))
-
-    write(fileName, flow)
+    write('../data2/' + fileName, flow)
 
 execute('BancorNetworkSimpleFinancialScenario1')
 execute('BancorNetworkSimpleFinancialScenario2')

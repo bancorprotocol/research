@@ -549,7 +549,7 @@ class BancorDapp:
         state = self.get_state(copy_type="initial", timestamp=timestamp)
         state, tkn_name, user_name = validate_input(state, tkn_name, "", timestamp)
         tkn_amt = Decimal(rewards_amt)
-        state = create_standard_reward_program(
+        state, id = create_standard_reward_program(
             state=state,
             tkn_name=tkn_name,
             rewards_token="bnt",
@@ -562,6 +562,7 @@ class BancorDapp:
         handle_logging(
             tkn_name, tkn_amt, transaction_type, user_name, self.transaction_id, state
         )
+        return id
 
     def join_standard_rewards_program(
         self,

@@ -168,7 +168,6 @@ class StandardProgram:
     id: int
     tkn_name: str
     rewards_token: str
-    is_enabled: bool
     is_active: bool
     start_time: int
     end_time: int
@@ -496,7 +495,7 @@ class State(GlobalSettings):
         """
         return [
             tkn_name
-            for tkn_name in self.whitelisted_tokens
+            for tkn_name in self.standard_reward_programs
             if self.standard_reward_programs[tkn_name].is_active
         ]
 
@@ -505,13 +504,7 @@ class State(GlobalSettings):
         """
         Returns the count of active standard reward programs
         """
-        return len(
-            [
-                self.standard_reward_programs[tkn_name]
-                for tkn_name in self.whitelisted_tokens
-                if self.standard_reward_programs[tkn_name].is_active
-            ]
-        )
+        return len(self.active_standard_programs())
 
     @property
     def bnt_price(self) -> Decimal:

@@ -556,7 +556,7 @@ class BancorDapp:
             total_rewards=tkn_amt,
             start_time=start_time,
             end_time=end_time,
-            curr_time=timestamp,
+            timestamp=timestamp,
         )
         self.next_transaction(state)
         handle_logging(

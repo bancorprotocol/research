@@ -399,18 +399,22 @@ def init_protocol(
         # Get tokens not yet initialized.
         if tkn_name not in state.tokens:
 
+            decimals = whitelisted_tokens[tkn_name]["decimals"]
             trading_fee = whitelisted_tokens[tkn_name]["trading_fee"]
             bnt_funding_limit = whitelisted_tokens[tkn_name]["bnt_funding_limit"]
+            ep_vault_balance = whitelisted_tokens[tkn_name]["ep_vault_balance"]
 
             # initialize tokens
             state.tokens[tkn_name] = Tokens(
                 tkn_name=tkn_name,
+                decimals=decimals,
                 trading_fee=trading_fee,
                 bnt_min_liquidity=bnt_min_liquidity,
                 network_fee=network_fee,
                 bnt_funding_limit=bnt_funding_limit,
                 withdrawal_fee=withdrawal_fee,
                 cooldown_time=cooldown_time,
+                external_protection_vault=ep_vault_balance,
             )
 
             # initialize pooltoken

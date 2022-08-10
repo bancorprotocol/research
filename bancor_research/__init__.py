@@ -61,13 +61,13 @@ class DEFAULT:
     ]
 
 DEFAULT.WHITELIST = {
-    token : {
+    TOKEN : {
         "decimals": DEFAULT.DECIMALS,
         "trading_fee": DEFAULT.TRADING_FEE,
-        "ep_vault_balance": DEFAULT.EP_VAULT_BALANCE,
         "bnt_funding_limit": DEFAULT.BNT_FUNDING_LIMIT,
+        "ep_vault_balance": DEFAULT.EP_VAULT_BALANCE,
     }
-    for token in DEFAULT.TOKENS
+    for TOKEN in DEFAULT.TOKENS
 }
 
 def read_price_feeds(price_feeds_path: str):

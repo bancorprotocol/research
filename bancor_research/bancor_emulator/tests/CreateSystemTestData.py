@@ -239,7 +239,7 @@ def execute(fileName):
 
         operation['expected'] = getState()
 
-    write('../data2/' + fileName, flow)
+    write(fileName, flow)
 
 execute('BancorNetworkSimpleFinancialScenario1')
 execute('BancorNetworkSimpleFinancialScenario2')

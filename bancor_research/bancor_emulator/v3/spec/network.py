@@ -347,13 +347,13 @@ class BancorDapp:
 
         # Iterate all reserve tokens
         for token in reserveTokens:
-            table[token.symbol()][tuple([3, "Network", "Master Vault"    ])] = fromWei(token.balanceOf(self.masterVault), token.decimals())
-            table[token.symbol()][tuple([3, "Network", "Protection Vault"])] = fromWei(token.balanceOf(self.epVault    ), token.decimals())
+            table[token.symbol()][tuple([3, 'Network', 'Master Vault'    ])] = fromWei(token.balanceOf(self.masterVault), token.decimals())
+            table[token.symbol()][tuple([3, 'Network', 'Protection Vault'])] = fromWei(token.balanceOf(self.epVault    ), token.decimals())
 
         # Iterate all pool tokens
         for token in poolTokens:
-            table[token.symbol()][tuple([3, "Network", "Rewards Vault"  ])] = fromWei(token.balanceOf(self.erVault), token.decimals())
-            table[token.symbol()][tuple([3, "Network", "Protocol Equity"])] = fromWei(token.balanceOf(self.bntPool), token.decimals())
+            table[token.symbol()][tuple([3, 'Network', 'Rewards Vault'  ])] = fromWei(token.balanceOf(self.erVault), token.decimals())
+            table[token.symbol()][tuple([3, 'Network', 'Protocol Equity'])] = fromWei(token.balanceOf(self.bntPool), token.decimals())
 
         df = pd.DataFrame(table).sort_index()
         return df.applymap(lambda x: round(x, decimals)) if decimals >= 0 else df

@@ -74,8 +74,10 @@ class BancorDapp:
 
         whitelisted_tokens = {
             k: {
+                "decimals": v["decimals"],
                 "trading_fee": toDecimal(v["trading_fee"]),
                 "bnt_funding_limit": Decimal(v["bnt_funding_limit"]),
+                "ep_vault_balance": Decimal(v["ep_vault_balance"]),
             }
             for k, v in whitelisted_tokens.items()
         }

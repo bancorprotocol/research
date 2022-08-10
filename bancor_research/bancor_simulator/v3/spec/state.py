@@ -264,6 +264,7 @@ class Tokens(GlobalSettings):
 
     tkn_name: str = None
     timestamp: int = DEFAULT_TIMESTAMP
+    decimals: int = DEFAULT_DECIMALS
     master_vault: Any = field(default_factory=Token)
     staking_ledger: Any = field(default_factory=Token)
     pooltoken_supply: Any = field(default_factory=Token)
@@ -283,7 +284,6 @@ class Tokens(GlobalSettings):
     is_trading_enabled: bool = False
     bnt_funding_limit: Decimal = DEFAULT_BNT_FUNDING_LIMIT
     trading_fee: Decimal = DEFAULT_TRADING_FEE
-    decimals: Decimal = DEFAULT_DECIMALS
 
     @property
     def bnt_remaining_funding(self):

@@ -55,10 +55,6 @@ def execute(fileName):
                 bancorDapp.withdraw(operation['userId'], id_number, timestamp)
             elif operation['type'] == 'trade':
                 bancorDapp.trade(operation['amount'], operation['sourcePoolId'], operation['targetPoolId'], operation['userId'], timestamp)
-            elif operation['type'] == 'enableTrading':
-                bancorDapp.price_feeds.at[timestamp, operation['poolId']] = operation['amount']['bntVirtualBalance']
-                bancorDapp.price_feeds.at[timestamp, 'bnt'] = operation['amount']['baseTokenVirtualBalance']
-                bancorDapp.enable_trading(operation['poolId'], timestamp)
             elif operation['type'] == 'burnPoolToken':
                 bancorDapp.burn_pool_tokens(operation['poolId'], operation['amount'], operation['userId'], timestamp)
             elif operation['type'] == 'joinProgram':
@@ -67,6 +63,12 @@ def execute(fileName):
                 bancorDapp.leave_standard_rewards_program(operation['poolId'], operation['amount'], operation['userId'], programIds[operation['poolId']], timestamp)
             elif operation['type'] == 'claimRewards':
                 bancorDapp.claim_standard_rewards(operation['userId'], [programIds[operation['poolId']]], timestamp)
+            elif operation['type'] == 'setFundingLimit':
+                bancorDapp.set_bnt_funding_limit(operation['poolId'], operation['amount'], timestamp)
+            elif operation['type'] == 'enableTrading':
+                bancorDapp.price_feeds.at[timestamp, operation['poolId']] = operation['amount']['bntVirtualBalance']
+                bancorDapp.price_feeds.at[timestamp, 'bnt'] = operation['amount']['baseTokenVirtualBalance']
+                bancorDapp.enable_trading(operation['poolId'], timestamp)
             else:
                 raise Exception('unsupported operation `{}` encountered'.format(operation['type']))
 

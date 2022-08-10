@@ -294,7 +294,7 @@ def process_withdrawal(
 
     withdrawal_fee = state.withdrawal_fee
     bnt_amt = withdraw_value * (1 - withdrawal_fee)
-    cooldown_time = state.cooldown_time
+    cooldown_time = state.tokens[tkn_name].cooldown_time
     cool_down_complete = timestamp - cooldown_timestamp >= cooldown_time
 
     if tkn_name != "bnt":
@@ -303,9 +303,7 @@ def process_withdrawal(
 
         if cool_down_complete and is_price_stable:
 
-            state.set_pending_withdrawals_status(
-                state, user_name, tkn_name, id_number, True
-            )
+            state.set_pending_withdrawals_status(user_name, id_number, True)
 
             bnt_trading_liquidity = get_bnt_trading_liquidity(state, tkn_name)
             tkn_trading_liquidity = get_tkn_trading_liquidity(state, tkn_name)

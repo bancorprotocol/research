@@ -691,13 +691,13 @@ class State(GlobalSettings):
         """
         Decrease external protection balance by a given amount.
         """
-        self.tokens[tkn_name].external_protection.subtract(value)
+        self.tokens[tkn_name].external_protection_vault.subtract(value)
 
     def increase_external_protection_balance(self, tkn_name: str, value: Decimal):
         """
         Increase external protection balance by a given amount.
         """
-        self.tokens[tkn_name].external_protection.add(value)
+        self.tokens[tkn_name].external_protection_vault.add(value)
 
     def decrease_user_balance(self, user_name: str, tkn_name: str, value: Decimal):
         """
@@ -937,14 +937,12 @@ class State(GlobalSettings):
         self.tokens[tkn_name].inv_spot_rate = value
 
     def set_pending_withdrawals_status(
-        self, user_name: str, tkn_name: str, id_number: int, status: bool
+        self, user_name: str, id_number: int, status: bool
     ):
         """
         Set pending_withdrawal to a given status.
         """
-        self.users[user_name].wallet[tkn_name].pending_withdrawals[
-            id_number
-        ].is_complete = status
+        self.users[user_name].pending_withdrawals[id_number].is_complete = status
 
     def create_whitelisted_tkn(self, tkn_name: str):
         """

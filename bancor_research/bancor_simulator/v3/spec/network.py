@@ -260,7 +260,7 @@ class BancorDapp:
         state, tkn_name, user_name = validate_input(
             state, tkn_name, user_name, timestamp
         )
-        tkn_amt = userAmount(state, tkn_name, user_name, tkn_amt)
+        tkn_amt = userAmount(state, "bn" + tkn_name, user_name, tkn_amt)
         state, id_number = begin_withdrawal_cooldown(
             state, tkn_amt, tkn_name, user_name
         )
@@ -520,7 +520,7 @@ class BancorDapp:
         state, tkn_name, user_name = validate_input(
             state, tkn_name, user_name, timestamp
         )
-        tkn_amt = userAmount(state, tkn_name, user_name, tkn_amt)
+        tkn_amt = userAmount(state, "bn" + tkn_name, user_name, tkn_amt)
         if tkn_name != "bnt":
             state.decrease_pooltoken_balance(tkn_name, tkn_amt)
             state.decrease_user_balance(
@@ -582,7 +582,7 @@ class BancorDapp:
         state, tkn_name, user_name = validate_input(
             state, tkn_name, user_name, timestamp
         )
-        tkn_amt = userAmount(state, tkn_name, user_name, tkn_amt)
+        tkn_amt = userAmount(state, "bn" + tkn_name, user_name, tkn_amt)
         state = join_standard_reward_program(
             state=state,
             user_name=user_name,
@@ -611,7 +611,7 @@ class BancorDapp:
         state, tkn_name, user_name = validate_input(
             state, tkn_name, user_name, timestamp
         )
-        tkn_amt = userAmount(state, tkn_name, user_name, tkn_amt)
+        tkn_amt = userAmount(state, "bn" + tkn_name, user_name, tkn_amt)
         state = leave_standard_reward_program(
             state=state,
             user_name=user_name,

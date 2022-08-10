@@ -368,7 +368,7 @@ def process_withdrawal(
         sufficient_vbnt = get_user_balance(state, user_name, "vbnt") >= pool_token_amt
 
         if cool_down_complete and sufficient_vbnt:
-            state.set_pending_withdrawals_status(user_name, tkn_name, id_number, True)
+            state.set_pending_withdrawals_status(user_name, id_number, True)
             state.decrease_user_balance(user_name, "vbnt", pool_token_amt)
             state.increase_user_balance(user_name, "bnt", bnt_amt)
             state.increase_protocol_wallet_balance("bnbnt", pool_token_amt)

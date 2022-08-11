@@ -430,6 +430,15 @@ def init_protocol(
                 cooldown_time=cooldown_time,
             )
 
+    for tkn_name in ["bnt", "bnbnt", "vbnt"]:
+
+        state.tokens[tkn_name] = Tokens(
+            tkn_name=tkn_name,
+            network_fee=network_fee,
+            withdrawal_fee=withdrawal_fee,
+            cooldown_time=cooldown_time,
+        )
+
     for usr in usernames:
 
         # Get users not yet initialized.

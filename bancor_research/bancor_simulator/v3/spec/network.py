@@ -99,11 +99,6 @@ class BancorDapp:
             withdrawal_fee=toDecimal(withdrawal_fee),
         )
 
-        # initialize bnt
-        state.tokens["bnt"] = Tokens(tkn_name="bnt")
-        state.tokens["bnbnt"] = Tokens(tkn_name="bnbnt")
-        state.tokens["vbnt"] = Tokens(tkn_name="vbnt")
-
         state.json_export = {"users": [], "operations": []}
         self._backup_states = {}
         self._global_state = state

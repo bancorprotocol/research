@@ -31,11 +31,11 @@ from typing import Tuple
 
 
 def trade_tkn_to_ema(
-    bnt_trading_liquidity: Decimal,
-    tkn_trading_liquidity: Decimal,
-    trading_fee: Decimal,
-    network_fee: Decimal,
-    future_ema: Decimal,
+        bnt_trading_liquidity: Decimal,
+        tkn_trading_liquidity: Decimal,
+        trading_fee: Decimal,
+        network_fee: Decimal,
+        future_ema: Decimal,
 ) -> Decimal:
     """
     Outputs the tkn_amt that should be traded to force the ema and the spot price together on a given pool.
@@ -46,25 +46,25 @@ def trade_tkn_to_ema(
     e = network_fee
     f = future_ema
     tkn_amt = (
-        (a * d * (Decimal("1") - e) - Decimal("2") * f * b)
-        + (
-            a
-            * (
-                Decimal("4") * f * b * (Decimal("1") - d * (Decimal("1") - e))
-                + a * d ** Decimal("2") * (Decimal("1") - e) ** Decimal("2")
-            )
-        )
-        ** (Decimal("1") / Decimal("2"))
-    ) / (Decimal("2") * f)
+                      (a * d * (Decimal("1") - e) - Decimal("2") * f * b)
+                      + (
+                              a
+                              * (
+                                      Decimal("4") * f * b * (Decimal("1") - d * (Decimal("1") - e))
+                                      + a * d ** Decimal("2") * (Decimal("1") - e) ** Decimal("2")
+                              )
+                      )
+                      ** (Decimal("1") / Decimal("2"))
+              ) / (Decimal("2") * f)
     return tkn_amt
 
 
 def trade_bnt_to_ema(
-    bnt_trading_liquidity,
-    tkn_trading_liquidity,
-    trading_fee,
-    network_fee,
-    future_ema,
+        bnt_trading_liquidity,
+        tkn_trading_liquidity,
+        trading_fee,
+        network_fee,
+        future_ema,
 ):
     """
     Analyze the state of any pool and create a swap that drives the ema and the spot price together.
@@ -76,27 +76,27 @@ def trade_bnt_to_ema(
     e = network_fee
     f = future_ema
     x = (
-        -Decimal("2") * a
-        + b * d * f
-        + (
-            (Decimal("2") * a - b * d * f) ** Decimal("2")
-            - Decimal("4") * a * (a - b * f)
-        )
-        ** (Decimal("1") / Decimal("2"))
-    ) / Decimal("2")
+                -Decimal("2") * a
+                + b * d * f
+                + (
+                        (Decimal("2") * a - b * d * f) ** Decimal("2")
+                        - Decimal("4") * a * (a - b * f)
+                )
+                ** (Decimal("1") / Decimal("2"))
+        ) / Decimal("2")
     a_recursion = (
-        a * (a + x) + d * (Decimal("1") - e) * (a * x + x ** Decimal("2"))
-    ) / (a + d * x)
+                          a * (a + x) + d * (Decimal("1") - e) * (a * x + x ** Decimal("2"))
+                  ) / (a + d * x)
     b_recursion = b * (a + d * x) / (a + x)
     n = 0
     p = Decimal("0.001")
     while a_recursion / b_recursion < f:
         n += 1
         p += Decimal("0.0001")
-        x += x * (f**p - (a_recursion / b_recursion) ** p) / f
+        x += x * (f ** p - (a_recursion / b_recursion) ** p) / f
         a_recursion = (
-            a * (a + x) + d * (Decimal("1") - e) * (a * x + x ** Decimal("2"))
-        ) / (a + d * x)
+                              a * (a + x) + d * (Decimal("1") - e) * (a * x + x ** Decimal("2"))
+                      ) / (a + d * x)
         b_recursion = b * (a + d * x) / (a + x)
         if n > 20000:
             break
@@ -105,14 +105,14 @@ def trade_bnt_to_ema(
 
 
 def process_arbitrage_trade(
-    tkn_name: str,
-    tkn_token_virtual_balance: Decimal,
-    bnt_virtual_balance: Decimal,
-    bnt_trading_liquidity: Decimal,
-    tkn_trading_liquidity: Decimal,
-    trading_fee: Decimal,
-    user_tkn: Decimal,
-    user_bnt: Decimal,
+        tkn_name: str,
+        tkn_token_virtual_balance: Decimal,
+        bnt_virtual_balance: Decimal,
+        bnt_trading_liquidity: Decimal,
+        tkn_trading_liquidity: Decimal,
+        trading_fee: Decimal,
+        user_tkn: Decimal,
+        user_bnt: Decimal,
 ) -> Tuple[Decimal, str, str, bool]:
     """
     Computes the appropriate arbitrage trade on the token_name pool.
@@ -124,24 +124,24 @@ def process_arbitrage_trade(
     q = tkn_token_virtual_balance
 
     bnt_trade_amt = (
-        -Decimal("2") * a * q
-        + b * m * p
-        + (
-            (Decimal("2") * a * q - b * m * p) ** Decimal("2")
-            - Decimal("4") * a * q * (a * q - b * p)
-        )
-        ** (Decimal("1") / Decimal("2"))
-    ) / (Decimal("2") * q)
+                            -Decimal("2") * a * q
+                            + b * m * p
+                            + (
+                                    (Decimal("2") * a * q - b * m * p) ** Decimal("2")
+                                    - Decimal("4") * a * q * (a * q - b * p)
+                            )
+                            ** (Decimal("1") / Decimal("2"))
+                    ) / (Decimal("2") * q)
 
     tkn_trade_amt = (
-        -Decimal("2") * b * p
-        + a * m * q
-        + (
-            (Decimal("2") * b * p - a * m * q) ** Decimal("2")
-            - Decimal("4") * b * p * (b * p - a * q)
-        )
-        ** (Decimal("1") / Decimal("2"))
-    ) / (Decimal("2") * p)
+                            -Decimal("2") * b * p
+                            + a * m * q
+                            + (
+                                    (Decimal("2") * b * p - a * m * q) ** Decimal("2")
+                                    - Decimal("4") * b * p * (b * p - a * q)
+                            )
+                            ** (Decimal("1") / Decimal("2"))
+                    ) / (Decimal("2") * p)
 
     if bnt_trade_amt > 0:
         source_token = "bnt"
@@ -190,9 +190,7 @@ class MonteCarloGenerator(object):
             for tkn_name in user_balances['poolSymbol'].unique():
 
                 user_balance = user_balances[user_balances['poolSymbol'] == tkn_name]['tokenAmount_real_usd'].values[0]
-                # if tkn_name not in v3.global_state.users[user_id].wallet:
-                #     v3.global_state.users[user_id].wallet[tkn_name] = Token(balance=user_balance)
-                v3.set_user_balance(user_name=user_id, tkn_name=tkn_name, tkn_amt=user_balance,  timestamp=0)
+                v3.set_user_balance(user_name=user_id, tkn_name=tkn_name, tkn_amt=user_balance, timestamp=0)
 
                 pooltkn_name = get_pooltoken_name(tkn_name)
                 if pooltkn_name not in v3.global_state.users[user_id].wallet:
@@ -210,10 +208,12 @@ class MonteCarloGenerator(object):
         self.daily_trade_volume = 0
         self.latest_amt = 0
         self.latest_tkn_name = None
+        self.rolling_trade_fees = {}
 
         random_tkn_names = []
 
         for tkn in pool_freq_dist:
+            self.rolling_trade_fees[tkn] = []
             freq = int(round(float(pool_freq_dist[tkn] * simulation_step_count), 0))
             for i in range(freq):
                 random_tkn_names.append(tkn)
@@ -253,6 +253,13 @@ class MonteCarloGenerator(object):
             user_name=user_name,
             timestamp=timestamp,
         )
+        if target_tkn == 'bnt':
+            tkn = tkn_name
+        else:
+            tkn = target_tkn
+        trading_fee = self.protocol.global_state.tokens[tkn].trading_fee
+        fees_earned = trading_fee * amt
+        self.rolling_trade_fees[tkn].append(fees_earned)
         self.daily_trade_volume += amt
         self.latest_tkn_name = tkn_name + "_" + target_tkn
         self.latest_amt = amt
@@ -716,11 +723,23 @@ class MonteCarloGenerator(object):
         vortex_burner(state, self.user_name)
         return self
 
-    def transact(self):
+    def transform_results(self, results: pd.DataFrame, simulation_tokens: list) -> pd.DataFrame:
+        nl = []
+        results_list = [results[['level_2', 'timestamp', tkn]] for tkn in simulation_tokens]
+        for df in results_list:
+            tkn_name = df.columns[-1]
+            df['tkn_name'] = [tkn_name for _ in range(len(df))]
+            df = df.rename({tkn_name: 'amount', 'level_2': 'name'}, axis=1)
+            df = df.sort_values(['tkn_name', 'timestamp', 'name'])
+            df = df[['timestamp', 'tkn_name', 'name', 'amount']]
+            nl.append(df)
+        return pd.concat(nl)
+
+    def transact(self, n_periods):
 
         i = self.random.randint(0, self.simulation_step_count)
 
-        all_users = [i for i in self.protocol.global_state.users]
+        all_users = [i for i in self.protocol.global_state.users if i != 'protocol']
         num_users = len(all_users) - 1
         u = self.random.randint(0, num_users)
         user_name = all_users[u]
@@ -728,13 +747,13 @@ class MonteCarloGenerator(object):
 
         arbitrage_percentage = .99
 
-        deposit_percentage = SIMULATION_MAX_STEPS * .329
-        trade_percentage = deposit_percentage + SIMULATION_MAX_STEPS * .44 * (1 - arbitrage_percentage)
-        arb_percentage = trade_percentage + SIMULATION_MAX_STEPS * .44 * arbitrage_percentage
-        withdraw_initiated = arb_percentage + SIMULATION_MAX_STEPS * .116
-        withdraw_completed = withdraw_initiated + SIMULATION_MAX_STEPS * .075
-        withdraw_canceled = withdraw_completed + SIMULATION_MAX_STEPS * .021
-        withdraw_pending = withdraw_canceled + SIMULATION_MAX_STEPS * .021
+        deposit_percentage = self.simulation_step_count * .329
+        trade_percentage = deposit_percentage + self.simulation_step_count * .44 * (1 - arbitrage_percentage)
+        arb_percentage = trade_percentage + self.simulation_step_count * .44 * arbitrage_percentage
+        withdraw_initiated = arb_percentage + self.simulation_step_count * .116
+        withdraw_completed = withdraw_initiated + self.simulation_step_count * .075
+        withdraw_canceled = withdraw_completed + self.simulation_step_count * .021
+        withdraw_pending = withdraw_canceled + self.simulation_step_count * .021
         latest_action = None
         if i < deposit_percentage:
             latest_action = "deposit"
@@ -767,7 +786,22 @@ class MonteCarloGenerator(object):
         df['latest_tkn_name'] = [self.latest_tkn_name for _ in range(len(df))]
         self.logger.append(df)
 
-    def run(self):
+    def set_bnt_funding_limit_by_rolling_avg(self, n_periods, constant_multiplier):
+        from statistics import mean
+        state = self.protocol.global_state
+        for tkn_name in list(state.whitelisted_tokens):
+            new_bnt_funding_limit = mean(self.rolling_trade_fees[tkn_name][-n_periods:]) * constant_multiplier
+            state.set_bnt_funding_limit(tkn_name, new_bnt_funding_limit)
+        self.protocol.set_state(state)
+        return self
+
+    def run(self, mean_events_per_day=None, n_periods=None, constant_multiplier=None):
         for ct in range(self.simulation_step_count):
             self.timestamp = ct
-            self.transact()
+            self.transact(n_periods)
+            if constant_multiplier is not None:
+                if ct // mean_events_per_day == 0 and ct > mean_events_per_day * n_periods:
+                    self.set_bnt_funding_limit_by_rolling_avg(n_periods, constant_multiplier)
+        return self.transform_results(pd.concat(self.logger), list(self.whitelisted_tokens))
+
+

@@ -8,6 +8,8 @@ import warnings
 import pandas as pd
 from pydantic.fields import TypeVar
 
+from bancor_research.bancor_simulator.v3.spec import Token
+
 with warnings.catch_warnings():
     warnings.simplefilter("ignore", FutureWarning)
     warnings.simplefilter("ignore", DeprecationWarning)
@@ -65,7 +67,7 @@ DEFAULT.WHITELIST = {
         "decimals": DEFAULT.DECIMALS,
         "trading_fee": DEFAULT.TRADING_FEE,
         "bnt_funding_limit": DEFAULT.BNT_FUNDING_LIMIT,
-        "ep_vault_balance": DEFAULT.EP_VAULT_BALANCE,
+        "ep_vault_balance": Token(balance=DEFAULT.EP_VAULT_BALANCE),
     }
     for TOKEN in DEFAULT.TOKENS
 }

@@ -4,7 +4,7 @@
 # --------------------------------------------------------------------------------------------------------------------
 """Mesa Agent-based implementations of the Bancor protocol."""
 from decimal import Decimal
-from typing import Tuple
+from typing import Tuple, Any
 
 import mesa
 from bancor_research.bancor_simulator.v3.spec import get_prices, State, get_bnt_trading_liquidity, \
@@ -176,11 +176,14 @@ class MonteCarloGenerator(object):
             price_feed: pd.DataFrame,
             user_initial_balances: pd.DataFrame,
             simulation_step_count: int,
-            pool_freq_dist: dict
+            pool_freq_dist: dict,
+            action_freq_dist: dict,
+            bnt_min_liquidity: Any = 10000
     ):
 
         # all agents use a single BancorDapp instance
         v3 = BancorDapp(whitelisted_tokens=whitelisted_tokens,
+                        bnt_min_liquidity=bnt_min_liquidity,
                         price_feeds=price_feed)
 
         for user_id in user_initial_balances['user_id'].unique():
@@ -209,6 +212,7 @@ class MonteCarloGenerator(object):
         self.latest_amt = 0
         self.latest_tkn_name = None
         self.rolling_trade_fees = {}
+        self.action_freq_dist = action_freq_dist
 
         random_tkn_names = []
 
@@ -257,7 +261,7 @@ class MonteCarloGenerator(object):
             tkn = tkn_name
         else:
             tkn = target_tkn
-        trading_fee = self.protocol.global_state.tokens[tkn].trading_fee
+        trading_fee = get_trading_fee(state, tkn_name)
         fees_earned = trading_fee * amt
         self.rolling_trade_fees[tkn].append(fees_earned)
         self.daily_trade_volume += amt
@@ -303,6 +307,14 @@ class MonteCarloGenerator(object):
                     self.daily_trade_volume += trade_amt
                 self.latest_tkn_name = source_token + "_" + target_token
                 self.latest_amt = trade_amt
+
+                if target_token == 'bnt':
+                    tkn = source_token
+                else:
+                    tkn = target_token
+                trading_fee = get_trading_fee(state, tkn_name)
+                fees_earned = trading_fee * trade_amt
+                self.rolling_trade_fees[tkn].append(fees_earned)
 
     def perform_random_arbitrage_trade(self):
         """
@@ -726,65 +738,16 @@ class MonteCarloGenerator(object):
     def transform_results(self, results: pd.DataFrame, simulation_tokens: list) -> pd.DataFrame:
         nl = []
         results_list = [results[['level_2', 'timestamp', tkn]] for tkn in simulation_tokens]
+        state = self.protocol.global_state
         for df in results_list:
             tkn_name = df.columns[-1]
+
             df['tkn_name'] = [tkn_name for _ in range(len(df))]
             df = df.rename({tkn_name: 'amount', 'level_2': 'name'}, axis=1)
             df = df.sort_values(['tkn_name', 'timestamp', 'name'])
             df = df[['timestamp', 'tkn_name', 'name', 'amount']]
             nl.append(df)
         return pd.concat(nl)
-
-    def transact(self, n_periods):
-
-        i = self.random.randint(0, self.simulation_step_count)
-
-        all_users = [i for i in self.protocol.global_state.users if i != 'protocol']
-        num_users = len(all_users) - 1
-        u = self.random.randint(0, num_users)
-        user_name = all_users[u]
-        self.user_name = user_name
-
-        arbitrage_percentage = .99
-
-        deposit_percentage = self.simulation_step_count * .329
-        trade_percentage = deposit_percentage + self.simulation_step_count * .44 * (1 - arbitrage_percentage)
-        arb_percentage = trade_percentage + self.simulation_step_count * .44 * arbitrage_percentage
-        withdraw_initiated = arb_percentage + self.simulation_step_count * .116
-        withdraw_completed = withdraw_initiated + self.simulation_step_count * .075
-        withdraw_canceled = withdraw_completed + self.simulation_step_count * .021
-        withdraw_pending = withdraw_canceled + self.simulation_step_count * .021
-        latest_action = None
-        if i < deposit_percentage:
-            latest_action = "deposit"
-            self.perform_random_deposit()
-        elif deposit_percentage <= i < trade_percentage:
-            latest_action = "trade"
-            self.perform_random_trade()
-        elif trade_percentage <= i < arb_percentage:
-            latest_action = "arbitrage_trade"
-            self.perform_random_arbitrage_trade()
-        elif arb_percentage <= i < withdraw_initiated:
-            latest_action = "cooldown"
-            self.perform_random_begin_cooldown()
-        elif withdraw_initiated <= i < withdraw_completed:
-            latest_action = "withdrawal"
-            self.perform_random_withdrawal()
-
-        timestamp = self.timestamp
-
-        for tkn_name in self.whitelisted_tokens:
-            if not self.protocol.global_state.tokens[tkn_name].is_trading_enabled:
-                self.protocol.enable_trading(tkn_name=tkn_name, timestamp=timestamp)
-
-        df = self.protocol.describe(decimals=4, users=False)
-        df['timestamp'] = [timestamp for _ in range(len(df))]
-        df = df.reset_index()
-        df = df[df['level_0'] > 1]
-        df['latest_action'] = [latest_action for _ in range(len(df))]
-        df['latest_amt'] = [self.latest_amt for _ in range(len(df))]
-        df['latest_tkn_name'] = [self.latest_tkn_name for _ in range(len(df))]
-        self.logger.append(df)
 
     def set_bnt_funding_limit_by_rolling_avg(self, n_periods, constant_multiplier):
         from statistics import mean
@@ -795,13 +758,13 @@ class MonteCarloGenerator(object):
         self.protocol.set_state(state)
         return self
 
-    def run(self, mean_events_per_day=None, n_periods=None, constant_multiplier=None):
+    def run(self, transact, mean_events_per_day=None, n_periods=None, constant_multiplier=None, is_proposal=False):
         for ct in range(self.simulation_step_count):
             self.timestamp = ct
-            self.transact(n_periods)
-            if constant_multiplier is not None:
-                if ct // mean_events_per_day == 0 and ct > mean_events_per_day * n_periods:
+            transact(self)
+            if is_proposal:
+                try:
                     self.set_bnt_funding_limit_by_rolling_avg(n_periods, constant_multiplier)
+                except:
+                    pass
         return self.transform_results(pd.concat(self.logger), list(self.whitelisted_tokens))
-
-

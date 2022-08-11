@@ -414,6 +414,7 @@ def init_protocol(
                 bnt_funding_limit=bnt_funding_limit,
                 withdrawal_fee=withdrawal_fee,
                 cooldown_time=cooldown_time,
+                external_protection_vault=Token(balance=ep_vault_balance),
             )
 
             # initialize pooltoken

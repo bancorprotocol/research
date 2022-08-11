@@ -41,7 +41,7 @@ def deposit_tkn(state: State, tkn_name: str, tkn_amt: Decimal, user_name: str) -
 
     state.increase_bnt_trading_liquidity(tkn_name, bnt_increase)
     state.increase_tkn_trading_liquidity(tkn_name, tkn_increase)
-    state.decrease_bnt_funding_amt(tkn_name, bnt_increase)
+    state.increase_bnt_funding_amt(tkn_name, bnt_increase)
     state.set_protocol_wallet_balance("bnt", bnt_increase)
 
     state.update_spot_rate(tkn_name)

@@ -47,13 +47,13 @@ DEFAULT_WITHDRAWAL_FEE = Decimal("0.0025")
 DEFAULT_TRADING_FEE = Decimal("0.01")
 DEFAULT_NETWORK_FEE = Decimal("0.2")
 DEFAULT_BNT_FUNDING_LIMIT = Decimal("1000000")
-DEFAULT_BNT_MIN_LIQUIDITY = Decimal("10000")
+DEFAULT_BNT_MIN_LIQUIDITY = Decimal("100")
 DEFAULT_COOLDOWN_TIME = SECONDS_PER_DAY * 7
 DEFAULT_ALPHA = Decimal("0.2")
 DEFAULT_LOWER_EMA_LIMIT = Decimal("0.99")
 DEFAULT_UPPER_EMA_LIMIT = Decimal("1.01")
 DEFAULT_NUM_TIMESTAMPS = SECONDS_PER_DAY * 30
-DEFAULT_ACCOUNT_BALANCE = Decimal(np.nan)
+DEFAULT_ACCOUNT_BALANCE = Decimal('0')
 DEFAULT_PRICE_FEEDS = pd.DataFrame(
     {
         "INDX": (0 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
@@ -116,7 +116,9 @@ class Token(object):
     def validate_value(self, value) -> Decimal:
         if pd.isnull(value):
             value = Decimal("0")
-        return Decimal(str(value))
+        value = Decimal(str(value))
+        assert Decimal("0") <= value, "Amount cannot be negative"
+        return value
 
 
 # Containers
@@ -334,7 +336,7 @@ class Tokens(GlobalSettings):
         """
         Computes the bnt_min_liquidity multiplied by 2.
         """
-        return 2 * self.bnt_min_liquidity
+        return min(self.bnt_funding_limit, 2 * self.bnt_min_liquidity)
 
     @property
     def inv_ema_rate(self) -> Decimal:
@@ -985,6 +987,10 @@ class State(GlobalSettings):
             self.users[user_name].wallet["vbnt"] = Token(
                 balance=DEFAULT_ACCOUNT_BALANCE
             )
+        if "bnbnt" not in self.users[user_name].wallet:
+            self.users[user_name].wallet["bnbnt"] = Token(
+                balance=DEFAULT_ACCOUNT_BALANCE
+            )
         return self
 
     def update_inv_spot_rate(self, tkn_name: str):
@@ -1584,7 +1590,19 @@ def get_max_bnt_deposit(
     """
     Used in simulation only.
     """
-    return max(get_pooltoken_balance(state, "bnt"), user_bnt)
+    # print('user_bnt', user_bnt)
+
+    if pd.isnull(user_bnt):
+        user_bnt = Decimal('0')
+
+    pooltoken_balance = get_pooltoken_balance(state, "bnt")
+    if pd.isnull(pooltoken_balance):
+        pooltoken_balance = Decimal('0')
+
+    pooltoken_balance = Decimal(pooltoken_balance)
+    user_bnt = Decimal(user_bnt)
+
+    return max(pooltoken_balance, user_bnt)
 
 
 def get_network_fee(state: State, tkn_name: str) -> Decimal:

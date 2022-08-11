@@ -56,10 +56,11 @@ class BancorDapp:
         whitelisted_tokens=DEFAULT.WHITELIST,
         price_feeds_path: str = DEFAULT.PRICE_FEEDS_PATH,
         price_feeds: PandasDataFrame = DEFAULT.PRICE_FEEDS,
+        log_state: bool = False
     ):
 
         transaction_id = 0
-
+        self.log_state = log_state
         self.json_data = None
         self.transaction_id = transaction_id
 
@@ -151,7 +152,8 @@ class BancorDapp:
         """
         Increments a new id and state for each action
         """
-        self.update_state(state)
+        if self.log_state:
+            self.update_state(state)
         self.transaction_id += 1
 
     def get_state(
@@ -160,7 +162,10 @@ class BancorDapp:
         """
         Creates a copy of the global state which will modified during a new action.
         """
-        return self.copy_state(copy_type=copy_type, state=state, timestamp=timestamp)
+        if self.log_state:
+            return self.copy_state(copy_type=copy_type, state=state, timestamp=timestamp)
+        else:
+            return self.global_state
 
     def revert_state(self, timestamp):
         """
@@ -303,7 +308,7 @@ class BancorDapp:
         DAO msig initilizes new tokens to allow trading once specified conditions are met.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        state, tkn_name, user_name = validate_input(state, tkn_name, "", timestamp)
+        state, tkn_name, tkn_amt, user_name = validate_input(state, tkn_name, np.nan, "", timestamp)
         state = enable_trading(state, tkn_name)
         self.next_transaction(state)
         handle_logging(
@@ -315,7 +320,7 @@ class BancorDapp:
             state,
         )
 
-    def describe(self, decimals: int = -1):
+    def describe(self, decimals: int = -1, users: bool = True):
         """
         Describes the state ledger in a format similar to BIP15 documentation.
         """
@@ -329,10 +334,11 @@ class BancorDapp:
         # Iterate all tokens
         for tkn_name in reserve_tokens + pool_tokens + ["vbnt"]:
             table[tkn_name] = {}
-            for account in [user for user in state.users if user != protocol_user]:
-                table[tkn_name][tuple([1, "Account", account])] = (
-                    state.users[account].wallet[tkn_name].balance
-                )
+            if users:
+                for account in [user for user in state.users if user != protocol_user]:
+                    table[tkn_name][tuple([1, "Account", account])] = (
+                        state.users[account].wallet[tkn_name].balance
+                    )
 
         # Iterate all reserve tokens except bnt
         for tkn_name in [tkn_name for tkn_name in reserve_tokens if tkn_name != "bnt"]:
@@ -403,12 +409,14 @@ class BancorDapp:
         """
         Creates a new user with a valid wallet
         """
-        state = self.get_state(copy_type="initial", timestamp=timestamp)
+        # state = self.get_state(copy_type="initial", timestamp=timestamp)
+        state = self.global_state
         state.create_user(user_name)
-        self.next_transaction(state)
-        handle_logging(
-            "NA", Decimal("0"), f"create_{user_name}", "NA", state.transaction_id, state
-        )
+        self.global_state = state
+        # self.next_transaction(state)
+        # handle_logging(
+        #     "NA", Decimal("0"), f"create_{user_name}", "NA", state.transaction_id, state
+        # )
 
     def distribute_autocompounding_program(
         self,
@@ -668,9 +676,9 @@ class BancorDapp:
         Sets user balance at the network interface level for convenience.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        state, tkn_name, user_name = validate_input(
-            state, tkn_name, user_name, timestamp
-        )
+        # state, tkn_name, tkn_amt, user_name, timestamp = validate_input(
+        #     state, tkn_amt, tkn_name, user_name, timestamp
+        # )
         tkn_amt = Decimal(tkn_amt)
         state.set_user_balance(user_name, tkn_name, tkn_amt)
         self.next_transaction(state)

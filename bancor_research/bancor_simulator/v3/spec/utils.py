@@ -175,6 +175,12 @@ def compute_max_tkn_deposit(
     """
     Computes the maximum deposit amount which will not exceed the target tvl.
     """
+    if pd.isnull(vault_tvl):
+        vault_tvl = Decimal("0")
+    if pd.isnull(target_tvl):
+        target_tvl = Decimal("0")
+    if pd.isnull(user_funds):
+        user_funds = Decimal("0")
     return max(target_tvl - vault_tvl, user_funds)
 
 
@@ -218,10 +224,11 @@ def enable_trading(state: State, tkn_name: str) -> State:
         state.set_tkn_trading_liquidity(tkn_name, tkn_bootstrap_liquidity)
 
         state = mint_protocol_bnt(state, bnt_bootstrap_liquidity)
-    else:
-        log = f"Bootstrap requirements *not* met for {tkn_name}"
-        print(log)
-        state.logger.info(log)
+
+    # else:
+    #     log = f"Bootstrap requirements *not* met for {tkn_name}"
+    #     print(log)
+    #     state.logger.info(log)
 
     return state
 
@@ -682,7 +689,7 @@ def log_json_operation(state, transaction_type, user_name, amt, timestamp):
 
 
 def validate_input(
-    state: State, tkn_name: str, user_name: str, timestamp: int
+    state: State, tkn_name: str, tkn_amt: Any, user_name: str, timestamp: int
 ) -> Tuple[State, str, str]:
     """
     Validates the input for all agent actions.
@@ -693,6 +700,8 @@ def validate_input(
     assert user_name != protocol_user, "user_name {} is reserved".format(protocol_user)
 
     tkn_name = tkn_name.lower()
+    tkn_amt = Decimal(tkn_amt)
+
     user_name = user_name if user_name else protocol_user
 
     if user_name not in state.users:
@@ -715,7 +724,7 @@ def validate_input(
 
     state.tokens[tkn_name].timestamp = timestamp
 
-    return state, tkn_name, user_name
+    return state, tkn_name, tkn_amt, user_name
 
 
 def setup_json_simulation(

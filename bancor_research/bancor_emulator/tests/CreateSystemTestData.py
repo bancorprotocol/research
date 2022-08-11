@@ -128,8 +128,8 @@ def execute(fileName):
         if token is bnbnt: vbnt.connect(userId).approve(network, amount)
         network.connect(userId).withdraw(network.connect(userId).initWithdrawal(token, amount))
 
-    def trade(sourcePoolId: str, targetPoolId: str, userId: str, amount: str):
-        token = reserveTokens[sourcePoolId]
+    def trade(poolId: str, targetPoolId: str, userId: str, amount: str):
+        token = reserveTokens[poolId]
         amount = userAmount(token, userId, amount)
         token.connect(userId).approve(network, amount)
         network.connect(userId).tradeBySourceAmount(token, reserveTokens[targetPoolId], amount, 1, uint256.max, userId)
@@ -210,7 +210,7 @@ def execute(fileName):
     for n in range(len(flow['operations'])):
         operation = flow['operations'][n]
 
-        print('{} out of {}: {}({})'.format(n + 1, len(flow['operations']), operation['type'], operation['amount']))
+        print('{} out of {}: {} {} ({})'.format(n + 1, len(flow['operations']), operation['type'], operation['poolId'], operation['amount']))
 
         if (operation['elapsed'] > 0):
             block.number += 1
@@ -221,7 +221,7 @@ def execute(fileName):
         elif operation['type'] == 'withdraw':
             withdraw(operation['poolId'], operation['userId'], operation['amount'])
         elif operation['type'] == 'trade':
-            trade(operation['sourcePoolId'], operation['targetPoolId'], operation['userId'], operation['amount'])
+            trade(operation['poolId'], operation['targetPoolId'], operation['userId'], operation['amount'])
         elif operation['type'] == 'burnPoolToken':
             burnPoolToken(operation['poolId'], operation['userId'], operation['amount'])
         elif operation['type'] == 'joinProgram':

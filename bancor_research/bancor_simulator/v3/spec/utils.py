@@ -53,19 +53,22 @@ def compute_user_total_holdings(state: State, user_name: str):
     return sum(holdings)
 
 
-def compute_pooltoken_amt(state: State, tkn_name: str, tkn_amt: Decimal) -> Decimal:
+def compute_rtkn_amt(state: State, tkn_name: str, ptkn_amt: Decimal) -> Decimal:
     """
-    Returns the pool_token_amt for a given tkn_name, tkn_amt.
+    Returns the reserve token amount for a given pool token amount.
     """
-    staked_amt = get_staked_balance(state, tkn_name)
+    staked_balance = get_staked_balance(state, tkn_name)
     pool_token_supply = get_pooltoken_balance(state, tkn_name)
-    if staked_amt > 0:
-        pool_token_amt = (lambda a, b, c: a * b / c)(
-            pool_token_supply, tkn_amt, staked_amt
-        )
-    else:
-        pool_token_amt = Decimal("0")
-    return pool_token_amt
+    return ptkn_amt * staked_balance / pool_token_supply
+
+
+def compute_ptkn_amt(state: State, tkn_name: str, rtkn_amt: Decimal) -> Decimal:
+    """
+    Returns the pool token amount for a given reserve token amount.
+    """
+    staked_balance = get_staked_balance(state, tkn_name)
+    pool_token_supply = get_pooltoken_balance(state, tkn_name)
+    return rtkn_amt * pool_token_supply / staked_balance
 
 
 def compute_bntkn_rate(state: State, tkn_name: str):
@@ -73,12 +76,10 @@ def compute_bntkn_rate(state: State, tkn_name: str):
     Computes the bntkn issuance rate for tkn deposits, based on the staking ledger and the current bntkn supply
     """
     pool_token_supply = get_pooltoken_balance(state, tkn_name)
-    staked_tkn = get_staked_balance(state, tkn_name)
-    if pool_token_supply == 0 and staked_tkn == 0:
-        bntkn_rate = Decimal("1")
-    else:
-        bntkn_rate = pool_token_supply / staked_tkn
-    return bntkn_rate
+    staked_balance = get_staked_balance(state, tkn_name)
+    if pool_token_supply == staked_balance:
+        return Decimal("1")
+    return pool_token_supply / staked_balance
 
 
 def compute_bntkn_amt(state: State, tkn_name: str, tkn_amt: Decimal) -> Decimal:

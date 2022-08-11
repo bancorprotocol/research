@@ -251,6 +251,7 @@ class BancorDapp:
         tkn_name: str,
         user_name: str,
         timestamp: int = 0,
+        by_ptkn_amt: bool = False,
         action_name: str = "begin cooldown",
     ):
         """
@@ -260,9 +261,9 @@ class BancorDapp:
         state, tkn_name, user_name = validate_input(
             state, tkn_name, user_name, timestamp
         )
-        tkn_amt = userAmount(state, "bn" + tkn_name, user_name, tkn_amt)
+        tkn_amt = userAmount(state, ("bn" if by_ptkn_amt else "") + tkn_name, user_name, tkn_amt)
         state, id_number = begin_withdrawal_cooldown(
-            state, tkn_amt, tkn_name, user_name
+            state, tkn_amt, tkn_name, user_name, by_ptkn_amt
         )
         self.next_transaction(state)
         handle_logging(

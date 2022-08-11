@@ -145,8 +145,10 @@ class BancorDapp:
         tkn_name: str,
         user_name: str,
         timestamp: int = 0,
+        by_ptkn_amt: bool = False,
         action_name: str = "begin cooldown",
     ):
+        assert by_ptkn_amt, "not yet supported"
         updateBlock(timestamp)
         tkn = self.poolTokens[tkn_name]
         amt = userAmount(tkn, user_name, tkn_amt)

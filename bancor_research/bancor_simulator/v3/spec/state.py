@@ -331,9 +331,9 @@ class Tokens(GlobalSettings):
     @property
     def bnt_bootstrap_liquidity(self):
         """
-        Computes the bnt_min_liquidity multiplied by 2.
+        Computes the minimum between bnt_min_liquidity multiplied by 2 and bnt_funding_limit.
         """
-        return 2 * self.bnt_min_liquidity
+        return min(2 * self.bnt_min_liquidity, self.bnt_funding_limit)
 
     @property
     def inv_ema_rate(self) -> Decimal:

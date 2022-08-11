@@ -53,7 +53,7 @@ DEFAULT_ALPHA = Decimal("0.2")
 DEFAULT_LOWER_EMA_LIMIT = Decimal("0.99")
 DEFAULT_UPPER_EMA_LIMIT = Decimal("1.01")
 DEFAULT_NUM_TIMESTAMPS = SECONDS_PER_DAY * 30
-DEFAULT_ACCOUNT_BALANCE = Decimal('0')
+DEFAULT_ACCOUNT_BALANCE = Decimal("0")
 DEFAULT_PRICE_FEEDS = pd.DataFrame(
     {
         "INDX": (0 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
@@ -1593,11 +1593,11 @@ def get_max_bnt_deposit(
     # print('user_bnt', user_bnt)
 
     if pd.isnull(user_bnt):
-        user_bnt = Decimal('0')
+        user_bnt = Decimal("0")
 
     pooltoken_balance = get_pooltoken_balance(state, "bnt")
     if pd.isnull(pooltoken_balance):
-        pooltoken_balance = Decimal('0')
+        pooltoken_balance = Decimal("0")
 
     pooltoken_balance = Decimal(pooltoken_balance)
     user_bnt = Decimal(user_bnt)

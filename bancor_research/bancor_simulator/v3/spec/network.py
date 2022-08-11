@@ -56,7 +56,7 @@ class BancorDapp:
         whitelisted_tokens=DEFAULT.WHITELIST,
         price_feeds_path: str = DEFAULT.PRICE_FEEDS_PATH,
         price_feeds: PandasDataFrame = DEFAULT.PRICE_FEEDS,
-        log_state: bool = False
+        log_state: bool = False,
     ):
 
         transaction_id = 0
@@ -163,7 +163,9 @@ class BancorDapp:
         Creates a copy of the global state which will modified during a new action.
         """
         if self.log_state:
-            return self.copy_state(copy_type=copy_type, state=state, timestamp=timestamp)
+            return self.copy_state(
+                copy_type=copy_type, state=state, timestamp=timestamp
+            )
         else:
             return self.global_state
 
@@ -308,7 +310,9 @@ class BancorDapp:
         DAO msig initilizes new tokens to allow trading once specified conditions are met.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        state, tkn_name, tkn_amt, user_name = validate_input(state, tkn_name, np.nan, "", timestamp)
+        state, tkn_name, tkn_amt, user_name = validate_input(
+            state, tkn_name, np.nan, "", timestamp
+        )
         state = enable_trading(state, tkn_name)
         self.next_transaction(state)
         handle_logging(

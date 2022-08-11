@@ -47,7 +47,7 @@ def deposit_tkn(state: State, tkn_name: str, tkn_amt: Decimal, user_name: str) -
     state.update_spot_rate(tkn_name)
 
     if check_pool_shutdown(state, tkn_name):
-        print(f'{tkn_name} pool is shutting down')
+        print(f"{tkn_name} pool is shutting down")
         state = shutdown_pool(state, tkn_name)
 
     return state

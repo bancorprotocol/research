@@ -376,12 +376,22 @@ def process_withdrawal(
     return state
 
 
-def begin_withdrawal_cooldown(state, withdraw_value, tkn_name, user_name, by_ptkn_amt: bool = False):
+def begin_withdrawal_cooldown(
+    state, withdraw_value, tkn_name, user_name, by_ptkn_amt: bool = False
+):
     """
     After a fixed time duration, these items can be retrieved and passed to the withdrawal algorithm.
     """
-    rtkn_amt = compute_rtkn_amt(state, tkn_name, withdraw_value) if     by_ptkn_amt else withdraw_value
-    ptkn_amt = compute_ptkn_amt(state, tkn_name, withdraw_value) if not by_ptkn_amt else withdraw_value
+    rtkn_amt = (
+        compute_rtkn_amt(state, tkn_name, withdraw_value)
+        if by_ptkn_amt
+        else withdraw_value
+    )
+    ptkn_amt = (
+        compute_ptkn_amt(state, tkn_name, withdraw_value)
+        if not by_ptkn_amt
+        else withdraw_value
+    )
     id_number = get_withdrawal_id(state)
     state.users[user_name].pending_withdrawals[id_number] = Cooldown(
         id=id_number,

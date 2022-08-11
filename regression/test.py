@@ -43,7 +43,7 @@ def execute(fileName):
     for n in range(len(fileData['operations'])):
         operation = fileData['operations'][n]
 
-        print('{} out of {}: {}({})'.format(n + 1, len(fileData['operations']), operation['type'], operation['amount']))
+        print('{} out of {}: {} {} ({})'.format(n + 1, len(fileData['operations']), operation['type'], operation['poolId'], operation['amount']))
 
         timestamp += operation['elapsed']
 
@@ -54,7 +54,7 @@ def execute(fileName):
                 id_number = bancorDapp.begin_cooldown(operation['amount'], operation['poolId'], operation['userId'], timestamp)
                 bancorDapp.withdraw(operation['userId'], id_number, timestamp)
             elif operation['type'] == 'trade':
-                bancorDapp.trade(operation['amount'], operation['sourcePoolId'], operation['targetPoolId'], operation['userId'], timestamp)
+                bancorDapp.trade(operation['amount'], operation['poolId'], operation['targetPoolId'], operation['userId'], timestamp)
             elif operation['type'] == 'burnPoolToken':
                 bancorDapp.burn_pool_tokens(operation['poolId'], operation['amount'], operation['userId'], timestamp)
             elif operation['type'] == 'joinProgram':

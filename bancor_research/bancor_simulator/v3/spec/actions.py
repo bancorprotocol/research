@@ -341,9 +341,10 @@ def process_withdrawal(
 
             bnbnt_renounced = bnbnt_rate * bnt_renounced
 
-            state.decrease_pooltoken_balance("bnbnt", bnbnt_renounced)
+            state.decrease_pooltoken_balance("bnt", bnbnt_renounced)
             state.decrease_protocol_wallet_balance("bnt", bnbnt_renounced)
             state.set_tkn_trading_liquidity(tkn_name, updated_tkn_liquidity)
+            state.decrease_pooltoken_balance(tkn_name, pool_token_amt)
             state.decrease_staked_balance(tkn_name, withdraw_value)
             state.decrease_vault_balance(tkn_name, tkn_sent_to_user)
             state.increase_user_balance(

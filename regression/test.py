@@ -43,46 +43,44 @@ def execute(fileName):
             timestamp
         )
 
-    for n in range(len(fileData['operations'])):
+    total = len(fileData['operations'])
+    for n in range(total):
         operation = fileData['operations'][n]
-
-        print('{} out of {}: '.format(n + 1, len(fileData['operations'])), end = '')
-
         timestamp += operation['elapsed']
 
         for bancorDapp in bancorDapps:
             if operation['type'] == 'deposit':
-                print('deposit {} {} reserve tokens'.format(operation['amount'], operation['poolId']))
+                print('{} out of {}: deposit {} {} reserve tokens'.format(n + 1, total, operation['amount'], operation['poolId']))
                 bancorDapp.deposit(operation['poolId'], operation['amount'], operation['userId'], timestamp)
             elif operation['type'] == 'withdraw':
-                print('withdraw {} {} pool tokens'.format(operation['amount'], operation['poolId']))
+                print('{} out of {}: withdraw {} {} pool tokens'.format(n + 1, total, operation['amount'], operation['poolId']))
                 id_number = bancorDapp.begin_cooldown_by_ptkn(operation['amount'], operation['poolId'], operation['userId'], timestamp)
                 bancorDapp.withdraw(operation['userId'], id_number, timestamp)
             elif operation['type'] == 'trade':
-                print('trade {} {} reserve tokens for {} reserve tokens'.format(operation['amount'], operation['poolId'], operation['targetPoolId']))
+                print('{} out of {}: trade {} {} reserve tokens for {} reserve tokens'.format(n + 1, total, operation['amount'], operation['poolId'], operation['targetPoolId']))
                 bancorDapp.trade(operation['amount'], operation['poolId'], operation['targetPoolId'], operation['userId'], timestamp)
             elif operation['type'] == 'burnPoolToken':
-                print('burn {} {} pool tokens'.format(operation['amount'], operation['poolId']))
+                print('{} out of {}: burn {} {} pool tokens'.format(n + 1, total, operation['amount'], operation['poolId']))
                 bancorDapp.burn_pool_tokens(operation['poolId'], operation['amount'], operation['userId'], timestamp)
             elif operation['type'] == 'joinProgram':
-                print('join {} {} pool tokens'.format(operation['amount'], operation['poolId']))
+                print('{} out of {}: join {} {} pool tokens'.format(n + 1, total, operation['amount'], operation['poolId']))
                 bancorDapp.join_standard_rewards_program(operation['poolId'], operation['amount'], operation['userId'], programIds[operation['poolId']], timestamp)
             elif operation['type'] == 'leaveProgram':
-                print('leave {} {} pool tokens'.format(operation['amount'], operation['poolId']))
+                print('{} out of {}: leave {} {} pool tokens'.format(n + 1, total, operation['amount'], operation['poolId']))
                 bancorDapp.leave_standard_rewards_program(operation['poolId'], operation['amount'], operation['userId'], programIds[operation['poolId']], timestamp)
             elif operation['type'] == 'claimRewards':
-                print('claim {} rewards'.format(operation['poolId']))
+                print('{} out of {}: claim {} rewards'.format(n + 1, total, operation['poolId']))
                 bancorDapp.claim_standard_rewards(operation['userId'], [programIds[operation['poolId']]], timestamp)
             elif operation['type'] == 'setFundingLimit':
-                print('set {} pool funding limit to {} bnt'.format(operation['poolId'], operation['amount']))
+                print('{} out of {}: set {} pool funding limit to {} bnt'.format(n + 1, total, operation['poolId'], operation['amount']))
                 bancorDapp.set_bnt_funding_limit(operation['poolId'], operation['amount'], timestamp)
             elif operation['type'] == 'enableTrading':
-                print('enable trading with 1 {} = {}/{} bnt'.format(operation['poolId'], operation['bntVirtualBalance'], operation['baseTokenVirtualBalance']))
+                print('{} out of {}: enable trading with 1 {} = {}/{} bnt'.format(n + 1, total, operation['poolId'], operation['bntVirtualBalance'], operation['baseTokenVirtualBalance']))
                 bancorDapp.enable_trading(operation['poolId'], timestamp, operation['bntVirtualBalance'], operation['baseTokenVirtualBalance'])
             else:
                 raise Exception('unsupported operation `{}` encountered'.format(operation['type']))
 
-    print(str(bancorDapps[0].describe(decimals=6).compare(bancorDapps[1].describe(decimals=6))))
+    print(bancorDapps[0].describe(decimals=6).compare(bancorDapps[1].describe(decimals=6)))
 
 execute('BancorNetworkSimpleFinancialScenario1')
 execute('BancorNetworkSimpleFinancialScenario2')

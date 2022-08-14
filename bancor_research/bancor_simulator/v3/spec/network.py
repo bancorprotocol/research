@@ -99,11 +99,6 @@ class BancorDapp:
             withdrawal_fee=toDecimal(withdrawal_fee),
         )
 
-        # initialize bnt
-        state.tokens["bnt"] = Tokens(tkn_name="bnt")
-        state.tokens["bnbnt"] = Tokens(tkn_name="bnbnt")
-        state.tokens["vbnt"] = Tokens(tkn_name="vbnt")
-
         state.json_export = {"users": [], "operations": []}
         self._backup_states = {}
         self._global_state = state
@@ -245,7 +240,7 @@ class BancorDapp:
             state,
         )
 
-    def begin_cooldown(
+    def begin_cooldown_by_rtkn(
         self,
         tkn_amt: str,
         tkn_name: str,
@@ -254,14 +249,39 @@ class BancorDapp:
         action_name: str = "begin cooldown",
     ):
         """
-        Begin the withdrawal cooldown operation.
+        Begin the withdrawal cooldown operation by specifying the output amount of reserve tokens.
+        """
+        state = self.get_state(copy_type="initial", timestamp=timestamp)
+        state, tkn_name, user_name = validate_input(
+            state, tkn_name, user_name, timestamp
+        )
+        tkn_amt = userAmount(state, tkn_name, user_name, tkn_amt)
+        id_number = begin_withdrawal_cooldown_by_rtkn(
+            state, tkn_amt, tkn_name, user_name
+        )
+        self.next_transaction(state)
+        handle_logging(
+            tkn_name, tkn_amt, action_name, user_name, self.transaction_id, state
+        )
+        return id_number
+
+    def begin_cooldown_by_ptkn(
+        self,
+        tkn_amt: str,
+        tkn_name: str,
+        user_name: str,
+        timestamp: int = 0,
+        action_name: str = "begin cooldown",
+    ):
+        """
+        Begin the withdrawal cooldown operation by specifying the intput amount of pool tokens.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
         state, tkn_name, user_name = validate_input(
             state, tkn_name, user_name, timestamp
         )
         tkn_amt = userAmount(state, "bn" + tkn_name, user_name, tkn_amt)
-        state, id_number = begin_withdrawal_cooldown(
+        id_number = begin_withdrawal_cooldown_by_ptkn(
             state, tkn_amt, tkn_name, user_name
         )
         self.next_transaction(state)

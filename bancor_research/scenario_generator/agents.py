@@ -655,7 +655,7 @@ class LP(RandomWalker):
             if user_bntkn_amt > 0 and bntkn_rate > 0:
                 bntkn_amt = self.get_random_cooldown_amt(user_bntkn_amt)
                 withdraw_value = bntkn_amt / bntkn_rate
-                self.protocol.v3.begin_cooldown(
+                self.protocol.v3.begin_cooldown_by_rtkn(
                     tkn_name=tkn_name,
                     tkn_amt=withdraw_value,
                     user_name=user_name,

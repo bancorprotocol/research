@@ -1,3 +1,6 @@
+from bancor_research.bancor_emulator import config
+config.enable_full_precision_mode(True)
+
 from bancor_research.bancor_simulator.v3.spec.network import BancorDapp as sBancorDapp
 from bancor_research.bancor_emulator.v3.spec.network  import BancorDapp as eBancorDapp
 
@@ -22,7 +25,7 @@ def execute(fileName):
             network_fee = fileData['network_fee'],
             whitelisted_tokens = fileData['pools'],
         )
-        for BancorDapp in [eBancorDapp]
+        for BancorDapp in [sBancorDapp, eBancorDapp]
     ]
 
     for user, balances in fileData['users'].items():
@@ -75,11 +78,11 @@ def execute(fileName):
                 bancorDapp.set_bnt_funding_limit(operation['poolId'], operation['amount'], timestamp)
             elif operation['type'] == 'enableTrading':
                 print('enable trading with 1 {} = {}/{} bnt'.format(operation['poolId'], operation['bntVirtualBalance'], operation['baseTokenVirtualBalance']))
-                bancorDapp.price_feeds.at[timestamp, operation['poolId']] = operation['bntVirtualBalance']
-                bancorDapp.price_feeds.at[timestamp, 'bnt'] = operation['baseTokenVirtualBalance']
-                bancorDapp.enable_trading(operation['poolId'], timestamp)
+                bancorDapp.enable_trading(operation['poolId'], timestamp, operation['bntVirtualBalance'], operation['baseTokenVirtualBalance'])
             else:
                 raise Exception('unsupported operation `{}` encountered'.format(operation['type']))
+
+    print(str(bancorDapps[0].describe(decimals=6).compare(bancorDapps[1].describe(decimals=6))))
 
 execute('BancorNetworkSimpleFinancialScenario1')
 execute('BancorNetworkSimpleFinancialScenario2')

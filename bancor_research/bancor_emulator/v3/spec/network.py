@@ -314,11 +314,13 @@ class BancorDapp:
         self,
         tkn_name: str,
         timestamp: int = 0,
+        tkn_price: str = "",
+        bnt_price: str = "",
         transaction_type: str = "enableTrading",
     ) -> None:
         updateBlock(timestamp)
-        tknPrice = self.price_feeds.at[timestamp, tkn_name]
-        bntPrice = self.price_feeds.at[timestamp, self.bnt.symbol()]
+        tknPrice = Decimal(tkn_price) if tkn_price else self.price_feeds.at[timestamp, tkn_name]
+        bntPrice = Decimal(bnt_price) if bnt_price else self.price_feeds.at[timestamp, self.bnt.symbol()]
         while tknPrice != int(tknPrice) or bntPrice != int(bntPrice):
             tknPrice *= 10
             bntPrice *= 10

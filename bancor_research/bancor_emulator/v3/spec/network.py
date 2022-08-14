@@ -139,6 +139,21 @@ class BancorDapp:
         src_tkn.connect(user_name).approve(self.network, src_amt)
         return self.network.connect(user_name).tradeBySourceAmount(src_tkn, trg_tkn, src_amt, 1, uint256.max, user_name)
 
+    def begin_cooldown_by_rtkn(
+        self,
+        tkn_amt: str,
+        tkn_name: str,
+        user_name: str,
+        timestamp: int = 0,
+        action_name: str = "begin cooldown",
+    ):
+        updateBlock(timestamp)
+        tkn = self.poolTokens[tkn_name]
+        amt = self.networkInfo.underlyingToPoolToken(userAmount(self.reserveTokens[tkn_name], user_name, tkn_amt))
+        tkn.connect(user_name).approve(self.network, amt)
+        if tkn is self.bnbnt: self.vbnt.connect(user_name).approve(self.network, amt)
+        return self.network.connect(user_name).initWithdrawal(tkn, amt)
+
     def begin_cooldown_by_ptkn(
         self,
         tkn_amt: str,

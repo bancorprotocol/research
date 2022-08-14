@@ -342,9 +342,8 @@ def process_withdrawal(
             bnbnt_renounced = bnbnt_rate * bnt_renounced
 
             state.decrease_pooltoken_balance("bnbnt", bnbnt_renounced)
-            state.decrease_protocol_wallet_balance("bnbnt", bnbnt_renounced)
+            state.decrease_protocol_wallet_balance("bnt", bnbnt_renounced)
             state.set_tkn_trading_liquidity(tkn_name, updated_tkn_liquidity)
-            state.decrease_protocol_wallet_balance(f"bn{tkn_name}", pool_token_amt)
             state.decrease_staked_balance(tkn_name, withdraw_value)
             state.decrease_vault_balance(tkn_name, tkn_sent_to_user)
             state.increase_user_balance(
@@ -371,7 +370,7 @@ def process_withdrawal(
             state.set_pending_withdrawals_status(user_name, id_number, True)
             state.decrease_user_balance(user_name, "vbnt", pool_token_amt)
             state.increase_user_balance(user_name, "bnt", bnt_amt)
-            state.increase_protocol_wallet_balance("bnbnt", pool_token_amt)
+            state.increase_protocol_wallet_balance("bnt", pool_token_amt)
 
     return state
 

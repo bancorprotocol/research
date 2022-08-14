@@ -327,8 +327,10 @@ class BancorDapp:
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
         state, tkn_name, user_name = validate_input(state, tkn_name, "", timestamp)
-        if tkn_price: state.price_feeds.at[state.timestamp, tkn_name] = tkn_price
-        if bnt_price: state.price_feeds.at[state.timestamp, "bnt"] = bnt_price
+        if tkn_price:
+            state.price_feeds.at[state.timestamp, tkn_name] = tkn_price
+        if bnt_price:
+            state.price_feeds.at[state.timestamp, "bnt"] = bnt_price
         state = enable_trading(state, tkn_name)
         self.next_transaction(state)
         handle_logging(

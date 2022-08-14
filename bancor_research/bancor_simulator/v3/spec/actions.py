@@ -376,22 +376,26 @@ def process_withdrawal(
     return state
 
 
-def begin_withdrawal_cooldown(
-    state, withdraw_value, tkn_name, user_name, by_ptkn_amt: bool = False
-):
+def begin_withdrawal_cooldown_by_rtkn(state, rtkn_amt, tkn_name, user_name):
+    """
+    Begin the withdrawal cooldown operation by specifying the output amount of reserve tokens.
+    """
+    ptkn_amt = compute_ptkn_amt(state, tkn_name, rtkn_amt)
+    return _begin_withdrawal_cooldown(state, tkn_name, user_name, rtkn_amt, ptkn_amt)
+
+
+def begin_withdrawal_cooldown_by_ptkn(state, ptkn_amt, tkn_name, user_name):
+    """
+    Begin the withdrawal cooldown operation by specifying the intput amount of pool tokens.
+    """
+    rtkn_amt = compute_rtkn_amt(state, tkn_name, ptkn_amt)
+    return _begin_withdrawal_cooldown(state, tkn_name, user_name, rtkn_amt, ptkn_amt)
+
+
+def _begin_withdrawal_cooldown(state, tkn_name, user_name, rtkn_amt, ptkn_amt):
     """
     After a fixed time duration, these items can be retrieved and passed to the withdrawal algorithm.
     """
-    rtkn_amt = (
-        compute_rtkn_amt(state, tkn_name, withdraw_value)
-        if by_ptkn_amt
-        else withdraw_value
-    )
-    ptkn_amt = (
-        compute_ptkn_amt(state, tkn_name, withdraw_value)
-        if not by_ptkn_amt
-        else withdraw_value
-    )
     id_number = get_withdrawal_id(state)
     state.users[user_name].pending_withdrawals[id_number] = Cooldown(
         id=id_number,
@@ -404,7 +408,7 @@ def begin_withdrawal_cooldown(
     )
 
     state.decrease_user_balance(user_name, f"bn{tkn_name}", ptkn_amt)
-    return state, id_number
+    return id_number
 
 
 def unpack_withdrawal_cooldown(

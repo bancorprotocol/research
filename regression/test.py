@@ -53,7 +53,7 @@ def execute(fileName):
                 bancorDapp.deposit(operation['poolId'], operation['amount'], operation['userId'], timestamp)
             elif operation['type'] == 'withdraw':
                 print('withdraw {} {} pool tokens'.format(operation['amount'], operation['poolId']))
-                id_number = bancorDapp.begin_cooldown(operation['amount'], operation['poolId'], operation['userId'], timestamp)
+                id_number = bancorDapp.begin_cooldown_by_ptkn(operation['amount'], operation['poolId'], operation['userId'], timestamp)
                 bancorDapp.withdraw(operation['userId'], id_number, timestamp)
             elif operation['type'] == 'trade':
                 print('trade {} {} reserve tokens for {} reserve tokens'.format(operation['amount'], operation['poolId'], operation['targetPoolId']))

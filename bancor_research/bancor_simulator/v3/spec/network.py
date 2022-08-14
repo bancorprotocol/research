@@ -240,27 +240,49 @@ class BancorDapp:
             state,
         )
 
-    def begin_cooldown(
+    def begin_cooldown_by_rtkn(
         self,
         tkn_amt: str,
         tkn_name: str,
         user_name: str,
         timestamp: int = 0,
-        by_ptkn_amt: bool = False,
         action_name: str = "begin cooldown",
     ):
         """
-        Begin the withdrawal cooldown operation.
+        Begin the withdrawal cooldown operation by specifying the output amount of reserve tokens.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
         state, tkn_name, user_name = validate_input(
             state, tkn_name, user_name, timestamp
         )
-        tkn_amt = userAmount(
-            state, ("bn" if by_ptkn_amt else "") + tkn_name, user_name, tkn_amt
+        tkn_amt = userAmount(state, tkn_name, user_name, tkn_amt)
+        id_number = begin_withdrawal_cooldown_by_rtkn(
+            state, tkn_amt, tkn_name, user_name
         )
-        state, id_number = begin_withdrawal_cooldown(
-            state, tkn_amt, tkn_name, user_name, by_ptkn_amt
+        self.next_transaction(state)
+        handle_logging(
+            tkn_name, tkn_amt, action_name, user_name, self.transaction_id, state
+        )
+        return id_number
+
+    def begin_cooldown_by_ptkn(
+        self,
+        tkn_amt: str,
+        tkn_name: str,
+        user_name: str,
+        timestamp: int = 0,
+        action_name: str = "begin cooldown",
+    ):
+        """
+        Begin the withdrawal cooldown operation by specifying the intput amount of pool tokens.
+        """
+        state = self.get_state(copy_type="initial", timestamp=timestamp)
+        state, tkn_name, user_name = validate_input(
+            state, tkn_name, user_name, timestamp
+        )
+        tkn_amt = userAmount(state, "bn" + tkn_name, user_name, tkn_amt)
+        id_number = begin_withdrawal_cooldown_by_ptkn(
+            state, tkn_amt, tkn_name, user_name
         )
         self.next_transaction(state)
         handle_logging(

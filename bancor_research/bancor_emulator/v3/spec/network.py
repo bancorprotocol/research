@@ -139,16 +139,14 @@ class BancorDapp:
         src_tkn.connect(user_name).approve(self.network, src_amt)
         return self.network.connect(user_name).tradeBySourceAmount(src_tkn, trg_tkn, src_amt, 1, uint256.max, user_name)
 
-    def begin_cooldown(
+    def begin_cooldown_by_ptkn(
         self,
         tkn_amt: str,
         tkn_name: str,
         user_name: str,
         timestamp: int = 0,
-        by_ptkn_amt: bool = False,
         action_name: str = "begin cooldown",
     ):
-        assert by_ptkn_amt, "not yet supported"
         updateBlock(timestamp)
         tkn = self.poolTokens[tkn_name]
         amt = userAmount(tkn, user_name, tkn_amt)

@@ -167,6 +167,7 @@ class BancorDapp:
                 copy_type=copy_type, state=state, timestamp=timestamp
             )
         else:
+            self.global_state.timestamp = timestamp
             return self.global_state
 
     def revert_state(self, timestamp):

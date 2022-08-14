@@ -79,4 +79,4 @@ def read_price_feeds(price_feeds_path: str):
     return price_feeds
 
 
-__version__ = "2.0.6"
+__version__ = "2.0.695"

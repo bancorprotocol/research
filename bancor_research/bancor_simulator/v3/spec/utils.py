@@ -24,8 +24,10 @@ def check_pool_shutdown(state: State, tkn_name: str) -> bool:
     trading_enabled = get_is_trading_enabled(state, tkn_name)
     bnt_min_liquidity = get_bnt_min_liquidity(state, tkn_name)
     bnt_trading_liquidity = get_bnt_trading_liquidity(state, tkn_name)
-    if bnt_trading_liquidity < bnt_min_liquidity and trading_enabled:
-        return True
+    if trading_enabled:
+        if bnt_trading_liquidity < bnt_min_liquidity:
+            # print('bnt_trading_liquidity < bnt_min_liquidity', bnt_trading_liquidity, bnt_min_liquidity)
+            return True
     return False
 
 
@@ -129,6 +131,7 @@ def compute_changed_bnt_trading_liquidity(
         return a * (b + d * x * (1 - e)) / (b + x)
     elif direction == "bnt":
         return (a * (a + x) + d * (1 - e) * (a * x + x**2)) / (a + d * x)
+
 
 
 def compute_changed_tkn_trading_liquidity(
@@ -250,7 +253,7 @@ def shutdown_pool(state: State, tkn_name: str) -> State:
     Shutdown pool when the bnt_min_trading_liquidity threshold is breached.
     """
 
-    bnt_trading_liquidity = state.tokens[tkn_name].bnt_trading_liquidity.balance
+    bnt_trading_liquidity = get_bnt_trading_liquidity(state, tkn_name)
     bnbnt_renounced = compute_bnbnt_amt(state, bnt_trading_liquidity)
 
     # adjust balances

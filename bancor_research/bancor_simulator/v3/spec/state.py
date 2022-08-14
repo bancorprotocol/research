@@ -117,7 +117,7 @@ class Token(object):
         if pd.isnull(value):
             value = Decimal("0")
         value = Decimal(str(value))
-        assert Decimal("0") <= value, "Amount cannot be negative"
+        # assert Decimal("0") <= value, "Amount cannot be negative"
         return value
 
 

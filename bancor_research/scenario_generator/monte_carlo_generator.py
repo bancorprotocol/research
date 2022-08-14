@@ -11,7 +11,7 @@ from bancor_research.bancor_simulator.v3.spec import get_prices, State, get_bnt_
     get_tkn_trading_liquidity, get_trading_fee, get_user_balance, get_is_trading_enabled, get_network_fee, get_ema_rate, \
     get_spot_rate, get_vault_balance, get_pooltoken_balance, get_staked_balance, get_external_protection_vault, \
     get_protocol_wallet_balance, get_vortex_balance, get_bnt_funding_limit, get_bnbnt_rate, get_max_bnt_deposit, \
-    get_user_pending_withdrawals, get_pooltoken_name, Token
+    get_user_pending_withdrawals, Token, get_bnt_min_liquidity, get_is_price_stable, get_pooltoken_name
 from bancor_research.bancor_simulator.v3.spec.actions import (
     unpack_withdrawal_cooldown,
     vortex_burner,
@@ -22,7 +22,7 @@ from bancor_research.bancor_simulator.v3.spec.utils import (
     compute_ema,
     compute_bntkn_rate,
     compute_max_tkn_deposit,
-    compute_vault_tkn_tvl,
+    compute_vault_tkn_tvl, check_pool_shutdown, shutdown_pool,
 )
 import pandas as pd
 import random
@@ -115,7 +115,7 @@ def process_arbitrage_trade(
         user_bnt: Decimal,
 ) -> Tuple[Decimal, str, str, bool]:
     """
-    Computes the appropriate arbitrage trade on the token_name pool.
+    Computes the appropriate arbitrage trade on the tkn_name pool.
     """
     a = bnt_trading_liquidity
     b = tkn_trading_liquidity
@@ -156,10 +156,10 @@ def process_arbitrage_trade(
         source_token = tkn_name
         target_token = "bnt"
         trade_amt = tkn_trade_amt
-        if pd.isnull(user_tkn):
-            user_tkn = Decimal('0')
-        if pd.isnull(trade_amt):
-            trade_amt = Decimal('0')
+        # if pd.isnull(user_tkn):
+        #     user_tkn = Decimal('0')
+        # if pd.isnull(trade_amt):
+        #     trade_amt = Decimal('0')
         user_capability = user_tkn > tkn_trade_amt
         return trade_amt, source_token, target_token, user_capability
 
@@ -221,7 +221,11 @@ class MonteCarloGenerator(object):
             freq = int(round(float(pool_freq_dist[tkn] * simulation_step_count), 0))
             for i in range(freq):
                 random_tkn_names.append(tkn)
-        random.shuffle(random_tkn_names)
+
+        random.seed(1)
+        for i in range(50):
+            random.shuffle(random_tkn_names)
+
         self.pool_freq_dist_list = random_tkn_names
 
     def get_random_amt(self, amt: Decimal) -> Decimal:
@@ -240,28 +244,39 @@ class MonteCarloGenerator(object):
         user_name = self.user_name
         tkn_name, target_tkn = self.get_random_tkn_names(state)
         source_liquidity = get_tkn_trading_liquidity(state, tkn_name)
+        bnt_min_liquidity = get_bnt_min_liquidity(state, tkn_name)
+        bnt_trading_liquidity = get_bnt_trading_liquidity(state, tkn_name)
+        delta = bnt_trading_liquidity - bnt_min_liquidity
         user_funds = get_user_balance(state, user_name, tkn_name)
-        swap_amt = self.get_random_amt(source_liquidity)
-        if pd.isnull(user_funds):
-            user_funds = Decimal('0')
-        if pd.isnull(swap_amt):
-            swap_amt = Decimal('0')
-        if user_funds > swap_amt:
-            amt = swap_amt
-        else:
-            amt = user_funds
-        self.protocol.trade(
-            tkn_amt=amt,
-            source_token=tkn_name,
-            target_token=target_tkn,
-            user_name=user_name,
-            timestamp=timestamp,
-        )
+
+        is_trading_enabled_source = get_is_trading_enabled(state, tkn_name)
+        is_trading_enabled_target = get_is_trading_enabled(state, target_tkn)
+        amt = 0
+        if is_trading_enabled_source and is_trading_enabled_target:
+            swap_amt = self.get_random_amt(source_liquidity)
+            if pd.isnull(user_funds):
+                user_funds = Decimal('0')
+
+            if pd.isnull(swap_amt):
+                swap_amt = Decimal('0')
+            if user_funds > swap_amt:
+                amt = swap_amt
+            else:
+                amt = user_funds
+
+            if amt > 0:
+                self.protocol.trade(
+                    tkn_amt=amt,
+                    source_token=tkn_name,
+                    target_token=target_tkn,
+                    user_name=user_name,
+                    timestamp=timestamp,
+                )
         if target_tkn == 'bnt':
             tkn = tkn_name
         else:
             tkn = target_tkn
-        trading_fee = get_trading_fee(state, tkn_name)
+        trading_fee = get_trading_fee(state, tkn)
         fees_earned = trading_fee * amt
         self.rolling_trade_fees[tkn].append(fees_earned)
         self.daily_trade_volume += amt
@@ -271,7 +286,7 @@ class MonteCarloGenerator(object):
 
     def arbitrage_trade(self, state: State, tkn_name: str, user_name: str):
         """
-        Computes the appropriate arbitrage trade on the token_name pool.
+        Computes the appropriate arbitrage trade on the tkn_name pool.
         """
         timestamp = self.timestamp
         tkn_price, bnt_price = get_prices(state, tkn_name)
@@ -281,7 +296,9 @@ class MonteCarloGenerator(object):
         user_tkn = get_user_balance(state, user_name, tkn_name)
         user_bnt = get_user_balance(state, user_name, "bnt")
         is_trading_enabled = get_is_trading_enabled(state, tkn_name)
-
+        trade_amt = Decimal('0')
+        source_token = tkn_name
+        target_token = tkn_name
         if is_trading_enabled:
             x = process_arbitrage_trade(
                 tkn_name,
@@ -301,20 +318,24 @@ class MonteCarloGenerator(object):
                     user_capability,
                 ) = x
                 if user_capability:
-                    self.protocol.trade(
-                        trade_amt, source_token, target_token, user_name, timestamp
-                    )
-                    self.daily_trade_volume += trade_amt
-                self.latest_tkn_name = source_token + "_" + target_token
-                self.latest_amt = trade_amt
+                    if trade_amt > 0:
+                        self.protocol.trade(
+                            trade_amt, source_token, target_token, user_name, timestamp
+                        )
 
-                if target_token == 'bnt':
-                    tkn = source_token
-                else:
-                    tkn = target_token
-                trading_fee = get_trading_fee(state, tkn_name)
-                fees_earned = trading_fee * trade_amt
-                self.rolling_trade_fees[tkn].append(fees_earned)
+
+        self.daily_trade_volume += trade_amt
+
+        self.latest_tkn_name = source_token + "_" + target_token
+        self.latest_amt = trade_amt
+
+        if target_token == 'bnt':
+            tkn = source_token
+        else:
+            tkn = target_token
+        trading_fee = get_trading_fee(state, tkn)
+        fees_earned = trading_fee * trade_amt
+        self.rolling_trade_fees[tkn].append(fees_earned)
 
     def perform_random_arbitrage_trade(self):
         """
@@ -322,8 +343,7 @@ class MonteCarloGenerator(object):
         """
         state = self.protocol.global_state
         user_name = self.random.choice([usr for usr in state.users if usr != 'protocol'])
-        tokens = [token for token in state.users[user_name].wallet if token != "bnt"]
-        tkn_name = self.random.choice(tokens)
+        tkn_name, target_tkn = self.get_random_tkn_names(state)
         if get_is_trading_enabled(state, tkn_name):
             self.arbitrage_trade(state, tkn_name, user_name)
 
@@ -411,7 +431,9 @@ class MonteCarloGenerator(object):
         return self
 
     def get_random_tkn_names(self, state: State) -> Tuple[str, str]:
-        source_tkn, target_tkn = self.random.sample(self.pool_freq_dist_list, 2)
+        source_tkn, target_tkn = 'None', 'None'
+        while source_tkn == target_tkn:
+            source_tkn, target_tkn = self.random.sample(self.pool_freq_dist_list, 2)
         return source_tkn, target_tkn
 
     def get_average_trading_fee(self):
@@ -505,14 +527,14 @@ class MonteCarloGenerator(object):
         return user_balance * Decimal(self.random.uniform(float(0.001), float(0.5)))
 
     def get_random_cooldown_amt(self, user_bntkn_amt: Decimal) -> Decimal:
-        if self.random.randint(0, 10) != 0:
-            max_amt, min_amt = user_bntkn_amt * Decimal(
-                "0.1"
-            ), user_bntkn_amt * Decimal("0.01")
-        else:
-            max_amt, min_amt = user_bntkn_amt * Decimal("1"), user_bntkn_amt * Decimal(
-                "0.5"
-            )
+        # if self.random.randint(0, 10) != 0:
+        max_amt, min_amt = user_bntkn_amt * Decimal(
+            "0.01"
+        ), user_bntkn_amt * Decimal("0.001")
+        # else:
+        #     max_amt, min_amt = user_bntkn_amt * Decimal("1"), user_bntkn_amt * Decimal(
+        #         "0.5"
+        #     )
         return Decimal(self.random.uniform(float(min_amt), float(max_amt)))
 
     def is_protocol_bnbnt_healthy(
@@ -648,7 +670,7 @@ class MonteCarloGenerator(object):
                     deposit_amt = Decimal('0')
                 if pd.isnull(user_tkn):
                     user_tkn = Decimal('0')
-                if deposit_amt < user_tkn:
+                if 0 < deposit_amt < user_tkn:
                     self.protocol.deposit(
                         tkn_name,
                         deposit_amt,
@@ -668,7 +690,8 @@ class MonteCarloGenerator(object):
                     deposit_amt = Decimal('0')
                 if pd.isnull(user_tkn):
                     user_tkn = Decimal('0')
-                if deposit_amt < user_tkn:
+
+                if 0 < deposit_amt < user_tkn:
                     self.protocol.deposit(
                         tkn_name, deposit_amt, user_name, timestamp
                     )
@@ -718,7 +741,7 @@ class MonteCarloGenerator(object):
         state = self.protocol.global_state
         timestamp = self.timestamp
         user_name = self.random.choice(state.usernames)
-        tkn_name = self.random.choice([tkn for tkn in state.whitelisted_tokens])
+        tkn_name, target_tkn = self.get_random_tkn_names(state)
         pending_withdrawals = get_user_pending_withdrawals(state, user_name, tkn_name)
         if len(pending_withdrawals) > 0:
             id_number = self.random.choice(pending_withdrawals)
@@ -748,23 +771,59 @@ class MonteCarloGenerator(object):
             df = df[['timestamp', 'tkn_name', 'name', 'amount']]
             nl.append(df)
         return pd.concat(nl)
+    
+    def reduce_trading_liquidity(self, tkn_name, updated_bnt_trading_liquidity):
+        """
+        Updates the state of the appropriate pool, and the protocol holdings, as required.
+        """
+        state = self.protocol.global_state
+        updated_bnt_trading_liquidity = Decimal(updated_bnt_trading_liquidity)
+        bnt_trading_liquidity = get_bnt_trading_liquidity(state, tkn_name)
+        tkn_trading_liquidity = get_tkn_trading_liquidity(state, tkn_name)
+        ema_rate = get_ema_rate(state, tkn_name)
+        spot_rate = get_spot_rate(state, tkn_name)
+        bnt_renounced = bnt_trading_liquidity - updated_bnt_trading_liquidity
+        staked_bnt = get_staked_balance(state, 'bnt')
+        bnbnt_supply = get_pooltoken_balance(state, 'bnt')
+        bnbnt_rate = get_bnbnt_rate(state)
+        bnbnt_renounced = bnbnt_rate * bnt_renounced
+        updated_tkn_trading_liquidity = max(tkn_trading_liquidity - bnt_renounced / ema_rate, 0)
+        if get_is_price_stable(state, tkn_name):
+            state.decrease_bnt_trading_liquidity(tkn_name, bnt_renounced)
+            state.decrease_staked_balance(tkn_name, bnt_renounced)
+            state.decrease_vault_balance(tkn_name, bnt_renounced)
+            state.decrease_pooltoken_balance(tkn_name, bnt_renounced)
+            state.decrease_protocol_wallet_balance(tkn_name, bnt_renounced)
+            state.set_bnt_funding_limit(tkn_name, updated_bnt_trading_liquidity)
+            state.set_bnt_funding_amt(tkn_name, updated_bnt_trading_liquidity)
+            state.set_tkn_trading_liquidity(tkn_name, updated_tkn_trading_liquidity)
+            if check_pool_shutdown(state, tkn_name):
+                state = shutdown_pool(state, tkn_name)
+            self.protocol.set_state(state)
 
     def set_bnt_funding_limit_by_rolling_avg(self, n_periods, constant_multiplier):
         from statistics import mean
         state = self.protocol.global_state
         for tkn_name in list(state.whitelisted_tokens):
             new_bnt_funding_limit = mean(self.rolling_trade_fees[tkn_name][-n_periods:]) * constant_multiplier
-            state.set_bnt_funding_limit(tkn_name, new_bnt_funding_limit)
-        self.protocol.set_state(state)
+            self.reduce_trading_liquidity(tkn_name, new_bnt_funding_limit)
+
+        #     state.set_bnt_funding_limit(tkn_name, new_bnt_funding_limit)
+        #     if check_pool_shutdown(state, tkn_name):
+        #         state = shutdown_pool(state, tkn_name)
+        # self.protocol.set_state(state)
+
         return self
 
     def run(self, transact, mean_events_per_day=None, n_periods=None, constant_multiplier=None, is_proposal=False):
         for ct in range(self.simulation_step_count):
             self.timestamp = ct
-            transact(self)
+            transact(self, is_proposal)
             if is_proposal:
                 try:
-                    self.set_bnt_funding_limit_by_rolling_avg(n_periods, constant_multiplier)
+                    if self.timestamp > mean_events_per_day * n_periods:
+                        print('set_bnt_funding_limit_by_rolling_avg', self.timestamp)
+                        self.set_bnt_funding_limit_by_rolling_avg(n_periods * mean_events_per_day, constant_multiplier)
                 except:
                     pass
-        return self.transform_results(pd.concat(self.logger), list(self.whitelisted_tokens))
+        return pd.concat(self.logger)

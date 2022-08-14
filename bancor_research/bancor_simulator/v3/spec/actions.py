@@ -39,6 +39,8 @@ def deposit_tkn(state: State, tkn_name: str, tkn_amt: Decimal, user_name: str) -
 
     case, bnt_increase, tkn_increase = compute_pool_depth_adjustment(state, tkn_name)
 
+    # print('bnt_increase, tkn_increase', bnt_increase, tkn_increase)
+
     state.increase_bnt_trading_liquidity(tkn_name, bnt_increase)
     state.increase_tkn_trading_liquidity(tkn_name, tkn_increase)
     state.increase_bnt_funding_amt(tkn_name, bnt_increase)
@@ -47,7 +49,7 @@ def deposit_tkn(state: State, tkn_name: str, tkn_amt: Decimal, user_name: str) -
     state.update_spot_rate(tkn_name)
 
     if check_pool_shutdown(state, tkn_name):
-        print(f"{tkn_name} pool is shutting down")
+        print(f"{tkn_name} pool is shutting down {state.timestamp}")
         state = shutdown_pool(state, tkn_name)
 
     return state
@@ -206,6 +208,8 @@ def trade_bnt_for_tkn(
         bnt_amt,
         direction,
     )
+    # print('updated_bnt_liquidity', updated_bnt_liquidity)
+    # print('updated_tkn_liquidity', updated_tkn_liquidity)
 
     state.increase_vault_balance("bnt", bnt_amt)
     state.decrease_vault_balance(tkn_name, tkn_sent_to_user)
@@ -262,7 +266,7 @@ def trade_tkn_for_bnt(
         tkn_amt,
         direction,
     )
-
+    # print('updated_bnt_liquidity', updated_bnt_liquidity)
     state.decrease_vault_balance("bnt", bnt_sent_to_user)
     state.increase_vault_balance(tkn_name, tkn_amt)
     state.set_bnt_trading_liquidity(tkn_name, updated_bnt_liquidity)

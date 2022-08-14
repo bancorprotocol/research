@@ -378,7 +378,7 @@ def process_withdrawal(
             state.set_pending_withdrawals_status(user_name, tkn_name, id_number, True)
             state.decrease_user_balance(user_name, "vbnt", pool_token_amt)
             state.increase_user_balance(user_name, "bnt", bnt_amt)
-            state.increase_protocol_wallet_balance("bnbnt", pool_token_amt)
+            state.increase_protocol_wallet_balance("bnt", pool_token_amt)
 
     return state
 

@@ -392,7 +392,9 @@ def begin_withdrawal_cooldown_by_ptkn(state, ptkn_amt, tkn_name, user_name):
     return _begin_withdrawal_cooldown(state, tkn_name, user_name, rtkn_amt, ptkn_amt)
 
 
-def _begin_withdrawal_cooldown(state, tkn_name, user_name, withdraw_value, pool_token_amt):
+def _begin_withdrawal_cooldown(
+    state, tkn_name, user_name, withdraw_value, pool_token_amt
+):
     """
     After a fixed time duration, these items can be retrieved and passed to the withdrawal algorithm.
     """

@@ -246,7 +246,7 @@ class BancorDapp:
         tkn_name: str,
         user_name: str,
         timestamp: int = 0,
-        action_name: str = "begin cooldown",
+        action_name: str = "begin cooldown by reserve token amount",
     ):
         """
         Begin the withdrawal cooldown operation by specifying the output amount of reserve tokens.
@@ -271,7 +271,7 @@ class BancorDapp:
         tkn_name: str,
         user_name: str,
         timestamp: int = 0,
-        action_name: str = "begin cooldown",
+        action_name: str = "begin cooldown by pool token amount",
     ):
         """
         Begin the withdrawal cooldown operation by specifying the intput amount of pool tokens.

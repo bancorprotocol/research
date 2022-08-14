@@ -393,7 +393,7 @@ def begin_withdrawal_cooldown_by_ptkn(state, ptkn_amt, tkn_name, user_name):
 
 
 def _begin_withdrawal_cooldown(
-    state, tkn_name, user_name, withdraw_value, pool_token_amt
+    state, tkn_name, user_name, rtkn_amt, ptkn_amt
 ):
     """
     After a fixed time duration, these items can be retrieved and passed to the withdrawal algorithm.
@@ -404,12 +404,12 @@ def _begin_withdrawal_cooldown(
         created_at=state.timestamp,
         user_name=user_name,
         tkn_name=tkn_name,
-        tkn=Token(balance=withdraw_value),
-        pooltoken=Token(balance=pool_token_amt),
+        tkn=Token(balance=rtkn_amt),
+        pooltoken=Token(balance=ptkn_amt),
         is_complete=False,
     )
 
-    state.decrease_user_balance(user_name, f"bn{tkn_name}", pool_token_amt)
+    state.decrease_user_balance(user_name, f"bn{tkn_name}", ptkn_amt)
     return id_number
 
 

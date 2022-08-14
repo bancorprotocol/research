@@ -145,7 +145,7 @@ class BancorDapp:
         tkn_name: str,
         user_name: str,
         timestamp: int = 0,
-        action_name: str = "begin cooldown",
+        action_name: str = "begin cooldown by reserve token amount",
     ):
         updateBlock(timestamp)
         tkn = self.poolTokens[tkn_name]
@@ -160,7 +160,7 @@ class BancorDapp:
         tkn_name: str,
         user_name: str,
         timestamp: int = 0,
-        action_name: str = "begin cooldown",
+        action_name: str = "begin cooldown by pool token amount",
     ):
         updateBlock(timestamp)
         tkn = self.poolTokens[tkn_name]

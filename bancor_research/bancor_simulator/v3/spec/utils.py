@@ -77,9 +77,9 @@ def compute_bntkn_rate(state: State, tkn_name: str):
     """
     pool_token_supply = get_pooltoken_balance(state, tkn_name)
     staked_balance = get_staked_balance(state, tkn_name)
-    if pool_token_supply == staked_balance:
-        return Decimal("1")
-    return pool_token_supply / staked_balance
+    if pool_token_supply != staked_balance:
+        return pool_token_supply / staked_balance
+    return Decimal("1")
 
 
 def compute_bntkn_amt(state: State, tkn_name: str, tkn_amt: Decimal) -> Decimal:

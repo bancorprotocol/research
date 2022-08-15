@@ -202,41 +202,42 @@ def execute(fileName):
             assertAlmostEqual(state[token.symbol()]['contract_erVault'], toValue(token, token.balanceOf(erVault)), 0, '0.000000000001')
             assertAlmostEqual(state[token.symbol()]['contract_bntPool'], toValue(token, token.balanceOf(bntPool)), 0, '0.000000000001')
 
+    def Print(title, *args):
+        print('operation {} out of {}: {}'.format(n + 1, len(flow['operations']), title.format(*args)))
+
     for n in range(len(flow['operations'])):
         operation = flow['operations'][n]
-
-        print('{} out of {}: '.format(n + 1, len(flow['operations'])), end = '')
 
         if (operation['elapsed'] > 0):
             block.number += 1
             block.timestamp += operation['elapsed']
 
         if operation['type'] == 'deposit':
-            print('deposit {} {} reserve tokens'.format(operation['amount'], operation['poolId']))
+            Print('deposit {} {} reserve tokens', operation['amount'], operation['poolId'])
             deposit(operation['poolId'], operation['userId'], operation['amount'])
         elif operation['type'] == 'withdraw':
-            print('withdraw {} {} pool tokens'.format(operation['amount'], operation['poolId']))
+            Print('withdraw {} {} pool tokens', operation['amount'], operation['poolId'])
             withdraw(operation['poolId'], operation['userId'], operation['amount'])
         elif operation['type'] == 'trade':
-            print('trade {} {} reserve tokens for {} reserve tokens'.format(operation['amount'], operation['poolId'], operation['targetPoolId']))
+            Print('trade {} {} reserve tokens for {} reserve tokens', operation['amount'], operation['poolId'], operation['targetPoolId'])
             trade(operation['poolId'], operation['targetPoolId'], operation['userId'], operation['amount'])
         elif operation['type'] == 'burnPoolToken':
-            print('burn {} {} pool tokens'.format(operation['amount'], operation['poolId']))
+            Print('burn {} {} pool tokens', operation['amount'], operation['poolId'])
             burnPoolToken(operation['poolId'], operation['userId'], operation['amount'])
         elif operation['type'] == 'joinProgram':
-            print('join {} {} pool tokens'.format(operation['amount'], operation['poolId']))
+            Print('join {} {} pool tokens', operation['amount'], operation['poolId'])
             joinProgram(operation['poolId'], operation['userId'], operation['amount'])
         elif operation['type'] == 'leaveProgram':
-            print('leave {} {} pool tokens'.format(operation['amount'], operation['poolId']))
+            Print('leave {} {} pool tokens', operation['amount'], operation['poolId'])
             leaveProgram(operation['poolId'], operation['userId'], operation['amount'])
         elif operation['type'] == 'claimRewards':
-            print('claim {} rewards'.format(operation['poolId']))
+            Print('claim {} rewards', operation['poolId'])
             claimRewards(operation['poolId'], operation['userId'])
         elif operation['type'] == 'setFundingLimit':
-            print('set {} pool funding limit to {} bnt'.format(operation['poolId'], operation['amount']))
+            Print('set {} pool funding limit to {} bnt', operation['poolId'], operation['amount'])
             setFundingLimit(operation['poolId'], operation['amount'])
         elif operation['type'] == 'enableTrading':
-            print('enable trading with 1 {} = {}/{} bnt'.format(operation['poolId'], operation['bntVirtualBalance'], operation['baseTokenVirtualBalance']))
+            Print('enable trading with 1 {} = {}/{} bnt', operation['poolId'], operation['bntVirtualBalance'], operation['baseTokenVirtualBalance'])
             enableTrading(operation['poolId'], operation['bntVirtualBalance'], operation['baseTokenVirtualBalance'])
         else:
             raise Exception('unsupported operation `{}` encountered'.format(operation['type']))

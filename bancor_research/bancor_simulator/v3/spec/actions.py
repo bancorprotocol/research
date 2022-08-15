@@ -39,10 +39,12 @@ def deposit_tkn(state: State, tkn_name: str, tkn_amt: Decimal, user_name: str) -
 
     case, bnt_increase, tkn_increase = compute_pool_depth_adjustment(state, tkn_name)
 
+    bnbnt_amt = compute_bnbnt_amt(state, bnt_increase)
     state.increase_bnt_trading_liquidity(tkn_name, bnt_increase)
     state.increase_tkn_trading_liquidity(tkn_name, tkn_increase)
     state.increase_bnt_funding_amt(tkn_name, bnt_increase)
-    state.set_protocol_wallet_balance("bnt", bnt_increase)
+    state.increase_vault_balance("bnt", bnt_increase)
+    state.increase_protocol_wallet_balance("bnt", bnbnt_amt)
 
     state.update_spot_rate(tkn_name)
 
@@ -337,7 +339,7 @@ def process_withdrawal(
             state.set_bnt_trading_liquidity(tkn_name, updated_bnt_liquidity)
             state.decrease_staked_balance("bnt", bnt_renounced)
             state.decrease_vault_balance("bnt", bnt_renounced)
-            state.increase_bnt_funding_amt(tkn_name, bnt_renounced)
+            state.decrease_bnt_funding_amt(tkn_name, bnt_renounced)
 
             bnbnt_renounced = bnbnt_rate * bnt_renounced
 

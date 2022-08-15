@@ -133,7 +133,6 @@ def compute_changed_bnt_trading_liquidity(
         return (a * (a + x) + d * (1 - e) * (a * x + x**2)) / (a + d * x)
 
 
-
 def compute_changed_tkn_trading_liquidity(
     a: Decimal, b: Decimal, d: Decimal, x: Decimal, direction: str
 ) -> Decimal:

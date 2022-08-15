@@ -525,17 +525,11 @@ class State(GlobalSettings):
         """
         Returns the inverse of the bnt price feed at the current timestamp
         """
-        if (
-            self.tokens["bnt"].staking_ledger.balance == 0
-            and self.tokens["bnt"].pooltoken_supply.balance == 0
-        ):
-            bnbnt_rate = Decimal("1")
-        else:
-            bnbnt_rate = Decimal(
-                self.tokens["bnt"].pooltoken_supply.balance
-                / self.tokens["bnt"].staking_ledger.balance
-            )
-        return bnbnt_rate
+        pooltoken_supply = self.tokens["bnt"].pooltoken_supply.balance
+        staking_ledger = self.tokens["bnt"].staking_ledger.balance
+        if pooltoken_supply != staking_ledger:
+            return Decimal(pooltoken_supply) / Decimal(staking_ledger)
+        return Decimal("1")
 
     def step(self):
         """

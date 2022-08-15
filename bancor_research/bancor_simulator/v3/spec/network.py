@@ -52,6 +52,7 @@ class BancorDapp:
         whitelisted_tokens=DEFAULT.WHITELIST,
         price_feeds_path: str = DEFAULT.PRICE_FEEDS_PATH,
         price_feeds: PandasDataFrame = DEFAULT.PRICE_FEEDS,
+        log_state: bool = False
     ):
 
         transaction_id = 0
@@ -103,6 +104,7 @@ class BancorDapp:
         self._backup_states = {}
         self._global_state = state
         self.history = []
+        self.log_state = log_state
 
     @property
     def backup_states(self):
@@ -144,7 +146,8 @@ class BancorDapp:
         """
         Increments a new id and state for each action
         """
-        self.update_state(state)
+        if self.log_state:
+            self.update_state(state)
         self.transaction_id += 1
 
     def get_state(
@@ -153,7 +156,13 @@ class BancorDapp:
         """
         Creates a copy of the global state which will modified during a new action.
         """
-        return self.copy_state(copy_type=copy_type, state=state, timestamp=timestamp)
+        if self.log_state:
+            return self.copy_state(
+                copy_type=copy_type, state=state, timestamp=timestamp
+            )
+        else:
+            self.global_state.timestamp = timestamp
+            return self.global_state
 
     def revert_state(self, timestamp):
         """

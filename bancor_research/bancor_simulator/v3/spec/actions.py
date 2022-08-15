@@ -34,8 +34,8 @@ def deposit_tkn(state: State, tkn_name: str, tkn_amt: Decimal, user_name: str) -
     state.decrease_user_balance(user_name, tkn_name, tkn_amt)
     state.increase_user_balance(user_name, f"bn{tkn_name}", bntkn_amt)
     state.increase_pooltoken_balance(tkn_name, bntkn_amt)
-    state.increase_vault_balance(tkn_name, bntkn_amt)
-    state.increase_staked_balance(tkn_name, bntkn_amt)
+    state.increase_vault_balance(tkn_name, tkn_amt)
+    state.increase_staked_balance(tkn_name, tkn_amt)
 
     case, bnt_increase, tkn_increase = compute_pool_depth_adjustment(state, tkn_name)
 

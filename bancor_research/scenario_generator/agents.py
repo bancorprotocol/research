@@ -467,9 +467,8 @@ class LP(RandomWalker):
         return self
 
     def perform_random_enable_trading(self):
-        self.protocol.v3.dao_msig_init_pools(
-            self.protocol.v3.global_state.whitelisted_tokens, "bnt"
-        )
+        for tkn_name in self.protocol.v3.global_state.whitelisted_tokens:
+            self.protocol.v3.enable_trading(tkn_name)
         return self
 
     def get_random_withdrawal_amt(self, tkn_name: str) -> Decimal:

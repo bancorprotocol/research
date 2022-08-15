@@ -317,9 +317,9 @@ class BancorDapp:
     def enable_trading(
         self,
         tkn_name: str,
-        timestamp: int = 0,
         tkn_price: str = "",
         bnt_price: str = "",
+        timestamp: int = 0,
         transaction_type: str = "enableTrading",
     ) -> None:
         """

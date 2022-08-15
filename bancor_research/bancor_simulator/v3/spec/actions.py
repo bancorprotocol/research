@@ -20,7 +20,7 @@ def deposit_bnt(state: State, tkn_name: str, tkn_amt: Decimal, user_name: str) -
     """
     bnbnt_amt = compute_bnbnt_amt(state, tkn_amt)
     state.decrease_user_balance(user_name, tkn_name, tkn_amt)
-    state.decrease_protocol_wallet_balance("bnt", tkn_amt)
+    state.decrease_protocol_wallet_balance("bnt", bnbnt_amt)
     state.increase_user_balance(user_name, f"bn{tkn_name}", bnbnt_amt)
     state.increase_user_balance(user_name, "vbnt", bnbnt_amt)
     return state

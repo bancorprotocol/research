@@ -329,18 +329,18 @@ from bancor_research.bancor_emulator import config
 
 if config.full_precision_mode:
     def exp2(f: Fraction256) -> (Fraction256):
-        return Fraction256({ 'n': uint256(2) ** (f.n / f.d), 'd': 1 });
+        return Fraction256({ 'n': uint256(2) ** (f.n / f.d), 'd': 1 })
     def truncatedFraction(fraction: Fraction256, max: int) -> (Fraction256):
-        return fraction;
+        return fraction
     def mulDivF(x, y, z) -> (uint):
-        return uint256(x) * y / z 
+        return uint256(x) * y / z
     def mulDivC(x, y, z) -> (uint):
-        return uint256(x) * y / z 
+        return uint256(x) * y / z
     def gt512(x: Uint512, y: Uint512) -> (bool):
-        return x.lo > y.lo;
+        return x.lo > y.lo
     def lt512(x: Uint512, y: Uint512) -> (bool):
-        return x.lo < y.lo;
+        return x.lo < y.lo
     def mul512(x, y) -> (Uint512):
-        return Uint512({ 'hi': 0, 'lo': uint256(x) * y });
+        return Uint512({ 'hi': 0, 'lo': uint256(x) * y })
 
 library(vars(), MathEx)

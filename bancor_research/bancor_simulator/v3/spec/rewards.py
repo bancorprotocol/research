@@ -166,8 +166,9 @@ def create_standard_reward_program(
         start_time=start_time,
         end_time=end_time,
         reward_rate=reward_rate,
-        remaining_rewards=remaining_rewards,
     )
+
+    state.set_standard_remaining_rewards(id, remaining_rewards)
 
     return state, id
 
@@ -187,6 +188,8 @@ def snapshot_standard_rewards(
     """
     Snapshot of the existing standard rewards before modifying the staked_reward_amt balance.
     """
+    state.map_user_standard_program(user_name, id)
+
     new_reward_per_token = calc_standard_reward_per_token(state, id, timestamp)
     old_reward_per_token = get_standard_reward_per_token(state, id)
 
@@ -273,13 +276,10 @@ def join_standard_reward_program(
     """
     Join a standard reward program with the given user and id.
     """
-    state.map_user_standard_program(user_name, id)
     pool_token_name = get_standard_reward_pool_token_name(state, id)
     state = snapshot_standard_rewards(state, id, timestamp, user_name)
     state.decrease_user_balance(user_name, pool_token_name, pool_token_amount)
-    state.increase_standard_reward_program_stakes(id, pool_token_amount)
     state.increase_user_standard_rewards_stakes(id, user_name, pool_token_amount)
-    state.add_user_to_standard_reward_providers(id, user_name)
     return state
 
 
@@ -291,10 +291,8 @@ def leave_standard_reward_program(
     """
     pool_token_name = get_standard_reward_pool_token_name(state, id)
     state = snapshot_standard_rewards(state, id, timestamp, user_name)
-    state.decrease_standard_reward_program_stakes(id, pool_token_amount)
     state.decrease_user_standard_rewards_stakes(id, user_name, pool_token_amount)
     state.increase_user_balance(user_name, pool_token_name, pool_token_amount)
-    state.remove_user_from_standard_reward_program(id, user_name)
     return state
 
 
@@ -314,7 +312,7 @@ def claim_standard_rewards(
         state = snapshot_standard_rewards(state, id, timestamp, user_name)
         reward_amt = get_user_pending_standard_rewards(state, id, user_name)
         state.set_user_pending_standard_rewards(user_name, id, Decimal(0))
-        remaining_rewards = get_remaining_standard_rewards(state, id)
+        remaining_rewards = get_standard_remaining_rewards(state, id)
 
         if reward_amt > 0:
 

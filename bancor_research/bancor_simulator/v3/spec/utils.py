@@ -509,14 +509,18 @@ def handle_ema(state: State, tkn_name: str) -> State:
         state.tokens[tkn_name].ema_last_updated = state.tokens[tkn_name].timestamp
         last_spot = get_spot_rate(state, tkn_name)
         last_ema = get_ema_rate(state, tkn_name)
-        new_ema = compute_ema(last_spot, last_ema)        
+        new_ema = compute_ema(last_spot, last_ema)
         state.set_ema_rate(tkn_name, new_ema)
-        state.logger.info(f"EMA updated | old value = {last_ema} | new value = {new_ema}")
+        state.logger.info(
+            f"EMA updated | old value = {last_ema} | new value = {new_ema}"
+        )
         last_spot = get_inv_spot_rate(state, tkn_name)
         last_ema = get_inv_ema_rate(state, tkn_name)
-        new_ema = compute_ema(last_spot, last_ema)        
+        new_ema = compute_ema(last_spot, last_ema)
         state.set_inv_ema_rate(tkn_name, new_ema)
-        state.logger.info(f"Inverse EMA updated | old value = {last_ema} | new value = {new_ema}")
+        state.logger.info(
+            f"Inverse EMA updated | old value = {last_ema} | new value = {new_ema}"
+        )
     return state
 
 

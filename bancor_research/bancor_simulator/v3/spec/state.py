@@ -295,8 +295,7 @@ class Tokens(GlobalSettings):
             Decimal(f"{DEFAULT_LOWER_EMA_LIMIT}") * self.ema_rate
             <= self.spot_rate
             <= Decimal(f"{DEFAULT_UPPER_EMA_LIMIT}") * self.ema_rate
-            and
-            Decimal(f"{DEFAULT_LOWER_EMA_LIMIT}") * self.inv_ema_rate
+            and Decimal(f"{DEFAULT_LOWER_EMA_LIMIT}") * self.inv_ema_rate
             <= self.inv_spot_rate
             <= Decimal(f"{DEFAULT_UPPER_EMA_LIMIT}") * self.inv_ema_rate
         )
@@ -785,8 +784,8 @@ class State(GlobalSettings):
     def set_initial_rates(self, tkn_name: str, bootstrap_rate: Decimal):
         self.tokens[tkn_name].spot_rate = bootstrap_rate
         self.tokens[tkn_name].ema_rate = bootstrap_rate
-        self.tokens[tkn_name].inv_spot_rate = bootstrap_rate ** -1
-        self.tokens[tkn_name].inv_ema_rate = bootstrap_rate ** -1
+        self.tokens[tkn_name].inv_spot_rate = bootstrap_rate**-1
+        self.tokens[tkn_name].inv_ema_rate = bootstrap_rate**-1
 
     def set_staked_balance(self, tkn_name: str, value: Decimal):
         """

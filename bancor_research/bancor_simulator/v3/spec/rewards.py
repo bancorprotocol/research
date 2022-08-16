@@ -138,7 +138,6 @@ def distribute_autocompounding_program(
 def create_standard_reward_program(
     state: State,
     tkn_name: str,
-    rewards_token: str,
     total_rewards: Decimal,
     start_time: int,
     end_time: int,
@@ -156,14 +155,12 @@ def create_standard_reward_program(
 
     id = state.next_standard_program_id()
 
-    unclaimed_rewards = get_unclaimed_rewards(state, rewards_token)
     reward_rate = total_rewards / (end_time - start_time)
     remaining_rewards = reward_rate * (end_time - start_time)
 
     state.standard_reward_programs[id] = StandardProgram(
         id=id,
         tkn_name=tkn_name,
-        rewards_token=rewards_token,
         is_active=True,
         last_update_time=start_time,
         start_time=start_time,
@@ -172,21 +169,14 @@ def create_standard_reward_program(
         remaining_rewards=remaining_rewards,
     )
 
-    state.set_standard_rewards_vault_balance(
-        rewards_token, unclaimed_rewards + total_rewards
-    )
     return state, id
 
 
 def terminate_standard_program(state: State, id: int, timestamp: int) -> State:
     """
-    Terminates the standard program.
+    Terminates the standard rewards program.
     """
-    tkn_name, rewards_token = get_standard_reward_tkn_name(state, id)
-    remaining_rewards = calc_standard_rewards_remaining(state, id, timestamp)
-
     state.set_standard_program_is_active(id, False)
-    state.decrease_standard_rewards_vault_balance(rewards_token, remaining_rewards)
     state.set_standard_program_end_time(id, timestamp)
     return state
 
@@ -197,7 +187,7 @@ def snapshot_standard_rewards(
     """
     Snapshot of the existing standard rewards before modifying the staked_reward_amt balance.
     """
-    new_reward_per_token = calc_standard_reward_per_token(state, id)
+    new_reward_per_token = calc_standard_reward_per_token(state, id, timestamp)
     old_reward_per_token = get_standard_reward_per_token(state, id)
 
     if new_reward_per_token != old_reward_per_token:
@@ -283,15 +273,9 @@ def join_standard_reward_program(
     """
     Join a standard reward program with the given user and id.
     """
-    tkn_name, rewards_token = get_standard_reward_tkn_name(state, id)
-    assert tkn_name in get_user_wallet_tokens(
-        state, user_name
-    ), f"User {user_name} does not have token {tkn_name} in wallet"
-
+    pool_token_name = get_standard_reward_pool_token_name(state, id)
     state = snapshot_standard_rewards(state, id, timestamp, user_name)
-    state.decrease_user_balance(
-        user_name, get_pooltoken_name(tkn_name), pool_token_amount
-    )
+    state.decrease_user_balance(user_name, pool_token_name, pool_token_amount)
     state.increase_standard_reward_program_stakes(id, pool_token_amount)
     state.increase_user_standard_rewards_stakes(id, pool_token_amount)
     state.add_user_to_standard_reward_providers(id, user_name)
@@ -304,17 +288,11 @@ def leave_standard_reward_program(
     """
     Leave a standard reward program for the given user and program id.
     """
-    tkn_name, rewards_token = get_standard_reward_tkn_name(state, id)
-    assert user_name in get_standard_reward_providers(
-        state, id
-    ), f"User {user_name} not in standard reward providers"
-
+    pool_token_name = get_standard_reward_pool_token_name(state, id)
     state = snapshot_standard_rewards(state, id, timestamp, user_name)
     state.decrease_standard_reward_program_stakes(id, pool_token_amount)
     state.decrease_user_standard_rewards_stakes(id, pool_token_amount)
-    state.increase_user_balance(
-        user_name, get_pooltoken_name(rewards_token), pool_token_amount
-    )
+    state.increase_user_balance(user_name, pool_token_name, pool_token_amount)
     state.remove_user_from_standard_reward_program(id, user_name)
     return state
 
@@ -324,7 +302,6 @@ def claim_standard_rewards(
     user_name: str,
     ids: list,
     timestamp: int,
-    is_vault_updated: bool = False,
 ) -> State:
     """
     Claim standard rewards for the given user.
@@ -333,7 +310,6 @@ def claim_standard_rewards(
 
     for id in ids:
 
-        tkn_name, rewards_token = get_standard_reward_tkn_name(state, id)
         state = snapshot_standard_rewards(state, id, timestamp, user_name)
         reward_amt = get_user_pending_standard_rewards(state, id, user_name)
         state.set_user_pending_standard_rewards(user_name, id, Decimal(0))
@@ -350,17 +326,4 @@ def claim_standard_rewards(
 
             total_amt += reward_amt
 
-            is_vault_updated = True
-
-    if is_vault_updated:
-        state.decrease_standard_rewards_vault_balance(rewards_token, total_amt)
-
-    return state
-
-
-def distribute_standard_rewards(
-    state: State, user_name: str, rewards_token: str, reward_amt: Decimal
-) -> State:
-    state.decrease_standard_rewards_vault_balance(rewards_token, reward_amt)
-    state.increase_user_balance(user_name, rewards_token, reward_amt)
     return state

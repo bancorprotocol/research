@@ -34,7 +34,7 @@ def execute(fileName):
             for bancorDapp in bancorDapps:
                 bancorDapp.set_user_balance(user, token, balance, timestamp)
 
-    programIds = dict((bancorDapp, {}) for bancorDapp in bancorDapps)
+    programIds = {bancorDapp : {} for bancorDapp in bancorDapps}
     for poolId, programsParams in fileData['programs'].items():
         for bancorDapp in bancorDapps:
             programIds[bancorDapp][poolId] = bancorDapp.create_standard_rewards_program(

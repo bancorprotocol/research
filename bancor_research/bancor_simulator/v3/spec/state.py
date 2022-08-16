@@ -167,7 +167,6 @@ class StandardProgram:
 
     id: int
     tkn_name: str
-    rewards_token: str
     is_active: bool
     start_time: int
     end_time: int
@@ -1022,13 +1021,6 @@ def get_vault_tvl(state: State) -> Decimal:
     )
 
 
-def get_unclaimed_rewards(state: State, tkn_name: str) -> Decimal:
-    """
-    Returns the rewards vault balance for a given tkn_name.
-    """
-    return state.tokens[tkn_name].standard_rewards_vault.balance
-
-
 def get_total_standard_rewards_staked(state, id: int) -> Decimal:
     """
     Returns the total standard rewards staked_reward_amt for a given program id.
@@ -1108,13 +1100,6 @@ def get_standard_reward_pool_token_name(state: State, id: int) -> str:
     Get the standard reward pool token name for a given id.
     """
     return get_pooltoken_name(state.standard_reward_programs[id].tkn_name)
-
-
-def get_standard_reward_rewards_token_name(state: State, id: int) -> str:
-    """
-    Get the standard reward rewards token name for a given id.
-    """
-    return state.standard_reward_programs[id].rewards_token
 
 
 def get_standard_reward_per_token(state: State, id: int) -> Decimal:

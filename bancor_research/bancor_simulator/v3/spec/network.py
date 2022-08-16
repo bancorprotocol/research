@@ -589,7 +589,6 @@ class BancorDapp:
         state, id = create_standard_reward_program(
             state=state,
             tkn_name=tkn_name,
-            rewards_token="bnt",
             total_rewards=tkn_amt,
             start_time=start_time,
             end_time=end_time,

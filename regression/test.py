@@ -19,6 +19,7 @@ def execute(fileName):
     bancorDapps = [
         BancorDapp(
             timestamp = timestamp,
+            log_state = False,
             cooldown_time = 0,
             bnt_min_liquidity = fileData['bnt_min_liquidity'],
             withdrawal_fee = fileData['withdrawal_fee'],

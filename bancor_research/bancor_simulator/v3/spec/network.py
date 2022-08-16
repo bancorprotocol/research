@@ -52,7 +52,7 @@ class BancorDapp:
         whitelisted_tokens=DEFAULT.WHITELIST,
         price_feeds_path: str = DEFAULT.PRICE_FEEDS_PATH,
         price_feeds: PandasDataFrame = DEFAULT.PRICE_FEEDS,
-        log_state: bool = False,
+        log_state: bool = True,
     ):
 
         transaction_id = 0

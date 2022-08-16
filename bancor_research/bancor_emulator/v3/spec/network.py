@@ -54,6 +54,7 @@ class BancorDapp:
         whitelisted_tokens = DEFAULT.WHITELIST,
         price_feeds_path: str = DEFAULT.PRICE_FEEDS_PATH,
         price_feeds: PandasDataFrame = DEFAULT.PRICE_FEEDS,
+        log_state: bool = True,
     ):
         block.timestamp = 0
         block.number = 0

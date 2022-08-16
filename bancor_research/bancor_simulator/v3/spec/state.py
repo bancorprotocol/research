@@ -177,7 +177,6 @@ class StandardProgram:
     total_unclaimed_rewards: Any = field(default_factory=Token)
     staked_reward_amt: Any = field(default_factory=Token)
     pooltoken_amt: Any = field(default_factory=Token)
-    providers: list = field(default_factory=list)
 
 
 @dataclass(config=Config)
@@ -535,18 +534,6 @@ class State(GlobalSettings):
         """
         self.timestamp += 1
 
-    def add_user_to_standard_reward_providers(self, id: int, user_name: str):
-        """
-        Add a user to a given standard reward program providers list.
-        """
-        self.standard_reward_programs[id].providers.append(user_name)
-
-    def remove_user_from_standard_reward_program(self, id: int, user_name: str):
-        """
-        Remove a user from a given standard reward program providers list.
-        """
-        self.standard_reward_programs[id].providers.remove(user_name)
-
     def set_standard_rewards_vault_balance(self, tkn_name: str, value: Decimal):
         """
         Set standard rewards vault balance by a given amount.
@@ -599,6 +586,7 @@ class State(GlobalSettings):
         Increase user standard rewards staked_reward_amt pooltokens by a given amount.
         """
         self.users[user_name].pending_standard_rewards[id].staked_amt.add(value)
+        self.standard_reward_programs[id].staked_reward_amt.add(value)
 
     def decrease_user_standard_rewards_stakes(
         self, id: int, user_name: str, value: Decimal
@@ -607,6 +595,7 @@ class State(GlobalSettings):
         Increase user standard rewards staked_reward_amt pooltokens by a given amount.
         """
         self.users[user_name].pending_standard_rewards[id].staked_amt.subtract(value)
+        self.standard_reward_programs[id].staked_reward_amt.subtract(value)
 
     def set_user_standard_rewards_stakes(self, id: int, user_name: str, value: Decimal):
         """
@@ -745,18 +734,6 @@ class State(GlobalSettings):
         Decrease vortex_ledger balance by a given amount.
         """
         self.tokens[tkn_name].vortex_ledger.subtract(value)
-
-    def increase_standard_reward_program_stakes(self, id: int, value: Decimal):
-        """
-        Increase the standard reward program staked_reward_amt balance by a given amount.
-        """
-        self.standard_reward_programs[id].staked_reward_amt.add(value)
-
-    def decrease_standard_reward_program_stakes(self, id: int, value: Decimal):
-        """
-        Decrease the standard reward program staked_reward_amt balance by a given amount.
-        """
-        self.standard_reward_programs[id].staked_reward_amt.subtract(value)
 
     def set_standard_rewards_per_token(self, id: int, value: Decimal):
         """
@@ -1021,16 +998,7 @@ def get_total_standard_rewards_staked(state, id: int) -> Decimal:
     """
     Returns the total standard rewards staked_reward_amt for a given program id.
     """
-    providers = [
-        state.users[user_name]
-        for user_name in state.standard_reward_programs[id].providers
-    ]
-    return sum(
-        [
-            provider.pending_standard_rewards[id].staked_amt.balance
-            for provider in providers
-        ]
-    )
+    return state.standard_reward_programs[id].staked_reward_amt.balance
 
 
 def get_tkn_virtual_balance(state: State, tkn_name: str) -> Decimal:
@@ -1578,20 +1546,13 @@ def get_trade_inputs(
 
 def get_autocompounding_remaining_rewards(state: State, tkn_name: str) -> Decimal:
     """
-    Get the remaining rewards for a given program.
+    Get the remaining rewards for a given auto-compounding program.
     """
     return state.autocompounding_reward_programs[tkn_name].remaining_rewards.balance
 
 
-def get_remaining_standard_rewards(state: State, id: int) -> Decimal:
+def get_standard_remaining_rewards(state: State, id: int) -> Decimal:
     """
-    Get the remaining rewards for a given program.
+    Get the remaining rewards for a given standard program.
     """
     return state.standard_reward_programs[id].remaining_rewards.balance
-
-
-def get_standard_program(state: State, tkn_name: str) -> Decimal:
-    """
-    Get the remaining rewards for a given program.
-    """
-    return state.autocompounding_reward_programs[tkn_name].remaining_rewards.balance

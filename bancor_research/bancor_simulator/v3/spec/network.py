@@ -669,7 +669,6 @@ class BancorDapp:
         Claim standard rewards for a given reward program and user.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        state, tkn_name, user_name = validate_input(state, "", user_name, timestamp)
         state = claim_standard_rewards(
             state=state,
             user_name=user_name,
@@ -678,7 +677,7 @@ class BancorDapp:
         )
         self.next_transaction(state)
         handle_logging(
-            tkn_name,
+            "",
             Decimal(0),
             transaction_type,
             user_name,

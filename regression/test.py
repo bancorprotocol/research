@@ -86,5 +86,13 @@ def execute(fileName):
 
     print(bancorDapps[0].describe(decimals=6).compare(bancorDapps[1].describe(decimals=6)))
 
+execute('BancorNetworkSimpleFinancialScenario1')
+execute('BancorNetworkSimpleFinancialScenario2')
+execute('BancorNetworkSimpleFinancialScenario3')
+execute('BancorNetworkSimpleFinancialScenario4')
+execute('BancorNetworkSimpleFinancialScenario5')
+execute('BancorNetworkSimpleFinancialScenario6')
+execute('BancorNetworkComplexFinancialScenario1')
+execute('BancorNetworkComplexFinancialScenario2')
 execute('BancorNetworkRewardsFinancialScenario1')
 execute('BancorNetworkRewardsFinancialScenario2')

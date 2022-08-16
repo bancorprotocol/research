@@ -342,6 +342,27 @@ class Tokens(GlobalSettings):
         ), f"vbnt_price attempted to be accessed in {self.tkn_name} state, call bnt state instead"
         return self._vbnt_price
 
+    @property
+    def bnt_bootstrap_liquidity(self):
+        """
+        Computes the minimum between bnt_min_liquidity multiplied by 2 and bnt_funding_limit.
+        """
+        return min(2 * self.bnt_min_liquidity, self.bnt_funding_limit)
+
+    @property
+    def updated_ema_rate(self) -> Decimal:
+        """
+        Computes the ema as a lagging average only once per block, per pool.
+        """
+        return self.alpha * self.spot_rate + (1 - self.alpha) * self.ema_rate
+
+    @property
+    def updated_inv_ema_rate(self) -> Decimal:
+        """
+        Computes the ema as a lagging average only once per block, per pool.
+        """
+        return self.alpha * self.inv_spot_rate + (1 - self.alpha) * self.inv_ema_rate
+
 
 @dataclass(config=Config)
 class State(GlobalSettings):

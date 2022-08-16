@@ -233,7 +233,6 @@ class UserStandardProgram:
     Represents a standard reward program user state
     """
 
-    id: int
     staked_amt: Any = field(default_factory=Token)
     pending_rewards: Any = field(default_factory=Token)
     reward_per_token_paid: Any = field(default_factory=Token)
@@ -553,6 +552,13 @@ class State(GlobalSettings):
         Set standard rewards vault balance by a given amount.
         """
         self.tokens[tkn_name].standard_rewards_vault.set(value)
+
+    def map_user_standard_program(self, user_name: str, id: int):
+        """
+        Map a user standard program if needed.
+        """
+        if id not in self.users[user_name].pending_standard_rewards:
+            self.users[user_name].pending_standard_rewards[id] = UserStandardProgram()
 
     def set_user_pending_standard_rewards(
         self, user_name: str, id: int, value: Decimal

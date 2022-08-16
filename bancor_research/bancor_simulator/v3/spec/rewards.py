@@ -273,6 +273,7 @@ def join_standard_reward_program(
     """
     Join a standard reward program with the given user and id.
     """
+    state.map_user_standard_program(user_name, id)
     pool_token_name = get_standard_reward_pool_token_name(state, id)
     state = snapshot_standard_rewards(state, id, timestamp, user_name)
     state.decrease_user_balance(user_name, pool_token_name, pool_token_amount)

@@ -34,15 +34,16 @@ def execute(fileName):
             for bancorDapp in bancorDapps:
                 bancorDapp.set_user_balance(user, token, balance, timestamp)
 
-    programIds = {}
+    programIds = dict((bancorDapp, {}) for bancorDapp in bancorDapps)
     for poolId, programsParams in fileData['programs'].items():
-        programIds[poolId] = bancorDapp.create_standard_rewards_program(
-            poolId,
-            programsParams['rewards'],
-            timestamp,
-            timestamp + programsParams['duration'],
-            timestamp
-        )
+        for bancorDapp in bancorDapps:
+            programIds[bancorDapp][poolId] = bancorDapp.create_standard_rewards_program(
+                poolId,
+                programsParams['rewards'],
+                timestamp,
+                timestamp + programsParams['duration'],
+                timestamp
+            )
 
     def Print(title, *args):
         print('operation {} out of {}: {}'.format(n + 1, len(fileData['operations']), title.format(*args)))
@@ -67,13 +68,13 @@ def execute(fileName):
                 bancorDapp.burn_pool_tokens(operation['poolId'], operation['amount'], operation['userId'], timestamp)
             elif operation['type'] == 'joinProgram':
                 Print('join {} {} pool tokens', operation['amount'], operation['poolId'])
-                bancorDapp.join_standard_rewards_program(operation['poolId'], operation['amount'], operation['userId'], programIds[operation['poolId']], timestamp)
+                bancorDapp.join_standard_rewards_program(operation['poolId'], operation['amount'], operation['userId'], programIds[bancorDapp][operation['poolId']], timestamp)
             elif operation['type'] == 'leaveProgram':
                 Print('leave {} {} pool tokens', operation['amount'], operation['poolId'])
-                bancorDapp.leave_standard_rewards_program(operation['poolId'], operation['amount'], operation['userId'], programIds[operation['poolId']], timestamp)
+                bancorDapp.leave_standard_rewards_program(operation['poolId'], operation['amount'], operation['userId'], programIds[bancorDapp][operation['poolId']], timestamp)
             elif operation['type'] == 'claimRewards':
                 Print('claim {} rewards', operation['poolId'])
-                bancorDapp.claim_standard_rewards(operation['userId'], [programIds[operation['poolId']]], timestamp)
+                bancorDapp.claim_standard_rewards(operation['userId'], [programIds[bancorDapp][operation['poolId']]], timestamp)
             elif operation['type'] == 'setFundingLimit':
                 Print('set {} pool funding limit to {} bnt', operation['poolId'], operation['amount'])
                 bancorDapp.set_bnt_funding_limit(operation['poolId'], operation['amount'], timestamp)
@@ -85,13 +86,5 @@ def execute(fileName):
 
     print(bancorDapps[0].describe(decimals=6).compare(bancorDapps[1].describe(decimals=6)))
 
-execute('BancorNetworkSimpleFinancialScenario1')
-execute('BancorNetworkSimpleFinancialScenario2')
-execute('BancorNetworkSimpleFinancialScenario3')
-execute('BancorNetworkSimpleFinancialScenario4')
-execute('BancorNetworkSimpleFinancialScenario5')
-execute('BancorNetworkSimpleFinancialScenario6')
-execute('BancorNetworkComplexFinancialScenario1')
-execute('BancorNetworkComplexFinancialScenario2')
 execute('BancorNetworkRewardsFinancialScenario1')
 execute('BancorNetworkRewardsFinancialScenario2')

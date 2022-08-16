@@ -1103,21 +1103,18 @@ def get_bnt_trading_liquidity(state: State, tkn_name: str) -> Decimal:
     return state.tokens[tkn_name].bnt_trading_liquidity.balance
 
 
-def get_standard_reward_providers(state: State, id: int) -> list:
+def get_standard_reward_pool_token_name(state: State, id: int) -> str:
     """
-    Get the standard reward providers for a given program id.
+    Get the standard reward pool token name for a given id.
     """
-    return state.standard_reward_programs[id].providers
+    return get_pooltoken_name(state.standard_reward_programs[id].tkn_name)
 
 
-def get_standard_reward_tkn_name(state: State, id: int) -> Tuple[str, str]:
+def get_standard_reward_rewards_token_name(state: State, id: int) -> str:
     """
-    Get the standard reward tkn_name for a given id.
+    Get the standard reward rewards token name for a given id.
     """
-    return (
-        state.standard_reward_programs[id].tkn_name,
-        state.standard_reward_programs[id].rewards_token,
-    )
+    return state.standard_reward_programs[id].rewards_token
 
 
 def get_standard_reward_per_token(state: State, id: int) -> Decimal:
@@ -1125,19 +1122,31 @@ def get_standard_reward_per_token(state: State, id: int) -> Decimal:
 
 
 def get_standard_reward_end_time(state: State, id: int) -> int:
-    pass
+    """
+    Get the standard reward end time for a given id.
+    """
+    return state.standard_reward_programs[id].end_time
 
 
 def get_standard_reward_start_time(state: State, id: int) -> int:
-    pass
+    """
+    Get the standard reward start time for a given id.
+    """
+    return state.standard_reward_programs[id].start_time
 
 
 def get_standard_reward_last_update_time(state: State, id: int) -> int:
-    pass
+    """
+    Get the standard reward last update time for a given id.
+    """
+    return state.standard_reward_programs[id].last_update_time
 
 
 def get_standard_reward_rate(state: State, id: int) -> int:
-    pass
+    """
+    Get the standard reward rate for a given id.
+    """
+    return state.standard_reward_programs[id].reward_rate
 
 
 def get_user_pending_rewards_staked_balance(
@@ -1156,17 +1165,6 @@ def get_user_reward_per_token_paid(state: State, id: int, user_name: str) -> Dec
         .pending_standard_rewards[id]
         .reward_per_token_paid.balance
     )
-
-
-def get_user_wallet_tokens(state: State, user_name: str) -> list:
-    """
-    List of all tokens for a given user.
-    """
-    return [
-        state.users[user_name].wallet[tkn_name].balance
-        for tkn_name in state.whitelisted_tokens
-        if state.users[user_name].wallet[tkn_name].balance > 0
-    ]
 
 
 def get_tkn_trading_liquidity(state: State, tkn_name: str) -> Decimal:

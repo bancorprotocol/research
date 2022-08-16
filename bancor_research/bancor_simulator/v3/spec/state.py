@@ -1021,7 +1021,7 @@ def get_total_standard_rewards_staked(state, id: int) -> Decimal:
     ]
     return sum(
         [
-            provider.pending_standard_rewards[id].staked_reward_amt.balance
+            provider.pending_standard_rewards[id].staked_amt.balance
             for provider in providers
         ]
     )
@@ -1130,7 +1130,7 @@ def get_standard_reward_rate(state: State, id: int) -> int:
 def get_user_pending_rewards_staked_balance(
     state: State, id: int, user_name: str
 ) -> Decimal:
-    return state.users[user_name].pending_standard_rewards[id].staked.balance
+    return state.users[user_name].pending_standard_rewards[id].staked_amt.balance
 
 
 def get_user_pending_standard_rewards(state: State, id: int, user_name: str) -> Decimal:

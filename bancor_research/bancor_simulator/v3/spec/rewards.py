@@ -277,7 +277,7 @@ def join_standard_reward_program(
     state = snapshot_standard_rewards(state, id, timestamp, user_name)
     state.decrease_user_balance(user_name, pool_token_name, pool_token_amount)
     state.increase_standard_reward_program_stakes(id, pool_token_amount)
-    state.increase_user_standard_rewards_stakes(id, pool_token_amount)
+    state.increase_user_standard_rewards_stakes(id, user_name, pool_token_amount)
     state.add_user_to_standard_reward_providers(id, user_name)
     return state
 
@@ -291,7 +291,7 @@ def leave_standard_reward_program(
     pool_token_name = get_standard_reward_pool_token_name(state, id)
     state = snapshot_standard_rewards(state, id, timestamp, user_name)
     state.decrease_standard_reward_program_stakes(id, pool_token_amount)
-    state.decrease_user_standard_rewards_stakes(id, pool_token_amount)
+    state.decrease_user_standard_rewards_stakes(id, user_name, pool_token_amount)
     state.increase_user_balance(user_name, pool_token_name, pool_token_amount)
     state.remove_user_from_standard_reward_program(id, user_name)
     return state

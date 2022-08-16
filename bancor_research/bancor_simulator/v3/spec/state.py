@@ -1103,7 +1103,10 @@ def get_standard_reward_pool_token_name(state: State, id: int) -> str:
 
 
 def get_standard_reward_per_token(state: State, id: int) -> Decimal:
-    pass
+    """
+    Get the standard reward per token for a given id.
+    """
+    return state.standard_reward_programs[id].reward_per_token.balance
 
 
 def get_standard_reward_end_time(state: State, id: int) -> int:

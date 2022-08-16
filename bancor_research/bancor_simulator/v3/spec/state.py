@@ -1001,7 +1001,6 @@ def get_total_standard_rewards_staked(state, id: int) -> Decimal:
     return state.standard_reward_programs[id].staked_reward_amt.balance
 
 
-
 def get_tkn_virtual_balance(state: State, tkn_name: str) -> Decimal:
     """
     Return the reciprocal of the price of bnt or tkn.

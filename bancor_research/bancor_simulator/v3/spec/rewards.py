@@ -174,7 +174,7 @@ def create_standard_reward_program(
 
 def terminate_standard_program(state: State, id: int, timestamp: int) -> State:
     """
-    Terminates the standard program.
+    Terminates the standard rewards program.
     """
     state.set_standard_program_is_active(id, False)
     state.set_standard_program_end_time(id, timestamp)

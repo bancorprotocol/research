@@ -971,30 +971,20 @@ class State(GlobalSettings):
             )
         return self
 
-    def update_inv_spot_rate(self, tkn_name: str):
-        """
-        Updates the inverse spot rate.
-        """
-        bnt_trading_liquidity = get_bnt_trading_liquidity(self, tkn_name)
-        tkn_trading_liquidity = get_tkn_trading_liquidity(self, tkn_name)
-        if bnt_trading_liquidity == 0 and tkn_trading_liquidity == 0:
-            inv_spot_rate = Decimal(0)
-        else:
-            inv_spot_rate = bnt_trading_liquidity / tkn_trading_liquidity
-        self.set_inv_spot_rate(tkn_name, inv_spot_rate)
-
     def update_spot_rate(self, tkn_name: str):
         """
-        Updates the spot rate.
+        Updates the spot rate and the inverse spot rate.
         """
         bnt_trading_liquidity = get_bnt_trading_liquidity(self, tkn_name)
         tkn_trading_liquidity = get_tkn_trading_liquidity(self, tkn_name)
         if bnt_trading_liquidity == 0 and tkn_trading_liquidity == 0:
             spot_rate = Decimal(0)
+            inv_spot_rate = Decimal(0)
         else:
             spot_rate = bnt_trading_liquidity / tkn_trading_liquidity
+            inv_spot_rate = tkn_trading_liquidity / bnt_trading_liquidity
         self.set_spot_rate(tkn_name, spot_rate)
-        self.update_inv_spot_rate(tkn_name)
+        self.set_inv_spot_rate(tkn_name, inv_spot_rate)
 
     def next_standard_program_id(self) -> int:
         """
@@ -1308,7 +1298,7 @@ def get_flat_distribution_rate_per_second(state: State, tkn_name: str) -> Decima
 
 def get_spot_rate(state: State, tkn_name: str) -> Decimal:
     """
-    Returns the bnt funding remaining for a given tkn_name relative to the limit.
+    Returns the spot rate for a given tkn_name.
     """
     return state.tokens[tkn_name].spot_rate
 
@@ -1322,7 +1312,7 @@ def get_inv_spot_rate(state: State, tkn_name: str) -> Decimal:
 
 def get_ema_rate(state: State, tkn_name: str) -> Decimal:
     """
-    Returns spot rate for a given tkn_name.
+    Returns the ema rate for a given tkn_name.
     """
     return state.tokens[tkn_name].ema_rate
 

@@ -96,15 +96,6 @@ def compute_bnbnt_amt(state: State, bnt_amt: Decimal) -> Decimal:
     return state.bnbnt_rate * bnt_amt
 
 
-def compute_ema(
-    last_spot: Decimal, last_ema: Decimal, alpha: Decimal = Decimal("0.2")
-) -> Decimal:
-    """
-    Computes the ema as a lagging average only once per block, per pool.
-    """
-    return alpha * last_spot + (1 - alpha) * last_ema
-
-
 def compute_changed_bnt_trading_liquidity(
     a: Decimal, b: Decimal, d: Decimal, e: Decimal, x: Decimal, direction: str
 ) -> Decimal:
@@ -506,21 +497,9 @@ def handle_ema(state: State, tkn_name: str) -> State:
     Handles the updating of the ema rate and the inverse ema rate, called before a swap is performed.
     """
     if state.tokens[tkn_name].ema_last_updated != state.tokens[tkn_name].timestamp:
-        state.tokens[tkn_name].ema_last_updated = state.tokens[tkn_name].timestamp
-        last_spot = get_spot_rate(state, tkn_name)
-        last_ema = get_ema_rate(state, tkn_name)
-        new_ema = compute_ema(last_spot, last_ema)
-        state.set_ema_rate(tkn_name, new_ema)
-        state.logger.info(
-            f"EMA updated | old value = {last_ema} | new value = {new_ema}"
-        )
-        last_spot = get_inv_spot_rate(state, tkn_name)
-        last_ema = get_inv_ema_rate(state, tkn_name)
-        new_ema = compute_ema(last_spot, last_ema)
-        state.set_inv_ema_rate(tkn_name, new_ema)
-        state.logger.info(
-            f"Inverse EMA updated | old value = {last_ema} | new value = {new_ema}"
-        )
+        self.tokens[tkn_name].ema_last_updated = self.timestamp
+        state.set_ema_rate(tkn_name, state.tokens[tkn_name].ema)
+        state.set_inv_ema_rate(tkn_name, state.tokens[tkn_name].inv_ema)
     return state
 
 

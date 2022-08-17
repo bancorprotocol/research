@@ -45,6 +45,7 @@ DEFAULT_DECIMALS = 18
 DEFAULT_WITHDRAWAL_FEE = Decimal("0.0025")
 DEFAULT_TRADING_FEE = Decimal("0.01")
 DEFAULT_NETWORK_FEE = Decimal("0.2")
+DEFAULT_ALPHA = Decimal("0.2")
 DEFAULT_BNT_FUNDING_LIMIT = Decimal("1000000")
 DEFAULT_BNT_MIN_LIQUIDITY = Decimal("10000")
 DEFAULT_COOLDOWN_TIME = SECONDS_PER_DAY * 7
@@ -139,6 +140,7 @@ class GlobalSettings:
     network_fee: Decimal = DEFAULT_NETWORK_FEE
     withdrawal_fee: Decimal = DEFAULT_WITHDRAWAL_FEE
     bnt_min_liquidity: Decimal = DEFAULT_BNT_MIN_LIQUIDITY
+    alpha: Decimal = DEFAULT_ALPHA
 
 
 @dataclass(config=Config)

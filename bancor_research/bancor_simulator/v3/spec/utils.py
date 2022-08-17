@@ -497,9 +497,9 @@ def handle_ema(state: State, tkn_name: str) -> State:
     Handles the updating of the ema rate and the inverse ema rate, called before a swap is performed.
     """
     if state.tokens[tkn_name].ema_last_updated != state.tokens[tkn_name].timestamp:
-        self.tokens[tkn_name].ema_last_updated = self.timestamp
-        state.set_ema_rate(tkn_name, state.tokens[tkn_name].ema)
-        state.set_inv_ema_rate(tkn_name, state.tokens[tkn_name].inv_ema)
+        state.tokens[tkn_name].ema_last_updated = state.timestamp
+        state.set_ema_rate(tkn_name, state.tokens[tkn_name].updated_ema_rate)
+        state.set_inv_ema_rate(tkn_name, state.tokens[tkn_name].updated_inv_ema_rate)
     return state
 
 

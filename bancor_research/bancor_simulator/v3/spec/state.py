@@ -30,7 +30,6 @@ class Epoch(int):
 MODEL = "Bancor Network"
 GENESIS_EPOCH = Epoch(0)
 SECONDS_PER_DAY = 86400
-MAX_UINT112 = 2**112 - 1
 PRECISION = 155
 
 # Configurable Genesis Variables
@@ -45,10 +44,10 @@ DEFAULT_DECIMALS = 18
 DEFAULT_WITHDRAWAL_FEE = Decimal("0.0025")
 DEFAULT_TRADING_FEE = Decimal("0.01")
 DEFAULT_NETWORK_FEE = Decimal("0.2")
-DEFAULT_ALPHA = Decimal("0.2")
 DEFAULT_BNT_FUNDING_LIMIT = Decimal("1000000")
 DEFAULT_BNT_MIN_LIQUIDITY = Decimal("10000")
 DEFAULT_COOLDOWN_TIME = SECONDS_PER_DAY * 7
+DEFAULT_ALPHA = Decimal("0.2")
 DEFAULT_LOWER_EMA_LIMIT = Decimal("0.99")
 DEFAULT_UPPER_EMA_LIMIT = Decimal("1.01")
 DEFAULT_NUM_TIMESTAMPS = SECONDS_PER_DAY * 30
@@ -131,7 +130,6 @@ class GlobalSettings:
     """
 
     timestamp: int = DEFAULT_TIMESTAMP
-    max_uint112: int = MAX_UINT112
     precision: int = PRECISION
     whitelisted_tokens: dict = field(default_factory=dict)
     active_users: List[str] = field(default_factory=lambda: DEFAULT_USERS)
@@ -328,6 +326,20 @@ class Tokens(GlobalSettings):
         return self.tkn_excess * self.ema_rate
 
     @property
+    def updated_ema_rate(self) -> Decimal:
+        """
+        Computes the ema as a lagging average only once per block, per pool.
+        """
+        return self.alpha * self.spot_rate + (1 - self.alpha) * self.ema_rate
+
+    @property
+    def updated_inv_ema_rate(self) -> Decimal:
+        """
+        Computes the ema as a lagging average only once per block, per pool.
+        """
+        return self.alpha * self.inv_spot_rate + (1 - self.alpha) * self.inv_ema_rate
+
+    @property
     def bnt_bootstrap_liquidity(self):
         """
         Computes the minimum between bnt_min_liquidity multiplied by 2 and bnt_funding_limit.
@@ -343,20 +355,6 @@ class Tokens(GlobalSettings):
             self.tkn_name == "bnt"
         ), f"vbnt_price attempted to be accessed in {self.tkn_name} state, call bnt state instead"
         return self._vbnt_price
-
-    @property
-    def updated_ema_rate(self) -> Decimal:
-        """
-        Computes the ema as a lagging average only once per block, per pool.
-        """
-        return self.alpha * self.spot_rate + (1 - self.alpha) * self.ema_rate
-
-    @property
-    def updated_inv_ema_rate(self) -> Decimal:
-        """
-        Computes the ema as a lagging average only once per block, per pool.
-        """
-        return self.alpha * self.inv_spot_rate + (1 - self.alpha) * self.inv_ema_rate
 
 
 @dataclass(config=Config)

@@ -321,7 +321,7 @@ class Tokens(GlobalSettings):
     @property
     def updated_inv_ema_rate(self) -> Decimal:
         """
-        Computes the ema as a lagging average only once per block, per pool.
+        Computes the inverse ema as a lagging average only once per block, per pool.
         """
         return self.alpha * self.inv_spot_rate + (1 - self.alpha) * self.inv_ema_rate
 
@@ -1175,6 +1175,20 @@ def get_avg_tkn_trading_liquidity(state: State, tkn_name: str) -> Decimal:
     The average trading liquidity for a given tkn_name.
     """
     return state.tokens[tkn_name].avg_tkn_trading_liquidity
+
+
+def get_updated_ema_rate(state: State, tkn_name: str) -> Decimal:
+    """
+    The ema as a lagging average only once per block, per pool.
+    """
+    return state.tokens[tkn_name].updated_ema_rate
+
+
+def get_updated_inv_ema_rate(state: State, tkn_name: str) -> Decimal:
+    """
+    The inverse ema as a lagging average only once per block, per pool.
+    """
+    return state.tokens[tkn_name].updated_ema_rate
 
 
 def get_tkn_excess_bnt_equivalence(state: State, tkn_name: str) -> Decimal:

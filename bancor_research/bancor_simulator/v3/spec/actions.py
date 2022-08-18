@@ -50,6 +50,9 @@ def deposit_tkn(state: State, tkn_name: str, tkn_amt: Decimal, user_name: str) -
 
     state.update_spot_rate(tkn_name)
 
+    if get_is_trading_enabled(state, tkn_name):
+        state = handle_ema(state, tkn_name)
+
     if check_pool_shutdown(state, tkn_name):
         state = shutdown_pool(state, tkn_name)
 
@@ -362,6 +365,9 @@ def process_withdrawal(
             state.increase_user_balance(user_name, "bnt", bnt_sent_to_user)
 
             state.update_spot_rate(tkn_name)
+
+            if get_is_trading_enabled(state, tkn_name):
+                state = handle_ema(state, tkn_name)
 
             if check_pool_shutdown(state, tkn_name):
                 state = shutdown_pool(state, tkn_name)

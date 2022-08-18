@@ -292,7 +292,9 @@ def compute_pool_depth_adjustment(
                 tkn_increase = tkn_excess
 
             else:
-                raise ValueError("Something went wrong, pool adjustment case not found...")
+                raise ValueError(
+                    "Something went wrong, pool adjustment case not found..."
+                )
 
         elif bnt_remaining_funding < 0:
             case = "case4"

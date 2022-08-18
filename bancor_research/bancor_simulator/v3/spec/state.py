@@ -312,20 +312,6 @@ class Tokens(GlobalSettings):
         )
 
     @property
-    def tkn_excess(self):
-        """
-        The difference between the master_vault balance and the average trading liquidity.
-        """
-        return self.master_vault.balance - self.avg_tkn_trading_liquidity
-
-    @property
-    def tkn_excess_bnt_equivalence(self):
-        """
-        Computes the equivalent bnt value of the non-trading tkn balance of the master_vault.
-        """
-        return self.tkn_excess * self.ema_rate
-
-    @property
     def updated_ema_rate(self) -> Decimal:
         """
         Computes the ema as a lagging average only once per block, per pool.
@@ -338,6 +324,20 @@ class Tokens(GlobalSettings):
         Computes the ema as a lagging average only once per block, per pool.
         """
         return self.alpha * self.inv_spot_rate + (1 - self.alpha) * self.inv_ema_rate
+
+    @property
+    def tkn_excess(self):
+        """
+        The difference between the master_vault balance and the average trading liquidity.
+        """
+        return self.master_vault.balance - self.avg_tkn_trading_liquidity
+
+    @property
+    def tkn_excess_bnt_equivalence(self):
+        """
+        Computes the equivalent bnt value of the non-trading tkn balance of the master_vault.
+        """
+        return self.tkn_excess * self.ema_rate
 
     @property
     def bnt_bootstrap_liquidity(self):

@@ -251,46 +251,55 @@ def compute_pool_depth_adjustment(
     is_trading_enabled = get_is_trading_enabled(state, tkn_name)
     is_price_stable = get_is_price_stable(state, tkn_name)
     bnt_remaining_funding = get_bnt_remaining_funding(state, tkn_name)
-    if is_trading_enabled and is_price_stable and bnt_remaining_funding > 0:
-        tkn_excess = get_tkn_excess(state, tkn_name)
-        tkn_excess_bnt_equivalence = get_tkn_excess_bnt_equivalence(state, tkn_name)
+    if is_trading_enabled and is_price_stable:
         # a mistake in the contract implementation (should use `get_ema_rate`)
         speculated_ema_rate = get_updated_ema_rate(state, tkn_name)
         bnt_trading_liquidity = get_bnt_trading_liquidity(state, tkn_name)
-        avg_tkn_trading_liquidity = bnt_trading_liquidity / speculated_ema_rate
 
-        if (
-            avg_tkn_trading_liquidity <= tkn_excess
-            and bnt_trading_liquidity <= bnt_remaining_funding
-        ):
-            case = "case1"
-            bnt_increase = bnt_trading_liquidity
-            tkn_increase = avg_tkn_trading_liquidity
+        if bnt_remaining_funding > 0:
+            tkn_excess = get_tkn_excess(state, tkn_name)
+            tkn_excess_bnt_equivalence = get_tkn_excess_bnt_equivalence(state, tkn_name)
+            avg_tkn_trading_liquidity = bnt_trading_liquidity / speculated_ema_rate
 
-        elif (
-            avg_tkn_trading_liquidity <= tkn_excess
-            and bnt_trading_liquidity > bnt_remaining_funding
-            or avg_tkn_trading_liquidity > tkn_excess
-            and tkn_excess_bnt_equivalence >= bnt_remaining_funding
-        ):
-            case = "case2"
+            if (
+                avg_tkn_trading_liquidity <= tkn_excess
+                and bnt_trading_liquidity <= bnt_remaining_funding
+            ):
+                case = "case1"
+                bnt_increase = bnt_trading_liquidity
+                tkn_increase = avg_tkn_trading_liquidity
+
+            elif (
+                avg_tkn_trading_liquidity <= tkn_excess
+                and bnt_trading_liquidity > bnt_remaining_funding
+                or avg_tkn_trading_liquidity > tkn_excess
+                and tkn_excess_bnt_equivalence >= bnt_remaining_funding
+            ):
+                case = "case2"
+                bnt_increase = bnt_remaining_funding
+                tkn_increase = bnt_remaining_funding / speculated_ema_rate
+
+            elif (
+                tkn_excess < avg_tkn_trading_liquidity
+                and bnt_trading_liquidity <= bnt_remaining_funding
+                or avg_tkn_trading_liquidity > tkn_excess
+                and bnt_trading_liquidity
+                > bnt_remaining_funding
+                > tkn_excess_bnt_equivalence
+            ):
+                case = "case3"
+                bnt_increase = tkn_excess_bnt_equivalence
+                tkn_increase = tkn_excess
+
+            else:
+                raise ValueError(
+                    "Something went wrong, pool adjustment case not found..."
+                )
+
+        elif bnt_remaining_funding < 0:
+            case = "case4"
             bnt_increase = bnt_remaining_funding
             tkn_increase = bnt_remaining_funding / speculated_ema_rate
-
-        elif (
-            tkn_excess < avg_tkn_trading_liquidity
-            and bnt_trading_liquidity <= bnt_remaining_funding
-            or avg_tkn_trading_liquidity > tkn_excess
-            and bnt_trading_liquidity
-            > bnt_remaining_funding
-            > tkn_excess_bnt_equivalence
-        ):
-            case = "case3"
-            bnt_increase = tkn_excess_bnt_equivalence
-            tkn_increase = tkn_excess
-
-        else:
-            raise ValueError("Something went wrong, pool adjustment case not found...")
 
     return case, bnt_increase, tkn_increase
 

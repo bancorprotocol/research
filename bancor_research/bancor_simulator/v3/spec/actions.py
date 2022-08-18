@@ -313,15 +313,13 @@ def process_withdrawal(
 
             bnt_trading_liquidity = get_bnt_trading_liquidity(state, tkn_name)
             tkn_trading_liquidity = get_tkn_trading_liquidity(state, tkn_name)
-            avg_tkn_trading_liquidity = get_avg_tkn_trading_liquidity(state, tkn_name)
-            tkn_excess = get_tkn_excess(state, tkn_name)
+            tkn_excess = get_vault_balance(state, tkn_name) - tkn_trading_liquidity
             staked_tkn = get_staked_balance(state, tkn_name)
             trading_fee = get_trading_fee(state, tkn_name)
 
             solver = WithdrawalAlgorithm(
                 bnt_trading_liquidity=bnt_trading_liquidity,
                 tkn_trading_liquidity=tkn_trading_liquidity,
-                avg_tkn_trading_liquidity=avg_tkn_trading_liquidity,
                 tkn_excess=tkn_excess,
                 staked_tkn=staked_tkn,
                 trading_fee=trading_fee,
@@ -451,7 +449,6 @@ def unpack_withdrawal_cooldown(
 class WithdrawalAlgorithm:
     bnt_trading_liquidity: Decimal = Decimal("0")
     tkn_trading_liquidity: Decimal = Decimal("0")
-    avg_tkn_trading_liquidity: Decimal = Decimal("0")
     tkn_excess: Decimal = Decimal("0")
     staked_tkn: Decimal = Decimal("0")
     trading_fee: Decimal = Decimal("0")
@@ -467,7 +464,7 @@ class WithdrawalAlgorithm:
         """
         Returns the maximum number of withdrawn TKN that can currently be supported under the arbitrage method.
         """
-        b = self.avg_tkn_trading_liquidity
+        b = self.tkn_trading_liquidity
         c = self.tkn_excess
         e = self.staked_tkn
         m = self.trading_fee
@@ -485,7 +482,7 @@ class WithdrawalAlgorithm:
         """
         Returns the maximum number of withdrawn TKN that can currently be supported under the arbitrage method.
         """
-        b = self.avg_tkn_trading_liquidity
+        b = self.tkn_trading_liquidity
         c = self.tkn_excess
         e = self.staked_tkn
         m = self.trading_fee
@@ -503,7 +500,7 @@ class WithdrawalAlgorithm:
         """
         Returns the maximum number of withdrawn TKN that can currently be supported under the arbitrage method.
         """
-        b = self.avg_tkn_trading_liquidity
+        b = self.tkn_trading_liquidity
         c = self.tkn_excess
         e = self.staked_tkn
         hlim = c * e / (b + c)
@@ -514,7 +511,7 @@ class WithdrawalAlgorithm:
         Calculates the withdrawal output variables when the v3 can arbitrage the pool.
         """
         a = self.bnt_trading_liquidity
-        b = self.avg_tkn_trading_liquidity
+        b = self.tkn_trading_liquidity
         c = self.tkn_excess
         e = self.staked_tkn
         m = self.trading_fee
@@ -563,7 +560,7 @@ class WithdrawalAlgorithm:
         Calculates the withdrawal output variables when arbitrage is forbidden, and the TKN trading liquidity must be used to cover the withdrawal amt.
         """
         a = self.bnt_trading_liquidity
-        b = self.avg_tkn_trading_liquidity
+        b = self.tkn_trading_liquidity
         c = self.tkn_excess
         n = self.withdrawal_fee
         x = self.withdraw_value
@@ -585,7 +582,7 @@ class WithdrawalAlgorithm:
         Calculates the withdrawal output variables when the v3 can arbitrage the pool.
         """
         a = self.bnt_trading_liquidity
-        b = self.avg_tkn_trading_liquidity
+        b = self.tkn_trading_liquidity
         c = self.tkn_excess
         e = self.staked_tkn
         m = self.trading_fee
@@ -611,7 +608,7 @@ class WithdrawalAlgorithm:
         Calculates the withdrawal output variables when arbitrage is forbidden, and the excess TKN is sufficient to cover the entire withdrawal amt.
         """
         a = self.bnt_trading_liquidity
-        b = self.avg_tkn_trading_liquidity
+        b = self.tkn_trading_liquidity
         c = self.tkn_excess
         e = self.staked_tkn
         n = self.withdrawal_fee
@@ -634,7 +631,7 @@ class WithdrawalAlgorithm:
         Calculates the withdrawal output variables when arbitrage is forbidden, and the excess TKN is sufficient to cover the entire withdrawal amt.
         """
         a = self.bnt_trading_liquidity
-        b = self.avg_tkn_trading_liquidity
+        b = self.tkn_trading_liquidity
         c = self.tkn_excess
         e = self.staked_tkn
         n = self.withdrawal_fee
@@ -657,7 +654,7 @@ class WithdrawalAlgorithm:
         This replaces any BNT that would have been received by the user with TKN.
         """
         a = self.bnt_trading_liquidity
-        b = self.avg_tkn_trading_liquidity
+        b = self.tkn_trading_liquidity
         n = self.withdrawal_fee
         T = self.bnt_sent_to_user
         w = self.external_protection_tkn_balance

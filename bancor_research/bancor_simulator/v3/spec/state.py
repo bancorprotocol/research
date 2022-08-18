@@ -8,7 +8,6 @@ import logging
 import warnings
 from dataclasses import field
 from decimal import Decimal
-from fractions import Fraction
 import pandas as pd
 import numpy as np
 from pydantic.types import Tuple, Any, List, Dict
@@ -31,7 +30,6 @@ class Epoch(int):
 MODEL = "Bancor Network"
 GENESIS_EPOCH = Epoch(0)
 SECONDS_PER_DAY = 86400
-MAX_UINT112 = 2**112 - 1
 PRECISION = 155
 
 # Configurable Genesis Variables
@@ -132,7 +130,6 @@ class GlobalSettings:
     """
 
     timestamp: int = DEFAULT_TIMESTAMP
-    max_uint112: int = MAX_UINT112
     precision: int = PRECISION
     whitelisted_tokens: dict = field(default_factory=dict)
     active_users: List[str] = field(default_factory=lambda: DEFAULT_USERS)
@@ -274,10 +271,10 @@ class Tokens(GlobalSettings):
     tkn_trading_liquidity: Any = field(default_factory=Token)
     bnt_funding_amt: Any = field(default_factory=Token)
     spot_rate: Decimal = Decimal("0")
-    inv_spot_rate: Decimal = Decimal("0")
     ema_rate: Decimal = Decimal("0")
+    inv_spot_rate: Decimal = Decimal("0")
+    inv_ema_rate: Decimal = Decimal("0")
     ema_last_updated: Decimal = Decimal("0")
-    _inv_ema_rate: Decimal = Decimal("0")
     is_trading_enabled: bool = False
     bnt_funding_limit: Decimal = DEFAULT_BNT_FUNDING_LIMIT
     trading_fee: Decimal = DEFAULT_TRADING_FEE
@@ -298,6 +295,9 @@ class Tokens(GlobalSettings):
             Decimal(f"{DEFAULT_LOWER_EMA_LIMIT}") * self.ema_rate
             <= self.spot_rate
             <= Decimal(f"{DEFAULT_UPPER_EMA_LIMIT}") * self.ema_rate
+            and Decimal(f"{DEFAULT_LOWER_EMA_LIMIT}") * self.inv_ema_rate
+            <= self.inv_spot_rate
+            <= Decimal(f"{DEFAULT_UPPER_EMA_LIMIT}") * self.inv_ema_rate
         )
 
     @property
@@ -310,6 +310,20 @@ class Tokens(GlobalSettings):
             if self.ema_rate > 0
             else 0
         )
+
+    @property
+    def updated_ema_rate(self) -> Decimal:
+        """
+        Computes the ema as a lagging average only once per block, per pool.
+        """
+        return self.alpha * self.spot_rate + (1 - self.alpha) * self.ema_rate
+
+    @property
+    def updated_inv_ema_rate(self) -> Decimal:
+        """
+        Computes the ema as a lagging average only once per block, per pool.
+        """
+        return self.alpha * self.inv_spot_rate + (1 - self.alpha) * self.inv_ema_rate
 
     @property
     def tkn_excess(self):
@@ -331,76 +345,6 @@ class Tokens(GlobalSettings):
         Computes the minimum between bnt_min_liquidity multiplied by 2 and bnt_funding_limit.
         """
         return min(2 * self.bnt_min_liquidity, self.bnt_funding_limit)
-
-    @property
-    def inv_ema_rate(self) -> Decimal:
-        """
-        The inverse EMA rate.
-        """
-        return self._inv_ema_rate
-
-    @inv_ema_rate.setter
-    def inv_ema_rate(self, val):
-        """
-        Sets a new inverse EMA rate value.
-        """
-        self._inv_ema_rate = (self.inv_spot_rate * Decimal(0.2)) + (Decimal(0.8) * val)
-
-    @property
-    def inv_ema(self) -> Fraction:
-        """
-        Returns a fraction as two separate outputs
-        """
-        return Fraction(self.inv_ema_rate)
-
-    @property
-    def ema(self) -> Fraction:
-        """
-        Returns a fraction as two separate outputs
-        """
-        return Fraction(self.ema_rate)
-
-    @property
-    def ema_descale(self) -> int:
-        """
-        Used for descaling the ema into at most 112 bits per component.
-        """
-        return (
-            int(max(self.ema.numerator, self.ema.denominator)) + self.max_uint112 - 1
-        ) // self.max_uint112
-
-    @property
-    def ema_compressed_numerator(self) -> int:
-        """
-        Used to measure the deviation of solidity fixed point math on v3 calclulations.
-        """
-        return int(self.ema.numerator / self.ema_descale)
-
-    @property
-    def ema_compressed_denominator(self) -> int:
-        """
-        Used to measure the deviation of solidity fixed point math on v3 calclulations.
-        """
-        return int(self.ema.denominator / self.ema_descale)
-
-    @property
-    def is_ema_update_allowed(self) -> bool:
-        """
-        Returns True if the moving average has not been updated on the existing block.
-        """
-        return int(self.timestamp) != int(self.ema_last_updated)
-
-    @property
-    def ema_deviation(self) -> Decimal:
-        """
-        Returns the deviation between these values as emaRate/emaCompressedRate.
-        """
-        if self.ema_compressed_numerator > 0:
-            return self.ema_rate * Decimal(
-                self.ema_compressed_denominator / self.ema_compressed_numerator
-            )
-        else:
-            return Decimal("0")
 
     @property
     def vbnt_price(self):
@@ -823,9 +767,27 @@ class State(GlobalSettings):
 
     def set_spot_rate(self, tkn_name: str, value: Decimal):
         """
-        Set the spot_rate to a given value.
+        Set the spot rate to a given value.
         """
         self.tokens[tkn_name].spot_rate = value
+
+    def set_ema_rate(self, tkn_name: str, value: Decimal):
+        """
+        Set the ema rate to a given amount.
+        """
+        self.tokens[tkn_name].ema_rate = value
+
+    def set_inv_spot_rate(self, tkn_name: str, value: Decimal):
+        """
+        Set the inverse spot rate to a given value.
+        """
+        self.tokens[tkn_name].inv_spot_rate = value
+
+    def set_inv_ema_rate(self, tkn_name: str, value: Decimal):
+        """
+        Set the inverse ema rate to a given value.
+        """
+        self.tokens[tkn_name].inv_ema_rate = value
 
     def set_bnt_funding_amt(self, tkn_name: str, value: Decimal):
         """
@@ -834,9 +796,10 @@ class State(GlobalSettings):
         self.tokens[tkn_name].bnt_funding_amt.set(value)
 
     def set_initial_rates(self, tkn_name: str, bootstrap_rate: Decimal):
-        self.tokens[tkn_name].spot_rate = self.tokens[
-            tkn_name
-        ].ema_rate = bootstrap_rate
+        self.tokens[tkn_name].spot_rate = bootstrap_rate
+        self.tokens[tkn_name].ema_rate = bootstrap_rate
+        self.tokens[tkn_name].inv_spot_rate = bootstrap_rate**-1
+        self.tokens[tkn_name].inv_ema_rate = bootstrap_rate**-1
 
     def set_staked_balance(self, tkn_name: str, value: Decimal):
         """
@@ -861,12 +824,6 @@ class State(GlobalSettings):
         Set the user balance to a given amount.
         """
         self.users[user_name].wallet[tkn_name].set(value)
-
-    def set_ema_rate(self, tkn_name: str, value: Decimal):
-        """
-        Set the ema rate to a given amount.
-        """
-        self.tokens[tkn_name].ema_rate = value
 
     def set_network_fee(self, tkn_name: str, value: Decimal):
         """
@@ -905,12 +862,6 @@ class State(GlobalSettings):
         Set the rewards is_active flag to a given status.
         """
         self.autocompounding_reward_programs[tkn_name].is_active = value
-
-    def set_inv_spot_rate(self, tkn_name: str, value: Decimal):
-        """
-        Set the inv_spot_rate to a given value.
-        """
-        self.tokens[tkn_name].inv_spot_rate = value
 
     def set_pending_withdrawals_status(
         self, user_name: str, id_number: int, status: bool
@@ -1277,6 +1228,13 @@ def get_spot_rate(state: State, tkn_name: str) -> Decimal:
     return state.tokens[tkn_name].spot_rate
 
 
+def get_ema_rate(state: State, tkn_name: str) -> Decimal:
+    """
+    Returns the ema rate for a given tkn_name.
+    """
+    return state.tokens[tkn_name].ema_rate
+
+
 def get_inv_spot_rate(state: State, tkn_name: str) -> Decimal:
     """
     Returns the inverse spot rate for a given tkn_name.
@@ -1284,11 +1242,11 @@ def get_inv_spot_rate(state: State, tkn_name: str) -> Decimal:
     return state.tokens[tkn_name].inv_spot_rate
 
 
-def get_ema_rate(state: State, tkn_name: str) -> Decimal:
+def get_inv_ema_rate(state: State, tkn_name: str) -> Decimal:
     """
-    Returns the ema rate for a given tkn_name.
+    Returns the inverse ema rate for a given tkn_name.
     """
-    return state.tokens[tkn_name].ema_rate
+    return state.tokens[tkn_name].inv_ema_rate
 
 
 def get_ema_last_updated(state: State, tkn_name: str) -> Decimal:
@@ -1397,6 +1355,8 @@ def get_rate_report(state: State, tkn_name: str, qdecimals: Decimal) -> list:
     return [
         f"Spot Rate={state.tokens[tkn_name].spot_rate}"
         f"EMA Rate={state.tokens[tkn_name].ema_rate}"
+        f"Inverse Spot Rate={state.tokens[tkn_name].inv_spot_rate}"
+        f"Inverse EMA Rate={state.tokens[tkn_name].inv_ema_rate}"
     ]
 
 

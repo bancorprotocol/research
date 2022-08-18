@@ -96,30 +96,6 @@ def compute_bnbnt_amt(state: State, bnt_amt: Decimal) -> Decimal:
     return state.bnbnt_rate * bnt_amt
 
 
-def compute_ema(
-    last_spot: Decimal, last_ema: Decimal, alpha: Decimal = Decimal("0.2")
-) -> Decimal:
-    """
-    Computes the ema as a lagging average only once per block, per pool.
-    """
-    return alpha * last_spot + (1 - alpha) * last_ema
-
-
-def compute_ema_deviation(
-    new_ema: Decimal,
-    new_ema_compressed_numerator: Decimal,
-    new_ema_compressed_denominator: Decimal,
-) -> Decimal:
-    """
-    Computes the deviation between these values as (ema_rate / ema_compressed_rate).
-    """
-    return (
-        new_ema
-        * Decimal(new_ema_compressed_denominator)
-        / Decimal(new_ema_compressed_numerator)
-    )
-
-
 def compute_changed_bnt_trading_liquidity(
     a: Decimal, b: Decimal, d: Decimal, e: Decimal, x: Decimal, direction: str
 ) -> Decimal:
@@ -259,8 +235,9 @@ def shutdown_pool(state: State, tkn_name: str) -> State:
     state.set_bnt_trading_liquidity(tkn_name, Decimal("0"))
     state.set_tkn_trading_liquidity(tkn_name, Decimal("0"))
     state.set_spot_rate(tkn_name, Decimal("0"))
-    state.set_inv_spot_rate(tkn_name, Decimal("0"))
     state.set_ema_rate(tkn_name, Decimal("0"))
+    state.set_inv_spot_rate(tkn_name, Decimal("0"))
+    state.set_inv_ema_rate(tkn_name, Decimal("0"))
     return state
 
 
@@ -485,14 +462,8 @@ def handle_logging(
             ],
             "spot_rate": [get_spot_rate(state, tkn_name)],
             "ema_rate": [get_ema_rate(state, tkn_name)],
-            "ema_descale": [state.tokens[tkn_name].ema_descale],
-            "ema_compressed_numerator": [
-                state.tokens[tkn_name].ema_compressed_numerator
-            ],
-            "ema_compressed_denominator": [
-                state.tokens[tkn_name].ema_compressed_denominator
-            ],
-            "ema_deviation": [state.tokens[tkn_name].ema_deviation],
+            "inv_spot_rate": [get_inv_spot_rate(state, tkn_name)],
+            "inv_ema_rate": [get_inv_ema_rate(state, tkn_name)],
             "ema_last_updated": [state.tokens[tkn_name].ema_last_updated],
             "network_fee": [state.network_fee],
             "withdrawal_fee": [state.withdrawal_fee],
@@ -523,16 +494,12 @@ def handle_vandalism_attack(state: State, tkn_name):
 
 def handle_ema(state: State, tkn_name: str) -> State:
     """
-    Handles the updating of the ema_rate, called before a swap is performed.
+    Handles the updating of the ema rate and the inverse ema rate, called before a swap is performed.
     """
-    last_spot = get_spot_rate(state, tkn_name)
-    last_ema = get_ema_rate(state, tkn_name)
-    update_allowed = get_is_ema_update_allowed(state, tkn_name)
-    if update_allowed:
-        new_ema = compute_ema(last_spot, last_ema)
+    if state.tokens[tkn_name].ema_last_updated != state.tokens[tkn_name].timestamp:
         state.tokens[tkn_name].ema_last_updated = state.tokens[tkn_name].timestamp
-        state.tokens[tkn_name].ema_rate = new_ema
-        state.logger.info(f"EMA updated | old EMA = {last_ema} | new EMA = {new_ema}")
+        state.set_ema_rate(tkn_name, state.tokens[tkn_name].updated_ema_rate)
+        state.set_inv_ema_rate(tkn_name, state.tokens[tkn_name].updated_inv_ema_rate)
     return state
 
 
@@ -541,8 +508,6 @@ def describe_rates(state: State, report={}) -> pd.DataFrame:
     Return a dataframe of the current system EMA & spot rates.
     """
     for tkn in state.whitelisted_tokens:
-        if state.tokens[tkn].spot_rate == Decimal(0):
-            state.tokens[tkn].spot_rate = state.tokens[tkn].ema_rate
         report[tkn] = get_rate_report(state, tkn)
     return pd.DataFrame(report).T.reset_index()
 

@@ -254,7 +254,9 @@ def compute_pool_depth_adjustment(
     if is_trading_enabled and is_price_stable and bnt_remaining_funding > 0:
         tkn_excess = get_tkn_excess(state, tkn_name)
         tkn_excess_bnt_equivalence = get_tkn_excess_bnt_equivalence(state, tkn_name)
-        speculated_ema_rate = get_updated_ema_rate(state, tkn_name) # a mistake in the contract implementation
+        speculated_ema_rate = get_updated_ema_rate(
+            state, tkn_name
+        )  # a mistake in the contract implementation
         bnt_trading_liquidity = get_bnt_trading_liquidity(state, tkn_name)
         avg_tkn_trading_liquidity = bnt_trading_liquidity / speculated_ema_rate
 

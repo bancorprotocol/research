@@ -409,7 +409,7 @@ class BancorDapp:
                 tuple([3, "Network", "Protocol Equity"])
             ] = state.tokens[tkn_name].protocol_wallet_pooltokens.balance
 
-        df = pd.DataFrame(table).sort_index()
+        df = pd.DataFrame(table).fillna(0).sort_index()
         return df.applymap(lambda x: round(x, decimals)) if decimals >= 0 else df
 
     def export(self):

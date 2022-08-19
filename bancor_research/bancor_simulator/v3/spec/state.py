@@ -1181,6 +1181,8 @@ def get_updated_ema_rate(state: State, tkn_name: str) -> Decimal:
     """
     The ema as a lagging average only once per block, per pool.
     """
+    if state.tokens[tkn_name].ema_last_updated == state.tokens[tkn_name].timestamp:
+        return state.tokens[tkn_name].ema_rate
     return state.tokens[tkn_name].updated_ema_rate
 
 
@@ -1188,7 +1190,9 @@ def get_updated_inv_ema_rate(state: State, tkn_name: str) -> Decimal:
     """
     The inverse ema as a lagging average only once per block, per pool.
     """
-    return state.tokens[tkn_name].updated_ema_rate
+    if state.tokens[tkn_name].ema_last_updated == state.tokens[tkn_name].timestamp:
+        return state.tokens[tkn_name].inv_ema_rate
+    return state.tokens[tkn_name].updated_inv_ema_rate
 
 
 def get_tkn_excess_bnt_equivalence(state: State, tkn_name: str) -> Decimal:

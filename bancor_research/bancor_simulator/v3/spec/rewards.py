@@ -325,4 +325,6 @@ def claim_standard_rewards(
 
             total_amt += reward_amt
 
+    state.increase_user_balance(user_name, "bnt", total_amt)
+
     return state

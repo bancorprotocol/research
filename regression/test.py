@@ -8,8 +8,6 @@ from os.path import join, dirname
 from json import loads
 
 def execute(fileName):
-    print(fileName)
-
     fileDesc = open(join(dirname(__file__), 'data', fileName + '.json'), 'r')
     fileData = loads(fileDesc.read())
     fileDesc.close()
@@ -46,7 +44,7 @@ def execute(fileName):
             )
 
     def Print(title, *args):
-        print('operation {} out of {}: {}'.format(n + 1, len(fileData['operations']), title.format(*args)))
+        print('{} - operation {} out of {}: {}'.format(fileName, n + 1, len(fileData['operations']), title.format(*args)))
 
     for n in range(len(fileData['operations'])):
         operation = fileData['operations'][n]
@@ -84,7 +82,9 @@ def execute(fileName):
             else:
                 raise Exception('unsupported operation `{}` encountered'.format(operation['type']))
 
-    print(bancorDapps[0].describe(decimals=6).compare(bancorDapps[1].describe(decimals=6)))
+        frames = [bancorDapp.describe(decimals=6) for bancorDapp in bancorDapps]
+        for diff in [pair[0].compare(pair[1]) for pair in zip(frames, frames[1:])]:
+            assert diff.empty, diff
 
 execute('BancorNetworkSimpleFinancialScenario1')
 execute('BancorNetworkSimpleFinancialScenario2')

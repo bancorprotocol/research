@@ -328,44 +328,6 @@ def swap_fee_collection(
         return b * d * x * (1 - e) / (a + x)
 
 
-def external_protection(
-    bnt_trading_liquidity,
-    average_tkn_trading_liquidity,
-    withdrawal_fee,
-    bnt_sent_to_user,
-    external_protection_tkn_balance,
-    tkn_withdraw_value,
-    tkn_sent_to_user,
-    trading_enabled,
-):
-    """
-    This replaces any BNT that would have been received by the user with TKN.
-    """
-    a = bnt_trading_liquidity
-    b = average_tkn_trading_liquidity
-    n = withdrawal_fee
-    T = bnt_sent_to_user
-    w = external_protection_tkn_balance
-    x = tkn_withdraw_value
-    S = tkn_sent_to_user
-
-    if not trading_enabled:
-        bnt_sent_to_user = Decimal("0")
-        external_protection_compensation = min(w, x * (1 - n) - S)
-
-    elif T and w:
-        if T * b > w * a:
-            bnt_sent_to_user = (T * b - w * a) / b
-            external_protection_compensation = w
-        else:
-            bnt_sent_to_user = Decimal("0")
-            external_protection_compensation = T * b / a
-    else:
-        bnt_sent_to_user = T
-        external_protection_compensation = Decimal("0")
-    return bnt_sent_to_user, external_protection_compensation
-
-
 def init_protocol(
     state: State,
     whitelisted_tokens: dict,

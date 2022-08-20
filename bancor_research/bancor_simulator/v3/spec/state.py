@@ -30,7 +30,6 @@ class Epoch(int):
 MODEL = "Bancor Network"
 GENESIS_EPOCH = Epoch(0)
 SECONDS_PER_DAY = 86400
-PRECISION = 155
 
 # Configurable Genesis Variables
 DEFAULT_TIMESTAMP = 0
@@ -130,7 +129,6 @@ class GlobalSettings:
     """
 
     timestamp: int = DEFAULT_TIMESTAMP
-    precision: int = PRECISION
     whitelisted_tokens: dict = field(default_factory=dict)
     active_users: List[str] = field(default_factory=lambda: DEFAULT_USERS)
     price_feeds_path: str = DEFAULT_PRICE_FEEDS_PATH

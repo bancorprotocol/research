@@ -48,8 +48,6 @@ def userAmount(token: IERC20, userId: str, amount: str):
     return toInt(token, amount)
 
 def execute(fileName):
-    print(fileName)
-
     flow = read(fileName)
 
     bnt   = ReserveToken('bnt'  , 'bnt'  , DEFAULT_TOKEN_DECIMALS)
@@ -203,7 +201,7 @@ def execute(fileName):
             assertAlmostEqual(state[token.symbol()]['contract_bntPool'], toValue(token, token.balanceOf(bntPool)), 0, '0.000000000001')
 
     def Print(title, *args):
-        print('operation {} out of {}: {}'.format(n + 1, len(flow['operations']), title.format(*args)))
+        print('{} - operation {} out of {}: {}'.format(fileName, n + 1, len(flow['operations']), title.format(*args)))
 
     for n in range(len(flow['operations'])):
         operation = flow['operations'][n]

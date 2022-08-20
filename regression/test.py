@@ -82,7 +82,7 @@ def execute(fileName):
             else:
                 raise Exception('unsupported operation `{}` encountered'.format(operation['type']))
 
-        frames = [bancorDapp.describe(decimals=6) for bancorDapp in bancorDapps]
+        frames = [bancorDapp.describe(decimals = 6) for bancorDapp in bancorDapps]
         for diff in [pair[0].compare(pair[1]) for pair in zip(frames, frames[1:])]:
             assert diff.empty, diff
 

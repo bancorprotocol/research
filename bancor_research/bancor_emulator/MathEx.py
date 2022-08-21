@@ -118,6 +118,7 @@ def exp2(f: Fraction256) -> (Fraction256):
 
 '''
     * @dev returns a fraction with truncated components
+    * note that since the input value is truncated, the use of the method incurs precision loss
 '''
 def truncatedFraction(fraction: Fraction256, max: int) -> (Fraction256):
     scale = Math.ceilDiv(Math.max(fraction.n, fraction.d), max);

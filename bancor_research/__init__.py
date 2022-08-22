@@ -16,7 +16,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 decimal.getcontext().prec = len(str(2 ** 512 - 1))
-decimal.getcontext().rounding = decimal.ROUND_DOWN
+decimal.getcontext().rounding = decimal.ROUND_HALF_DOWN
 
 Decimal = decimal.Decimal
 

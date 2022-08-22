@@ -21,14 +21,17 @@ Note:
     every step of every run.
 """
 import os
+
 from bancor_research import DEFAULT, Decimal, DataFrame
+
+trading_fee = Decimal(DEFAULT.TRADING_FEE[:-1]) / 100
 
 # Add any desired parameters to sweep below.
 br_params = {
     "trading_fee": [
-        DEFAULT.TRADING_FEE - Decimal("0.001"),
-        DEFAULT.TRADING_FEE,
-        DEFAULT.TRADING_FEE + Decimal("0.001"),
+        trading_fee - Decimal("0.001"),
+        trading_fee,
+        trading_fee + Decimal("0.001"),
     ]
 }
 

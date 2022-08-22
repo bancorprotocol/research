@@ -259,6 +259,8 @@ def compute_pool_depth_adjustment(
         bnt_trading_liquidity = get_bnt_trading_liquidity(state, tkn_name)
 
         if bnt_remaining_funding > 0:
+            # changed due to contract implementation
+            # should possibly use `get_tkn_excess` and `get_tkn_excess_bnt_equivalence` instead
             tkn_trading_liquidity = get_tkn_trading_liquidity(state, tkn_name)
             tkn_excess = get_vault_balance(state, tkn_name) - tkn_trading_liquidity
             tkn_excess_bnt_equivalence = tkn_excess * speculated_ema_rate

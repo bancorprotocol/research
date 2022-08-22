@@ -10,7 +10,7 @@ from bancor_research.bancor_simulator.v3.spec.actions import *
 from bancor_research.bancor_simulator.v3.spec.rewards import *
 from bancor_research.bancor_simulator.v3.spec.state import *
 
-from bancor_research import DataFrame, read_price_feeds
+from bancor_research import SECONDS_PER_DAY, DataFrame, read_price_feeds
 
 
 def to_decimal(percent: str):
@@ -25,8 +25,6 @@ def to_user_amount(state: State, tkn_name: str, user_name: str, amount: str):
 
 class BancorDapp:
     """Main BancorDapp class and simulator module interface."""
-
-    name = MODEL
 
     """
     Args:
@@ -481,8 +479,7 @@ class BancorDapp:
         distribution_type: str,
         timestamp: int,
         half_life_days: int = 0,
-        total_duration_in_days: Decimal = Decimal("0"),
-        total_duration_in_seconds: Decimal = Decimal("0"),
+        total_duration_in_days: int = 0,
         transaction_type: str = "create autocompounding program",
     ):
         """
@@ -490,10 +487,6 @@ class BancorDapp:
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
         state, tkn_name, user_name = validate_input(state, tkn_name, "", timestamp)
-        if total_duration_in_seconds == 0 and total_duration_in_days != 0:
-            total_duration_in_seconds = Decimal(f"{SECONDS_PER_DAY}") * Decimal(
-                total_duration_in_days
-            )
 
         program_id = state.autocompounding_programs_count + 1
 
@@ -521,8 +514,8 @@ class BancorDapp:
             tkn_name=tkn_name,
             owner_id=user_name,
             is_active=is_active,
-            half_life_days=half_life_days,
-            total_duration_in_seconds=total_duration_in_seconds,
+            half_life_seconds=half_life_days * SECONDS_PER_DAY,
+            total_duration_in_seconds=total_duration_in_days * SECONDS_PER_DAY,
             start_time=start_time,
             created_at=timestamp,
             total_rewards=Token(balance=total_rewards),

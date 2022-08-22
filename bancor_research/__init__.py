@@ -24,6 +24,8 @@ DataFrame = pandas.DataFrame
 
 PandasDataFrame = TypeVar("pandas.core.frame.DataFrame")
 
+SECONDS_PER_DAY = 24 * 60 * 60
+
 class DEFAULT:
     TIMESTAMP = 0
 
@@ -37,8 +39,8 @@ class DEFAULT:
     BNT_MIN_LIQUIDITY = "10000"
     EP_VAULT_BALANCE  = "0"
 
-    COOLDOWN_TIME  = 7 * 24 * 60 * 60
-    NUM_TIMESTAMPS = 30 * 24 * 60 * 60
+    COOLDOWN_TIME  = 7 * SECONDS_PER_DAY
+    NUM_TIMESTAMPS = 30 * SECONDS_PER_DAY
 
     PRICE_FEEDS_PATH = "https://bancorml.s3.us-east-2.amazonaws.com/price_feeds.parquet"
 

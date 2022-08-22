@@ -14,25 +14,15 @@ from bancor_research import DEFAULT, Decimal, PandasDataFrame
 logger = logging.getLogger(__name__)
 
 
-# Custom types
-class Epoch(int):
-    pass
-
-
-# Non-Configurable Constants
-MODEL = "Bancor Network"
-GENESIS_EPOCH = Epoch(0)
-SECONDS_PER_DAY = 86400
-
 # Configurable Genesis Variables
 DEFAULT_TIMESTAMP = DEFAULT.TIMESTAMP
 DEFAULT_USERS = DEFAULT.USERS
-DEFAULT_DECIMALS = 18
-DEFAULT_WITHDRAWAL_FEE = Decimal("0.0025")
-DEFAULT_TRADING_FEE = Decimal("0.01")
-DEFAULT_NETWORK_FEE = Decimal("0.2")
-DEFAULT_BNT_FUNDING_LIMIT = Decimal("1000000")
-DEFAULT_BNT_MIN_LIQUIDITY = Decimal("10000")
+DEFAULT_DECIMALS = DEFAULT.DECIMALS
+DEFAULT_WITHDRAWAL_FEE = Decimal(DEFAULT.WITHDRAWAL_FEE[:-1]) / 100
+DEFAULT_TRADING_FEE = Decimal(DEFAULT.TRADING_FEE[:-1]) / 100
+DEFAULT_NETWORK_FEE = Decimal(DEFAULT.NETWORK_FEE[:-1]) / 100
+DEFAULT_BNT_FUNDING_LIMIT = Decimal(DEFAULT.BNT_FUNDING_LIMIT)
+DEFAULT_BNT_MIN_LIQUIDITY = Decimal(DEFAULT.BNT_MIN_LIQUIDITY)
 DEFAULT_COOLDOWN_TIME = DEFAULT.COOLDOWN_TIME
 DEFAULT_ALPHA = Decimal("0.2")
 DEFAULT_LOWER_EMA_LIMIT = Decimal("0.99")
@@ -140,14 +130,13 @@ class AutocompoundingProgram:
     id: int
     tkn_name: str
     owner_id: str
-    half_life_days: int
     start_time: int
     created_at: int
-    _half_life_seconds: int = 0
+    half_life_seconds: int = 0
     total_rewards: Any = field(default_factory=Token)
     remaining_rewards: Any = field(default_factory=Token)
     prev_token_amt_distributed: Any = field(default_factory=Token)
-    total_duration_in_seconds: Decimal = Decimal("0")
+    total_duration_in_seconds: int = 0
     distribution_type: str = "exp"
     is_active: bool = False
     is_enabled: bool = False
@@ -158,24 +147,6 @@ class AutocompoundingProgram:
         Returns the rate per second of the distribution.
         """
         return self.total_rewards.balance / self.total_duration_in_seconds
-
-    @property
-    def half_life_seconds(self):
-        """
-        Returns the half-life of the distribution in seonds.
-        """
-        return (
-            self.half_life_days * SECONDS_PER_DAY
-            if self._half_life_seconds == 0
-            else self._half_life_seconds
-        )
-
-    @half_life_seconds.setter
-    def half_life_seconds(self, value):
-        """
-        Sets the half-life of the distribution in seonds.
-        """
-        self._half_life_seconds = value
 
 
 @dataclass(config=Config)
@@ -212,7 +183,6 @@ class Tokens(GlobalSettings):
     """
 
     tkn_name: str = None
-    timestamp: int = DEFAULT_TIMESTAMP
     decimals: int = DEFAULT_DECIMALS
     master_vault: Any = field(default_factory=Token)
     staking_ledger: Any = field(default_factory=Token)
@@ -319,7 +289,6 @@ class State(GlobalSettings):
     """
 
     transaction_id: int = 0
-    timestamp: int = DEFAULT_TIMESTAMP
     price_feeds: PandasDataFrame = None
     tokens: Dict[str, Tokens] = field(default_factory=lambda: defaultdict(Tokens))
     users: Dict[str, User] = field(default_factory=lambda: defaultdict(User))

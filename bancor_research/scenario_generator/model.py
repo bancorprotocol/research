@@ -6,7 +6,7 @@
 
 import mesa
 import itertools
-from decimal import Decimal
+from bancor_research import Decimal
 from mesa.datacollection import DataCollector
 from pydantic.types import Any
 

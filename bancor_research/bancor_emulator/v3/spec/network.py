@@ -1,4 +1,3 @@
-from bancor_research.bancor_emulator.solidity.uint.float import Decimal
 from bancor_research.bancor_emulator.solidity import uint, uint32, uint256, block
 
 from bancor_research.bancor_emulator.BancorNetwork      import BancorNetwork     
@@ -16,7 +15,7 @@ from bancor_research.bancor_emulator.StandardRewards    import StandardRewards
 from bancor_research.bancor_emulator.TokenGovernance    import TokenGovernance   
 from bancor_research.bancor_emulator.Vault              import Vault             
 
-from bancor_research import DEFAULT, PandasDataFrame, read_price_feeds, pd
+from bancor_research import DEFAULT, Decimal, pd, PandasDataFrame, read_price_feeds
 
 def toPPM(percent: str):
     return uint32(PPM_RESOLUTION.data * Decimal(percent[:-1]) / 100)

@@ -1,5 +1,6 @@
 from os.path import join, dirname
 from json import loads, dumps
+from bancor_research import Decimal
 
 def read(fileName):
     file = open(_getPath(fileName), mode = 'r', newline = '\n')
@@ -14,8 +15,6 @@ def write(fileName, data):
 
 def _getPath(fileName):
     return join(dirname(__file__), '..', '..', '..', '..', 'regression', 'data', fileName + '.json')
-
-from bancor_research.bancor_emulator.solidity.uint.float import Decimal
 
 def assertAlmostEqual(expected, actual, maxAbsoluteError = 0, maxRelativeError = 0, relation = None):
     expected = Decimal(expected)

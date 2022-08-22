@@ -6,12 +6,11 @@
 import copy
 import logging
 from dataclasses import field
-from decimal import Decimal
 from pydantic.types import Tuple, Any, List, Dict
 from pydantic.dataclasses import dataclass
 from pydantic.schema import defaultdict
 
-from bancor_research import DEFAULT, PandasDataFrame, pd
+from bancor_research import DEFAULT, Decimal, pd, PandasDataFrame
 
 logger = logging.getLogger(__name__)
 

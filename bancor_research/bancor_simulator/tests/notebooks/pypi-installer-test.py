@@ -8,8 +8,7 @@ from bancor_research.bancor_simulator.v3.spec.network import *
 
 # COMMAND ----------
 
-import pandas as pd
-from decimal import Decimal
+from bancor_research import Decimal, pd
 
 bnt_min_liquidity: Decimal = Decimal("10000")
 bnt_funding_limit: Decimal = Decimal("40000")

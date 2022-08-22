@@ -7,6 +7,7 @@
 import warnings
 import pandas as pd
 from pydantic.fields import TypeVar
+from decimal import Decimal, getcontext
 
 with warnings.catch_warnings():
     warnings.simplefilter("ignore", FutureWarning)
@@ -17,6 +18,8 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 PandasDataFrame = TypeVar("pandas.core.frame.DataFrame")
+
+getcontext().prec = len(str(Decimal(2 ** 512 - 1)))
 
 class DEFAULT:
     TIMESTAMP = 0

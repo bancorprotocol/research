@@ -1,7 +1,4 @@
-from decimal import Decimal
-from decimal import getcontext
-
-getcontext().prec = len(str(Decimal(2 ** 512 - 1)))
+from bancor_research import Decimal
 
 class uint:
     sizes = [(n + 1) * 8 for n in range(32)]

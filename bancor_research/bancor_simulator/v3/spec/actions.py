@@ -319,6 +319,8 @@ def process_withdrawal(
 
             solver = WithdrawalAlgorithm(
                 bnt_trading_liquidity=bnt_trading_liquidity,
+                # changed due to contract implementation
+                # was previously `avg_tkn_trading_liquidity`
                 tkn_trading_liquidity=tkn_trading_liquidity,
                 tkn_excess=tkn_excess,
                 staked_tkn=staked_tkn,

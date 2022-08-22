@@ -15,7 +15,7 @@ from bancor_research.bancor_emulator.StandardRewards    import StandardRewards
 from bancor_research.bancor_emulator.TokenGovernance    import TokenGovernance   
 from bancor_research.bancor_emulator.Vault              import Vault             
 
-from bancor_research import DEFAULT, Decimal, pd, PandasDataFrame, read_price_feeds
+from bancor_research import DEFAULT, Decimal, DataFrame, PandasDataFrame, read_price_feeds
 
 def toPPM(percent: str):
     return uint32(PPM_RESOLUTION.data * Decimal(percent[:-1]) / 100)
@@ -372,7 +372,7 @@ class BancorDapp:
             table[token.symbol()][tuple([3, 'Network', 'Rewards Vault'  ])] = fromWei(token.balanceOf(self.erVault), token.decimals())
             table[token.symbol()][tuple([3, 'Network', 'Protocol Equity'])] = fromWei(token.balanceOf(self.bntPool), token.decimals())
 
-        df = pd.DataFrame(table).fillna(0).sort_index()
+        df = DataFrame(table).fillna(0).sort_index()
         return df.applymap(lambda x: round(x, decimals)) if decimals >= 0 else df
 
 # whitelisted_tokens: list = ['bnt', 'eth', 'wbtc', 'link']

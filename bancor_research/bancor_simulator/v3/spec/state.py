@@ -3,14 +3,13 @@
 # Licensed under the MIT LICENSE. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------------------------------
 """System state variables, constants, containers and interface."""
-import copy
-import logging
+import copy, logging, pandas
 from dataclasses import field
 from pydantic.types import Tuple, Any, List, Dict
 from pydantic.dataclasses import dataclass
 from pydantic.schema import defaultdict
 
-from bancor_research import DEFAULT, Decimal, pd, PandasDataFrame
+from bancor_research import DEFAULT, Decimal, PandasDataFrame
 
 logger = logging.getLogger(__name__)
 
@@ -66,11 +65,11 @@ class Token(object):
         return self.validate_value(value)
 
     def validate_balance(self):
-        if pd.isnull(self.balance):
+        if pandas.isnull(self.balance):
             self.balance = Decimal("0")
 
     def validate_value(self, value) -> Decimal:
-        if pd.isnull(value):
+        if pandas.isnull(value):
             value = Decimal("0")
         return Decimal(str(value))
 

@@ -4,9 +4,7 @@
 # --------------------------------------------------------------------------------------------------------------------
 """Spec, simulation, & emulation modules for Bancor v3."""
 
-import warnings
-import decimal
-import pandas as pd
+import warnings, decimal, pandas
 from pydantic.fields import TypeVar
 
 with warnings.catch_warnings():
@@ -21,6 +19,8 @@ decimal.getcontext().prec = len(str(2 ** 512 - 1))
 decimal.getcontext().rounding = decimal.ROUND_DOWN
 
 Decimal = decimal.Decimal
+
+DataFrame = pandas.DataFrame
 
 PandasDataFrame = TypeVar("pandas.core.frame.DataFrame")
 
@@ -42,7 +42,7 @@ class DEFAULT:
 
     PRICE_FEEDS_PATH = "https://bancorml.s3.us-east-2.amazonaws.com/price_feeds.parquet"
 
-    PRICE_FEEDS = pd.DataFrame({
+    PRICE_FEEDS = DataFrame({
         "INDX": (    0.00 for _ in range(NUM_TIMESTAMPS)),
         "vbnt": (    1.00 for _ in range(NUM_TIMESTAMPS)),
         "tkn" : (    2.50 for _ in range(NUM_TIMESTAMPS)),
@@ -77,7 +77,7 @@ DEFAULT.WHITELIST = {
 }
 
 def read_price_feeds(price_feeds_path: str):
-    price_feeds = pd.read_parquet(price_feeds_path)
+    price_feeds = pandas.read_parquet(price_feeds_path)
     price_feeds.columns = [col.lower() for col in price_feeds.columns]
     return price_feeds
 

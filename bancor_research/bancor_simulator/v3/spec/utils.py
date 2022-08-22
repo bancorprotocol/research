@@ -4,6 +4,7 @@
 # --------------------------------------------------------------------------------------------------------------------
 """Utility functions."""
 from bancor_research.bancor_simulator.v3.spec.state import *
+from bancor_research import Decimal, DataFrame
 import json, pickle, cloudpickle
 
 
@@ -449,7 +450,7 @@ def handle_logging(
             "staked_bnt": [get_staked_balance(state, "bnt")],
             "bnbnt_rate": [state.bnbnt_rate],
         }
-        state.history.append(pd.DataFrame(state_variables))
+        state.history.append(DataFrame(state_variables))
     return state
 
 
@@ -476,16 +477,16 @@ def handle_ema(state: State, tkn_name: str) -> State:
     return state
 
 
-def describe_rates(state: State, report={}) -> pd.DataFrame:
+def describe_rates(state: State, report={}) -> DataFrame:
     """
     Return a dataframe of the current system EMA & spot rates.
     """
     for tkn in state.whitelisted_tokens:
         report[tkn] = get_rate_report(state, tkn)
-    return pd.DataFrame(report).T.reset_index()
+    return DataFrame(report).T.reset_index()
 
 
-def describe(state: State, rates: bool = False, decimals=6) -> pd.DataFrame:
+def describe(state: State, rates: bool = False, decimals=6) -> DataFrame:
     """
     Builds a dataframe of the current system/ledger state.
     """
@@ -501,7 +502,7 @@ def describe(state: State, rates: bool = False, decimals=6) -> pd.DataFrame:
         while len(description[col]) < max_rows:
             description[col].append("")
 
-    return pd.DataFrame(description)
+    return DataFrame(description)
 
 
 def build_json_operation(

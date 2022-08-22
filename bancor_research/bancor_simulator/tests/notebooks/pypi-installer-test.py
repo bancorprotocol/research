@@ -8,7 +8,7 @@ from bancor_research.bancor_simulator.v3.spec.network import *
 
 # COMMAND ----------
 
-from bancor_research import Decimal, pd
+from bancor_research import Decimal, DataFrame
 
 bnt_min_liquidity: Decimal = Decimal("10000")
 bnt_funding_limit: Decimal = Decimal("40000")
@@ -21,7 +21,7 @@ whitelisted_tokens: list = ["bnt", "eth", "wbtc", "link"]
 cooldown_time: int = 7
 iter_limit = 10000
 withdrawal_fee: Decimal = Decimal("0.0025")
-price_feeds = pd.DataFrame(
+price_feeds = DataFrame(
     {
         "INDX": [0 for i in range(iter_limit + 1)],
         "bnt": [2.5 for i in range(iter_limit + 1)],

@@ -3,7 +3,7 @@
 # Licensed under the MIT LICENSE. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------------------------------
 """Simulation constants and default state variables."""
-from decimal import Decimal
+from bancor_research import Decimal
 
 SIMULATION_TARGET_TVL: Decimal = Decimal("160000000")
 SIMULATION_TARGET_TRADE_VOLUME: Decimal = Decimal("20000000")

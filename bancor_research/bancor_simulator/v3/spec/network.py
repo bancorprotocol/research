@@ -4,13 +4,13 @@
 # --------------------------------------------------------------------------------------------------------------------
 """Main BancorDapp class and simulator module interface."""
 
-import cloudpickle
+import cloudpickle, pandas
 
 from bancor_research.bancor_simulator.v3.spec.actions import *
 from bancor_research.bancor_simulator.v3.spec.rewards import *
 from bancor_research.bancor_simulator.v3.spec.state import *
 
-from bancor_research import DEFAULT, PandasDataFrame, read_price_feeds, pd
+from bancor_research import DataFrame, read_price_feeds
 
 
 def to_decimal(percent: str):
@@ -174,7 +174,7 @@ class BancorDapp:
         """
         Displays the history of the bancor network in a dataframe.
         """
-        return pd.concat(
+        return pandas.concat(
             [
                 self.global_state.history[i]
                 for i in range(len(self.global_state.history))
@@ -409,14 +409,14 @@ class BancorDapp:
                 tuple([3, "Network", "Protocol Equity"])
             ] = state.tokens[tkn_name].protocol_wallet_pooltokens.balance
 
-        df = pd.DataFrame(table).fillna(0).sort_index()
+        df = DataFrame(table).fillna(0).sort_index()
         return df.applymap(lambda x: round(x, decimals)) if decimals >= 0 else df
 
     def export(self):
         """
         Exports transaction history record
         """
-        return pd.concat(self.global_state.history)
+        return pandas.concat(self.global_state.history)
 
     def whitelist_token(self, tkn_name: str, timestamp: int = 0):
         """

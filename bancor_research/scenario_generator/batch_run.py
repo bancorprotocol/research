@@ -22,12 +22,16 @@ Note:
 """
 import os
 
+from bancor_research import DEFAULT, Decimal, DataFrame
+
+trading_fee = Decimal(DEFAULT.TRADING_FEE[:-1]) / 100
+
 # Add any desired parameters to sweep below.
 br_params = {
     "trading_fee": [
-        DEFAULT_TRADING_FEE - Decimal("0.001"),
-        DEFAULT_TRADING_FEE,
-        DEFAULT_TRADING_FEE + Decimal("0.001"),
+        trading_fee - Decimal("0.001"),
+        trading_fee,
+        trading_fee + Decimal("0.001"),
     ]
 }
 
@@ -38,7 +42,7 @@ if __name__ == "__main__":
         data_collection_period=1,
         max_steps=SIMULATION_MAX_STEPS,
     )
-    br_df = pd.DataFrame(data)
+    br_df = DataFrame(data)
 
     overwrite_dir = True
     os.makedirs(SIMULATION_OUTPUT_PATH, exist_ok=overwrite_dir)

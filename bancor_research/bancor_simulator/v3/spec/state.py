@@ -5,18 +5,13 @@
 """System state variables, constants, containers and interface."""
 import copy
 import logging
-import warnings
 from dataclasses import field
 from decimal import Decimal
-import pandas as pd
-import numpy as np
 from pydantic.types import Tuple, Any, List, Dict
 from pydantic.dataclasses import dataclass
-from pydantic.fields import TypeVar
 from pydantic.schema import defaultdict
 
-warnings.filterwarnings("ignore", category=RuntimeWarning)
-PandasDataFrame = TypeVar("pandas.core.frame.DataFrame")
+from bancor_research import DEFAULT, PandasDataFrame, pd
 
 logger = logging.getLogger(__name__)
 
@@ -32,54 +27,19 @@ GENESIS_EPOCH = Epoch(0)
 SECONDS_PER_DAY = 86400
 
 # Configurable Genesis Variables
-DEFAULT_TIMESTAMP = 0
-DEFAULT_USERS = ["Alice", "Bob", "Charlie", "Trader"]
-DEFAULT_PRICE_FEEDS_PATH = (
-    "https://bancorml.s3.us-east-2.amazonaws.com/price_feeds.parquet"
-)
-DEFAULT_EXP_DECAY_DISTRIBUTION = 1
-DEFAULT_FLAT_DISTRIBUTION = 0
+DEFAULT_TIMESTAMP = DEFAULT.TIMESTAMP
+DEFAULT_USERS = DEFAULT.USERS
 DEFAULT_DECIMALS = 18
 DEFAULT_WITHDRAWAL_FEE = Decimal("0.0025")
 DEFAULT_TRADING_FEE = Decimal("0.01")
 DEFAULT_NETWORK_FEE = Decimal("0.2")
 DEFAULT_BNT_FUNDING_LIMIT = Decimal("1000000")
 DEFAULT_BNT_MIN_LIQUIDITY = Decimal("10000")
-DEFAULT_COOLDOWN_TIME = SECONDS_PER_DAY * 7
+DEFAULT_COOLDOWN_TIME = DEFAULT.COOLDOWN_TIME
 DEFAULT_ALPHA = Decimal("0.2")
 DEFAULT_LOWER_EMA_LIMIT = Decimal("0.99")
 DEFAULT_UPPER_EMA_LIMIT = Decimal("1.01")
-DEFAULT_NUM_TIMESTAMPS = SECONDS_PER_DAY * 30
 DEFAULT_ACCOUNT_BALANCE = Decimal("0")
-DEFAULT_PRICE_FEEDS = pd.DataFrame(
-    {
-        "INDX": (0 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
-        "vbnt": (1.0 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
-        "tkn": (2.5 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
-        "bnt": (2.5 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
-        "link": (15.00 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
-        "eth": (2500.00 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
-        "wbtc": (40000.00 for _ in range(DEFAULT_NUM_TIMESTAMPS)),
-    }
-)
-DEFAULT_WHITELIST = {
-    "eth": {
-        "trading_fee": DEFAULT_TRADING_FEE,
-        "bnt_funding_limit": DEFAULT_BNT_FUNDING_LIMIT,
-    },
-    "link": {
-        "trading_fee": DEFAULT_TRADING_FEE,
-        "bnt_funding_limit": DEFAULT_BNT_FUNDING_LIMIT,
-    },
-    "tkn": {
-        "trading_fee": DEFAULT_TRADING_FEE,
-        "bnt_funding_limit": DEFAULT_BNT_FUNDING_LIMIT,
-    },
-    "wbtc": {
-        "trading_fee": DEFAULT_TRADING_FEE,
-        "bnt_funding_limit": DEFAULT_BNT_FUNDING_LIMIT,
-    },
-}
 
 
 # Misc dependencies for `State`
@@ -131,7 +91,6 @@ class GlobalSettings:
     timestamp: int = DEFAULT_TIMESTAMP
     whitelisted_tokens: dict = field(default_factory=dict)
     active_users: List[str] = field(default_factory=lambda: DEFAULT_USERS)
-    price_feeds_path: str = DEFAULT_PRICE_FEEDS_PATH
     cooldown_time: int = DEFAULT_COOLDOWN_TIME
     network_fee: Decimal = DEFAULT_NETWORK_FEE
     withdrawal_fee: Decimal = DEFAULT_WITHDRAWAL_FEE

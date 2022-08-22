@@ -253,7 +253,8 @@ def compute_pool_depth_adjustment(
     is_price_stable = get_is_price_stable(state, tkn_name)
     bnt_remaining_funding = get_bnt_remaining_funding(state, tkn_name)
     if is_trading_enabled and is_price_stable:
-        # a mistake in the contract implementation (should use `get_ema_rate`)
+        # changed due to contract implementation
+        # should probably use `get_ema_rate` instead
         speculated_ema_rate = get_updated_ema_rate(state, tkn_name)
         bnt_trading_liquidity = get_bnt_trading_liquidity(state, tkn_name)
 
@@ -297,6 +298,8 @@ def compute_pool_depth_adjustment(
                     "Something went wrong, pool adjustment case not found..."
                 )
 
+        # added due to contract implementation
+        # was originally intended for admin only
         elif bnt_remaining_funding < 0:
             case = "case4"
             bnt_increase = bnt_remaining_funding

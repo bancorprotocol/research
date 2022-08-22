@@ -10,7 +10,7 @@ from bancor_research.bancor_simulator.v3.spec.actions import *
 from bancor_research.bancor_simulator.v3.spec.rewards import *
 from bancor_research.bancor_simulator.v3.spec.state import *
 
-from bancor_research import DataFrame, read_price_feeds
+from bancor_research import SECONDS_PER_DAY, DataFrame, read_price_feeds
 
 
 def to_decimal(percent: str):
@@ -514,8 +514,8 @@ class BancorDapp:
             tkn_name=tkn_name,
             owner_id=user_name,
             is_active=is_active,
-            half_life_seconds=half_life_days * 24 * 60 * 60,
-            total_duration_in_seconds=total_duration_in_days * 24 * 60 * 60,
+            half_life_seconds=half_life_days * SECONDS_PER_DAY,
+            total_duration_in_seconds=total_duration_in_days * SECONDS_PER_DAY,
             start_time=start_time,
             created_at=timestamp,
             total_rewards=Token(balance=total_rewards),

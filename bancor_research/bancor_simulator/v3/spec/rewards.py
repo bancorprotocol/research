@@ -191,17 +191,11 @@ def snapshot_standard_rewards(
     state.map_user_standard_program(user_name, id)
 
     new_reward_per_token = calc_standard_reward_per_token(state, id, timestamp)
-    old_reward_per_token = get_standard_reward_per_token(state, id)
-
-    if new_reward_per_token != old_reward_per_token:
-        state.set_standard_rewards_per_token(id, new_reward_per_token)
+    state.set_standard_rewards_per_token(id, new_reward_per_token)
 
     end_time = get_standard_reward_end_time(state, id)
-    new_update_time = min(timestamp, end_time)
     last_update_time = get_standard_reward_last_update_time(state, id)
-
-    if last_update_time < new_update_time:
-        state.set_standard_rewards_last_update_time(id, new_update_time)
+    state.set_standard_rewards_last_update_time(id, max(min(timestamp, end_time), last_update_time))
 
     provider_staked_amount = get_user_pending_rewards_staked_balance(
         state, id, user_name
@@ -216,9 +210,7 @@ def snapshot_standard_rewards(
         reward_per_token_paid,
     )
 
-    if new_pending_rewards != 0:
-        state.set_provider_pending_standard_rewards(user_name, id, new_pending_rewards)
-
+    state.set_provider_pending_standard_rewards(user_name, id, new_pending_rewards)
     state.set_provider_reward_per_token_paid(user_name, id, new_reward_per_token)
     return state
 

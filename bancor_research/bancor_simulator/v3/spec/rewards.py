@@ -195,7 +195,9 @@ def snapshot_standard_rewards(
 
     end_time = get_standard_reward_end_time(state, id)
     last_update_time = get_standard_reward_last_update_time(state, id)
-    state.set_standard_rewards_last_update_time(id, max(min(timestamp, end_time), last_update_time))
+    state.set_standard_rewards_last_update_time(
+        id, max(min(timestamp, end_time), last_update_time)
+    )
 
     provider_staked_amount = get_user_pending_rewards_staked_balance(
         state, id, user_name

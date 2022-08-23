@@ -5,9 +5,11 @@ options = {
     '2': False,
 }
 
+prompt = 'enter {}: '.format(' or '.join('`{}` to {} full-precision'.format(option, 'enable' if mode else 'disable') for option, mode in options.items()))
+
 option = sys.argv[1] if len(sys.argv) > 1 else None
 while option not in options:
-    option = input('enter {}: '.format(' or '.join('`{}` to {} full-precision'.format(option, 'enable' if mode else 'disable') for option, mode in options.items())))
+    option = input(prompt)
 
 mode = options[option]
 desc = 'full-precision {}'.format('enabled' if mode else 'disabled')
@@ -57,10 +59,9 @@ def execute(fileName, decimals):
                 timestamp
             )
 
-    print('\n{} ({}):'.format(fileName, desc))
-
     def Info(string, *args):
-        return 'operation {} out of {}: {}'.format(n + 1, len(fileData['operations']), string.format(*args))
+        print('\r{} ({}), operation {} out of {}... '.format(fileName, desc, n + 1, len(fileData['operations'])), end = '')
+        return string.format(*args)
 
     for n in range(len(fileData['operations'])):
         operation = fileData['operations'][n]
@@ -101,6 +102,8 @@ def execute(fileName, decimals):
         frames = [bancorDapp.describe(decimals) for bancorDapp in bancorDapps]
         for diff in [pair[0].compare(pair[1]) for pair in zip(frames, frames[1:])]:
             assert diff.empty, '{}\n{}'.format(info, diff)
+
+    print('deviation:')
 
     frames = [bancorDapp.describe() for bancorDapp in bancorDapps]
     for pair in [[item.astype('float128') for item in pair] for pair in zip(frames, frames[1:])]:

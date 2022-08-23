@@ -1,16 +1,16 @@
 import sys
 
 options = {
-    '1': {'desc': 'full-precision enabled' , 'mode': True },
-    '2': {'desc': 'full-precision disabled', 'mode': False},
+    '1': True,
+    '2': False,
 }
 
 option = sys.argv[1] if len(sys.argv) > 1 else None
 while option not in options:
-    option = input(''.join('{} - {}\n'.format(key, value['desc']) for key, value in options.items()) + 'enter your choice: ')
+    option = input('enter {}: '.format(' or '.join('`{}` to {} full-precision'.format(option, 'enable' if mode else 'disable') for option, mode in options.items())))
 
-desc = options[option]['desc']
-mode = options[option]['mode']
+mode = options[option]
+desc = 'full-precision {}'.format('enabled' if mode else 'disabled')
 
 from bancor_research.bancor_emulator import config
 config.enable_full_precision_mode(mode)

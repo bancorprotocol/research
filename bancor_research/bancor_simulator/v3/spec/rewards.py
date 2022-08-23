@@ -267,7 +267,7 @@ def calc_standard_rewards_remaining(state: State, id: int, timestamp: int) -> De
     """
     reward_rate = get_standard_reward_rate(state, id)
     end_time = get_standard_reward_end_time(state, id)
-    return reward_rate * (end_time - timestamp) if end_time > timestamp else Decimal(0)
+    return reward_rate * max(end_time - timestamp, 0)
 
 
 def join_standard_reward_program(
@@ -305,26 +305,14 @@ def claim_standard_rewards(
     """
     Claim standard rewards for the given user.
     """
-    total_amt = Decimal("0")
-
     for id in ids:
 
         state = snapshot_standard_rewards(state, id, timestamp, user_name)
         reward_amt = get_user_pending_standard_rewards(state, id, user_name)
-        state.set_user_pending_standard_rewards(user_name, id, Decimal(0))
         remaining_rewards = get_standard_remaining_rewards(state, id)
-
-        if reward_amt > 0:
-
-            if remaining_rewards < reward_amt:
-                raise ValueError("Claimed rewards exceed available rewards")
-
-            updated_remaining_rewards = remaining_rewards - reward_amt
-
-            state.set_standard_remaining_rewards(id, updated_remaining_rewards)
-
-            total_amt += reward_amt
-
-    state.increase_user_balance(user_name, "bnt", total_amt)
+        assert remaining_rewards >= reward_amt
+        state.set_standard_remaining_rewards(id, remaining_rewards - reward_amt)
+        state.set_user_pending_standard_rewards(user_name, id, Decimal(0))
+        state.increase_user_balance(user_name, "bnt", reward_amt)
 
     return state

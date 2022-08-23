@@ -374,6 +374,3 @@ class BancorDapp:
 
         df = DataFrame(table).fillna(0).sort_index()
         return df.applymap(lambda x: round(x, decimals)) if decimals >= 0 else df
-
-# whitelisted_tokens: list = ['bnt', 'eth', 'wbtc', 'link']
-# v3 = BancorDapp(whitelisted_tokens=whitelisted_tokens)

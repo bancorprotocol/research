@@ -1,17 +1,18 @@
 import sys
 
 options = {
-    '1': {'description': 'Full Precision Enabled' , 'mode': True , 'decimals': 142},
-    '2': {'description': 'Full Precision Disabled', 'mode': False, 'decimals':  10},
+    '1': True,
+    '2': False,
 }
+
+prompt = 'enter {}: '.format(' or '.join('`{}` to {} full-precision'.format(option, 'enable' if mode else 'disable') for option, mode in options.items()))
 
 option = sys.argv[1] if len(sys.argv) > 1 else None
 while option not in options:
-    option = input(''.join('{} - {}\n'.format(key, value['description']) for key, value in options.items()) + 'enter your choice: ')
+    option = input(prompt)
 
-mode = options[option]['mode']
-decimals = options[option]['decimals']
-description = options[option]['description']
+mode = options[option]
+desc = 'full-precision {}'.format('enabled' if mode else 'disabled')
 
 from bancor_research.bancor_emulator import config
 config.enable_full_precision_mode(mode)
@@ -22,7 +23,7 @@ from bancor_research.bancor_emulator.v3.spec.network  import BancorDapp as eBanc
 from os.path import join, dirname
 from json import loads
 
-def execute(fileName):
+def execute(fileName, decimals = -1):
     fileDesc = open(join(dirname(__file__), 'data', fileName + '.json'), 'r')
     fileData = loads(fileDesc.read())
     fileDesc.close()
@@ -58,60 +59,61 @@ def execute(fileName):
                 timestamp
             )
 
-    def Print(title, *args):
-        print('{} - {} - operation {} out of {}: {}'.format(description, fileName, n + 1, len(fileData['operations']), title.format(*args)))
-
     for n in range(len(fileData['operations'])):
         operation = fileData['operations'][n]
         timestamp += operation['elapsed']
 
+        print('\r{} ({}), operation {} out of {}... '.format(fileName, desc, n + 1, len(fileData['operations'])), end = '')
+
         for bancorDapp in bancorDapps:
             if operation['type'] == 'deposit':
-                Print('deposit {} {} reserve tokens', operation['amount'], operation['poolId'])
+                info = 'deposit {} {} reserve tokens'.format(operation['amount'], operation['poolId'])
                 bancorDapp.deposit(operation['poolId'], operation['amount'], operation['userId'], timestamp)
             elif operation['type'] == 'withdraw':
-                Print('withdraw {} {} pool tokens', operation['amount'], operation['poolId'])
+                info = 'withdraw {} {} pool tokens'.format(operation['amount'], operation['poolId'])
                 id_number = bancorDapp.begin_cooldown_by_ptkn(operation['amount'], operation['poolId'], operation['userId'], timestamp)
                 bancorDapp.withdraw(operation['userId'], id_number, timestamp)
             elif operation['type'] == 'trade':
-                Print('trade {} {} reserve tokens for {} reserve tokens', operation['amount'], operation['poolId'], operation['targetPoolId'])
+                info = 'trade {} {} reserve tokens for {} reserve tokens'.format(operation['amount'], operation['poolId'], operation['targetPoolId'])
                 bancorDapp.trade(operation['amount'], operation['poolId'], operation['targetPoolId'], operation['userId'], timestamp)
             elif operation['type'] == 'burnPoolToken':
-                Print('burn {} {} pool tokens', operation['amount'], operation['poolId'])
+                info = 'burn {} {} pool tokens'.format(operation['amount'], operation['poolId'])
                 bancorDapp.burn_pool_tokens(operation['poolId'], operation['amount'], operation['userId'], timestamp)
             elif operation['type'] == 'joinProgram':
-                Print('join {} {} pool tokens', operation['amount'], operation['poolId'])
+                info = 'join {} {} pool tokens'.format(operation['amount'], operation['poolId'])
                 bancorDapp.join_standard_rewards_program(operation['poolId'], operation['amount'], operation['userId'], programIds[bancorDapp][operation['poolId']], timestamp)
             elif operation['type'] == 'leaveProgram':
-                Print('leave {} {} pool tokens', operation['amount'], operation['poolId'])
+                info = 'leave {} {} pool tokens'.format(operation['amount'], operation['poolId'])
                 bancorDapp.leave_standard_rewards_program(operation['poolId'], operation['amount'], operation['userId'], programIds[bancorDapp][operation['poolId']], timestamp)
             elif operation['type'] == 'claimRewards':
-                Print('claim {} rewards', operation['poolId'])
+                info = 'claim {} rewards'.format(operation['poolId'])
                 bancorDapp.claim_standard_rewards(operation['userId'], [programIds[bancorDapp][operation['poolId']]], timestamp)
             elif operation['type'] == 'setFundingLimit':
-                Print('set {} pool funding limit to {} bnt', operation['poolId'], operation['amount'])
+                info = 'set {} pool funding limit to {} bnt'.format(operation['poolId'], operation['amount'])
                 bancorDapp.set_bnt_funding_limit(operation['poolId'], operation['amount'], timestamp)
             elif operation['type'] == 'enableTrading':
-                Print('enable trading with 1 {} = {}/{} bnt', operation['poolId'], operation['bntVirtualBalance'], operation['baseTokenVirtualBalance'])
+                info = 'enable trading with 1 {} = {}/{} bnt'.format(operation['poolId'], operation['bntVirtualBalance'], operation['baseTokenVirtualBalance'])
                 bancorDapp.enable_trading(operation['poolId'], operation['bntVirtualBalance'], operation['baseTokenVirtualBalance'], timestamp)
             else:
                 raise Exception('unsupported operation `{}` encountered'.format(operation['type']))
 
         frames = [bancorDapp.describe(decimals) for bancorDapp in bancorDapps]
         for diff in [pair[0].compare(pair[1]) for pair in zip(frames, frames[1:])]:
-            assert diff.empty, diff
+            assert diff.empty, '{}\n{}'.format(info, diff)
+
+    print('deviation:')
 
     frames = [bancorDapp.describe() for bancorDapp in bancorDapps]
     for pair in [[item.astype('float128') for item in pair] for pair in zip(frames, frames[1:])]:
         print((abs(pair[0] - pair[1]) / pair[1]).fillna(0).applymap(lambda x: '{:.18f}%'.format(x * 100)))
 
 execute('BancorNetworkSimpleFinancialScenario1')
-execute('BancorNetworkSimpleFinancialScenario2')
-execute('BancorNetworkSimpleFinancialScenario3')
-execute('BancorNetworkSimpleFinancialScenario4')
+execute('BancorNetworkSimpleFinancialScenario2', 147 if mode else 17)
+execute('BancorNetworkSimpleFinancialScenario3', 147 if mode else 17)
+execute('BancorNetworkSimpleFinancialScenario4', 147 if mode else 16)
 execute('BancorNetworkSimpleFinancialScenario5')
 execute('BancorNetworkSimpleFinancialScenario6')
-execute('BancorNetworkComplexFinancialScenario1')
-execute('BancorNetworkComplexFinancialScenario2')
-execute('BancorNetworkRewardsFinancialScenario1')
-execute('BancorNetworkRewardsFinancialScenario2')
+execute('BancorNetworkComplexFinancialScenario1', 142 if mode else 12)
+execute('BancorNetworkComplexFinancialScenario2', 143 if mode else 12)
+execute('BancorNetworkRewardsFinancialScenario1', 143 if mode else 10)
+execute('BancorNetworkRewardsFinancialScenario2', 143 if mode else 10)

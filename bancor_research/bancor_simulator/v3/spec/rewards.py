@@ -310,11 +310,9 @@ def claim_standard_rewards(
         state = snapshot_standard_rewards(state, id, timestamp, user_name)
         reward_amt = get_user_pending_standard_rewards(state, id, user_name)
         remaining_rewards = get_standard_remaining_rewards(state, id)
-        assert (
-            remaining_rewards >= reward_amt
-        ), "Claimed rewards exceed available rewards"
-        state.set_user_pending_standard_rewards(user_name, id, Decimal(0))
+        assert remaining_rewards >= reward_amt
         state.set_standard_remaining_rewards(id, remaining_rewards - reward_amt)
+        state.set_user_pending_standard_rewards(user_name, id, Decimal(0))
         state.increase_user_balance(user_name, "bnt", reward_amt)
 
     return state

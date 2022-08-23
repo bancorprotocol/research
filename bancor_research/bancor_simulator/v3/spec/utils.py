@@ -180,7 +180,6 @@ def enable_trading(state: State, tkn_name: str) -> State:
 
     if check_is_bootstrap_reqs_met(state, tkn_name, bootstrap_liquidity):
         log = f"Bootstrap requirements met for {tkn_name}"
-        print(log)
         state.logger.info(log)
 
         state.set_is_trading_enabled(tkn_name, True)

@@ -109,12 +109,12 @@ def execute(fileName, decimals):
     for pair in [[item.astype('float128') for item in pair] for pair in zip(frames, frames[1:])]:
         print((abs(pair[0] - pair[1]) / pair[1]).fillna(0).applymap(lambda x: '{:.18f}%'.format(x * 100)))
 
-execute('BancorNetworkSimpleFinancialScenario1' , 147 if mode else 147)
+execute('BancorNetworkSimpleFinancialScenario1' ,  -1 if mode else  -1)
 execute('BancorNetworkSimpleFinancialScenario2' , 147 if mode else  17)
 execute('BancorNetworkSimpleFinancialScenario3' , 147 if mode else  17)
 execute('BancorNetworkSimpleFinancialScenario4' , 147 if mode else  16)
-execute('BancorNetworkSimpleFinancialScenario5' , 150 if mode else 150)
-execute('BancorNetworkSimpleFinancialScenario6' , 150 if mode else 150)
+execute('BancorNetworkSimpleFinancialScenario5' ,  -1 if mode else  -1)
+execute('BancorNetworkSimpleFinancialScenario6' ,  -1 if mode else  -1)
 execute('BancorNetworkComplexFinancialScenario1', 142 if mode else  12)
 execute('BancorNetworkComplexFinancialScenario2', 143 if mode else  12)
 execute('BancorNetworkRewardsFinancialScenario1', 143 if mode else  10)

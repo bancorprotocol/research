@@ -446,7 +446,7 @@ class BancorDapp:
 
     def distribute_autocompounding_program(
         self,
-        tkn_name: str = "tkn",
+        tkn_name: str,
         timestamp: int = 0,
         transaction_type: str = "distribute_autocompounding_program",
     ):
@@ -472,7 +472,6 @@ class BancorDapp:
 
     def create_autocompounding_program(
         self,
-        state: State,
         tkn_name: str,
         total_rewards: str,
         start_time: int,

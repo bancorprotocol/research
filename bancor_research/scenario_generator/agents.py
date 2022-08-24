@@ -558,7 +558,6 @@ class LP(RandomWalker):
 
         if distribution_type == "flat":
             self.protocol.v3.create_autocompounding_program(
-                state=state,
                 tkn_name=tkn_name,
                 distribution_type=distribution_type,
                 total_rewards="86400",
@@ -568,7 +567,6 @@ class LP(RandomWalker):
             )
         else:
             self.protocol.v3.create_autocompounding_program(
-                state=state,
                 tkn_name=tkn_name,
                 distribution_type=distribution_type,
                 half_life_days=1,

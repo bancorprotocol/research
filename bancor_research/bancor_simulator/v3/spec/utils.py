@@ -618,8 +618,8 @@ def log_json_operation(state, transaction_type, user_name, amt, timestamp):
         json_operation["amt"]["tknRewardsType"] = str(
             state.autocompounding_reward_programs["tkn"].distribution_type
         )
-        json_operation["amt"]["tknHalfLifeInDays"] = format_json(
-            state.autocompounding_reward_programs["tkn"].half_life_days, integer=True
+        json_operation["amt"]["tknHalfLife"] = format_json(
+            state.autocompounding_reward_programs["tkn"].half_life, integer=True
         )
 
     if transaction_type == "createAutocompoundingRewardProgramBNT":
@@ -632,8 +632,8 @@ def log_json_operation(state, transaction_type, user_name, amt, timestamp):
         state.json_export["bntRewardsType"] = str(
             state.autocompounding_reward_programs["bnt"].distribution_type
         )
-        state.json_export["bntHalfLifeInDays"] = format_json(
-            state.autocompounding_reward_programs["bnt"].half_life_days, integer=True
+        state.json_export["bntHalfLife"] = format_json(
+            state.autocompounding_reward_programs["bnt"].half_life, integer=True
         )
 
     return json_operation

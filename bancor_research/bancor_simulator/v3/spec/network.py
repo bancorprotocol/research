@@ -10,7 +10,7 @@ from bancor_research.bancor_simulator.v3.spec.actions import *
 from bancor_research.bancor_simulator.v3.spec.rewards import *
 from bancor_research.bancor_simulator.v3.spec.state import *
 
-from bancor_research import SECONDS_PER_DAY, DataFrame, read_price_feeds
+from bancor_research import DataFrame, read_price_feeds
 
 
 def to_decimal(percent: str):
@@ -470,16 +470,54 @@ class BancorDapp:
         state = setup_json_simulation(state, json_data, tkn_name)
         self.next_transaction(state)
 
-    def create_autocompounding_program(
+    def create_ac_rewards_flat_program(
         self,
         tkn_name: str,
         total_rewards: str,
         start_time: int,
+        total_duration: int,
+        timestamp: int = 0,
+        transaction_type: str = "create autocompounding rewards flat program",
+    ):
+        self._create_ac_rewards_program(
+            tkn_name=tkn_name,
+            total_rewards=total_rewards,
+            distribution_type="flat",
+            start_time=start_time,
+            total_duration=total_duration,
+            timestamp=timestamp,
+            transaction_type=transaction_type,
+        )
+
+    def create_ac_rewards_exp_program(
+        self,
+        tkn_name: str,
+        total_rewards: str,
+        start_time: int,
+        half_life: int,
+        timestamp: int = 0,
+        transaction_type: str = "create autocompounding rewards exp program",
+    ):
+        self._create_ac_rewards_program(
+            tkn_name=tkn_name,
+            total_rewards=total_rewards,
+            distribution_type="exp",
+            start_time=start_time,
+            half_life=half_life,
+            timestamp=timestamp,
+            transaction_type=transaction_type,
+        )
+
+    def _create_ac_rewards_program(
+        self,
+        tkn_name: str,
+        total_rewards: str,
         distribution_type: str,
-        timestamp: int,
-        half_life_days: int = 0,
-        total_duration_in_days: int = 0,
-        transaction_type: str = "create autocompounding program",
+        start_time: int,
+        total_duration: int = 0,
+        half_life: int = 0,
+        timestamp: int = 0,
+        transaction_type: str = "",
     ):
         """
         Creates a new autocompounding program.
@@ -500,26 +538,22 @@ class BancorDapp:
         else:
             program_wallet_bntkn = get_protocol_wallet_balance(state, "bnt")
 
-        if timestamp >= start_time:
-            is_active = True
-        else:
-            is_active = False
+        is_active = timestamp >= start_time
 
         total_rewards = Decimal(total_rewards)
 
         # Add the program to the rest.
         state.autocompounding_reward_programs[tkn_name] = AutocompoundingProgram(
             id=program_id,
-            tkn_name=tkn_name,
-            owner_id=user_name,
-            is_active=is_active,
-            half_life_seconds=half_life_days * SECONDS_PER_DAY,
-            total_duration_in_seconds=total_duration_in_days * SECONDS_PER_DAY,
-            start_time=start_time,
             created_at=timestamp,
+            tkn_name=tkn_name,
+            distribution_type=distribution_type,
+            start_time=start_time,
+            total_duration=total_duration,
+            half_life=half_life,
             total_rewards=Token(balance=total_rewards),
             remaining_rewards=Token(balance=total_rewards),
-            distribution_type=distribution_type,
+            is_active=is_active,
         )
 
         self.next_transaction(state)

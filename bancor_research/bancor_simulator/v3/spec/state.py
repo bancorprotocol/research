@@ -128,16 +128,15 @@ class AutocompoundingProgram:
     """
 
     id: int
-    tkn_name: str
-    owner_id: str
-    start_time: int
     created_at: int
-    half_life_seconds: int = 0
+    tkn_name: str
+    distribution_type: str
+    start_time: int
+    total_duration: int = 0
+    half_life: int = 0
     total_rewards: Any = field(default_factory=Token)
     remaining_rewards: Any = field(default_factory=Token)
     prev_token_amt_distributed: Any = field(default_factory=Token)
-    total_duration_in_seconds: int = 0
-    distribution_type: str = "exp"
     is_active: bool = False
     is_enabled: bool = False
 
@@ -146,7 +145,7 @@ class AutocompoundingProgram:
         """
         Returns the rate per second of the distribution.
         """
-        return self.total_rewards.balance / self.total_duration_in_seconds
+        return self.total_rewards.balance / self.total_duration
 
 
 @dataclass(config=Config)
@@ -1080,11 +1079,11 @@ def get_autocompounding_start_time(state: State, tkn_name: str) -> int:
     return state.autocompounding_reward_programs[tkn_name].start_time
 
 
-def get_half_life_seconds(state: State, tkn_name: str) -> int:
+def get_half_life(state: State, tkn_name: str) -> int:
     """
-    The half life in seconds for a given autocompounding rewards program.
+    The half life for a given autocompounding rewards program.
     """
-    return state.autocompounding_reward_programs[tkn_name].half_life_seconds
+    return state.autocompounding_reward_programs[tkn_name].half_life
 
 
 def get_timestamp(state: State) -> int:

@@ -53,8 +53,8 @@ def calc_exp_token_amt_to_distribute(
     """
     Return the token amt to distribute for a given exponential distribution reward program.
     """
-    half_life_seconds = get_half_life_seconds(state, tkn_name)
-    return total_rewards * (1 - (2 ** (-time_elapsed / half_life_seconds)))
+    half_life = get_half_life(state, tkn_name)
+    return total_rewards * (1 - (2 ** (-time_elapsed / half_life)))
 
 
 def distribute_autocompounding_program(

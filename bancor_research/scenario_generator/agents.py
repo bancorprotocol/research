@@ -5,6 +5,7 @@
 """Mesa Agent-based implementations of the Bancor protocol."""
 
 import mesa
+from bancor_research import SECONDS_PER_DAY
 
 from bancor_research.bancor_simulator.v3.spec.actions import (
     unpack_withdrawal_cooldown,
@@ -557,21 +558,19 @@ class LP(RandomWalker):
         distribution_type = self.random.choice(["flat", "exp"])
 
         if distribution_type == "flat":
-            self.protocol.v3.create_autocompounding_program(
+            self.protocol.v3.create_ac_rewards_flat_program(
                 tkn_name=tkn_name,
-                distribution_type=distribution_type,
                 total_rewards="86400",
-                total_duration_in_days=365,
                 start_time=start_time,
+                total_duration=365*SECONDS_PER_DAY,
                 timestamp=timestamp,
             )
         else:
-            self.protocol.v3.create_autocompounding_program(
+            self.protocol.v3.create_ac_rewards_exp_program(
                 tkn_name=tkn_name,
-                distribution_type=distribution_type,
-                half_life_days=1,
                 total_rewards="360000",
                 start_time=start_time,
+                half_life=1*SECONDS_PER_DAY,
                 timestamp=timestamp,
             )
 

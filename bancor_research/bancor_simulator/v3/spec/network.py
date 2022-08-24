@@ -486,8 +486,8 @@ class BancorDapp:
             start_time=start_time,
             total_duration=total_duration,
             timestamp=timestamp,
-            transaction_type=transaction_type
-        );
+            transaction_type=transaction_type,
+        )
 
     def create_ac_rewards_exp_program(
         self,
@@ -505,8 +505,8 @@ class BancorDapp:
             start_time=start_time,
             half_life=half_life,
             timestamp=timestamp,
-            transaction_type=transaction_type
-        );
+            transaction_type=transaction_type,
+        )
 
     def _create_ac_rewards_program(
         self,

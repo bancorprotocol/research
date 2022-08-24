@@ -105,7 +105,7 @@ def execute(fileName, decimals = -1):
 
     frames = [bancorDapp.describe() for bancorDapp in bancorDapps]
     for pair in [[item.astype('float128') for item in pair] for pair in zip(frames, frames[1:])]:
-        print((abs(pair[0] - pair[1]) / pair[1]).fillna(0).applymap(lambda x: '{:.18f}%'.format(x * 100)))
+        print((abs(pair[0] - pair[1]) / pair[1]).fillna(0).applymap(lambda x: '{:.12f}%'.format(x * 100)))
 
 execute('BancorNetworkSimpleFinancialScenario1')
 execute('BancorNetworkSimpleFinancialScenario2', 147 if mode else 17)
@@ -117,3 +117,4 @@ execute('BancorNetworkComplexFinancialScenario1', 142 if mode else 12)
 execute('BancorNetworkComplexFinancialScenario2', 143 if mode else 12)
 execute('BancorNetworkRewardsFinancialScenario1', 143 if mode else 10)
 execute('BancorNetworkRewardsFinancialScenario2', 143 if mode else 10)
+execute('BancorNetworkMassiveFinancialScenario1', 143 if mode else 10)

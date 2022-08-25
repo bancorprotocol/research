@@ -190,7 +190,7 @@ class Tokens(GlobalSettings):
     vortex_ledger: Any = field(default_factory=Token)
     vbnt_burned: Any = field(default_factory=Token)
     external_protection_vault: Any = field(default_factory=Token)
-    standard_rewards_vault: Any = field(default_factory=Token)
+    external_rewards_vault: Any = field(default_factory=Token)
     bnt_trading_liquidity: Any = field(default_factory=Token)
     tkn_trading_liquidity: Any = field(default_factory=Token)
     bnt_funding_amt: Any = field(default_factory=Token)
@@ -401,11 +401,11 @@ class State(GlobalSettings):
         """
         self.timestamp += 1
 
-    def set_standard_rewards_vault_balance(self, tkn_name: str, value: Decimal):
+    def set_external_rewards_vault_balance(self, tkn_name: str, value: Decimal):
         """
-        Set standard rewards vault balance by a given amount.
+        Set external rewards vault balance by a given amount.
         """
-        self.tokens[tkn_name].standard_rewards_vault.set(value)
+        self.tokens[tkn_name].external_rewards_vault.set(value)
 
     def map_user_standard_program(self, user_name: str, id: int):
         """
@@ -422,17 +422,17 @@ class State(GlobalSettings):
         """
         self.users[user_name].pending_standard_rewards[id].pending_rewards.set(value)
 
-    def increase_standard_rewards_vault_balance(self, tkn_name: str, value: Decimal):
+    def increase_external_rewards_vault_balance(self, tkn_name: str, value: Decimal):
         """
-        Increase standard rewards vault balance by a given amount.
+        Increase external rewards vault balance by a given amount.
         """
-        self.tokens[tkn_name].standard_rewards_vault.add(value)
+        self.tokens[tkn_name].external_rewards_vault.add(value)
 
-    def decrease_standard_rewards_vault_balance(self, tkn_name: str, value: Decimal):
+    def decrease_external_rewards_vault_balance(self, tkn_name: str, value: Decimal):
         """
-        Decrease standard rewards vault balance by a given amount.
+        Decrease external rewards vault balance by a given amount.
         """
-        self.tokens[tkn_name].standard_rewards_vault.subtract(value)
+        self.tokens[tkn_name].external_rewards_vault.subtract(value)
 
     def decrease_pooltoken_balance(self, tkn_name: str, value: Decimal):
         """

@@ -533,7 +533,7 @@ class LP(RandomWalker):
             bnbnt_rate,
         )
 
-    def random_distribute_autocompounding_program(self):
+    def process_random_autocompounding_program(self):
         """
         Performs a random trade on the server.
         """
@@ -542,7 +542,7 @@ class LP(RandomWalker):
 
         for tkn_name in state.whitelisted_tokens:
             if tkn_name in state.active_autocompounding_programs:
-                self.protocol.v3.distribute_autocompounding_program(
+                self.protocol.v3.process_ac_rewards_program(
                     tkn_name=tkn_name, timestamp=timestamp
                 )
 
@@ -558,16 +558,18 @@ class LP(RandomWalker):
         distribution_type = self.random.choice(["flat", "exp"])
 
         if distribution_type == "flat":
-            self.protocol.v3.create_ac_rewards_flat_program(
+            self.protocol.v3.create_flat_ac_rewards_program(
                 tkn_name=tkn_name,
+                user_name=self.user_name,
                 total_rewards="86400",
                 start_time=start_time,
                 total_duration=365*SECONDS_PER_DAY,
                 timestamp=timestamp,
             )
         else:
-            self.protocol.v3.create_ac_rewards_exp_program(
+            self.protocol.v3.create_exp_ac_rewards_program(
                 tkn_name=tkn_name,
+                user_name=self.user_name,
                 total_rewards="360000",
                 start_time=start_time,
                 half_life=1*SECONDS_PER_DAY,
@@ -876,9 +878,9 @@ class LP(RandomWalker):
             # print(f'{self.protocol.v3.global_state.timestamp} {self.user_name} create_random_autocompounding_rewards')
             self.create_random_autocompounding_rewards()
         elif 500 <= i < 600:
-            latest_action = "distribute_autocompounding"
-            # print(f'{self.protocol.v3.global_state.timestamp} {self.user_name} random_distribute_autocompounding_program')
-            self.random_distribute_autocompounding_program()
+            latest_action = "process_autocompounding"
+            # print(f'{self.protocol.v3.global_state.timestamp} {self.user_name} process_random_autocompounding_program')
+            self.process_random_autocompounding_program()
         elif 600 <= i < 1000:
             latest_action = "deposit"
             # print(f'{self.protocol.v3.global_state.timestamp} {self.user_name} perform_random_deposit')

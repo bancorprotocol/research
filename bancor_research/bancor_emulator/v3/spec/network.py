@@ -1,19 +1,20 @@
 from bancor_research.bancor_emulator.solidity import uint, uint32, uint256, block
 
-from bancor_research.bancor_emulator.BancorNetwork      import BancorNetwork     
-from bancor_research.bancor_emulator.BancorNetworkInfo  import BancorNetworkInfo 
-from bancor_research.bancor_emulator.BNTPool            import BNTPool           
-from bancor_research.bancor_emulator.Constants          import PPM_RESOLUTION    
-from bancor_research.bancor_emulator.ERC20              import ERC20             
-from bancor_research.bancor_emulator.NetworkSettings    import NetworkSettings   
-from bancor_research.bancor_emulator.PendingWithdrawals import PendingWithdrawals
-from bancor_research.bancor_emulator.PoolCollection     import PoolCollection    
-from bancor_research.bancor_emulator.PoolToken          import PoolToken         
-from bancor_research.bancor_emulator.PoolTokenFactory   import PoolTokenFactory  
-from bancor_research.bancor_emulator.ReserveToken       import ReserveToken      
-from bancor_research.bancor_emulator.StandardRewards    import StandardRewards   
-from bancor_research.bancor_emulator.TokenGovernance    import TokenGovernance   
-from bancor_research.bancor_emulator.Vault              import Vault             
+from bancor_research.bancor_emulator.AutoCompoundingRewards import AutoCompoundingRewards
+from bancor_research.bancor_emulator.BancorNetwork          import BancorNetwork         
+from bancor_research.bancor_emulator.BancorNetworkInfo      import BancorNetworkInfo     
+from bancor_research.bancor_emulator.BNTPool                import BNTPool               
+from bancor_research.bancor_emulator.Constants              import PPM_RESOLUTION        
+from bancor_research.bancor_emulator.ERC20                  import ERC20                 
+from bancor_research.bancor_emulator.NetworkSettings        import NetworkSettings       
+from bancor_research.bancor_emulator.PendingWithdrawals     import PendingWithdrawals    
+from bancor_research.bancor_emulator.PoolCollection         import PoolCollection        
+from bancor_research.bancor_emulator.PoolToken              import PoolToken             
+from bancor_research.bancor_emulator.PoolTokenFactory       import PoolTokenFactory      
+from bancor_research.bancor_emulator.ReserveToken           import ReserveToken          
+from bancor_research.bancor_emulator.StandardRewards        import StandardRewards       
+from bancor_research.bancor_emulator.TokenGovernance        import TokenGovernance       
+from bancor_research.bancor_emulator.Vault                  import Vault                 
 
 from bancor_research import DEFAULT, Decimal, DataFrame, PandasDataFrame, read_price_feeds
 
@@ -76,6 +77,7 @@ class BancorDapp:
         self.poolMigrator       = None
         self.poolCollection     = PoolCollection(self.network, self.bnt, self.networkSettings, self.masterVault, self.bntPool, self.epVault, self.poolTokenFactory, self.poolMigrator)
         self.standardRewards    = StandardRewards(self.network, self.networkSettings, self.bntGovernance, self.vbnt, self.bntPool)
+        self.compoundRewards    = AutoCompoundingRewards(self.network, self.networkSettings, self.bnt, self.bntPool, self.erVault)
         self.networkInfo        = BancorNetworkInfo(self.network, self.bntGovernance, self.vbntGovernance, self.networkSettings, self.masterVault, self.epVault, self.erVault, self.bntPool, self.pendingWithdrawals, self.poolMigrator)
 
         self.networkSettings.initialize()
@@ -84,6 +86,7 @@ class BancorDapp:
         self.pendingWithdrawals.initialize()
         self.poolTokenFactory.initialize()
         self.standardRewards.initialize()
+        self.compoundRewards.initialize()
         self.networkInfo.initialize()
 
         self.networkSettings.setWithdrawalFeePPM(toPPM(withdrawal_fee))
@@ -244,6 +247,58 @@ class BancorDapp:
     ):
         updateBlock(timestamp)
         return self.standardRewards.connect(user_name).claimRewards(program_ids)
+
+    def create_flat_ac_rewards_program(
+        self,
+        tkn_name: str,
+        user_name: str,
+        total_rewards: str,
+        start_time: int,
+        total_duration: int,
+        timestamp: int = 0,
+        transaction_type: str = "create flat autocompounding rewards program",
+    ):
+        updateBlock(timestamp)
+        tkn = self.reserveTokens[tkn_name]
+        amt = userAmount(tkn, user_name, total_rewards)
+        self.poolTokens[tkn_name].connect(user_name).transfer(self.erVault, self.networkInfo.underlyingToPoolToken(tkn, amt))
+        return self.compoundRewards.createFlatProgram(tkn, amt, start_time, start_time + total_duration)
+
+    def create_exp_ac_rewards_program(
+        self,
+        tkn_name: str,
+        user_name: str,
+        total_rewards: str,
+        start_time: int,
+        half_life: int,
+        timestamp: int = 0,
+        transaction_type: str = "create exp autocompounding rewards program",
+    ):
+        updateBlock(timestamp)
+        tkn = self.reserveTokens[tkn_name]
+        amt = userAmount(tkn, user_name, total_rewards)
+        self.poolTokens[tkn_name].connect(user_name).transfer(self.erVault, self.networkInfo.underlyingToPoolToken(tkn, amt))
+        return self.compoundRewards.createExpDecayProgram(tkn, amt, start_time, half_life)
+
+    def process_ac_rewards_program(
+        self,
+        tkn_name: str,
+        timestamp: int = 0,
+        transaction_type: str = "process autocompounding rewards program",
+    ):
+        updateBlock(timestamp)
+        tkn = self.reserveTokens[tkn_name]
+        return self.compoundRewards.processRewards(tkn)
+
+    def terminate_ac_rewards_program(
+        self,
+        tkn_name: str,
+        timestamp: int = 0,
+        transaction_type: str = "terminate autocompounding rewards program",
+    ):
+        updateBlock(timestamp)
+        tkn = self.reserveTokens[tkn_name]
+        return self.compoundRewards.terminateProgram(tkn)
 
     def set_user_balance(
         self,

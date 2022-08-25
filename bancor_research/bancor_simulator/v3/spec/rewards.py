@@ -57,11 +57,9 @@ def calc_exp_token_amt_to_distribute(
     return total_rewards * (1 - (2 ** (-time_elapsed / half_life)))
 
 
-def distribute_autocompounding_program(
-    state: State, tkn_name: str, timestamp: int, verbose: bool = True
-) -> State:
+def process_ac_rewards_program(state: State, tkn_name: str, timestamp: int) -> State:
     """
-    Distribute autocompounding rewards for a given program.
+    Processes autocompounding rewards program for a given pool.
     """
     assert (
         tkn_name in state.autocompounding_reward_programs
@@ -102,9 +100,6 @@ def distribute_autocompounding_program(
     )
 
     if pool_token_amt_to_burn > program_wallet_bntkn:
-        print(
-            "pool_token_amt_to_burn > program_wallet_bntkn, setting pool_token_amt_to_burn=0"
-        )
         pool_token_amt_to_burn = program_wallet_bntkn
         state.set_program_is_active(tkn_name, False)
 
@@ -113,16 +108,14 @@ def distribute_autocompounding_program(
     remaining_rewards = total_rewards - token_amt_to_distribute
     state.set_autocompounding_remaining_rewards(tkn_name, remaining_rewards)
 
-    if verbose:
-        print(f" staked_amt = {staked_amt}")
-        print(f" erc20contracts_bntkn = {erc20contracts_bntkn}")
-        print(f" program_wallet_bntkn = {program_wallet_bntkn}")
-        print(f" total_rewards = {total_rewards}")
-        print(f" prev_token_amt_distributed = {prev_token_amt_distributed}")
-        print(f" token_amt_to_distribute = {token_amt_to_distribute}")
-        print(f" pool_token_amt_to_burn = {pool_token_amt_to_burn}")
-        print(f" remaining_rewards = {remaining_rewards}")
+    return state
 
+
+def terminate_ac_rewards_program(state: State, tkn_name: str, timestamp: int) -> State:
+    """
+    Terminates autocompounding rewards program for a given pool.
+    """
+    del state.autocompounding_reward_programs[tkn_name]
     return state
 
 

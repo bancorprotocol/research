@@ -88,6 +88,18 @@ def execute(fileName, decimals = -1):
             elif operation['type'] == 'claimRewards':
                 info = 'claim {} rewards'.format(operation['poolId'])
                 bancorDapp.claim_standard_rewards(operation['userId'], [programIds[bancorDapp][operation['poolId']]], timestamp)
+            elif operation['type'] == 'createFlatAcrProgram':
+                info = 'create a flat rewards program of {} {} reserve tokens'.format(operation['rewards'], operation['poolId'])
+                bancorDapp.create_flat_ac_rewards_program(operation['poolId'], operation['userId'], operation['rewards'], timestamp, operation['duration'], timestamp)
+            elif operation['type'] == 'createExpAcrProgram':
+                info = 'create an exp rewards program of {} {} reserve tokens'.format(operation['rewards'], operation['poolId'])
+                bancorDapp.create_exp_ac_rewards_program(operation['poolId'], operation['userId'], operation['rewards'], timestamp, operation['halfLife'], timestamp)
+            elif operation['type'] == 'processAcrProgram':
+                info = 'process the ac rewards program of {}'.format(operation['poolId'])
+                bancorDapp.process_ac_rewards_program(operation['poolId'], timestamp)
+            elif operation['type'] == 'terminateAcrProgram':
+                info = 'terminate the ac rewards program of {}'.format(operation['poolId'])
+                bancorDapp.terminate_ac_rewards_program(operation['poolId'], timestamp)
             elif operation['type'] == 'setFundingLimit':
                 info = 'set {} pool funding limit to {} bnt'.format(operation['poolId'], operation['amount'])
                 bancorDapp.set_bnt_funding_limit(operation['poolId'], operation['amount'], timestamp)
@@ -115,7 +127,7 @@ execute('BancorNetworkSimpleFinancialScenario5')
 execute('BancorNetworkSimpleFinancialScenario6')
 execute('BancorNetworkComplexFinancialScenario1', 142 if mode else 12)
 execute('BancorNetworkComplexFinancialScenario2', 143 if mode else 12)
-execute('BancorNetworkRewardsFinancialScenario1', 143 if mode else 10)
+execute('BancorNetworkRewardsFinancialScenario1', 142 if mode else 10)
 execute('BancorNetworkRewardsFinancialScenario2', 143 if mode else 10)
 execute('BancorNetworkMassiveFinancialScenario1', 142 if mode else 10)
 execute('BancorNetworkMassiveFinancialScenario2', 142 if mode else 10)

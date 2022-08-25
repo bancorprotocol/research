@@ -402,7 +402,7 @@ class BancorDapp:
             ].external_protection_vault.balance
             table["bn" + tkn_name][
                 tuple([3, "Network", "Rewards Vault"])
-            ] = state.tokens[tkn_name].standard_rewards_vault.balance
+            ] = state.tokens[tkn_name].external_rewards_vault.balance
             table["bn" + tkn_name][
                 tuple([3, "Network", "Protocol Equity"])
             ] = state.tokens[tkn_name].protocol_wallet_pooltokens.balance
@@ -444,21 +444,29 @@ class BancorDapp:
             "NA", Decimal("0"), f"create_{user_name}", "NA", state.transaction_id, state
         )
 
-    def distribute_autocompounding_program(
+    def process_ac_rewards_program(
         self,
         tkn_name: str,
         timestamp: int = 0,
-        transaction_type: str = "distribute_autocompounding_program",
+        transaction_type: str = "process autocompounding rewards program",
     ):
         """
-        Distribute auto-compounding program.
+        Processes autocompounding rewards program.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
         state, tkn_name, user_name = validate_input(state, tkn_name, "", timestamp)
-        state = distribute_autocompounding_program(
+        state = process_ac_rewards_program(
             state=state, tkn_name=tkn_name, timestamp=timestamp
         )
         self.next_transaction(state)
+        handle_logging(
+            tkn_name=tkn_name,
+            user_name=user_name,
+            tkn_amt=Decimal(0),
+            action_name=transaction_type,
+            transaction_id=self.transaction_id,
+            state=state,
+        )
 
     def load_json_simulation(self, path, tkn_name="tkn", timestamp: int = 0):
         """
@@ -470,17 +478,19 @@ class BancorDapp:
         state = setup_json_simulation(state, json_data, tkn_name)
         self.next_transaction(state)
 
-    def create_ac_rewards_flat_program(
+    def create_flat_ac_rewards_program(
         self,
         tkn_name: str,
+        user_name: str,
         total_rewards: str,
         start_time: int,
         total_duration: int,
         timestamp: int = 0,
-        transaction_type: str = "create autocompounding rewards flat program",
+        transaction_type: str = "create flat autocompounding rewards program",
     ):
         self._create_ac_rewards_program(
             tkn_name=tkn_name,
+            user_name=user_name,
             total_rewards=total_rewards,
             distribution_type="flat",
             start_time=start_time,
@@ -489,17 +499,19 @@ class BancorDapp:
             transaction_type=transaction_type,
         )
 
-    def create_ac_rewards_exp_program(
+    def create_exp_ac_rewards_program(
         self,
         tkn_name: str,
+        user_name: str,
         total_rewards: str,
         start_time: int,
         half_life: int,
         timestamp: int = 0,
-        transaction_type: str = "create autocompounding rewards exp program",
+        transaction_type: str = "create exp autocompounding rewards program",
     ):
         self._create_ac_rewards_program(
             tkn_name=tkn_name,
+            user_name=user_name,
             total_rewards=total_rewards,
             distribution_type="exp",
             start_time=start_time,
@@ -511,6 +523,7 @@ class BancorDapp:
     def _create_ac_rewards_program(
         self,
         tkn_name: str,
+        user_name: str,
         total_rewards: str,
         distribution_type: str,
         start_time: int,
@@ -520,27 +533,22 @@ class BancorDapp:
         transaction_type: str = "",
     ):
         """
-        Creates a new autocompounding program.
+        Creates autocompounding rewards program.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        state, tkn_name, user_name = validate_input(state, tkn_name, "", timestamp)
+        state, tkn_name, user_name = validate_input(
+            state, tkn_name, user_name, timestamp
+        )
 
         program_id = state.autocompounding_programs_count + 1
 
-        if tkn_name != "bnt":
-            program_wallet_bntkn = self.deposit(
-                tkn_name=tkn_name,
-                tkn_amt=total_rewards,
-                user_name="",
-                timestamp=timestamp,
-            )
-            state.decrease_protocol_wallet_balance(tkn_name, program_wallet_bntkn)
-        else:
-            program_wallet_bntkn = get_protocol_wallet_balance(state, "bnt")
-
         is_active = timestamp >= start_time
 
-        total_rewards = Decimal(total_rewards)
+        total_rewards = to_user_amount(state, tkn_name, user_name, total_rewards)
+
+        ptkn_amt = compute_ptkn_amt(state, tkn_name, total_rewards)
+        state.decrease_user_balance(user_name, "bn" + tkn_name, ptkn_amt)
+        state.increase_external_rewards_vault_balance(tkn_name, ptkn_amt)
 
         # Add the program to the rest.
         state.autocompounding_reward_programs[tkn_name] = AutocompoundingProgram(
@@ -559,9 +567,33 @@ class BancorDapp:
         self.next_transaction(state)
         handle_logging(
             tkn_name=tkn_name,
+            user_name=user_name,
             tkn_amt=total_rewards,
             action_name=transaction_type,
+            transaction_id=self.transaction_id,
+            state=state,
+        )
+
+    def terminate_ac_rewards_program(
+        self,
+        tkn_name: str,
+        timestamp: int = 0,
+        transaction_type: str = "terminate autocompounding rewards program",
+    ):
+        """
+        Terminates autocompounding rewards program.
+        """
+        state = self.get_state(copy_type="initial", timestamp=timestamp)
+        state, tkn_name, user_name = validate_input(state, tkn_name, "", timestamp)
+        state = terminate_ac_rewards_program(
+            state=state, tkn_name=tkn_name, timestamp=timestamp
+        )
+        self.next_transaction(state)
+        handle_logging(
+            tkn_name=tkn_name,
             user_name=user_name,
+            tkn_amt=Decimal(0),
+            action_name=transaction_type,
             transaction_id=self.transaction_id,
             state=state,
         )

@@ -343,7 +343,7 @@ class AutoCompoundingRewards(contract, Time):
     '''
      * @dev returns the amount of tokens to distribute
     '''
-    def _tokenAmountToDistribute(p, currTime) -> (uint):
+    def _tokenAmountToDistribute(self, p, currTime) -> (uint):
         prevTime = uint32(Math.max(p.prevDistributionTimestamp, p.startTime));
 
         if (p.distributionType == FLAT_DISTRIBUTION):

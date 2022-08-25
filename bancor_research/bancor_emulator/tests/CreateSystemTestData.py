@@ -5,6 +5,7 @@ config.enable_full_precision_mode(True)
 
 from bancor_research.bancor_emulator.solidity import uint, uint32, uint256, block
 
+from bancor_research.bancor_emulator.AutoCompoundingRewards import AutoCompoundingRewards
 from bancor_research.bancor_emulator.BancorNetwork import BancorNetwork
 from bancor_research.bancor_emulator.BancorNetworkInfo import BancorNetworkInfo
 from bancor_research.bancor_emulator.BNTPool import BNTPool
@@ -67,6 +68,7 @@ def execute(fileName):
     poolMigrator       = None
     poolCollection     = PoolCollection(network, bnt, networkSettings, masterVault, bntPool, epVault, poolTokenFactory, poolMigrator)
     standardRewards    = StandardRewards(network, networkSettings, bntGovernance, vbnt, bntPool)
+    compoundRewards    = AutoCompoundingRewards(network, networkSettings, bnt, bntPool, erVault)
     networkInfo        = BancorNetworkInfo(network, bntGovernance, vbntGovernance, networkSettings, masterVault, epVault, erVault, bntPool, pendingWithdrawals, poolMigrator)
 
     networkSettings.initialize()
@@ -75,6 +77,7 @@ def execute(fileName):
     pendingWithdrawals.initialize()
     poolTokenFactory.initialize()
     standardRewards.initialize()
+    compoundRewards.initialize()
     networkInfo.initialize()
 
     networkSettings.setWithdrawalFeePPM(toPPM(flow['withdrawal_fee']))
@@ -150,6 +153,24 @@ def execute(fileName):
 
     def claimRewards(poolId: str, userId: str):
         standardRewards.connect(userId).claimRewards([programIds[poolId]])
+
+    def createFlatAcrProgram(poolId: str, userId: str, rewards: str, duration: int):
+        token = reserveTokens[poolId]
+        amount = userAmount(token, userId, rewards)
+        poolTokens[poolId].connect(userId).transfer(erVault, networkInfo.underlyingToPoolToken(token, amount))
+        compoundRewards.createFlatProgram(token, amount, block.timestamp, block.timestamp + duration)
+
+    def createExpAcrProgram(poolId: str, userId: str, rewards: str, halfLife: int):
+        token = reserveTokens[poolId]
+        amount = userAmount(token, userId, rewards)
+        poolTokens[poolId].connect(userId).transfer(erVault, networkInfo.underlyingToPoolToken(token, amount))
+        compoundRewards.createExpDecayProgram(token, amount, block.timestamp, halfLife)
+
+    def processAcrProgram(poolId: str):
+        compoundRewards.processRewards(reserveTokens[poolId])
+
+    def terminateAcrProgram(poolId: str):
+        compoundRewards.terminateProgram(reserveTokens[poolId])
 
     def setFundingLimit(poolId: str, amount: str):
         token = reserveTokens[poolId]
@@ -236,6 +257,18 @@ def execute(fileName):
         elif operation['type'] == 'claimRewards':
             Print('claim {} rewards', operation['poolId'])
             claimRewards(operation['poolId'], operation['userId'])
+        elif operation['type'] == 'createFlatAcrProgram':
+            Print('create a flat rewards program of {} {} reserve tokens', operation['rewards'], operation['poolId'])
+            createFlatAcrProgram(operation['poolId'], operation['userId'], operation['rewards'], operation['duration'])
+        elif operation['type'] == 'createExpAcrProgram':
+            Print('create an exp rewards program of {} {} reserve tokens', operation['rewards'], operation['poolId'])
+            createExpAcrProgram(operation['poolId'], operation['userId'], operation['rewards'], operation['halfLife'])
+        elif operation['type'] == 'processAcrProgram':
+            Print('process the ac rewards program of {}', operation['poolId'])
+            processAcrProgram(operation['poolId'])
+        elif operation['type'] == 'terminateAcrProgram':
+            Print('terminate the ac rewards program of {}', operation['poolId'])
+            terminateAcrProgram(operation['poolId'])
         elif operation['type'] == 'setFundingLimit':
             Print('set {} pool funding limit to {} bnt', operation['poolId'], operation['amount'])
             setFundingLimit(operation['poolId'], operation['amount'])

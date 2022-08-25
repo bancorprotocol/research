@@ -292,7 +292,7 @@ class BancorDapp:
     ):
         updateBlock(timestamp)
         tkn = self.reserveTokens[tkn_name]
-        return self.compoundRewards.processAcrProgram(tkn)
+        return self.compoundRewards.processRewards(tkn)
 
     def set_user_balance(
         self,

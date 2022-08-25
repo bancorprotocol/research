@@ -402,7 +402,7 @@ class BancorDapp:
             ].external_protection_vault.balance
             table["bn" + tkn_name][
                 tuple([3, "Network", "Rewards Vault"])
-            ] = state.tokens[tkn_name].standard_rewards_vault.balance
+            ] = state.tokens[tkn_name].external_rewards_vault.balance
             table["bn" + tkn_name][
                 tuple([3, "Network", "Protocol Equity"])
             ] = state.tokens[tkn_name].protocol_wallet_pooltokens.balance
@@ -542,20 +542,13 @@ class BancorDapp:
 
         program_id = state.autocompounding_programs_count + 1
 
-        if tkn_name != "bnt":
-            program_wallet_bntkn = self.deposit(
-                tkn_name=tkn_name,
-                tkn_amt=total_rewards,
-                user_name=user_name,
-                timestamp=timestamp,
-            )
-            state.decrease_protocol_wallet_balance(tkn_name, program_wallet_bntkn)
-        else:
-            program_wallet_bntkn = get_protocol_wallet_balance(state, "bnt")
-
         is_active = timestamp >= start_time
 
         total_rewards = to_user_amount(state, tkn_name, user_name, total_rewards)
+
+        ptkn_amt = compute_ptkn_amt(state, tkn_name, total_rewards)
+        state.decrease_user_balance(user_name, "bn" + tkn_name, ptkn_amt)
+        state.increase_external_rewards_vault_balance(tkn_name, ptkn_amt)
 
         # Add the program to the rest.
         state.autocompounding_reward_programs[tkn_name] = AutocompoundingProgram(

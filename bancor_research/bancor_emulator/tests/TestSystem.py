@@ -5,6 +5,7 @@ config.enable_full_precision_mode(False)
 
 from bancor_research.bancor_emulator.solidity import uint, uint32, uint256, block
 
+from bancor_research.bancor_emulator.AutoCompoundingRewards import AutoCompoundingRewards
 from bancor_research.bancor_emulator.BancorNetwork import BancorNetwork
 from bancor_research.bancor_emulator.BancorNetworkInfo import BancorNetworkInfo
 from bancor_research.bancor_emulator.BNTPool import BNTPool
@@ -67,6 +68,7 @@ def execute(fileName):
     poolMigrator       = None
     poolCollection     = PoolCollection(network, bnt, networkSettings, masterVault, bntPool, epVault, poolTokenFactory, poolMigrator)
     standardRewards    = StandardRewards(network, networkSettings, bntGovernance, vbnt, bntPool)
+    compoundRewards    = AutoCompoundingRewards(network, networkSettings, bnt, bntPool, erVault)
     networkInfo        = BancorNetworkInfo(network, bntGovernance, vbntGovernance, networkSettings, masterVault, epVault, erVault, bntPool, pendingWithdrawals, poolMigrator)
 
     networkSettings.initialize()
@@ -75,6 +77,7 @@ def execute(fileName):
     pendingWithdrawals.initialize()
     poolTokenFactory.initialize()
     standardRewards.initialize()
+    compoundRewards.initialize()
     networkInfo.initialize()
 
     networkSettings.setWithdrawalFeePPM(toPPM(flow['withdrawal_fee']))
@@ -160,6 +163,25 @@ def execute(fileName):
         token = reserveTokens[poolId]
         poolCollection.enableTrading(token, uint256(bntVirtualBalance), uint256(tknVirtualBalance))
 
+    def createFlatAcrProgram(poolId: str, userId: str, rewards: str, duration: int):
+        rToken = reserveTokens[poolId]
+        pToken = poolTokens[poolId]
+        rAmount = userAmount(rToken, userId, rewards)
+        pAmount = bntPool.poolTokenAmountToBurn(rAmount) if rToken is bnt else poolCollection.poolTokenAmountToBurn(rToken, rAmount, pToken.balanceOf(erVault))
+        pToken.connect(userId).transfer(erVault, pAmount)
+        compoundRewards.createFlatProgram(rToken, rAmount, block.timestamp, block.timestamp + duration)
+
+    def createExpAcrProgram(poolId: str, userId: str, rewards: str, halfLife: int):
+        rToken = reserveTokens[poolId]
+        pToken = poolTokens[poolId]
+        rAmount = userAmount(rToken, userId, rewards)
+        pAmount = bntPool.poolTokenAmountToBurn(rAmount) if rToken is bnt else poolCollection.poolTokenAmountToBurn(rToken, rAmount, pToken.balanceOf(erVault))
+        pToken.connect(userId).transfer(erVault, pAmount)
+        compoundRewards.createExpDecayProgram(rToken, rAmount, block.timestamp, halfLife)
+
+    def processAcrProgram(poolId: str):
+        compoundRewards.processRewards(reserveTokens[poolId])
+
     def verifyState(state):
         reserveTokenValues = list(reserveTokens.values())
         poolTokenValues = list(poolTokens.values())
@@ -237,6 +259,15 @@ def execute(fileName):
         elif operation['type'] == 'enableTrading':
             Print('enable trading with 1 {} = {}/{} bnt', operation['poolId'], operation['bntVirtualBalance'], operation['baseTokenVirtualBalance'])
             enableTrading(operation['poolId'], operation['bntVirtualBalance'], operation['baseTokenVirtualBalance'])
+        elif operation['type'] == 'createFlatAcrProgram':
+            Print('create a flat rewards program of {} {} reserve tokens', operation['rewards'], operation['poolId'])
+            createFlatAcrProgram(operation['poolId'], operation['userId'], operation['rewards'], operation['duration'])
+        elif operation['type'] == 'createExpAcrProgram':
+            Print('create an exp rewards program of {} {} reserve tokens', operation['rewards'], operation['poolId'])
+            createExpAcrProgram(operation['poolId'], operation['userId'], operation['rewards'], operation['halfLife'])
+        elif operation['type'] == 'processAcrProgram':
+            Print('process the ac rewards program of {}', operation['poolId'])
+            processAcrProgram(operation['poolId'])
         else:
             raise Exception('unsupported operation `{}` encountered'.format(operation['type']))
 

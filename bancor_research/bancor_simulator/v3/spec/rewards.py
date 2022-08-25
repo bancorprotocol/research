@@ -57,7 +57,7 @@ def calc_exp_token_amt_to_distribute(
     return total_rewards * (1 - (2 ** (-time_elapsed / half_life)))
 
 
-def distribute_autocompounding_program(
+def process_ac_rewards_program(
     state: State, tkn_name: str, timestamp: int, verbose: bool = True
 ) -> State:
     """

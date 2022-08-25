@@ -94,6 +94,15 @@ def execute(fileName, decimals = -1):
             elif operation['type'] == 'enableTrading':
                 info = 'enable trading with 1 {} = {}/{} bnt'.format(operation['poolId'], operation['bntVirtualBalance'], operation['baseTokenVirtualBalance'])
                 bancorDapp.enable_trading(operation['poolId'], operation['bntVirtualBalance'], operation['baseTokenVirtualBalance'], timestamp)
+            elif operation['type'] == 'createFlatAcrProgram':
+                info = 'create a flat rewards program of {} {} reserve tokens', operation['rewards'], operation['poolId']
+                bancorDapp.create_flat_ac_rewards_program(operation['poolId'], operation['userId'], operation['rewards'], timestamp, operation['duration'], timestamp)
+            elif operation['type'] == 'createExpAcrProgram':
+                info = 'create an exp rewards program of {} {} reserve tokens', operation['rewards'], operation['poolId']
+                bancorDapp.create_exp_ac_rewards_program(operation['poolId'], operation['userId'], operation['rewards'], timestamp, operation['halfLife'], timestamp)
+            elif operation['type'] == 'processAcrProgram':
+                info = 'process the ac rewards program of {}', operation['poolId']
+                bancorDapp.process_ac_rewards_program(operation['poolId'])
             else:
                 raise Exception('unsupported operation `{}` encountered'.format(operation['type']))
 

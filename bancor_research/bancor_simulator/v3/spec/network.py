@@ -444,18 +444,18 @@ class BancorDapp:
             "NA", Decimal("0"), f"create_{user_name}", "NA", state.transaction_id, state
         )
 
-    def distribute_autocompounding_program(
+    def process_ac_rewards_program(
         self,
         tkn_name: str,
         timestamp: int = 0,
-        transaction_type: str = "distribute_autocompounding_program",
+        transaction_type: str = "process autocompounding rewards program",
     ):
         """
         Distribute auto-compounding program.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
         state, tkn_name, user_name = validate_input(state, tkn_name, "", timestamp)
-        state = distribute_autocompounding_program(
+        state = process_ac_rewards_program(
             state=state, tkn_name=tkn_name, timestamp=timestamp
         )
         self.next_transaction(state)
@@ -470,17 +470,19 @@ class BancorDapp:
         state = setup_json_simulation(state, json_data, tkn_name)
         self.next_transaction(state)
 
-    def create_ac_rewards_flat_program(
+    def create_flat_ac_rewards_program(
         self,
         tkn_name: str,
+        user_name: str,
         total_rewards: str,
         start_time: int,
         total_duration: int,
         timestamp: int = 0,
-        transaction_type: str = "create autocompounding rewards flat program",
+        transaction_type: str = "create flat autocompounding rewards program",
     ):
         self._create_ac_rewards_program(
             tkn_name=tkn_name,
+            user_name=user_name,
             total_rewards=total_rewards,
             distribution_type="flat",
             start_time=start_time,
@@ -489,17 +491,19 @@ class BancorDapp:
             transaction_type=transaction_type,
         )
 
-    def create_ac_rewards_exp_program(
+    def create_exp_ac_rewards_program(
         self,
         tkn_name: str,
+        user_name: str,
         total_rewards: str,
         start_time: int,
         half_life: int,
         timestamp: int = 0,
-        transaction_type: str = "create autocompounding rewards exp program",
+        transaction_type: str = "create exp autocompounding rewards program",
     ):
         self._create_ac_rewards_program(
             tkn_name=tkn_name,
+            user_name=user_name,
             total_rewards=total_rewards,
             distribution_type="exp",
             start_time=start_time,
@@ -511,6 +515,7 @@ class BancorDapp:
     def _create_ac_rewards_program(
         self,
         tkn_name: str,
+        user_name: str,
         total_rewards: str,
         distribution_type: str,
         start_time: int,
@@ -523,7 +528,7 @@ class BancorDapp:
         Creates a new autocompounding program.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        state, tkn_name, user_name = validate_input(state, tkn_name, "", timestamp)
+        state, tkn_name, user_name = validate_input(state, tkn_name, user_name, timestamp)
 
         program_id = state.autocompounding_programs_count + 1
 
@@ -531,7 +536,7 @@ class BancorDapp:
             program_wallet_bntkn = self.deposit(
                 tkn_name=tkn_name,
                 tkn_amt=total_rewards,
-                user_name="",
+                user_name=user_name,
                 timestamp=timestamp,
             )
             state.decrease_protocol_wallet_balance(tkn_name, program_wallet_bntkn)
@@ -559,9 +564,9 @@ class BancorDapp:
         self.next_transaction(state)
         handle_logging(
             tkn_name=tkn_name,
+            user_name=user_name,
             tkn_amt=total_rewards,
             action_name=transaction_type,
-            user_name=user_name,
             transaction_id=self.transaction_id,
             state=state,
         )

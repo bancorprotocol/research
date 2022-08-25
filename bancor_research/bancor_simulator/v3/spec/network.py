@@ -459,6 +459,14 @@ class BancorDapp:
             state=state, tkn_name=tkn_name, timestamp=timestamp
         )
         self.next_transaction(state)
+        handle_logging(
+            tkn_name=tkn_name,
+            user_name=user_name,
+            tkn_amt=Decimal(0),
+            action_name=transaction_type,
+            transaction_id=self.transaction_id,
+            state=state,
+        )
 
     def load_json_simulation(self, path, tkn_name="tkn", timestamp: int = 0):
         """
@@ -547,7 +555,7 @@ class BancorDapp:
 
         is_active = timestamp >= start_time
 
-        total_rewards = Decimal(total_rewards)
+        total_rewards = to_user_amount(state, tkn_name, user_name, total_rewards)
 
         # Add the program to the rest.
         state.autocompounding_reward_programs[tkn_name] = AutocompoundingProgram(

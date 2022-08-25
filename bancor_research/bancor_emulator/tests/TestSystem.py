@@ -155,20 +155,16 @@ def execute(fileName):
         standardRewards.connect(userId).claimRewards([programIds[poolId]])
 
     def createFlatAcrProgram(poolId: str, userId: str, rewards: str, duration: int):
-        rToken = reserveTokens[poolId]
-        pToken = poolTokens[poolId]
-        rAmount = userAmount(rToken, userId, rewards)
-        pAmount = networkInfo.underlyingToPoolToken(rToken, rAmount)
-        pToken.connect(userId).transfer(erVault, pAmount)
-        compoundRewards.createFlatProgram(rToken, rAmount, block.timestamp, block.timestamp + duration)
+        token = reserveTokens[poolId]
+        amount = userAmount(token, userId, rewards)
+        poolTokens[poolId].connect(userId).transfer(erVault, networkInfo.underlyingToPoolToken(token, amount))
+        compoundRewards.createFlatProgram(token, amount, block.timestamp, block.timestamp + duration)
 
     def createExpAcrProgram(poolId: str, userId: str, rewards: str, halfLife: int):
-        rToken = reserveTokens[poolId]
-        pToken = poolTokens[poolId]
-        rAmount = userAmount(rToken, userId, rewards)
-        pAmount = networkInfo.underlyingToPoolToken(rToken, rAmount)
-        pToken.connect(userId).transfer(erVault, pAmount)
-        compoundRewards.createExpDecayProgram(rToken, rAmount, block.timestamp, halfLife)
+        token = reserveTokens[poolId]
+        amount = userAmount(token, userId, rewards)
+        poolTokens[poolId].connect(userId).transfer(erVault, networkInfo.underlyingToPoolToken(token, amount))
+        compoundRewards.createExpDecayProgram(token, amount, block.timestamp, halfLife)
 
     def processAcrProgram(poolId: str):
         compoundRewards.processRewards(reserveTokens[poolId])

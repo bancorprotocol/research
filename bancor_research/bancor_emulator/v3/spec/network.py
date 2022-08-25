@@ -259,12 +259,10 @@ class BancorDapp:
         transaction_type: str = "create flat autocompounding rewards program",
     ):
         updateBlock(timestamp)
-        r_tkn = self.reserveTokens[tkn_name]
-        p_tkn = self.poolTokens[tkn_name]
-        r_amt = userAmount(r_tkn, user_name, total_rewards)
-        p_amt = self.networkInfo.underlyingToPoolToken(r_tkn, r_amt)
-        p_tkn.connect(user_name).transfer(self.erVault, p_amt)
-        return self.compoundRewards.createFlatProgram(r_tkn, r_amt, start_time, start_time + total_duration)
+        tkn = self.reserveTokens[tkn_name]
+        amt = userAmount(tkn, user_name, total_rewards)
+        self.poolTokens[tkn_name].connect(user_name).transfer(self.erVault, self.networkInfo.underlyingToPoolToken(tkn, amt))
+        return self.compoundRewards.createFlatProgram(tkn, amt, start_time, start_time + total_duration)
 
     def create_exp_ac_rewards_program(
         self,
@@ -277,12 +275,10 @@ class BancorDapp:
         transaction_type: str = "create exp autocompounding rewards program",
     ):
         updateBlock(timestamp)
-        r_tkn = self.reserveTokens[tkn_name]
-        p_tkn = self.poolTokens[tkn_name]
-        r_amt = userAmount(r_tkn, user_name, total_rewards)
-        p_amt = self.networkInfo.underlyingToPoolToken(r_tkn, r_amt)
-        p_tkn.connect(user_name).transfer(self.erVault, p_amt)
-        return self.compoundRewards.createExpDecayProgram(r_tkn, r_amt, start_time, half_life)
+        tkn = self.reserveTokens[tkn_name]
+        amt = userAmount(tkn, user_name, total_rewards)
+        self.poolTokens[tkn_name].connect(user_name).transfer(self.erVault, self.networkInfo.underlyingToPoolToken(tkn, amt))
+        return self.compoundRewards.createExpDecayProgram(tkn, amt, start_time, half_life)
 
     def process_ac_rewards_program(
         self,

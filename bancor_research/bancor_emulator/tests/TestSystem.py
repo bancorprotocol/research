@@ -169,6 +169,9 @@ def execute(fileName):
     def processAcrProgram(poolId: str):
         compoundRewards.processRewards(reserveTokens[poolId])
 
+    def terminateAcrProgram(poolId: str):
+        compoundRewards.terminateProgram(reserveTokens[poolId])
+
     def setFundingLimit(poolId: str, amount: str):
         token = reserveTokens[poolId]
         amount = userAmount(bnt, None, amount)
@@ -258,6 +261,9 @@ def execute(fileName):
         elif operation['type'] == 'processAcrProgram':
             Print('process the ac rewards program of {}', operation['poolId'])
             processAcrProgram(operation['poolId'])
+        elif operation['type'] == 'terminateAcrProgram':
+            Print('terminate the ac rewards program of {}', operation['poolId'])
+            terminateAcrProgram(operation['poolId'])
         elif operation['type'] == 'setFundingLimit':
             Print('set {} pool funding limit to {} bnt', operation['poolId'], operation['amount'])
             setFundingLimit(operation['poolId'], operation['amount'])

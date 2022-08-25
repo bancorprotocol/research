@@ -574,6 +574,30 @@ class BancorDapp:
             state=state,
         )
 
+    def terminate_ac_rewards_program(
+        self,
+        tkn_name: str,
+        timestamp: int = 0,
+        transaction_type: str = "terminate autocompounding rewards program",
+    ):
+        """
+        Terminate auto-compounding program.
+        """
+        state = self.get_state(copy_type="initial", timestamp=timestamp)
+        state, tkn_name, user_name = validate_input(state, tkn_name, "", timestamp)
+        state = terminate_ac_rewards_program(
+            state=state, tkn_name=tkn_name, timestamp=timestamp
+        )
+        self.next_transaction(state)
+        handle_logging(
+            tkn_name=tkn_name,
+            user_name=user_name,
+            tkn_amt=Decimal(0),
+            action_name=transaction_type,
+            transaction_id=self.transaction_id,
+            state=state,
+        )
+
     def burn_pool_tokens(
         self,
         tkn_name: str,

@@ -59,7 +59,7 @@ def calc_exp_token_amt_to_distribute(
 
 def process_ac_rewards_program(state: State, tkn_name: str, timestamp: int) -> State:
     """
-    Distribute autocompounding rewards for a given program.
+    Process autocompounding rewards program for a given pool.
     """
     assert (
         tkn_name in state.autocompounding_reward_programs
@@ -108,6 +108,14 @@ def process_ac_rewards_program(state: State, tkn_name: str, timestamp: int) -> S
     remaining_rewards = total_rewards - token_amt_to_distribute
     state.set_autocompounding_remaining_rewards(tkn_name, remaining_rewards)
 
+    return state
+
+
+def terminate_ac_rewards_program(state: State, tkn_name: str, timestamp: int) -> State:
+    """
+    Terminate autocompounding rewards program for a given pool.
+    """
+    del state.autocompounding_reward_programs[tkn_name]
     return state
 
 

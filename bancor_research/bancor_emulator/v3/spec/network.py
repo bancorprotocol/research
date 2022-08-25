@@ -290,6 +290,16 @@ class BancorDapp:
         tkn = self.reserveTokens[tkn_name]
         return self.compoundRewards.processRewards(tkn)
 
+    def terminate_ac_rewards_program(
+        self,
+        tkn_name: str,
+        timestamp: int = 0,
+        transaction_type: str = "terminate autocompounding rewards program",
+    ):
+        updateBlock(timestamp)
+        tkn = self.reserveTokens[tkn_name]
+        return self.compoundRewards.terminateProgram(tkn)
+
     def set_user_balance(
         self,
         user_name: str,

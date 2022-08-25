@@ -97,6 +97,9 @@ def execute(fileName, decimals = -1):
             elif operation['type'] == 'processAcrProgram':
                 info = 'process the ac rewards program of {}', operation['poolId']
                 bancorDapp.process_ac_rewards_program(operation['poolId'])
+            elif operation['type'] == 'terminateAcrProgram':
+                info = 'terminate the ac rewards program of {}', operation['poolId']
+                bancorDapp.terminate_ac_rewards_program(operation['poolId'])
             elif operation['type'] == 'setFundingLimit':
                 info = 'set {} pool funding limit to {} bnt'.format(operation['poolId'], operation['amount'])
                 bancorDapp.set_bnt_funding_limit(operation['poolId'], operation['amount'], timestamp)

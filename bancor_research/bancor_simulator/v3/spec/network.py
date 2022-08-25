@@ -451,7 +451,7 @@ class BancorDapp:
         transaction_type: str = "process autocompounding rewards program",
     ):
         """
-        Distribute auto-compounding program.
+        Processes autocompounding rewards program.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
         state, tkn_name, user_name = validate_input(state, tkn_name, "", timestamp)
@@ -533,7 +533,7 @@ class BancorDapp:
         transaction_type: str = "",
     ):
         """
-        Creates a new autocompounding program.
+        Creates autocompounding rewards program.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
         state, tkn_name, user_name = validate_input(
@@ -581,7 +581,7 @@ class BancorDapp:
         transaction_type: str = "terminate autocompounding rewards program",
     ):
         """
-        Terminate auto-compounding program.
+        Terminates autocompounding rewards program.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
         state, tkn_name, user_name = validate_input(state, tkn_name, "", timestamp)

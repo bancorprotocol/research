@@ -154,15 +154,6 @@ def execute(fileName):
     def claimRewards(poolId: str, userId: str):
         standardRewards.connect(userId).claimRewards([programIds[poolId]])
 
-    def setFundingLimit(poolId: str, amount: str):
-        token = reserveTokens[poolId]
-        amount = userAmount(bnt, None, amount)
-        networkSettings.setFundingLimit(token, amount)
-
-    def enableTrading(poolId: str, bntVirtualBalance: int, tknVirtualBalance: int):
-        token = reserveTokens[poolId]
-        poolCollection.enableTrading(token, uint256(bntVirtualBalance), uint256(tknVirtualBalance))
-
     def createFlatAcrProgram(poolId: str, userId: str, rewards: str, duration: int):
         rToken = reserveTokens[poolId]
         pToken = poolTokens[poolId]
@@ -181,6 +172,15 @@ def execute(fileName):
 
     def processAcrProgram(poolId: str):
         compoundRewards.processRewards(reserveTokens[poolId])
+
+    def setFundingLimit(poolId: str, amount: str):
+        token = reserveTokens[poolId]
+        amount = userAmount(bnt, None, amount)
+        networkSettings.setFundingLimit(token, amount)
+
+    def enableTrading(poolId: str, bntVirtualBalance: int, tknVirtualBalance: int):
+        token = reserveTokens[poolId]
+        poolCollection.enableTrading(token, uint256(bntVirtualBalance), uint256(tknVirtualBalance))
 
     def getState():
         state = {}
@@ -258,12 +258,6 @@ def execute(fileName):
         elif operation['type'] == 'claimRewards':
             Print('claim {} rewards', operation['poolId'])
             claimRewards(operation['poolId'], operation['userId'])
-        elif operation['type'] == 'setFundingLimit':
-            Print('set {} pool funding limit to {} bnt', operation['poolId'], operation['amount'])
-            setFundingLimit(operation['poolId'], operation['amount'])
-        elif operation['type'] == 'enableTrading':
-            Print('enable trading with 1 {} = {}/{} bnt', operation['poolId'], operation['bntVirtualBalance'], operation['baseTokenVirtualBalance'])
-            enableTrading(operation['poolId'], operation['bntVirtualBalance'], operation['baseTokenVirtualBalance'])
         elif operation['type'] == 'createFlatAcrProgram':
             Print('create a flat rewards program of {} {} reserve tokens', operation['rewards'], operation['poolId'])
             createFlatAcrProgram(operation['poolId'], operation['userId'], operation['rewards'], operation['duration'])
@@ -273,6 +267,12 @@ def execute(fileName):
         elif operation['type'] == 'processAcrProgram':
             Print('process the ac rewards program of {}', operation['poolId'])
             processAcrProgram(operation['poolId'])
+        elif operation['type'] == 'setFundingLimit':
+            Print('set {} pool funding limit to {} bnt', operation['poolId'], operation['amount'])
+            setFundingLimit(operation['poolId'], operation['amount'])
+        elif operation['type'] == 'enableTrading':
+            Print('enable trading with 1 {} = {}/{} bnt', operation['poolId'], operation['bntVirtualBalance'], operation['baseTokenVirtualBalance'])
+            enableTrading(operation['poolId'], operation['bntVirtualBalance'], operation['baseTokenVirtualBalance'])
         else:
             raise Exception('unsupported operation `{}` encountered'.format(operation['type']))
 

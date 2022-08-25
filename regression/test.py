@@ -88,12 +88,6 @@ def execute(fileName, decimals = -1):
             elif operation['type'] == 'claimRewards':
                 info = 'claim {} rewards'.format(operation['poolId'])
                 bancorDapp.claim_standard_rewards(operation['userId'], [programIds[bancorDapp][operation['poolId']]], timestamp)
-            elif operation['type'] == 'setFundingLimit':
-                info = 'set {} pool funding limit to {} bnt'.format(operation['poolId'], operation['amount'])
-                bancorDapp.set_bnt_funding_limit(operation['poolId'], operation['amount'], timestamp)
-            elif operation['type'] == 'enableTrading':
-                info = 'enable trading with 1 {} = {}/{} bnt'.format(operation['poolId'], operation['bntVirtualBalance'], operation['baseTokenVirtualBalance'])
-                bancorDapp.enable_trading(operation['poolId'], operation['bntVirtualBalance'], operation['baseTokenVirtualBalance'], timestamp)
             elif operation['type'] == 'createFlatAcrProgram':
                 info = 'create a flat rewards program of {} {} reserve tokens', operation['rewards'], operation['poolId']
                 bancorDapp.create_flat_ac_rewards_program(operation['poolId'], operation['userId'], operation['rewards'], timestamp, operation['duration'], timestamp)
@@ -103,6 +97,12 @@ def execute(fileName, decimals = -1):
             elif operation['type'] == 'processAcrProgram':
                 info = 'process the ac rewards program of {}', operation['poolId']
                 bancorDapp.process_ac_rewards_program(operation['poolId'])
+            elif operation['type'] == 'setFundingLimit':
+                info = 'set {} pool funding limit to {} bnt'.format(operation['poolId'], operation['amount'])
+                bancorDapp.set_bnt_funding_limit(operation['poolId'], operation['amount'], timestamp)
+            elif operation['type'] == 'enableTrading':
+                info = 'enable trading with 1 {} = {}/{} bnt'.format(operation['poolId'], operation['bntVirtualBalance'], operation['baseTokenVirtualBalance'])
+                bancorDapp.enable_trading(operation['poolId'], operation['bntVirtualBalance'], operation['baseTokenVirtualBalance'], timestamp)
             else:
                 raise Exception('unsupported operation `{}` encountered'.format(operation['type']))
 

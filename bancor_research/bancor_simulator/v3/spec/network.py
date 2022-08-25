@@ -528,7 +528,9 @@ class BancorDapp:
         Creates a new autocompounding program.
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
-        state, tkn_name, user_name = validate_input(state, tkn_name, user_name, timestamp)
+        state, tkn_name, user_name = validate_input(
+            state, tkn_name, user_name, timestamp
+        )
 
         program_id = state.autocompounding_programs_count + 1
 

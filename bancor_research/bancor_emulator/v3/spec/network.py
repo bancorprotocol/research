@@ -262,7 +262,7 @@ class BancorDapp:
         r_tkn = self.reserveTokens[tkn_name]
         p_tkn = self.poolTokens[tkn_name]
         r_amt = userAmount(r_tkn, user_name, total_rewards)
-        p_amt = self.bntPool.poolTokenAmountToBurn(r_amt) if r_tkn is self.bnt else self.poolCollection.poolTokenAmountToBurn(r_tkn, r_amt, p_tkn.balanceOf(self.erVault))
+        p_amt = self.networkInfo.underlyingToPoolToken(r_tkn, r_amt)
         p_tkn.connect(user_name).transfer(self.erVault, p_amt)
         return self.compoundRewards.createFlatProgram(r_tkn, r_amt, start_time, start_time + total_duration)
 
@@ -280,7 +280,7 @@ class BancorDapp:
         r_tkn = self.reserveTokens[tkn_name]
         p_tkn = self.poolTokens[tkn_name]
         r_amt = userAmount(r_tkn, user_name, total_rewards)
-        p_amt = self.bntPool.poolTokenAmountToBurn(r_amt) if r_tkn is self.bnt else self.poolCollection.poolTokenAmountToBurn(r_tkn, r_amt, p_tkn.balanceOf(self.erVault))
+        p_amt = self.networkInfo.underlyingToPoolToken(r_tkn, r_amt)
         p_tkn.connect(user_name).transfer(self.erVault, p_amt)
         return self.compoundRewards.createExpDecayProgram(r_tkn, r_amt, start_time, half_life)
 

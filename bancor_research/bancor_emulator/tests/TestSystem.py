@@ -158,7 +158,7 @@ def execute(fileName):
         rToken = reserveTokens[poolId]
         pToken = poolTokens[poolId]
         rAmount = userAmount(rToken, userId, rewards)
-        pAmount = bntPool.poolTokenAmountToBurn(rAmount) if rToken is bnt else poolCollection.poolTokenAmountToBurn(rToken, rAmount, pToken.balanceOf(erVault))
+        pAmount = networkInfo.underlyingToPoolToken(rToken, rAmount)
         pToken.connect(userId).transfer(erVault, pAmount)
         compoundRewards.createFlatProgram(rToken, rAmount, block.timestamp, block.timestamp + duration)
 
@@ -166,7 +166,7 @@ def execute(fileName):
         rToken = reserveTokens[poolId]
         pToken = poolTokens[poolId]
         rAmount = userAmount(rToken, userId, rewards)
-        pAmount = bntPool.poolTokenAmountToBurn(rAmount) if rToken is bnt else poolCollection.poolTokenAmountToBurn(rToken, rAmount, pToken.balanceOf(erVault))
+        pAmount = networkInfo.underlyingToPoolToken(rToken, rAmount)
         pToken.connect(userId).transfer(erVault, pAmount)
         compoundRewards.createExpDecayProgram(rToken, rAmount, block.timestamp, halfLife)
 

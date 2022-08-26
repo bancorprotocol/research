@@ -19,6 +19,13 @@ def deposit_bnt(state: State, tkn_name: str, tkn_amt: Decimal, user_name: str) -
     Specific case of `deposit` for bnt token.
     """
     bnbnt_amt = compute_bnbnt_amt(state, tkn_amt)
+    protocol_wallet_balance = get_protocol_wallet_balance(state, "bnt")
+    if bnbnt_amt > protocol_wallet_balance:
+        ptkn_amt = bnbnt_amt - protocol_wallet_balance
+        rtkn_amt = compute_rtkn_amt(state, "bnt", ptkn_amt)
+        state.increase_staked_balance("bnt", rtkn_amt)
+        state.increase_pooltoken_balance("bnt", ptkn_amt)
+        state.increase_protocol_wallet_balance("bnt", ptkn_amt)
     state.decrease_user_balance(user_name, tkn_name, tkn_amt)
     state.decrease_protocol_wallet_balance("bnt", bnbnt_amt)
     state.increase_user_balance(user_name, f"bn{tkn_name}", bnbnt_amt)

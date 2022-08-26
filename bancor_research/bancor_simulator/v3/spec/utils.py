@@ -189,7 +189,9 @@ def enable_trading(state: State, tkn_name: str) -> State:
 
         bnt_bootstrap_liquidity = get_bnt_bootstrap_liquidity(state, tkn_name)
         state.set_bnt_trading_liquidity(tkn_name, bnt_bootstrap_liquidity)
-        state.set_bnt_funding_amt(tkn_name, bnt_bootstrap_liquidity)
+        # changed due to contract implementation
+        # should possibly use `set_bnt_funding_amt` instead
+        state.increase_bnt_funding_amt(tkn_name, bnt_bootstrap_liquidity)
 
         tkn_bootstrap_liquidity = get_tkn_bootstrap_liquidity(state, tkn_name)
         state.set_tkn_trading_liquidity(tkn_name, tkn_bootstrap_liquidity)

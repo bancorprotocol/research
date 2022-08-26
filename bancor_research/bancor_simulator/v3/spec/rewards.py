@@ -6,15 +6,6 @@
 from bancor_research.bancor_simulator.v3.spec.state import *
 
 
-def burn_tokens(state: State, tkn_name: str, tkn_amt: Decimal) -> State:
-    """
-    Burn tokens for a given exponential distribution reward program.
-    """
-    state.decrease_pooltoken_balance(tkn_name, tkn_amt)
-    state.decrease_protocol_wallet_balance(tkn_name, tkn_amt)
-    return state
-
-
 def calc_pool_token_amt_to_burn(
     staked_amt: Decimal,
     token_amt_to_distribute: Decimal,
@@ -103,7 +94,8 @@ def process_ac_rewards_program(state: State, tkn_name: str, timestamp: int) -> S
         pool_token_amt_to_burn = program_wallet_bntkn
         state.set_program_is_active(tkn_name, False)
 
-    state = burn_tokens(state, tkn_name, pool_token_amt_to_burn)
+    state.decrease_pooltoken_balance(tkn_name, pool_token_amt_to_burn)
+    state.decrease_protocol_wallet_balance(tkn_name, pool_token_amt_to_burn)
     state.set_prev_token_amt_distributed(tkn_name, token_amt_to_distribute)
     remaining_rewards = total_rewards - token_amt_to_distribute
     state.set_autocompounding_remaining_rewards(tkn_name, remaining_rewards)

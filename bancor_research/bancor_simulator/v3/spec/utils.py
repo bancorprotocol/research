@@ -556,7 +556,9 @@ def build_json_operation(
                 "User": format_json(get_user_balance(state, tkn_name, user_name)),
                 "masterVault": format_json(get_vault_balance(state, tkn_name)),
                 "erVault": format_json(er_vault_tkn),
-                "epVault": format_json(get_external_protection_vault_balance(state, tkn_name)),
+                "epVault": format_json(
+                    get_external_protection_vault_balance(state, tkn_name)
+                ),
             },
             "bntBalances": {
                 "User": format_json(get_user_balance(state, "bnt", user_name)),

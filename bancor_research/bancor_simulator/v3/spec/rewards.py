@@ -58,7 +58,6 @@ def process_ac_rewards_program(state: State, tkn_name: str, timestamp: int) -> S
 
     staked_amt = get_staked_balance(state, tkn_name)
     erc20contracts_bntkn = get_pooltoken_balance(state, tkn_name)
-    program_wallet_bntkn = get_protocol_wallet_balance(state, tkn_name)
     total_rewards = get_total_rewards(state, tkn_name)
     prev_token_amt_distributed = get_prev_token_amt_distributed(state, tkn_name)
     distribution_type = get_distribution_type(state, tkn_name)
@@ -82,6 +81,11 @@ def process_ac_rewards_program(state: State, tkn_name: str, timestamp: int) -> S
             time_elapsed=time_elapsed,
         )
 
+    if tkn_name == "bnt":
+        program_wallet_bntkn = get_protocol_wallet_balance(state, tkn_name)
+    else:
+        program_wallet_bntkn = get_external_rewards_vault_balance(state, tkn_name)
+
     pool_token_amt_to_burn = calc_pool_token_amt_to_burn(
         staked_amt=staked_amt,
         token_amt_to_distribute=token_amt_to_distribute,
@@ -90,15 +94,15 @@ def process_ac_rewards_program(state: State, tkn_name: str, timestamp: int) -> S
         program_wallet_bntkn=program_wallet_bntkn,
     )
 
-    if pool_token_amt_to_burn > program_wallet_bntkn:
-        pool_token_amt_to_burn = program_wallet_bntkn
-        state.set_program_is_active(tkn_name, False)
-
-    state.decrease_pooltoken_balance(tkn_name, pool_token_amt_to_burn)
-    state.decrease_protocol_wallet_balance(tkn_name, pool_token_amt_to_burn)
-    state.set_prev_token_amt_distributed(tkn_name, token_amt_to_distribute)
-    remaining_rewards = total_rewards - token_amt_to_distribute
-    state.set_autocompounding_remaining_rewards(tkn_name, remaining_rewards)
+    if pool_token_amt_to_burn > 0:
+        state.decrease_pooltoken_balance(tkn_name, pool_token_amt_to_burn)
+        state.set_prev_token_amt_distributed(tkn_name, token_amt_to_distribute)
+        remaining_rewards = total_rewards - token_amt_to_distribute
+        state.set_autocompounding_remaining_rewards(tkn_name, remaining_rewards)
+        if tkn_name == "bnt":
+            state.decrease_protocol_wallet_balance(tkn_name, pool_token_amt_to_burn)
+        else:
+            state.decrease_external_rewards_vault_balance(tkn_name, pool_token_amt_to_burn)
 
     return state
 

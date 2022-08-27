@@ -1014,6 +1014,13 @@ def get_external_protection_vault(state: State, tkn_name: str) -> Decimal:
     return state.tokens[tkn_name].external_protection_vault.balance
 
 
+def get_external_rewards_vault_balance(state: State, tkn_name: str) -> Decimal:
+    """
+    The current external rewards vault balance for a given tkn_name.
+    """
+    return state.tokens[tkn_name].external_rewards_vault.balance
+
+
 def get_pooltoken_balance(state: State, tkn_name: str) -> Decimal:
     """
     The current erc20 contracts staked_amt supply for a given tkn_name.

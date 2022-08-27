@@ -1007,9 +1007,9 @@ def get_bnt_funding_amt(state: State, tkn_name: str) -> Decimal:
     return state.tokens[tkn_name].bnt_funding_amt.balance
 
 
-def get_external_protection_vault(state: State, tkn_name: str) -> Decimal:
+def get_external_protection_vault_balance(state: State, tkn_name: str) -> Decimal:
     """
-    The current external protection master_vault balance for a given tkn_name.
+    The current external protection vault balance for a given tkn_name.
     """
     return state.tokens[tkn_name].external_protection_vault.balance
 
@@ -1044,7 +1044,7 @@ def get_vortex_balance(state: State, tkn_name: str) -> Decimal:
 
 def get_user_balance(state: State, user_name: str, tkn_name: str) -> Decimal:
     """
-    The current external protection master_vault balance for a given tkn_name.
+    The user balance for a given tkn_name.
     """
     return state.users[user_name].wallet[tkn_name].balance
 
@@ -1367,7 +1367,7 @@ def get_external_protection_description(state: State, qdecimals: Decimal) -> lis
     Builds a structured list for current state information display.
     """
     return [
-        f"{tkn_name}=" + str(get_external_protection_vault(state, tkn_name))
+        f"{tkn_name}=" + str(get_external_protection_vault_balance(state, tkn_name))
         for tkn_name in state.whitelisted_tokens
     ]
 

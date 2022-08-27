@@ -439,7 +439,7 @@ def handle_logging(
             "bnt_remaining_funding": [get_bnt_remaining_funding(state, tkn_name)],
             "bnt_funding_amt": [get_bnt_funding_amt(state, tkn_name)],
             "external_protection_vault": [
-                get_external_protection_vault(state, tkn_name)
+                get_external_protection_vault_balance(state, tkn_name)
             ],
             "spot_rate": [get_spot_rate(state, tkn_name)],
             "ema_rate": [get_ema_rate(state, tkn_name)],
@@ -556,7 +556,7 @@ def build_json_operation(
                 "User": format_json(get_user_balance(state, tkn_name, user_name)),
                 "masterVault": format_json(get_vault_balance(state, tkn_name)),
                 "erVault": format_json(er_vault_tkn),
-                "epVault": format_json(get_external_protection_vault(state, tkn_name)),
+                "epVault": format_json(get_external_protection_vault_balance(state, tkn_name)),
             },
             "bntBalances": {
                 "User": format_json(get_user_balance(state, "bnt", user_name)),

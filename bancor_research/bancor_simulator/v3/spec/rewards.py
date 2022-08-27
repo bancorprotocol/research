@@ -102,7 +102,9 @@ def process_ac_rewards_program(state: State, tkn_name: str, timestamp: int) -> S
         if tkn_name == "bnt":
             state.decrease_protocol_wallet_balance(tkn_name, pool_token_amt_to_burn)
         else:
-            state.decrease_external_rewards_vault_balance(tkn_name, pool_token_amt_to_burn)
+            state.decrease_external_rewards_vault_balance(
+                tkn_name, pool_token_amt_to_burn
+            )
 
     return state
 

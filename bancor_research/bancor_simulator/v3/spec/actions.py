@@ -674,14 +674,14 @@ class WithdrawalAlgorithm:
         n = self.withdrawal_fee
         w = self.external_protection_tkn_balance
         x = self.withdraw_value
+        y = x * (1 - n)
         if not self.is_trading_enabled:
-            bnt_sent_to_user = max(Decimal("0"), x * (1 - n) - w)
-            external_protection_compensation = min(w, x * (1 - n))
+            bnt_sent_to_user = max(Decimal("0"), y - w)
+            external_protection_compensation = min(w, y)
         else:
-            bnt_sent_to_user = max(
-                Decimal("0"), a * (x * (1 - n) * (e - b - c) / e - w) / b
-            )
-            external_protection_compensation = min(w, x * (1 - n) * (e - b - c) / e)
+            z = y * (e - b - c) / e
+            bnt_sent_to_user = max(Decimal("0"), a * (z - w) / b)
+            external_protection_compensation = min(w, z)
         return bnt_sent_to_user, external_protection_compensation
 
     def illiquid_withdrawal(self):

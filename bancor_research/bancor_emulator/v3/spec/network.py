@@ -241,7 +241,7 @@ class BancorDapp:
     def claim_standard_rewards(
         self,
         user_name: str,
-        program_ids: list[int],
+        program_ids: list,
         timestamp: int = 0,
         transaction_type: str = "claim_standard_rewards",
     ):

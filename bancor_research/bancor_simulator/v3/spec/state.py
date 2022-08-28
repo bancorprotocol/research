@@ -215,13 +215,17 @@ class Tokens(GlobalSettings):
         """
         True if the spot price deviation from the EMA is less than 1% (or other preset threshold amount).
         """
+        # changed due to contract implementation
+        # should probably use `ema_rate` and `inv_ema_rate` instead
+        ema_rate = self.updated_ema_rate
+        inv_ema_rate = self.updated_inv_ema_rate
         return (
-            DEFAULT_LOWER_EMA_LIMIT * self.ema_rate
+            DEFAULT_LOWER_EMA_LIMIT * ema_rate
             <= self.spot_rate
-            <= DEFAULT_UPPER_EMA_LIMIT * self.ema_rate
-            and DEFAULT_LOWER_EMA_LIMIT * self.inv_ema_rate
+            <= DEFAULT_UPPER_EMA_LIMIT * ema_rate
+            and DEFAULT_LOWER_EMA_LIMIT * inv_ema_rate
             <= self.inv_spot_rate
-            <= DEFAULT_UPPER_EMA_LIMIT * self.inv_ema_rate
+            <= DEFAULT_UPPER_EMA_LIMIT * inv_ema_rate
         )
 
     @property

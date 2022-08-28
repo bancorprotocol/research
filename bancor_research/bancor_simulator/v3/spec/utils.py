@@ -140,7 +140,9 @@ def compute_bootstrap_rate(state: State, tkn_name: str) -> Decimal:
     return get_bnt_virtual_balance(state) / get_tkn_virtual_balance(state, tkn_name)
 
 
-def compute_master_vault_tkn_tvl(master_vault_balance: Decimal, token_price: Decimal) -> Decimal:
+def compute_master_vault_tkn_tvl(
+    master_vault_balance: Decimal, token_price: Decimal
+) -> Decimal:
     """
     Computes the master vault tvl for a given tkn.
     """

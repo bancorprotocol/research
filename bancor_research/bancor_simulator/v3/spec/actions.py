@@ -41,7 +41,7 @@ def deposit_tkn(state: State, tkn_name: str, tkn_amt: Decimal, user_name: str) -
     state.decrease_user_balance(user_name, tkn_name, tkn_amt)
     state.increase_user_balance(user_name, f"bn{tkn_name}", bntkn_amt)
     state.increase_pooltoken_balance(tkn_name, bntkn_amt)
-    state.increase_vault_balance(tkn_name, tkn_amt)
+    state.increase_master_vault_balance(tkn_name, tkn_amt)
     state.increase_staked_balance(tkn_name, tkn_amt)
 
     case, bnt_increase, tkn_increase = compute_pool_depth_adjustment(state, tkn_name)
@@ -52,7 +52,7 @@ def deposit_tkn(state: State, tkn_name: str, tkn_amt: Decimal, user_name: str) -
     state.increase_bnt_funding_amt(tkn_name, bnt_increase)
     state.increase_protocol_wallet_balance("bnt", bnbnt_amt)
     state.increase_pooltoken_balance("bnt", bnbnt_amt)
-    state.increase_vault_balance("bnt", bnt_increase)
+    state.increase_master_vault_balance("bnt", bnt_increase)
     state.increase_staked_balance("bnt", bnt_increase)
 
     state.update_spot_rate(tkn_name)
@@ -217,8 +217,8 @@ def trade_bnt_for_tkn(
         direction,
     )
 
-    state.increase_vault_balance("bnt", bnt_amt)
-    state.decrease_vault_balance(tkn_name, tkn_sent_to_user)
+    state.increase_master_vault_balance("bnt", bnt_amt)
+    state.decrease_master_vault_balance(tkn_name, tkn_sent_to_user)
     state.set_bnt_trading_liquidity(tkn_name, updated_bnt_liquidity)
     state.set_tkn_trading_liquidity(tkn_name, updated_tkn_liquidity)
     state.increase_staked_balance(tkn_name, trade_fee)
@@ -273,8 +273,8 @@ def trade_tkn_for_bnt(
         direction,
     )
 
-    state.decrease_vault_balance("bnt", bnt_sent_to_user)
-    state.increase_vault_balance(tkn_name, tkn_amt)
+    state.decrease_master_vault_balance("bnt", bnt_sent_to_user)
+    state.increase_master_vault_balance(tkn_name, tkn_amt)
     state.set_bnt_trading_liquidity(tkn_name, updated_bnt_liquidity)
     state.set_tkn_trading_liquidity(tkn_name, updated_tkn_liquidity)
     state.increase_staked_balance("bnt", trade_fee)
@@ -317,7 +317,8 @@ def process_withdrawal(
 
             bnt_trading_liquidity = get_bnt_trading_liquidity(state, tkn_name)
             tkn_trading_liquidity = get_tkn_trading_liquidity(state, tkn_name)
-            tkn_excess = get_vault_balance(state, tkn_name) - tkn_trading_liquidity
+            master_vault_balance = get_master_vault_balance(state, tkn_name)
+            tkn_excess = master_vault_balance - tkn_trading_liquidity
             staked_tkn = get_staked_balance(state, tkn_name)
             trading_fee = get_trading_fee(state, tkn_name)
 
@@ -343,11 +344,11 @@ def process_withdrawal(
 
             if bnt_renounced == 0:
                 bnt_delta = updated_bnt_liquidity - bnt_trading_liquidity
-                state.increase_vault_balance("bnt", bnt_delta)
+                state.increase_master_vault_balance("bnt", bnt_delta)
 
             state.set_bnt_trading_liquidity(tkn_name, updated_bnt_liquidity)
             state.decrease_staked_balance("bnt", bnt_renounced)
-            state.decrease_vault_balance("bnt", bnt_renounced)
+            state.decrease_master_vault_balance("bnt", bnt_renounced)
             state.decrease_bnt_funding_amt(tkn_name, bnt_renounced)
 
             bnbnt_renounced = bnbnt_rate * bnt_renounced
@@ -357,7 +358,7 @@ def process_withdrawal(
             state.set_tkn_trading_liquidity(tkn_name, updated_tkn_liquidity)
             state.decrease_pooltoken_balance(tkn_name, pool_token_amt)
             state.decrease_staked_balance(tkn_name, withdraw_value)
-            state.decrease_vault_balance(tkn_name, tkn_sent_to_user)
+            state.decrease_master_vault_balance(tkn_name, tkn_sent_to_user)
             state.increase_user_balance(
                 user_name,
                 tkn_name,
@@ -857,8 +858,8 @@ def vortex_burner(state: State, user_name: str):
         state.increase_user_balance(user_name, "bnt", burn_reward)
         state.set_vortex_balance("bnt", Decimal("0"))
         state.increase_vbnt_burned("bnt", Decimal("0"))
-        state.decrease_vault_balance("bnt", burn_reward)
-        state.decrease_vault_balance(tkn_name, burn_reward)
+        state.decrease_master_vault_balance("bnt", burn_reward)
+        state.decrease_master_vault_balance(tkn_name, burn_reward)
         state.set_bnt_trading_liquidity(tkn_name, updated_bnt_liquidity)
         state.set_tkn_trading_liquidity(tkn_name, updated_tkn_liquidity)
         state.increase_staked_balance(tkn_name, trade_fee)

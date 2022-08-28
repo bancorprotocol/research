@@ -23,7 +23,7 @@ from bancor_research.bancor_simulator.v3.spec.utils import (
     compute_ema,
     compute_bntkn_rate,
     compute_max_tkn_deposit,
-    compute_vault_tkn_tvl,
+    compute_master_vault_tkn_tvl,
 )
 
 
@@ -49,16 +49,14 @@ class Trader(RandomWalker):
         # init system logging parameters for DataCollector
         self.latest_tkn_name = None
         self.latest_tkn_amt = None
-        self.latest_action = None
         self.latest_user_name = None
         self.latest_action = None
-        self.vault_bnt = None
         self.erc20contracts_bntkn = None
         self.erc20contracts_bnbnt = None
         self.staked_bnt = None
         self.staked_tkn = None
-        self.vault_bnt = None
-        self.vault_tkn = None
+        self.master_vault_bnt = None
+        self.master_vault_tkn = None
         self.external_protection_vault_tkn = None
         self.protocol_wallet_bnbnt = None
         self.protocol_wallet_bntkn = None
@@ -308,13 +306,12 @@ class Trader(RandomWalker):
         state = self.protocol.v3.global_state
         self.latest_user_name = self.user_name
         self.latest_action = latest_action
-        self.vault_bnt = get_vault_balance(state, "bnt")
         self.erc20contracts_bntkn = get_pooltoken_balance(state, "tkn")
         self.erc20contracts_bnbnt = get_pooltoken_balance(state, "bnt")
         self.staked_bnt = get_staked_balance(state, "bnt")
         self.staked_tkn = get_staked_balance(state, "tkn")
-        self.vault_bnt = get_vault_balance(state, "bnt")
-        self.vault_tkn = get_vault_balance(state, "tkn")
+        self.master_vault_bnt = get_master_vault_balance(state, "bnt")
+        self.master_vault_tkn = get_master_vault_balance(state, "tkn")
         self.external_protection_vault_tkn = get_external_protection_vault_balance(state, "tkn")
         self.protocol_wallet_bnbnt = get_protocol_wallet_balance(state, "bnt")
         self.protocol_wallet_bntkn = get_protocol_wallet_balance(state, "tkn")
@@ -351,16 +348,14 @@ class LP(RandomWalker):
         # Bancor dapp, set at __init__, all people use the same dapp
         self.latest_tkn_name = None
         self.latest_tkn_amt = None
-        self.latest_action = None
         self.latest_user_name = None
         self.latest_action = None
-        self.vault_bnt = None
         self.erc20contracts_bntkn = None
         self.erc20contracts_bnbnt = None
         self.staked_bnt = None
         self.staked_tkn = None
-        self.vault_bnt = None
-        self.vault_tkn = None
+        self.master_vault_bnt = None
+        self.master_vault_tkn = None
         self.external_protection_vault_tkn = None
         self.protocol_wallet_bnbnt = None
         self.protocol_wallet_bntkn = None
@@ -694,12 +689,12 @@ class LP(RandomWalker):
         ) = self.get_deposit_payload(state)
         deposit_amt = None
         if tkn_name != "bnt":
-            vault_balance = get_vault_balance(state, tkn_name)
+            master_vault_balance = get_master_vault_balance(state, tkn_name)
             token_price, bnt_price = get_prices(state, tkn_name)
-            vault_tvl = compute_vault_tkn_tvl(vault_balance, token_price)
-            if vault_tvl < target_tvl:
+            master_vault_tvl = compute_master_vault_tkn_tvl(master_vault_balance, token_price)
+            if master_vault_tvl < target_tvl:
                 max_tkn_deposit = compute_max_tkn_deposit(
-                    vault_tvl, target_tvl, user_tkn
+                    master_vault_tvl, target_tvl, user_tkn
                 )
                 deposit_amt = self.get_random_amt(max_tkn_deposit)
                 if deposit_amt < user_tkn:
@@ -921,13 +916,12 @@ class LP(RandomWalker):
         state = self.protocol.v3.global_state
         self.latest_user_name = self.user_name
         self.latest_action = latest_action
-        self.vault_bnt = get_vault_balance(state, "bnt")
         self.erc20contracts_bntkn = get_pooltoken_balance(state, "tkn")
         self.erc20contracts_bnbnt = get_pooltoken_balance(state, "bnt")
         self.staked_bnt = get_staked_balance(state, "bnt")
         self.staked_tkn = get_staked_balance(state, "tkn")
-        self.vault_bnt = get_vault_balance(state, "bnt")
-        self.vault_tkn = get_vault_balance(state, "tkn")
+        self.master_vault_bnt = get_master_vault_balance(state, "bnt")
+        self.master_vault_tkn = get_master_vault_balance(state, "tkn")
         self.external_protection_vault_tkn = get_external_protection_vault_balance(state, "tkn")
         self.protocol_wallet_bnbnt = get_protocol_wallet_balance(state, "bnt")
         self.protocol_wallet_bntkn = get_protocol_wallet_balance(state, "tkn")

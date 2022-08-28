@@ -317,9 +317,8 @@ def process_withdrawal(
 
             bnt_trading_liquidity = get_bnt_trading_liquidity(state, tkn_name)
             tkn_trading_liquidity = get_tkn_trading_liquidity(state, tkn_name)
-            tkn_excess = (
-                get_master_vault_balance(state, tkn_name) - tkn_trading_liquidity
-            )
+            master_vault_balance = get_master_vault_balance(state, tkn_name)
+            tkn_excess = master_vault_balance - tkn_trading_liquidity
             staked_tkn = get_staked_balance(state, tkn_name)
             trading_fee = get_trading_fee(state, tkn_name)
 

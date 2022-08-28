@@ -23,7 +23,7 @@ from bancor_research.bancor_simulator.v3.spec.utils import (
     compute_ema,
     compute_bntkn_rate,
     compute_max_tkn_deposit,
-    compute_vault_tkn_tvl,
+    compute_master_vault_tkn_tvl,
 )
 
 
@@ -689,12 +689,12 @@ class LP(RandomWalker):
         ) = self.get_deposit_payload(state)
         deposit_amt = None
         if tkn_name != "bnt":
-            vault_balance = get_master_vault_balance(state, tkn_name)
+            master_vault_balance = get_master_vault_balance(state, tkn_name)
             token_price, bnt_price = get_prices(state, tkn_name)
-            vault_tvl = compute_vault_tkn_tvl(vault_balance, token_price)
-            if vault_tvl < target_tvl:
+            master_vault_tvl = compute_master_vault_tkn_tvl(master_vault_balance, token_price)
+            if master_vault_tvl < target_tvl:
                 max_tkn_deposit = compute_max_tkn_deposit(
-                    vault_tvl, target_tvl, user_tkn
+                    master_vault_tvl, target_tvl, user_tkn
                 )
                 deposit_amt = self.get_random_amt(max_tkn_deposit)
                 if deposit_amt < user_tkn:

@@ -36,8 +36,8 @@ def check_is_bootstrap_reqs_met(
     """
     CHecks if the bootstrap requirements are met for a given tkn_name.
     """
-    vault_balance = get_master_vault_balance(state, tkn_name)
-    return vault_balance >= bootstrap_liquidity
+    master_vault_balance = get_master_vault_balance(state, tkn_name)
+    return master_vault_balance >= bootstrap_liquidity
 
 
 def compute_user_total_holdings(state: State, user_name: str):
@@ -140,20 +140,20 @@ def compute_bootstrap_rate(state: State, tkn_name: str) -> Decimal:
     return get_bnt_virtual_balance(state) / get_tkn_virtual_balance(state, tkn_name)
 
 
-def compute_vault_tkn_tvl(vault_balance: Decimal, token_price: Decimal) -> Decimal:
+def compute_master_vault_tkn_tvl(master_vault_balance: Decimal, token_price: Decimal) -> Decimal:
     """
-    Computes the vault tvl for a given tkn.
+    Computes the master vault tvl for a given tkn.
     """
-    return vault_balance * token_price
+    return master_vault_balance * token_price
 
 
 def compute_max_tkn_deposit(
-    vault_tvl: Decimal, target_tvl: Decimal, user_funds: Decimal
+    master_vault_tvl: Decimal, target_tvl: Decimal, user_funds: Decimal
 ) -> Decimal:
     """
     Computes the maximum deposit amount which will not exceed the target tvl.
     """
-    return max(target_tvl - vault_tvl, user_funds)
+    return max(target_tvl - master_vault_tvl, user_funds)
 
 
 def format_json(val: Any, integer: bool = False, percentage: bool = False) -> Any:
@@ -263,9 +263,8 @@ def compute_pool_depth_adjustment(
             # changed due to contract implementation
             # should possibly use `get_tkn_excess` and `get_tkn_excess_bnt_equivalence` instead
             tkn_trading_liquidity = get_tkn_trading_liquidity(state, tkn_name)
-            tkn_excess = (
-                get_master_vault_balance(state, tkn_name) - tkn_trading_liquidity
-            )
+            master_vault_balance = get_master_vault_balance(state, tkn_name)
+            tkn_excess = master_vault_balance - tkn_trading_liquidity
             tkn_excess_bnt_equivalence = tkn_excess * speculated_ema_rate
             avg_tkn_trading_liquidity = bnt_trading_liquidity / speculated_ema_rate
 

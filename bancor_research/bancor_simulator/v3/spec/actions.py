@@ -60,6 +60,9 @@ def deposit_tkn(state: State, tkn_name: str, tkn_amt: Decimal, user_name: str) -
     if get_is_trading_enabled(state, tkn_name):
         state = handle_ema(state, tkn_name)
 
+    if check_pool_shutdown(state, tkn_name) and bnt_increase > 0:
+        state = shutdown_pool(state, tkn_name)
+
     return state
 
 

@@ -114,7 +114,7 @@ class BancorSimulation(mesa.Model):
                 "latest_action": "latest_action",
                 "latest_tkn_name": "latest_tkn_name",
                 "latest_tkn_amt": "latest_tkn_amt",
-                "vault_bnt": "vault_bnt",
+                "master_vault_bnt": "master_vault_bnt",
                 "erc20contracts_bntkn": "erc20contracts_bntkn",
                 "staked_bnt": "staked_bnt",
                 "external_protection_vault_tkn": "external_protection_vault_tkn",
@@ -123,8 +123,8 @@ class BancorSimulation(mesa.Model):
                 "protocol_wallet_bnbnt": "protocol_wallet_bnbnt",
                 "vortex_bnt": "vortex_bnt",
                 "erc20contracts_bnbnt": "erc20contracts_bnbnt",
-                "vault_tkn": "vault_bnt",
-                "staked_tkn": "staked_bnt",
+                "master_vault_tkn": "master_vault_tkn",
+                "staked_tkn": "staked_tkn",
             },
         )
 

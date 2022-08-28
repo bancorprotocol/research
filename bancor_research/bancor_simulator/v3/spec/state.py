@@ -900,7 +900,7 @@ def get_staked_balance(state: State, tkn_name: str) -> Decimal:
 
 def get_master_vault_balance(state: State, tkn_name: str) -> Decimal:
     """
-    The current balance of the master master_vault for a given tkn_name.
+    The current balance of the master_vault for a given tkn_name.
     """
     return state.tokens[tkn_name].master_vault.balance
 

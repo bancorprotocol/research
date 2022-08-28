@@ -430,7 +430,7 @@ def handle_logging(
             "latest_amt": [tkn_amt],
             "latest_user_name": [user_name],
             "tkn_name": [tkn_name],
-            "vault_tkn": [get_master_vault_balance(state, tkn_name)],
+            "master_vault_tkn": [get_master_vault_balance(state, tkn_name)],
             "erc20contracts_bntkn": [get_pooltoken_balance(state, tkn_name)],
             "staked_tkn": [get_staked_balance(state, tkn_name)],
             "is_trading_enabled": [get_is_trading_enabled(state, tkn_name)],
@@ -455,7 +455,7 @@ def handle_logging(
             "protocol_wallet_bnbnt": [get_protocol_wallet_balance(state, "bnt")],
             "vortex_bnt": [get_vortex_balance(state, "bnt")],
             "erc20contracts_bnbnt": [get_pooltoken_balance(state, "bnt")],
-            "vault_bnt": [get_master_vault_balance(state, "bnt")],
+            "master_vault_bnt": [get_master_vault_balance(state, "bnt")],
             "staked_bnt": [get_staked_balance(state, "bnt")],
             "bnbnt_rate": [state.bnbnt_rate],
         }

@@ -518,13 +518,13 @@ class State(GlobalSettings):
         """
         self.tokens[tkn_name].protocol_wallet_pooltokens.add(value)
 
-    def decrease_vault_balance(self, tkn_name: str, value: Decimal):
+    def decrease_master_vault_balance(self, tkn_name: str, value: Decimal):
         """
         Decrease master_vault balance by a given amount.
         """
         self.tokens[tkn_name].master_vault.subtract(value)
 
-    def increase_vault_balance(self, tkn_name: str, value: Decimal):
+    def increase_master_vault_balance(self, tkn_name: str, value: Decimal):
         """
         Increase master_vault balance by a given amount.
         """
@@ -736,12 +736,6 @@ class State(GlobalSettings):
         """
         self.tokens[tkn_name].protocol_wallet_pooltokens.set(value)
 
-    def set_vault_balance(self, tkn_name: str, value: Decimal):
-        """
-        Set the master_vault balance to a given amount.
-        """
-        self.tokens[tkn_name].master_vault.set(value)
-
     def set_user_balance(self, user_name: str, tkn_name: str, value: Decimal):
         """
         Set the user balance to a given amount.
@@ -853,21 +847,6 @@ class State(GlobalSettings):
         return copy.deepcopy(self)
 
 
-def get_vault_tvl(state: State) -> Decimal:
-    """
-    Computes the vault tvl for all tkns.
-    """
-    return sum(
-        [
-            (
-                get_tkn_price(state, tkn_name)
-                * state.tokens[tkn_name].master_vault.balance
-            )
-            for tkn_name in state.whitelisted_tokens
-        ]
-    )
-
-
 def get_total_standard_rewards_staked(state, id: int) -> Decimal:
     """
     Returns the total standard rewards staked_reward_amt for a given program id.
@@ -919,7 +898,7 @@ def get_staked_balance(state: State, tkn_name: str) -> Decimal:
     return state.tokens[tkn_name].staking_ledger.balance
 
 
-def get_vault_balance(state: State, tkn_name: str) -> Decimal:
+def get_master_vault_balance(state: State, tkn_name: str) -> Decimal:
     """
     The current balance of the master master_vault for a given tkn_name.
     """
@@ -1320,12 +1299,12 @@ def get_trading_liquidity_description(state: State, qdecimals: Decimal) -> list:
     ]
 
 
-def get_vault_description(state: State, qdecimals: Decimal) -> list:
+def get_master_vault_description(state: State, qdecimals: Decimal) -> list:
     """
     Builds a structured list for current state information display.
     """
-    return [f"bnt={get_vault_balance(state, 'bnt')}"] + [
-        f"{tkn_name}=" + str(get_vault_balance(state, tkn_name))
+    return [f"bnt={get_master_vault_balance(state, 'bnt')}"] + [
+        f"{tkn_name}=" + str(get_master_vault_balance(state, tkn_name))
         for tkn_name in state.whitelisted_tokens
         if tkn_name != "bnt"
     ]
@@ -1387,7 +1366,7 @@ def get_description(state: State, qdecimals: Decimal) -> dict:
     """
     return {
         "Trading Liquidity": get_trading_liquidity_description(state, qdecimals),
-        "Vault": get_vault_description(state, qdecimals),
+        "Vault": get_master_vault_description(state, qdecimals),
         "Staking": get_staking_description(state, qdecimals),
         "ERC20 Contracts": get_pooltoken_description(state, qdecimals),
         "Vortex": get_vortex_description(state, qdecimals),

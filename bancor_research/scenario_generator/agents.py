@@ -308,13 +308,13 @@ class Trader(RandomWalker):
         state = self.protocol.v3.global_state
         self.latest_user_name = self.user_name
         self.latest_action = latest_action
-        self.vault_bnt = get_vault_balance(state, "bnt")
+        self.vault_bnt = get_master_vault_balance(state, "bnt")
         self.erc20contracts_bntkn = get_pooltoken_balance(state, "tkn")
         self.erc20contracts_bnbnt = get_pooltoken_balance(state, "bnt")
         self.staked_bnt = get_staked_balance(state, "bnt")
         self.staked_tkn = get_staked_balance(state, "tkn")
-        self.vault_bnt = get_vault_balance(state, "bnt")
-        self.vault_tkn = get_vault_balance(state, "tkn")
+        self.vault_bnt = get_master_vault_balance(state, "bnt")
+        self.vault_tkn = get_master_vault_balance(state, "tkn")
         self.external_protection_vault_tkn = get_external_protection_vault_balance(state, "tkn")
         self.protocol_wallet_bnbnt = get_protocol_wallet_balance(state, "bnt")
         self.protocol_wallet_bntkn = get_protocol_wallet_balance(state, "tkn")
@@ -694,7 +694,7 @@ class LP(RandomWalker):
         ) = self.get_deposit_payload(state)
         deposit_amt = None
         if tkn_name != "bnt":
-            vault_balance = get_vault_balance(state, tkn_name)
+            vault_balance = get_master_vault_balance(state, tkn_name)
             token_price, bnt_price = get_prices(state, tkn_name)
             vault_tvl = compute_vault_tkn_tvl(vault_balance, token_price)
             if vault_tvl < target_tvl:
@@ -921,13 +921,13 @@ class LP(RandomWalker):
         state = self.protocol.v3.global_state
         self.latest_user_name = self.user_name
         self.latest_action = latest_action
-        self.vault_bnt = get_vault_balance(state, "bnt")
+        self.vault_bnt = get_master_vault_balance(state, "bnt")
         self.erc20contracts_bntkn = get_pooltoken_balance(state, "tkn")
         self.erc20contracts_bnbnt = get_pooltoken_balance(state, "bnt")
         self.staked_bnt = get_staked_balance(state, "bnt")
         self.staked_tkn = get_staked_balance(state, "tkn")
-        self.vault_bnt = get_vault_balance(state, "bnt")
-        self.vault_tkn = get_vault_balance(state, "tkn")
+        self.vault_bnt = get_master_vault_balance(state, "bnt")
+        self.vault_tkn = get_master_vault_balance(state, "tkn")
         self.external_protection_vault_tkn = get_external_protection_vault_balance(state, "tkn")
         self.protocol_wallet_bnbnt = get_protocol_wallet_balance(state, "bnt")
         self.protocol_wallet_bntkn = get_protocol_wallet_balance(state, "tkn")

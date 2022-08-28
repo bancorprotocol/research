@@ -36,7 +36,7 @@ def check_is_bootstrap_reqs_met(
     """
     CHecks if the bootstrap requirements are met for a given tkn_name.
     """
-    vault_balance = get_vault_balance(state, tkn_name)
+    vault_balance = get_master_vault_balance(state, tkn_name)
     return vault_balance >= bootstrap_liquidity
 
 
@@ -210,7 +210,7 @@ def mint_protocol_bnt(state: State, tkn_amt: Decimal) -> State:
     Handles adjustments to the system resulting from the v3 minting BNT.
     """
     bnbnt_amt = compute_bnbnt_amt(state, tkn_amt)
-    state.increase_vault_balance("bnt", tkn_amt)
+    state.increase_master_vault_balance("bnt", tkn_amt)
     state.increase_pooltoken_balance("bnt", bnbnt_amt)
     state.increase_staked_balance("bnt", tkn_amt)
     state.increase_protocol_wallet_balance("bnt", bnbnt_amt)
@@ -227,7 +227,7 @@ def shutdown_pool(state: State, tkn_name: str) -> State:
 
     # adjust balances
     state.decrease_staked_balance("bnt", bnt_trading_liquidity)
-    state.decrease_vault_balance("bnt", bnt_trading_liquidity)
+    state.decrease_master_vault_balance("bnt", bnt_trading_liquidity)
     state.decrease_pooltoken_balance("bnt", bnbnt_renounced)
     state.decrease_protocol_wallet_balance("bnt", bnbnt_renounced)
     state.decrease_bnt_funding_amt(tkn_name, bnt_trading_liquidity)
@@ -263,7 +263,7 @@ def compute_pool_depth_adjustment(
             # changed due to contract implementation
             # should possibly use `get_tkn_excess` and `get_tkn_excess_bnt_equivalence` instead
             tkn_trading_liquidity = get_tkn_trading_liquidity(state, tkn_name)
-            tkn_excess = get_vault_balance(state, tkn_name) - tkn_trading_liquidity
+            tkn_excess = get_master_vault_balance(state, tkn_name) - tkn_trading_liquidity
             tkn_excess_bnt_equivalence = tkn_excess * speculated_ema_rate
             avg_tkn_trading_liquidity = bnt_trading_liquidity / speculated_ema_rate
 
@@ -428,7 +428,7 @@ def handle_logging(
             "latest_amt": [tkn_amt],
             "latest_user_name": [user_name],
             "tkn_name": [tkn_name],
-            "vault_tkn": [get_vault_balance(state, tkn_name)],
+            "vault_tkn": [get_master_vault_balance(state, tkn_name)],
             "erc20contracts_bntkn": [get_pooltoken_balance(state, tkn_name)],
             "staked_tkn": [get_staked_balance(state, tkn_name)],
             "is_trading_enabled": [get_is_trading_enabled(state, tkn_name)],
@@ -453,7 +453,7 @@ def handle_logging(
             "protocol_wallet_bnbnt": [get_protocol_wallet_balance(state, "bnt")],
             "vortex_bnt": [get_vortex_balance(state, "bnt")],
             "erc20contracts_bnbnt": [get_pooltoken_balance(state, "bnt")],
-            "vault_bnt": [get_vault_balance(state, "bnt")],
+            "vault_bnt": [get_master_vault_balance(state, "bnt")],
             "staked_bnt": [get_staked_balance(state, "bnt")],
             "bnbnt_rate": [state.bnbnt_rate],
         }
@@ -554,7 +554,7 @@ def build_json_operation(
         "expected": {
             "tknBalances": {
                 "User": format_json(get_user_balance(state, tkn_name, user_name)),
-                "masterVault": format_json(get_vault_balance(state, tkn_name)),
+                "masterVault": format_json(get_master_vault_balance(state, tkn_name)),
                 "erVault": format_json(er_vault_tkn),
                 "epVault": format_json(
                     get_external_protection_vault_balance(state, tkn_name)
@@ -562,7 +562,7 @@ def build_json_operation(
             },
             "bntBalances": {
                 "User": format_json(get_user_balance(state, "bnt", user_name)),
-                "masterVault": format_json(get_vault_balance(state, "bnt")),
+                "masterVault": format_json(get_master_vault_balance(state, "bnt")),
                 "erVault": format_json(er_vault_bnt),
             },
             "bntknBalances": {

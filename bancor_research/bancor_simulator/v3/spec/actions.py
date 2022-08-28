@@ -323,6 +323,7 @@ def process_withdrawal(
             master_vault_balance = get_master_vault_balance(state, tkn_name)
             tkn_excess = master_vault_balance - tkn_trading_liquidity
             staked_tkn = get_staked_balance(state, tkn_name)
+            external_protection_tkn_balance = get_external_protection_vault_balance(state, tkn_name)
             trading_fee = get_trading_fee(state, tkn_name)
 
             solver = WithdrawalAlgorithm(
@@ -332,6 +333,7 @@ def process_withdrawal(
                 tkn_trading_liquidity=tkn_trading_liquidity,
                 tkn_excess=tkn_excess,
                 staked_tkn=staked_tkn,
+                external_protection_tkn_balance=external_protection_tkn_balance,
                 trading_fee=trading_fee,
                 withdrawal_fee=withdrawal_fee,
                 withdraw_value=withdraw_value,

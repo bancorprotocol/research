@@ -507,7 +507,7 @@ class WithdrawalAlgorithm:
             * (e * n - m * (b + c - e * (1 - n)))
             / ((1 - m) * (b + c - e) * (b + c - e * (1 - n)))
         )
-        return 0 # hmax (retroactively, due to change in contract implementation)
+        return 0  # hmax (retroactively, due to change in contract implementation)
 
     @property
     def hlim(self):

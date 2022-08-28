@@ -798,7 +798,6 @@ class WithdrawalAlgorithm:
                     tkn_sent_to_user,
                     bnt_sent_to_user,
                 ) = self.default_withdrawal_deficit_exposed()
-
             (
                 bnt_sent_to_user,
                 external_protection_compensation,

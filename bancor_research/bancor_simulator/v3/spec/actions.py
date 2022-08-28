@@ -67,12 +67,12 @@ def deposit_tkn(state: State, tkn_name: str, tkn_amt: Decimal, user_name: str) -
 
 
 def process_trade(
-        state: State,
-        tkn_amt: Decimal,
-        source_token: str,
-        target_token: str,
-        user_name: str,
-        timestamp: int = 0,
+    state: State,
+    tkn_amt: Decimal,
+    source_token: str,
+    target_token: str,
+    user_name: str,
+    timestamp: int = 0,
 ) -> State:
     """
     Main logic for trade actions.
@@ -122,10 +122,10 @@ def process_trade(
         )
 
     elif (
-            source_token != "bnt"
-            and target_token != "bnt"
-            and is_trading_enabled_source
-            and is_trading_enabled_target
+        source_token != "bnt"
+        and target_token != "bnt"
+        and is_trading_enabled_source
+        and is_trading_enabled_target
     ):
 
         (
@@ -175,14 +175,14 @@ def process_trade(
 
 
 def trade_bnt_for_tkn(
-        state: State,
-        bnt_trading_liquidity: Decimal,
-        tkn_trading_liquidity: Decimal,
-        trading_fee: Decimal,
-        network_fee: Decimal,
-        bnt_amt: Decimal,
-        tkn_name: str,
-        direction: str = "bnt",
+    state: State,
+    bnt_trading_liquidity: Decimal,
+    tkn_trading_liquidity: Decimal,
+    trading_fee: Decimal,
+    network_fee: Decimal,
+    bnt_amt: Decimal,
+    tkn_name: str,
+    direction: str = "bnt",
 ) -> Tuple[State, Decimal]:
     """
     Specific case of `trade` when bnt is the source token.
@@ -231,14 +231,14 @@ def trade_bnt_for_tkn(
 
 
 def trade_tkn_for_bnt(
-        state: State,
-        bnt_trading_liquidity: Decimal,
-        tkn_trading_liquidity: Decimal,
-        trading_fee: Decimal,
-        network_fee: Decimal,
-        tkn_amt: Decimal,
-        tkn_name: str,
-        direction="tkn",
+    state: State,
+    bnt_trading_liquidity: Decimal,
+    tkn_trading_liquidity: Decimal,
+    trading_fee: Decimal,
+    network_fee: Decimal,
+    tkn_amt: Decimal,
+    tkn_name: str,
+    direction="tkn",
 ):
     """
     Specific case of `trade` when bnt is the target token.
@@ -288,10 +288,10 @@ def trade_tkn_for_bnt(
 
 
 def process_withdrawal(
-        state: State,
-        user_name: str,
-        id_number: int,
-        timestamp: int = 0,
+    state: State,
+    user_name: str,
+    id_number: int,
+    timestamp: int = 0,
 ):
     """
     Main withdrawal logic based on the withdraw algorithm of the BIP15 spec.
@@ -434,7 +434,7 @@ def _begin_withdrawal_cooldown(state, tkn_name, user_name, rtkn_amt, ptkn_amt):
 
 
 def unpack_withdrawal_cooldown(
-        state: State, user_name: str, id_number: int
+    state: State, user_name: str, id_number: int
 ) -> Tuple[int, int, str, Decimal, Decimal, str]:
     """
     Introduced to make the withdrawals easier to handle.
@@ -484,10 +484,10 @@ class WithdrawalAlgorithm:
         m = self.trading_fee
         n = self.withdrawal_fee
         hmax = (
-                b
-                * e
-                * (e * n + m * (b + c - e))
-                / ((1 - m) * (b + c - e) * (b + c - e * (1 - n)))
+            b
+            * e
+            * (e * n + m * (b + c - e))
+            / ((1 - m) * (b + c - e) * (b + c - e * (1 - n)))
         )
         return hmax
 
@@ -502,10 +502,10 @@ class WithdrawalAlgorithm:
         m = self.trading_fee
         n = self.withdrawal_fee
         hmax = (
-                b
-                * e
-                * (e * n - m * (b + c - e * (1 - n)))
-                / ((1 - m) * (b + c - e) * (b + c - e * (1 - n)))
+            b
+            * e
+            * (e * n - m * (b + c - e * (1 - n)))
+            / ((1 - m) * (b + c - e) * (b + c - e * (1 - n)))
         )
         return 0  # hmax (retroactively, due to change in contract implementation)
 
@@ -532,9 +532,9 @@ class WithdrawalAlgorithm:
         n = self.withdrawal_fee
         x = self.withdraw_value
         updated_bnt_liquidity = (
-                a
-                * (b * e - m * (b * e + x * (b + c - e * (1 - n))))
-                / ((1 - m) * (b * e + x * (b + c - e * (1 - n))))
+            a
+            * (b * e - m * (b * e + x * (b + c - e * (1 - n))))
+            / ((1 - m) * (b * e + x * (b + c - e * (1 - n))))
         )
         bnt_renounced = Decimal("0")
         updated_tkn_liquidity = (b * e + x * (b + c + e * (n - 1))) / e
@@ -549,7 +549,7 @@ class WithdrawalAlgorithm:
         )
 
     def default_withdrawal_surplus_covered(
-            self,
+        self,
     ):
         """
         Calculates the withdrawal output variables when arbitrage is forbidden, and the excess TKN is sufficient to cover the entire withdrawal amt.
@@ -603,7 +603,7 @@ class WithdrawalAlgorithm:
         n = self.withdrawal_fee
         x = self.withdraw_value
         updated_bnt_liquidity = (
-                a * b * e / (b * e + x * (1 - m) * (b + c - e * (1 - n)))
+            a * b * e / (b * e + x * (1 - m) * (b + c - e * (1 - n)))
         )
         bnt_renounced = Decimal("0")
         updated_tkn_liquidity = (b * e + x * (b + c - e * (1 - n))) / e
@@ -663,7 +663,13 @@ class WithdrawalAlgorithm:
             bnt_sent_to_user,
         )
 
-    def external_protection(self, bnt_trading_liquidity, tkn_trading_liquidity, bnt_sent_to_user, tkn_sent_to_user):
+    def external_protection(
+        self,
+        bnt_trading_liquidity,
+        tkn_trading_liquidity,
+        bnt_sent_to_user,
+        tkn_sent_to_user,
+    ):
         """
         This replaces any BNT that would have been received by the user with TKN.
         """
@@ -715,11 +721,11 @@ class WithdrawalAlgorithm:
         )
 
     def process_withdrawal(
-            self,
-            updated_bnt_liquidity: Decimal = Decimal("0"),
-            bnt_renounced: Decimal = Decimal("0"),
-            updated_tkn_liquidity: Decimal = Decimal("0"),
-            tkn_sent_to_user: Decimal = Decimal("0"),
+        self,
+        updated_bnt_liquidity: Decimal = Decimal("0"),
+        bnt_renounced: Decimal = Decimal("0"),
+        updated_tkn_liquidity: Decimal = Decimal("0"),
+        tkn_sent_to_user: Decimal = Decimal("0"),
     ):
         """
         Evaluates the conditions, and calls the appropriate functions
@@ -791,10 +797,12 @@ class WithdrawalAlgorithm:
         (
             bnt_sent_to_user,
             external_protection_compensation,
-        ) = self.external_protection(updated_bnt_liquidity,
-                                     updated_tkn_liquidity,
-                                     tkn_sent_to_user,
-                                     bnt_sent_to_user)
+        ) = self.external_protection(
+            updated_bnt_liquidity,
+            updated_tkn_liquidity,
+            tkn_sent_to_user,
+            bnt_sent_to_user,
+        )
         return (
             updated_bnt_liquidity,
             bnt_renounced,

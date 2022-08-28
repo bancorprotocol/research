@@ -678,7 +678,9 @@ class WithdrawalAlgorithm:
             bnt_sent_to_user = max(Decimal("0"), x * (1 - n) - w)
             external_protection_compensation = min(w, x * (1 - n))
         else:
-            bnt_sent_to_user = max(Decimal("0"), a * (x * (1 - n) * (e - b - c) / e - w) / b)
+            bnt_sent_to_user = max(
+                Decimal("0"), a * (x * (1 - n) * (e - b - c) / e - w) / b
+            )
             external_protection_compensation = min(w, x * (1 - n) * (e - b - c) / e)
         return bnt_sent_to_user, external_protection_compensation
 
@@ -776,7 +778,10 @@ class WithdrawalAlgorithm:
                     tkn_sent_to_user,
                     bnt_sent_to_user,
                 ) = self.default_withdrawal_deficit_covered()
-                bnt_sent_to_user, external_protection_compensation = self.external_protection()
+                (
+                    bnt_sent_to_user,
+                    external_protection_compensation,
+                ) = self.external_protection()
             else:
                 (
                     updated_bnt_liquidity,
@@ -785,7 +790,10 @@ class WithdrawalAlgorithm:
                     tkn_sent_to_user,
                     bnt_sent_to_user,
                 ) = self.default_withdrawal_deficit_exposed()
-                bnt_sent_to_user, external_protection_compensation = self.external_protection()
+                (
+                    bnt_sent_to_user,
+                    external_protection_compensation,
+                ) = self.external_protection()
 
         return (
             updated_bnt_liquidity,

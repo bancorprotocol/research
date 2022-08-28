@@ -323,6 +323,9 @@ def process_withdrawal(
             master_vault_balance = get_master_vault_balance(state, tkn_name)
             tkn_excess = master_vault_balance - tkn_trading_liquidity
             staked_tkn = get_staked_balance(state, tkn_name)
+            external_protection_tkn_balance = get_external_protection_vault_balance(
+                state, tkn_name
+            )
             trading_fee = get_trading_fee(state, tkn_name)
 
             solver = WithdrawalAlgorithm(
@@ -332,6 +335,7 @@ def process_withdrawal(
                 tkn_trading_liquidity=tkn_trading_liquidity,
                 tkn_excess=tkn_excess,
                 staked_tkn=staked_tkn,
+                external_protection_tkn_balance=external_protection_tkn_balance,
                 trading_fee=trading_fee,
                 withdrawal_fee=withdrawal_fee,
                 withdraw_value=withdraw_value,
@@ -503,7 +507,7 @@ class WithdrawalAlgorithm:
             * (e * n - m * (b + c - e * (1 - n)))
             / ((1 - m) * (b + c - e) * (b + c - e * (1 - n)))
         )
-        return hmax
+        return 0  # hmax (retroactively, due to change in contract implementation)
 
     @property
     def hlim(self):
@@ -659,17 +663,24 @@ class WithdrawalAlgorithm:
             bnt_sent_to_user,
         )
 
-    def external_protection(self):
+    def external_protection(
+        self,
+        bnt_trading_liquidity,
+        tkn_trading_liquidity,
+        bnt_sent_to_user,
+        tkn_sent_to_user,
+    ):
         """
         This replaces any BNT that would have been received by the user with TKN.
         """
-        a = self.bnt_trading_liquidity
-        b = self.tkn_trading_liquidity
+        a = bnt_trading_liquidity
+        b = tkn_trading_liquidity
         n = self.withdrawal_fee
-        T = self.bnt_sent_to_user
+        T = bnt_sent_to_user
         w = self.external_protection_tkn_balance
         x = self.withdraw_value
-        S = self.tkn_sent_to_user
+        S = tkn_sent_to_user
+
         if not self.is_trading_enabled:
             bnt_sent_to_user = Decimal("0")
             external_protection_compensation = min(w, x * (1 - n) - S)
@@ -725,6 +736,10 @@ class WithdrawalAlgorithm:
         e = self.staked_tkn
         n = self.withdrawal_fee
         x = self.withdraw_value
+
+        bnt_sent_to_user = Decimal("0")
+        external_protection_compensation = Decimal("0")
+
         if not self.is_trading_enabled:
             (
                 updated_bnt_liquidity,
@@ -783,7 +798,15 @@ class WithdrawalAlgorithm:
                     tkn_sent_to_user,
                     bnt_sent_to_user,
                 ) = self.default_withdrawal_deficit_exposed()
-        bnt_sent_to_user, external_protection_compensation = self.external_protection()
+            (
+                bnt_sent_to_user,
+                external_protection_compensation,
+            ) = self.external_protection(
+                updated_bnt_liquidity,
+                updated_tkn_liquidity,
+                bnt_sent_to_user,
+                tkn_sent_to_user,
+            )
 
         return (
             updated_bnt_liquidity,

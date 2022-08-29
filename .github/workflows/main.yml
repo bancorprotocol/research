@@ -14,6 +14,7 @@ jobs:
       with:
         python-version: 3.8 #install the python version needed
         lfs: true
+    - run: git lfs pull
     - run: git lfs checkout
     - run: python setup.py install
     - run: python -i regression/test.py 1

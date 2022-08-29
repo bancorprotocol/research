@@ -116,7 +116,7 @@ def execute(fileName, decimals = -1):
     print('deviation:')
 
     frames = [bancorDapp.describe() for bancorDapp in bancorDapps]
-    for pair in [[item.astype('float128') for item in pair] for pair in zip(frames, frames[1:])]:
+    for pair in [[item.astype('float64') for item in pair] for pair in zip(frames, frames[1:])]:
         print((abs(pair[0] - pair[1]) / pair[1]).fillna(0).applymap(lambda x: '{:.12f}%'.format(x * 100)))
 
 execute('BancorNetworkSimpleFinancialScenario1')

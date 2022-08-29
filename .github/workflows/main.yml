@@ -1,0 +1,22 @@
+# This is a basic workflow to run regression tests
+
+name: CI-regression-tests
+
+
+on:
+ pull_request:
+
+jobs:
+ build:
+  runs-on: ubuntu-latest
+
+  steps:
+    - name: setup python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.8 #install the python version needed
+
+    - name: execute regression/test.py
+      run: |
+        python setup.py install
+        python regression/test.py

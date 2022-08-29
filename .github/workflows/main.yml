@@ -16,8 +16,8 @@ jobs:
     - uses: actions/setup-python@v4
       with:
         python-version: 3.8 #install the python version needed
-
-    - name: execute regression/test.py
-      run: |
+    - run: |
         python setup.py install
-        python regression/test.py
+        python python -i regression/test.py 1
+        python python -i regression/test.py 2
+

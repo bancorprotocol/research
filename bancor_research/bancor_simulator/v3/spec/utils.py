@@ -263,8 +263,12 @@ def compute_pool_depth_adjustment(
 
         if bnt_remaining_funding > 0:
             tkn_excess = get_tkn_excess(state, tkn_name)
-            tkn_excess_bnt_equivalence = get_tkn_excess_bnt_equivalence(state, tkn_name, rate)
-            avg_tkn_trading_liquidity = get_avg_tkn_trading_liquidity(state, tkn_name, rate)
+            tkn_excess_bnt_equivalence = get_tkn_excess_bnt_equivalence(
+                state, tkn_name, rate
+            )
+            avg_tkn_trading_liquidity = get_avg_tkn_trading_liquidity(
+                state, tkn_name, rate
+            )
 
             if (
                 avg_tkn_trading_liquidity <= tkn_excess

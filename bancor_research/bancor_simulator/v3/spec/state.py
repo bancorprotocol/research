@@ -1058,7 +1058,9 @@ def get_timestamp(state: State) -> int:
     return state.timestamp
 
 
-def get_avg_tkn_trading_liquidity(state: State, tkn_name: str, rate: Decimal) -> Decimal:
+def get_avg_tkn_trading_liquidity(
+    state: State, tkn_name: str, rate: Decimal
+) -> Decimal:
     """
     The average trading liquidity for a given tkn_name.
     """
@@ -1083,7 +1085,9 @@ def get_updated_inv_ema_rate(state: State, tkn_name: str) -> Decimal:
     return state.tokens[tkn_name].updated_inv_ema_rate
 
 
-def get_tkn_excess_bnt_equivalence(state: State, tkn_name: str, rate: Decimal) -> Decimal:
+def get_tkn_excess_bnt_equivalence(
+    state: State, tkn_name: str, rate: Decimal
+) -> Decimal:
     """
     Returns the equivalent bnt value of the non-trading tkn balance of the master_vault.
     """
@@ -1094,7 +1098,9 @@ def get_tkn_excess(state: State, tkn_name: str) -> Decimal:
     """
     The difference between the master_vault balance and the average trading liquidity.
     """
-    return get_master_vault_balance(state, tkn_name) - get_tkn_trading_liquidity(state, tkn_name)
+    return get_master_vault_balance(state, tkn_name) - get_tkn_trading_liquidity(
+        state, tkn_name
+    )
 
 
 def get_is_trading_enabled(state: State, tkn_name: str) -> bool:

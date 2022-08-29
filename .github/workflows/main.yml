@@ -12,7 +12,8 @@ jobs:
 
   steps:
     - name: setup python
-      uses: actions/setup-python@v4
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
       with:
         python-version: 3.8 #install the python version needed
 

@@ -3,21 +3,17 @@
 name: CI-regression-tests
 
 
-on:
- pull_request:
+on: [pull_request]
 
 jobs:
  build:
   runs-on: ubuntu-latest
-
   steps:
-    - name: setup python
     - uses: actions/checkout@v3
     - uses: actions/setup-python@v4
       with:
         python-version: 3.8 #install the python version needed
-    - run: |
-        python setup.py install
-        python python -i regression/test.py 1
-        python python -i regression/test.py 2
+    - run: python setup.py install
+    - run: python -i regression/test.py 1
+    - run: python -i regression/test.py 2
 

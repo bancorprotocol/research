@@ -229,17 +229,6 @@ class Tokens(GlobalSettings):
         )
 
     @property
-    def avg_tkn_trading_liquidity(self):
-        """
-        The tkn trading liquidity adjusted by the ema.
-        """
-        return (
-            self.bnt_trading_liquidity.balance / self.ema_rate
-            if self.ema_rate > 0
-            else 0
-        )
-
-    @property
     def updated_ema_rate(self) -> Decimal:
         """
         Computes the ema as a lagging average only once per block, per pool.
@@ -252,20 +241,6 @@ class Tokens(GlobalSettings):
         Computes the inverse ema as a lagging average only once per block, per pool.
         """
         return self.alpha * self.inv_spot_rate + (1 - self.alpha) * self.inv_ema_rate
-
-    @property
-    def tkn_excess(self):
-        """
-        The difference between the master_vault balance and the average trading liquidity.
-        """
-        return self.master_vault.balance - self.avg_tkn_trading_liquidity
-
-    @property
-    def tkn_excess_bnt_equivalence(self):
-        """
-        Computes the equivalent bnt value of the non-trading tkn balance of the master_vault.
-        """
-        return self.tkn_excess * self.ema_rate
 
     @property
     def bnt_bootstrap_liquidity(self):
@@ -1083,11 +1058,13 @@ def get_timestamp(state: State) -> int:
     return state.timestamp
 
 
-def get_avg_tkn_trading_liquidity(state: State, tkn_name: str) -> Decimal:
+def get_avg_tkn_trading_liquidity(
+    state: State, tkn_name: str, rate: Decimal
+) -> Decimal:
     """
     The average trading liquidity for a given tkn_name.
     """
-    return state.tokens[tkn_name].avg_tkn_trading_liquidity
+    return get_bnt_trading_liquidity(state, tkn_name) / rate
 
 
 def get_updated_ema_rate(state: State, tkn_name: str) -> Decimal:
@@ -1108,18 +1085,22 @@ def get_updated_inv_ema_rate(state: State, tkn_name: str) -> Decimal:
     return state.tokens[tkn_name].updated_inv_ema_rate
 
 
-def get_tkn_excess_bnt_equivalence(state: State, tkn_name: str) -> Decimal:
+def get_tkn_excess_bnt_equivalence(
+    state: State, tkn_name: str, rate: Decimal
+) -> Decimal:
     """
     Returns the equivalent bnt value of the non-trading tkn balance of the master_vault.
     """
-    return state.tokens[tkn_name].tkn_excess_bnt_equivalence
+    return get_tkn_excess(state, tkn_name) * rate
 
 
 def get_tkn_excess(state: State, tkn_name: str) -> Decimal:
     """
     The difference between the master_vault balance and the average trading liquidity.
     """
-    return state.tokens[tkn_name].tkn_excess
+    return get_master_vault_balance(state, tkn_name) - get_tkn_trading_liquidity(
+        state, tkn_name
+    )
 
 
 def get_is_trading_enabled(state: State, tkn_name: str) -> bool:

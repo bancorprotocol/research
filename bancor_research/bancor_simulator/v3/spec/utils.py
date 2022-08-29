@@ -258,17 +258,13 @@ def compute_pool_depth_adjustment(
     if is_trading_enabled and is_price_stable:
         # changed due to contract implementation
         # should probably use `get_ema_rate` instead
-        speculated_ema_rate = get_updated_ema_rate(state, tkn_name)
+        rate = get_updated_ema_rate(state, tkn_name)
         bnt_trading_liquidity = get_bnt_trading_liquidity(state, tkn_name)
 
         if bnt_remaining_funding > 0:
-            # changed due to contract implementation
-            # should possibly use `get_tkn_excess` and `get_tkn_excess_bnt_equivalence` instead
-            tkn_trading_liquidity = get_tkn_trading_liquidity(state, tkn_name)
-            master_vault_balance = get_master_vault_balance(state, tkn_name)
-            tkn_excess = master_vault_balance - tkn_trading_liquidity
-            tkn_excess_bnt_equivalence = tkn_excess * speculated_ema_rate
-            avg_tkn_trading_liquidity = bnt_trading_liquidity / speculated_ema_rate
+            tkn_excess = get_tkn_excess(state, tkn_name)
+            tkn_excess_bnt_equivalence = get_tkn_excess_bnt_equivalence(state, tkn_name, rate)
+            avg_tkn_trading_liquidity = get_avg_tkn_trading_liquidity(state, tkn_name, rate)
 
             if (
                 avg_tkn_trading_liquidity <= tkn_excess
@@ -286,7 +282,7 @@ def compute_pool_depth_adjustment(
             ):
                 case = "case2"
                 bnt_increase = bnt_remaining_funding
-                tkn_increase = bnt_remaining_funding / speculated_ema_rate
+                tkn_increase = bnt_remaining_funding / rate
 
             elif (
                 tkn_excess < avg_tkn_trading_liquidity
@@ -310,7 +306,7 @@ def compute_pool_depth_adjustment(
         elif bnt_remaining_funding < 0:
             case = "case4"
             bnt_increase = bnt_remaining_funding
-            tkn_increase = bnt_remaining_funding / speculated_ema_rate
+            tkn_increase = bnt_remaining_funding / rate
 
     return case, bnt_increase, tkn_increase
 

@@ -94,6 +94,10 @@ def process_ac_rewards_program(state: State, tkn_name: str, timestamp: int) -> S
         program_wallet_bntkn=program_wallet_bntkn,
     )
 
+    # sanity check
+    if pool_token_amt_to_burn >= erc20contracts_bntkn / 2:
+        return terminate_ac_rewards_program(state, tkn_name, timestamp)
+
     if pool_token_amt_to_burn > 0:
         state.decrease_pooltoken_balance(tkn_name, pool_token_amt_to_burn)
         state.set_prev_token_amt_distributed(tkn_name, token_amt_to_distribute)

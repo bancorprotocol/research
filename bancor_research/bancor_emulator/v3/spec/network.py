@@ -152,7 +152,7 @@ class BancorDapp:
     ):
         updateBlock(timestamp)
         tkn = self.poolTokens[tkn_name]
-        amt = self.networkInfo.underlyingToPoolToken(userAmount(self.reserveTokens[tkn_name], user_name, tkn_amt))
+        amt = self.networkInfo.underlyingToPoolToken(self.reserveTokens[tkn_name], userAmount(self.reserveTokens[tkn_name], user_name, tkn_amt))
         tkn.connect(user_name).approve(self.network, amt)
         if tkn is self.bnbnt: self.vbnt.connect(user_name).approve(self.network, amt)
         return self.network.connect(user_name).initWithdrawal(tkn, amt)

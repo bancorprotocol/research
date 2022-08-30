@@ -178,6 +178,8 @@ def enable_trading(state: State, tkn_name: str) -> State:
     Enables trading if the minimum bnt equivalent of tkn exists to justify bootstrapping.
     """
 
+    assert not get_is_trading_enabled(state, tkn_name), "trading is already enabled"
+
     bootstrap_liquidity = get_tkn_bootstrap_liquidity(state, tkn_name)
 
     if check_is_bootstrap_reqs_met(state, tkn_name, bootstrap_liquidity):
@@ -201,8 +203,8 @@ def enable_trading(state: State, tkn_name: str) -> State:
         state = mint_protocol_bnt(state, bnt_bootstrap_liquidity)
     else:
         log = f"Bootstrap requirements *not* met for {tkn_name}"
-        print(log)
         state.logger.info(log)
+        raise Exception(log)
 
     return state
 

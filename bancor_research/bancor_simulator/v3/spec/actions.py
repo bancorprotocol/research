@@ -212,11 +212,12 @@ def trade_bnt_for_tkn(
         direction,
     )
 
-    if tkn_name in state.rolling_trade_fees:
-        state.rolling_trade_fees[tkn_name].append(trade_fee)
-    else:
-        state.rolling_trade_fees[tkn_name] = []
-        state.rolling_trade_fees[tkn_name].append(trade_fee)
+    if trade_fee > 0:
+        if tkn_name in state.rolling_trade_fees:
+            state.rolling_trade_fees[tkn_name].append(trade_fee)
+        else:
+            state.rolling_trade_fees[tkn_name] = []
+            state.rolling_trade_fees[tkn_name].append(trade_fee)
 
     bnt_collected_by_vortex = vortex_collection(
         bnt_trading_liquidity,
@@ -275,11 +276,12 @@ def trade_tkn_for_bnt(
         direction,
     )
 
-    if tkn_name in state.rolling_trade_fees:
-        state.rolling_trade_fees[tkn_name].append(trade_fee)
-    else:
-        state.rolling_trade_fees[tkn_name] = []
-        state.rolling_trade_fees[tkn_name].append(trade_fee)
+    if trade_fee > 0:
+        if tkn_name in state.rolling_trade_fees:
+            state.rolling_trade_fees[tkn_name].append(trade_fee)
+        else:
+            state.rolling_trade_fees[tkn_name] = []
+            state.rolling_trade_fees[tkn_name].append(trade_fee)
 
     bnt_collected_by_vortex = vortex_collection(
         bnt_trading_liquidity,

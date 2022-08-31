@@ -1,7 +1,6 @@
+import decimal
 from decimal import Decimal
 import pandas as pd
-from bancor_simulator.v3.spec import get_vault_balance
-
 from bancor_research.bancor_simulator.v3.spec import *
 import random
 from statistics import mean
@@ -14,7 +13,6 @@ class MonteCarloGenerator(object):
 
     def __init__(
         self,
-        target_tvl: Decimal,
         whitelisted_tokens: dict,
         price_feed: pd.DataFrame,
         user_initial_balances: pd.DataFrame,
@@ -23,12 +21,10 @@ class MonteCarloGenerator(object):
         num_simulation_days: int,
         pool_freq_dist: dict,
         action_freq_dist: dict,
-        slippage_profile: dict,
         deposit_mean: float,
         trade_mean: float,
         withdraw_mean: float,
         cooldown_time: int = 0,
-        slippage_pearson_correlation: float = 0.0,
         bnt_min_liquidity: Any = 10000,
     ):
 
@@ -69,7 +65,6 @@ class MonteCarloGenerator(object):
         self.random = random
         self.logger = []
         self.timestamp = 0
-        self.target_tvl = target_tvl
         self.simulation_actions_count = simulation_actions_count
         self.whitelisted_tokens = whitelisted_tokens
         self.daily_trade_volume = 0
@@ -79,13 +74,13 @@ class MonteCarloGenerator(object):
         self.total_fees_earned = {}
         self.action_freq_dist = action_freq_dist
         self.num_timesteps = num_timesteps
-        self.slippage_profile = slippage_profile
+        self.slippage_profile = {}
         self.user_initial_balances = user_initial_balances
         self.iloss_tracker = {}
         self.iloss_realized = {}
-        self.total_trade_fees_earned = {}
+        self.total_fees_earned = {}
         self.num_simulation_days = num_simulation_days
-        self.slippage_pearson_correlation = slippage_pearson_correlation
+        self.slippage_pearson_correlation = 0
         self.deposit_mean = deposit_mean
         self.trade_mean = trade_mean
         self.withdraw_mean = withdraw_mean
@@ -93,7 +88,7 @@ class MonteCarloGenerator(object):
 
         # create a list of tokens which occur at the desired frequency
         for tkn in pool_freq_dist:
-            self.total_trade_fees_earned[tkn] = [0]
+            self.total_fees_earned[tkn] = [0]
             self.rolling_trade_fees[tkn] = []
             self.iloss_realized[tkn] = [0]
             freq = int(round(float(pool_freq_dist[tkn] * simulation_actions_count), 0))
@@ -120,45 +115,48 @@ class MonteCarloGenerator(object):
         """
         Computes the appropriate arbitrage trade on the tkn_name pool.
         """
-        a = bnt_trading_liquidity
-        b = tkn_trading_liquidity
-        m = trading_fee
-        p = bnt_virtual_balance
-        q = tkn_token_virtual_balance
+        try:
+            a = bnt_trading_liquidity
+            b = tkn_trading_liquidity
+            m = trading_fee
+            p = bnt_virtual_balance
+            q = tkn_token_virtual_balance
 
-        bnt_trade_amt = (
-            -Decimal("2") * a * q
-            + b * m * p
-            + (
-                (Decimal("2") * a * q - b * m * p) ** Decimal("2")
-                - Decimal("4") * a * q * (a * q - b * p)
-            )
-            ** (Decimal("1") / Decimal("2"))
-        ) / (Decimal("2") * q)
+            bnt_trade_amt = (
+                -Decimal("2") * a * q
+                + b * m * p
+                + (
+                    (Decimal("2") * a * q - b * m * p) ** Decimal("2")
+                    - Decimal("4") * a * q * (a * q - b * p)
+                )
+                ** (Decimal("1") / Decimal("2"))
+            ) / (Decimal("2") * q)
 
-        tkn_trade_amt = (
-            -Decimal("2") * b * p
-            + a * m * q
-            + (
-                (Decimal("2") * b * p - a * m * q) ** Decimal("2")
-                - Decimal("4") * b * p * (b * p - a * q)
-            )
-            ** (Decimal("1") / Decimal("2"))
-        ) / (Decimal("2") * p)
+            tkn_trade_amt = (
+                -Decimal("2") * b * p
+                + a * m * q
+                + (
+                    (Decimal("2") * b * p - a * m * q) ** Decimal("2")
+                    - Decimal("4") * b * p * (b * p - a * q)
+                )
+                ** (Decimal("1") / Decimal("2"))
+            ) / (Decimal("2") * p)
 
-        if bnt_trade_amt > 0:
-            source_token = "bnt"
-            target_token = tkn_name
-            trade_amt = bnt_trade_amt
-            user_capability = user_bnt > bnt_trade_amt
-            return trade_amt, source_token, target_token, user_capability
+            if bnt_trade_amt > 0:
+                source_token = "bnt"
+                target_token = tkn_name
+                trade_amt = bnt_trade_amt
+                user_capability = user_bnt > bnt_trade_amt
+                return trade_amt, source_token, target_token, user_capability
 
-        elif tkn_trade_amt > 0:
-            source_token = tkn_name
-            target_token = "bnt"
-            trade_amt = tkn_trade_amt
-            user_capability = user_tkn > tkn_trade_amt
-            return trade_amt, source_token, target_token, user_capability
+            elif tkn_trade_amt > 0:
+                source_token = tkn_name
+                target_token = "bnt"
+                trade_amt = tkn_trade_amt
+                user_capability = user_tkn > tkn_trade_amt
+                return trade_amt, source_token, target_token, user_capability
+        except decimal.InvalidOperation:
+            print("Invalid operation of decimal, skipping this action.")
 
     def get_random_deposit_amt(self, amt: Decimal = None) -> Decimal:
         if amt is None:
@@ -241,86 +239,84 @@ class MonteCarloGenerator(object):
         """
         Performs a random trade on the server.
         """
-        state = self.protocol.global_state
-        timestamp = self.timestamp
-        user_name = "global user"
-        source_tkn, target_tkn = self.get_random_tkn_names(state)
-        tkn_trading_liquidity_source = get_tkn_trading_liquidity(state, source_tkn)
-        user_source_before = get_user_balance(state, user_name, source_tkn)
-        swap_amt = self.get_random_trade_amt()
+        try:
+            state = self.protocol.global_state
+            timestamp = self.timestamp
+            user_name = "global user"
+            source_tkn, target_tkn = self.get_random_tkn_names(state)
+            tkn_trading_liquidity_source = get_tkn_trading_liquidity(state, source_tkn)
+            user_source_before = get_user_balance(state, user_name, source_tkn)
+            swap_amt = self.get_random_trade_amt()
 
-        if user_source_before > swap_amt:
-            amt = swap_amt
-        else:
-            amt = user_source_before / Decimal("1000.0")
+            if user_source_before > swap_amt:
+                amt = swap_amt
+            else:
+                amt = user_source_before / Decimal("1000.0")
 
-        if amt > 0:
-            self.protocol.trade(
-                tkn_amt=str(amt),
-                source_token=source_tkn,
-                target_token=target_tkn,
-                user_name=user_name,
-                timestamp=timestamp,
-            )
+            if amt > 0:
+                self.protocol.trade(
+                    tkn_amt=str(amt),
+                    source_token=source_tkn,
+                    target_token=target_tkn,
+                    user_name=user_name,
+                    timestamp=timestamp,
+                )
+                self.latest_tkn_name = source_tkn + "_" + target_tkn
+                self.latest_amt = amt
+                self.handle_trade_fees(target_tkn, source_tkn)
 
-            self.latest_tkn_name = source_tkn + "_" + target_tkn
-            self.latest_amt = amt
-
-            slippage_perc = self.get_slippage(
-                amt, tkn_trading_liquidity_source, source_tkn
-            )
-            self.handle_trade_fees(target_tkn, source_tkn, slippage_perc)
-
-        return self
+        except decimal.DivisionByZero:
+            print(f"Attempted decimal.DivisionByZero. Skipping transaction.")
 
     def perform_random_arbitrage_trade(self):
         """
         Performs a random arbitrage trade.
         """
-        state = self.protocol.global_state
-        user_name = "global user"
-        tkn_name, target_tkn = self.get_random_tkn_names(state)
-        timestamp = self.timestamp
-        tkn_price, bnt_price = get_prices(state, tkn_name)
-        bnt_trading_liquidity = get_bnt_trading_liquidity(state, tkn_name)
-        tkn_trading_liquidity = get_tkn_trading_liquidity(state, tkn_name)
-        trading_fee = get_trading_fee(state, tkn_name)
-        user_tkn = get_user_balance(state, user_name, tkn_name)
-        user_bnt = get_user_balance(state, user_name, "bnt")
-        trade_amt = Decimal("0")
-        source_token = tkn_name
-        target_token = target_tkn
-        x = self.process_arbitrage_trade(
-            tkn_name,
-            tkn_price,
-            bnt_price,
-            bnt_trading_liquidity,
-            tkn_trading_liquidity,
-            trading_fee,
-            user_tkn,
-            user_bnt,
-        )
-        if x is not None:
-            (
-                trade_amt,
-                source_token,
-                target_token,
-                user_capability,
-            ) = x
-            if user_capability:
-                if trade_amt > 0:
-                    self.protocol.trade(
-                        str(trade_amt), source_token, target_token, user_name, timestamp
-                    )
+        try:
+            state = self.protocol.global_state
+            user_name = "global user"
+            tkn_name, target_tkn = self.get_random_tkn_names(state)
+            timestamp = self.timestamp
+            tkn_price, bnt_price = get_prices(state, tkn_name)
+            bnt_trading_liquidity = get_bnt_trading_liquidity(state, tkn_name)
+            tkn_trading_liquidity = get_tkn_trading_liquidity(state, tkn_name)
+            trading_fee = get_trading_fee(state, tkn_name)
+            user_tkn = get_user_balance(state, user_name, tkn_name)
+            user_bnt = get_user_balance(state, user_name, "bnt")
+            trade_amt = Decimal("0")
+            source_token = tkn_name
+            target_token = target_tkn
+            x = self.process_arbitrage_trade(
+                tkn_name,
+                tkn_price,
+                bnt_price,
+                bnt_trading_liquidity,
+                tkn_trading_liquidity,
+                trading_fee,
+                user_tkn,
+                user_bnt,
+            )
+            if x is not None:
+                (
+                    trade_amt,
+                    source_token,
+                    target_token,
+                    user_capability,
+                ) = x
+                if user_capability:
+                    if trade_amt > 0:
+                        self.protocol.trade(
+                            str(trade_amt), source_token, target_token, user_name, timestamp
+                        )
 
-            source_tkn = source_token
-            target_tkn = target_token
-            slippage_perc = 0
-            self.handle_trade_fees(target_tkn, source_tkn, slippage_perc)
+                source_tkn = source_token
+                target_tkn = target_token
+                self.handle_trade_fees(target_tkn, source_tkn)
 
-        self.latest_tkn_name = source_token + "_" + target_token
-        self.latest_amt = trade_amt
-        return self
+            self.latest_tkn_name = source_token + "_" + target_token
+            self.latest_amt = trade_amt
+        except KeyError:
+            print("The price feed index is too short, key not found.")
 
     def get_random_tkn_names(self, state: State) -> Tuple[str, str]:
         source_tkn, target_tkn = "None", "None"
@@ -402,10 +398,7 @@ class MonteCarloGenerator(object):
         bntkn_rate = compute_bntkn_rate(state, tkn_name)
         if user_bntkn_amt > 0 and bntkn_rate > 0:
             try:
-                #                 bntkn_amt = self.get_random_cooldown_amt()
                 bntkn_amt = user_bntkn_amt
-                #                 if bntkn_amt > user_bntkn_amt:
-                #                     bntkn_amt = user_bntkn_amt * Decimal(0.0001)
                 withdraw_value = bntkn_amt / bntkn_rate
                 id_number = self.protocol.begin_cooldown_by_rtkn(
                     tkn_amt=str(withdraw_value),
@@ -429,7 +422,6 @@ class MonteCarloGenerator(object):
                 ) * 100
 
                 iloss_realized = float(self.iloss(var_A, var_B)) * float(withdraw_value)
-                print("iloss_realized", iloss_realized)
                 self.iloss_tracker[user_name] = {
                     "tkn_name": tkn_name,
                     "tkn_price": tkn_price_final,
@@ -458,77 +450,86 @@ class MonteCarloGenerator(object):
         """
         price_ratio = (float(var_A) / 100 + 1) / (float(var_B) / 100 + 1)
         il = 2 * (price_ratio**0.5 / (1 + price_ratio)) - 1
-        print("price_ratio, il", price_ratio, il)
         return il
 
     def perform_random_deposit(self):
         """
         Performs a random deposit action
         """
-        state = self.protocol.global_state
-        timestamp = self.timestamp
-        user_name = f"user_{timestamp}"
-        self.protocol.create_user(user_name)
-        user_balances = self.user_initial_balances[
-            self.user_initial_balances["user_id"] == "global user"
-        ]
-        for tkn_name in user_balances["poolSymbol"].unique():
-            user_balance = user_balances[user_balances["poolSymbol"] == tkn_name][
-                "tokenAmount_real_usd"
-            ].values[0]
-            self.protocol.set_user_balance(
-                user_name=user_name,
-                tkn_name=tkn_name,
-                tkn_amt=user_balance,
-                timestamp=timestamp,
-            )
-            pooltkn_name = get_pooltoken_name(tkn_name)
-            if pooltkn_name not in self.protocol.global_state.users[user_name].wallet:
-                self.protocol.global_state.users[user_name].wallet[
-                    pooltkn_name
-                ] = Token(balance=Decimal("0"))
 
-        state = self.protocol.global_state
-
-        (
-            user_name,
-            tkn_name,
-            user_tkn,
-            user_bnt,
-            bnbnt_supply,
-            protocol_bnbnt,
-            bnbnt_rate,
-        ) = self.get_deposit_payload(state, user_name)
-        deposit_amt = None
-        if tkn_name != "bnt":
-            deposit_amt = self.get_random_deposit_amt()
-            if 0 < deposit_amt < user_tkn:
-                self.protocol.deposit(
-                    tkn_name,
-                    str(deposit_amt),
-                    user_name,
-                    timestamp,
+        try:
+            state = self.protocol.global_state
+            timestamp = self.timestamp
+            user_name = f"user_{timestamp}"
+            self.protocol.create_user(user_name)
+            user_balances = self.user_initial_balances[
+                self.user_initial_balances["user_id"] == "global user"
+            ]
+            for tkn_name in user_balances["poolSymbol"].unique():
+                user_balance = user_balances[user_balances["poolSymbol"] == tkn_name][
+                    "tokenAmount_real_usd"
+                ].values[0]
+                self.protocol.set_user_balance(
+                    user_name=user_name,
+                    tkn_name=tkn_name,
+                    tkn_amt=user_balance,
+                    timestamp=timestamp,
                 )
-        elif tkn_name == "bnt":
-            if bnbnt_supply > 0 and self.is_protocol_bnbnt_healthy(
-                protocol_bnbnt, bnbnt_supply
-            ):
-                maximum_bnbnt = bnbnt_supply / Decimal("0.5") - protocol_bnbnt
-                maximum_bnt_deposit = max(maximum_bnbnt / bnbnt_rate, user_bnt)
+                pooltkn_name = get_pooltoken_name(tkn_name)
+                if pooltkn_name not in self.protocol.global_state.users[user_name].wallet:
+                    self.protocol.global_state.users[user_name].wallet[
+                        pooltkn_name
+                    ] = Token(balance=Decimal("0"))
+
+            state = self.protocol.global_state
+
+            (
+                user_name,
+                tkn_name,
+                user_tkn,
+                user_bnt,
+                bnbnt_supply,
+                protocol_bnbnt,
+                bnbnt_rate,
+            ) = self.get_deposit_payload(state, user_name)
+            deposit_amt = None
+            if tkn_name != "bnt":
                 deposit_amt = self.get_random_deposit_amt()
                 if 0 < deposit_amt < user_tkn:
-                    self.protocol.deposit(
-                        tkn_name, str(deposit_amt), user_name, timestamp
-                    )
-        self.latest_tkn_name = tkn_name
-        self.latest_amt = deposit_amt
-        self.iloss_tracker[user_name] = {
-            "tkn_name": tkn_name,
-            "tkn_price": get_tkn_price(state, tkn_name),
-            "bnt_price": get_tkn_price(state, "bnt"),
-            "timestamp": timestamp,
-            "iloss_realized": 0.0,
-        }
+                    try:
+                        self.protocol.deposit(
+                            tkn_name,
+                            str(deposit_amt),
+                            user_name,
+                            timestamp,
+                        )
+                    except ZeroDivisionError:
+                        print(f'ZeroDivisionError during {tkn_name} deposit, skipping this action...')
+
+            elif tkn_name == "bnt":
+                if bnbnt_supply > 0 and self.is_protocol_bnbnt_healthy(
+                    protocol_bnbnt, bnbnt_supply
+                ):
+                    deposit_amt = self.get_random_deposit_amt()
+                    if 0 < deposit_amt < user_tkn:
+                        try:
+                            self.protocol.deposit(
+                                tkn_name, str(deposit_amt), user_name, timestamp
+                            )
+                        except ZeroDivisionError:
+                            print(f'ZeroDivisionError during {tkn_name} deposit, skipping this action...')
+
+            self.latest_tkn_name = tkn_name
+            self.latest_amt = deposit_amt
+            self.iloss_tracker[user_name] = {
+                "tkn_name": tkn_name,
+                "tkn_price": get_tkn_price(state, tkn_name),
+                "bnt_price": get_tkn_price(state, "bnt"),
+                "timestamp": timestamp,
+                "iloss_realized": 0.0,
+            }
+        except KeyError:
+            print('Price feed index key not found during deposit')
 
     def update_trading_liquidity(self, n_events: int, constant_multiplier: int = 520):
         """
@@ -538,61 +539,63 @@ class MonteCarloGenerator(object):
         state = self.protocol.global_state
         for tkn_name in list(state.whitelisted_tokens):
             if len(self.rolling_trade_fees[tkn_name]) > 0:
+                try:
+                    # Calculate the new value for bnt_funding_limit based on the rolling avg trade fees.
+                    new_bnt_funding_limit = (
+                        mean(self.rolling_trade_fees[tkn_name][-n_events:])
+                        * constant_multiplier
+                    )
 
-                # Calculate the new value for bnt_funding_limit based on the rolling avg trade fees.
-                new_bnt_funding_limit = (
-                    mean(self.rolling_trade_fees[tkn_name][-n_events:])
-                    * constant_multiplier
-                )
+                    # Convert the tkn units into BNT
+                    tkn_price = get_tkn_price(state, tkn_name)
+                    bnt_price = get_tkn_price(state, "bnt")
+                    bnt_per_tkn = tkn_price / bnt_price
+                    new_bnt_funding_limit = new_bnt_funding_limit * bnt_per_tkn
+                    updated_bnt_trading_liquidity = Decimal(new_bnt_funding_limit)
 
-                # Convert the tkn units into BNT
-                tkn_price = get_tkn_price(state, tkn_name)
-                bnt_price = get_tkn_price(state, "bnt")
-                bnt_per_tkn = tkn_price / bnt_price
-                new_bnt_funding_limit = new_bnt_funding_limit * bnt_per_tkn
-                updated_bnt_trading_liquidity = Decimal(new_bnt_funding_limit)
+                    # Get the current system state variables
+                    current_bnt_funding_limit = get_bnt_funding_limit(state, tkn_name)
+                    bnt_trading_liquidity = get_bnt_trading_liquidity(state, tkn_name)
+                    tkn_trading_liquidity = get_tkn_trading_liquidity(state, tkn_name)
 
-                # Get the current system state variables
-                current_bnt_funding_limit = get_bnt_funding_limit(state, tkn_name)
-                bnt_trading_liquidity = get_bnt_trading_liquidity(state, tkn_name)
-                tkn_trading_liquidity = get_tkn_trading_liquidity(state, tkn_name)
+                    # Calculate the change in trading liquidity
+                    bnt_delta = bnt_trading_liquidity - updated_bnt_trading_liquidity
 
-                # Calculate the change in trading liquidity
-                bnt_delta = bnt_trading_liquidity - updated_bnt_trading_liquidity
+                    # If the price is stable, perform the update
+                    if get_is_price_stable(state, tkn_name) and new_bnt_funding_limit > 0:
 
-                # If the price is stable, perform the update
-                if get_is_price_stable(state, tkn_name):
+                        if bnt_delta > 0:
+                            # If we are reducing the trading liquidity, make the necessary adjustments
+                            state.decrease_staked_balance(tkn_name, bnt_delta)
+                            state.decrease_master_vault_balance(tkn_name, bnt_delta)
+                            state.decrease_pooltoken_balance(tkn_name, bnt_delta)
+                            state.decrease_protocol_wallet_balance(tkn_name, bnt_delta)
+                            updated_tkn_trading_liquidity = max(
+                                tkn_trading_liquidity - bnt_delta, 0
+                            )
+                            state.set_tkn_trading_liquidity(
+                                tkn_name, updated_tkn_trading_liquidity
+                            )
+                            state.set_bnt_trading_liquidity(
+                                tkn_name, updated_bnt_trading_liquidity
+                            )
+                            state.set_bnt_funding_amt(
+                                tkn_name, updated_bnt_trading_liquidity
+                            )
 
-                    if bnt_delta > 0:
-                        # If we are reducing the trading liquidity, make the necessary adjustments
-                        state.decrease_staked_balance(tkn_name, bnt_delta)
-                        state.decrease_vault_balance(tkn_name, bnt_delta)
-                        state.decrease_pooltoken_balance(tkn_name, bnt_delta)
-                        state.decrease_protocol_wallet_balance(tkn_name, bnt_delta)
-                        updated_tkn_trading_liquidity = max(
-                            tkn_trading_liquidity - bnt_delta, 0
-                        )
-                        state.set_tkn_trading_liquidity(
-                            tkn_name, updated_tkn_trading_liquidity
-                        )
-                        state.set_bnt_trading_liquidity(
-                            tkn_name, updated_bnt_trading_liquidity
-                        )
-                        state.set_bnt_funding_amt(
-                            tkn_name, updated_bnt_trading_liquidity
-                        )
+                        # In order to avoid automatic pool shutdown, we change this parameter dynamically also
+                        state.tokens[tkn_name].bnt_min_liquidity = Decimal(
+                            updated_bnt_trading_liquidity
+                        ) * Decimal("0.5")
 
-                    # In order to avoid automatic pool shutdown, we change this parameter dynamically also
-                    state.tokens[tkn_name].bnt_min_liquidity = Decimal(
-                        updated_bnt_trading_liquidity
-                    ) * Decimal("0.5")
+                        state.set_bnt_funding_limit(tkn_name, updated_bnt_trading_liquidity)
 
-                    state.set_bnt_funding_limit(tkn_name, updated_bnt_trading_liquidity)
+                        if check_pool_shutdown(state, tkn_name):
+                            state = shutdown_pool(state, tkn_name)
 
-                    if check_pool_shutdown(state, tkn_name):
-                        state = shutdown_pool(state, tkn_name)
-
-                    self.protocol.set_state(state)
+                        self.protocol.set_state(state)
+                except KeyError:
+                    print(f"The price feeds dataset is too short. KeyError detected for {tkn_name}. Skipping this actions...")
 
     def run(
         self,

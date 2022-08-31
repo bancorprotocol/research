@@ -280,6 +280,7 @@ class State(GlobalSettings):
     logger: Any = logger
     json_export: dict = field(default_factory=dict)
     whitelisted_tokens: dict = field(default_factory=dict)
+    rolling_trade_fees: dict = field(default_factory=dict)
 
     @property
     def valid_rewards_programs(self):

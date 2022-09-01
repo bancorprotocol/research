@@ -594,7 +594,12 @@ class MonteCarloGenerator(object):
                     n_events = int(round(mean_events_per_day * n_rolling_days, 0))
                     backup_state = self.protocol.global_state.copy()
                     try:
-                        self.update_trading_liquidity(n_events, constant_multiplier)
+                        try:
+                            self.update_trading_liquidity(n_events, constant_multiplier)
+                        except KeyError:
+                            print(f'The price feed is too short to complete the run. Early stopping will result.')
+                            self.protocol.global_state = backup_state
+                            break
                     except AssertionError as e:
                         print(f'Proposal trading liquidity update failed, reverting state. {e}')
                         self.protocol.global_state = backup_state

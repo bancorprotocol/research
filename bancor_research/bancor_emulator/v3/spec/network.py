@@ -427,5 +427,8 @@ class BancorDapp:
             table[token.symbol()][tuple([3, 'Network', 'Rewards Vault'  ])] = fromWei(token.balanceOf(self.erVault), token.decimals())
             table[token.symbol()][tuple([3, 'Network', 'Protocol Equity'])] = fromWei(token.balanceOf(self.bntPool), token.decimals())
 
+        # Iterate only bnt
+        table[self.bnt.symbol()][tuple([3, 'Network', 'BNT Staked Balance'])] = fromWei(self.bntPool.stakedBalance(), self.bnt.decimals())
+
         df = DataFrame(table).fillna(0).sort_index()
         return df.applymap(lambda x: round(x, decimals)) if decimals >= 0 else df

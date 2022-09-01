@@ -231,7 +231,7 @@ def shutdown_pool(state: State, tkn_name: str) -> State:
     bnbnt_renounced = compute_bnbnt_amt(state, bnt_renounced)
 
     # adjust balances
-    state.decrease_staked_balance("bnt", bnt_trading_liquidity)
+    state.decrease_staked_balance("bnt", bnt_renounced)
     state.decrease_master_vault_balance("bnt", bnt_trading_liquidity)
     state.decrease_pooltoken_balance("bnt", bnbnt_renounced)
     state.decrease_protocol_wallet_balance("bnt", bnbnt_renounced)

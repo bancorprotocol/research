@@ -367,11 +367,11 @@ def process_withdrawal(
                 state.increase_master_vault_balance("bnt", bnt_delta)
 
             state.set_bnt_trading_liquidity(tkn_name, updated_bnt_liquidity)
-            state.decrease_staked_balance("bnt", bnt_renounced)
             state.decrease_master_vault_balance("bnt", bnt_renounced)
 
             bnt_renounced = min(bnt_renounced, get_bnt_funding_amt(state, tkn_name))
             state.decrease_bnt_funding_amt(tkn_name, bnt_renounced)
+            state.decrease_staked_balance("bnt", bnt_renounced)
 
             bnbnt_renounced = bnbnt_rate * bnt_renounced
 

@@ -407,6 +407,8 @@ class BancorDapp:
                 tuple([3, "Network", "Protocol Equity"])
             ] = state.tokens[tkn_name].protocol_wallet_pooltokens.balance
 
+        table["bnt"][tuple([3, 'Network', 'BNT Staked Balance'])] = state.tokens["bnt"].staking_ledger.balance
+
         df = DataFrame(table).fillna(0).sort_index()
         return df.applymap(lambda x: round(x, decimals)) if decimals >= 0 else df
 

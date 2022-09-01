@@ -42,18 +42,24 @@ class Token(object):
     def add(self, value: Decimal):
         self.validate_balance()
         new_balance = self.balance + self.validate(value)
-        assert new_balance >= 0, ValueError("Balance must be non-negative. Cannot complete operation.")
+        assert new_balance >= 0, ValueError(
+            "Balance must be non-negative. Cannot complete operation."
+        )
         self.balance += self.validate(value)
 
     def subtract(self, value: Decimal):
         self.validate_balance()
         new_balance = self.balance - self.validate(value)
-        assert new_balance >= 0, ValueError("Balance must be non-negative. Cannot complete operation.")
+        assert new_balance >= 0, ValueError(
+            "Balance must be non-negative. Cannot complete operation."
+        )
         self.balance -= self.validate(value)
 
     def set(self, value: Decimal):
         self.validate_balance()
-        assert self.validate(value) >= 0, ValueError("Balance must be non-negative. Cannot complete operation.")
+        assert self.validate(value) >= 0, ValueError(
+            "Balance must be non-negative. Cannot complete operation."
+        )
         self.balance = self.validate(value)
 
     def validate(self, value) -> Decimal:

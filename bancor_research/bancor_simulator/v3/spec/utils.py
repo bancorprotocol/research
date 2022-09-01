@@ -226,15 +226,16 @@ def shutdown_pool(state: State, tkn_name: str) -> State:
     Shutdown pool when the bnt_min_trading_liquidity threshold is breached.
     """
 
-    bnt_trading_liquidity = state.tokens[tkn_name].bnt_trading_liquidity.balance
-    bnbnt_renounced = compute_bnbnt_amt(state, bnt_trading_liquidity)
+    bnt_trading_liquidity = get_bnt_trading_liquidity(state, tkn_name)
+    bnt_renounced = min(bnt_trading_liquidity, get_bnt_funding_amt(state, tkn_name))
+    bnbnt_renounced = compute_bnbnt_amt(state, bnt_renounced)
 
     # adjust balances
     state.decrease_staked_balance("bnt", bnt_trading_liquidity)
     state.decrease_master_vault_balance("bnt", bnt_trading_liquidity)
     state.decrease_pooltoken_balance("bnt", bnbnt_renounced)
     state.decrease_protocol_wallet_balance("bnt", bnbnt_renounced)
-    state.decrease_bnt_funding_amt(tkn_name, bnt_trading_liquidity)
+    state.decrease_bnt_funding_amt(tkn_name, bnt_renounced)
 
     # set balances
     state.set_is_trading_enabled(tkn_name, False)

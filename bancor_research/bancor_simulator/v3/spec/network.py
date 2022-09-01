@@ -407,6 +407,7 @@ class BancorDapp:
                 tuple([3, "Network", "Protocol Equity"])
             ] = state.tokens[tkn_name].protocol_wallet_pooltokens.balance
 
+        # Iterate only bnt
         table["bnt"][tuple([3, "Network", "BNT Staked Balance"])] = state.tokens[
             "bnt"
         ].staking_ledger.balance

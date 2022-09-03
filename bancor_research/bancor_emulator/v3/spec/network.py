@@ -19,16 +19,16 @@ from bancor_research.bancor_emulator.Vault                  import Vault
 from bancor_research import DEFAULT, Decimal, DataFrame, PandasDataFrame, read_price_feeds
 
 def toPPM(percent: str):
-    return uint32(PPM_RESOLUTION.data * Decimal(percent[:-1]) / 100)
+    return uint32(Decimal(str(PPM_RESOLUTION)) * Decimal(percent[:-1]) / 100)
 
 def toWei(amount: str, decimals: int):
     return uint256(Decimal(amount) * 10 ** decimals)
 
 def fromWei(amount: uint, decimals: int):
-    return Decimal(amount.data) / 10 ** decimals
+    return Decimal(str(amount)) / 10 ** decimals
 
 def fromFraction(n: uint, d: uint):
-    return Decimal('nan') if n == d == 0 else Decimal(n.data) / Decimal(d.data)
+    return Decimal('nan') if n == d == 0 else Decimal(str(n)) / Decimal(str(d))
 
 def userAmount(token: ERC20, userId: str, amount: str):
     if (amount.endswith('%')):

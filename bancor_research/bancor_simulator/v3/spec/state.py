@@ -41,14 +41,25 @@ class Token(object):
 
     def add(self, value: Decimal):
         self.validate_balance()
+        new_balance = self.balance + self.validate(value)
+        assert new_balance >= 0, ValueError(
+            "Balance must be non-negative. Cannot complete operation."
+        )
         self.balance += self.validate(value)
 
     def subtract(self, value: Decimal):
         self.validate_balance()
+        new_balance = self.balance - self.validate(value)
+        assert new_balance >= 0, ValueError(
+            "Balance must be non-negative. Cannot complete operation."
+        )
         self.balance -= self.validate(value)
 
     def set(self, value: Decimal):
         self.validate_balance()
+        assert self.validate(value) >= 0, ValueError(
+            "Balance must be non-negative. Cannot complete operation."
+        )
         self.balance = self.validate(value)
 
     def validate(self, value) -> Decimal:
@@ -709,6 +720,12 @@ class State(GlobalSettings):
         Set the staked_reward_amt balance to a given amount.
         """
         self.tokens[tkn_name].staking_ledger.set(value)
+
+    def set_master_vault_balance(self, tkn_name: str, value: Decimal):
+        """
+        Set the master_vault_balance balance to a given amount.
+        """
+        self.tokens[tkn_name].master_vault.set(value)
 
     def set_protocol_wallet_balance(self, tkn_name: str, value: Decimal):
         """

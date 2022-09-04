@@ -204,7 +204,7 @@ def enable_trading(state: State, tkn_name: str) -> State:
     else:
         log = f"Bootstrap requirements *not* met for {tkn_name}"
         state.logger.info(log)
-        raise Exception(log)
+        print(log)
 
     return state
 

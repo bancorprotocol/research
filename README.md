@@ -15,7 +15,7 @@
 
 See [official documentation](https://simulator.bancor.network/chapters/bancor-simulator.html) for complete details.
 
-**Warning**: The docs are a work in progress with potentially broken links, unfinished sections, and a non-exhuastive overview of commands and example usage. Moreover, the entirety of the codebase and documentation is subject to change without warning.
+**Warning**: The docs are a work in progress with potentially broken links, unfinished sections, and a non-exhaustive overview of commands and example usage. Moreover, the entirety of the codebase and documentation is subject to change without warning.
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
@@ -95,7 +95,7 @@ in [BIP15: Proposing Bancor 3](https://docs.google.com/document/d/11UeMYaI_1CWdf
 
 To build locally, `pip install -r requirements.txt` and then `jupyter-book build .`
 
-**Follow the build instructions on the Jupyter Book guide**. The guide has information for how to use the Jupyter Book
+**Follow the build instructions on the Jupyter Book guide**. The guide has information on how to use the Jupyter Book
 CLI to build this book. You can find
 the [Jupyter Book build instructions here](https://jupyterbook.org/start/build.html).
 
@@ -103,4 +103,4 @@ Build and preview the text locally
 
 To build locally, pip install -r requirements.txt and then jupyter-book build .
 
-Follow the build instructions on the Jupyter Book guide. The guide has information for how to use the Jupyter Book CLI to build this book. You can find the Jupyter Book build instructions here.
+Follow the build instructions on the Jupyter Book guide. The guide has information on how to use the Jupyter Book CLI to build this book. You can find the Jupyter Book build instructions here.

@@ -430,7 +430,10 @@ class BancorDapp:
         state = self.get_state(copy_type="initial", timestamp=timestamp)
         tkn_name = tkn_name.lower()
         state.price_feeds[tkn_name]=[0 for _ in range(len(state.price_feeds))]
+
         state.create_whitelisted_tkn(tkn_name)
+        handle_whitelisting_tokens(state)
+
         self.next_transaction(state)
         handle_logging(
             tkn_name,

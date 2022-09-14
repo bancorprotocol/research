@@ -774,9 +774,12 @@ class State(GlobalSettings):
         """
         if tkn_name not in self.whitelisted_tokens:
             self.whitelisted_tokens[tkn_name] = {
+                "decimals": 18,
                 "trading_fee": DEFAULT_TRADING_FEE,
                 "bnt_funding_limit": DEFAULT_BNT_FUNDING_LIMIT,
+                "ep_vault_balance": DEFAULT.EP_VAULT_BALANCE,
             }
+        return self
 
     def create_user(self, user_name: str):
         """

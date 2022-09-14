@@ -14,7 +14,10 @@ from bancor_research import DataFrame, read_price_feeds
 
 
 def to_decimal(percent: str):
-    return Decimal(percent[:-1]) / 100
+    try:
+        return Decimal(percent[:-1]) / 100
+    except TypeError:
+        return percent
 
 
 def to_user_amount(state: State, tkn_name: str, user_name: str, amount: str):
@@ -427,6 +430,7 @@ class BancorDapp:
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
         tkn_name = tkn_name.lower()
+        state.price_feeds[tkn_name] = [0 for _ in range(len(state.price_feeds))]
         state.create_whitelisted_tkn(tkn_name)
         self.next_transaction(state)
         handle_logging(

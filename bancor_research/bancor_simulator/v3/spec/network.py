@@ -19,6 +19,7 @@ def to_decimal(percent: str):
     except TypeError:
         return percent
 
+
 def to_user_amount(state: State, tkn_name: str, user_name: str, amount: str):
     if amount.endswith("%"):
         return get_user_balance(state, user_name, tkn_name) * to_decimal(amount)
@@ -429,7 +430,7 @@ class BancorDapp:
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
         tkn_name = tkn_name.lower()
-        state.price_feeds[tkn_name]=[0 for _ in range(len(state.price_feeds))]
+        state.price_feeds[tkn_name] = [0 for _ in range(len(state.price_feeds))]
         state.create_whitelisted_tkn(tkn_name)
         self.next_transaction(state)
         handle_logging(

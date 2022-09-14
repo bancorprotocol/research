@@ -342,6 +342,49 @@ def swap_fee_collection(
         return b * d * x * (1 - e) / (a + x)
 
 
+def handle_whitelisting_tokens(state):
+    whitelisted_tokens = state.whitelisted_tokens
+    bnt_min_liquidity = state.bnt_min_liquidity
+    withdrawal_fee = state.withdrawal_fee
+    network_fee = state.network_fee
+    cooldown_time = state.cooldown_time
+
+    for tkn_name in whitelisted_tokens:
+
+        # Get tokens not yet initialized.
+        if tkn_name not in state.tokens:
+
+            decimals = whitelisted_tokens[tkn_name]["decimals"]
+            trading_fee = whitelisted_tokens[tkn_name]["trading_fee"]
+            bnt_funding_limit = whitelisted_tokens[tkn_name]["bnt_funding_limit"]
+            ep_vault_balance = whitelisted_tokens[tkn_name]["ep_vault_balance"]
+
+            # initialize tokens
+            state.tokens[tkn_name] = Tokens(
+                tkn_name=tkn_name,
+                decimals=decimals,
+                trading_fee=trading_fee,
+                bnt_min_liquidity=bnt_min_liquidity,
+                network_fee=network_fee,
+                bnt_funding_limit=bnt_funding_limit,
+                withdrawal_fee=withdrawal_fee,
+                cooldown_time=cooldown_time,
+                external_protection_vault=Token(balance=ep_vault_balance),
+            )
+
+            # initialize pooltoken
+            pooltkn_name = get_pooltoken_name(tkn_name)
+            state.tokens[pooltkn_name] = Tokens(
+                tkn_name=pooltkn_name,
+                trading_fee=trading_fee,
+                bnt_min_liquidity=bnt_min_liquidity,
+                network_fee=network_fee,
+                bnt_funding_limit=bnt_funding_limit,
+                withdrawal_fee=withdrawal_fee,
+                cooldown_time=cooldown_time,
+            )
+
+
 def init_protocol(
     state: State,
     whitelisted_tokens: dict,

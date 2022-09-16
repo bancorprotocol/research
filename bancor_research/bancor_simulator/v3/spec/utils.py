@@ -471,45 +471,45 @@ def handle_logging(
     """
     state.iter_transaction_id = transaction_id
     for tkn_name in state.whitelisted_tokens:
-        try:
-            state_variables = {
-                "timestamp": [state.timestamp],
-                "latest_action": [action_name],
-                "latest_amt": [tkn_amt],
-                "latest_user_name": [user_name],
-                "tkn_name": [tkn_name],
-                "master_vault_tkn": [get_master_vault_balance(state, tkn_name)],
-                "erc20contracts_bntkn": [get_pooltoken_balance(state, tkn_name)],
-                "staked_tkn": [get_staked_balance(state, tkn_name)],
-                "is_trading_enabled": [get_is_trading_enabled(state, tkn_name)],
-                "bnt_trading_liquidity": [get_bnt_trading_liquidity(state, tkn_name)],
-                "tkn_trading_liquidity": [get_tkn_trading_liquidity(state, tkn_name)],
-                "trading_fee": [get_trading_fee(state, tkn_name)],
-                "bnt_funding_limit": [get_bnt_funding_limit(state, tkn_name)],
-                "bnt_remaining_funding": [get_bnt_remaining_funding(state, tkn_name)],
-                "bnt_funding_amt": [get_bnt_funding_amt(state, tkn_name)],
-                "external_protection_vault": [
-                    get_external_protection_vault_balance(state, tkn_name)
-                ],
-                "spot_rate": [get_spot_rate(state, tkn_name)],
-                "ema_rate": [get_ema_rate(state, tkn_name)],
-                "inv_spot_rate": [get_inv_spot_rate(state, tkn_name)],
-                "inv_ema_rate": [get_inv_ema_rate(state, tkn_name)],
-                "ema_last_updated": [state.tokens[tkn_name].ema_last_updated],
-                "network_fee": [state.network_fee],
-                "withdrawal_fee": [state.withdrawal_fee],
-                "bnt_min_liquidity": [state.bnt_min_liquidity],
-                "cooldown_time": [state.cooldown_time],
-                "protocol_wallet_bnbnt": [get_protocol_wallet_balance(state, "bnt")],
-                "vortex_bnt": [get_vortex_balance(state, "bnt")],
-                "erc20contracts_bnbnt": [get_pooltoken_balance(state, "bnt")],
-                "master_vault_bnt": [get_master_vault_balance(state, "bnt")],
-                "staked_bnt": [get_staked_balance(state, "bnt")],
-                "bnbnt_rate": [state.bnbnt_rate],
-            }
-            state.history.append(DataFrame(state_variables))
-        except KeyError:
-            pass
+        # try:
+        state_variables = {
+            "timestamp": [state.timestamp],
+            "latest_action": [action_name],
+            "latest_amt": [tkn_amt],
+            "latest_user_name": [user_name],
+            "tkn_name": [tkn_name],
+            "master_vault_tkn": [get_master_vault_balance(state, tkn_name)],
+            "erc20contracts_bntkn": [get_pooltoken_balance(state, tkn_name)],
+            "staked_tkn": [get_staked_balance(state, tkn_name)],
+            "is_trading_enabled": [get_is_trading_enabled(state, tkn_name)],
+            "bnt_trading_liquidity": [get_bnt_trading_liquidity(state, tkn_name)],
+            "tkn_trading_liquidity": [get_tkn_trading_liquidity(state, tkn_name)],
+            "trading_fee": [get_trading_fee(state, tkn_name)],
+            "bnt_funding_limit": [get_bnt_funding_limit(state, tkn_name)],
+            "bnt_remaining_funding": [get_bnt_remaining_funding(state, tkn_name)],
+            "bnt_funding_amt": [get_bnt_funding_amt(state, tkn_name)],
+            "external_protection_vault": [
+                get_external_protection_vault_balance(state, tkn_name)
+            ],
+            "spot_rate": [get_spot_rate(state, tkn_name)],
+            "ema_rate": [get_ema_rate(state, tkn_name)],
+            "inv_spot_rate": [get_inv_spot_rate(state, tkn_name)],
+            "inv_ema_rate": [get_inv_ema_rate(state, tkn_name)],
+            "ema_last_updated": [state.tokens[tkn_name].ema_last_updated],
+            "network_fee": [state.network_fee],
+            "withdrawal_fee": [state.withdrawal_fee],
+            "bnt_min_liquidity": [state.bnt_min_liquidity],
+            "cooldown_time": [state.cooldown_time],
+            "protocol_wallet_bnbnt": [get_protocol_wallet_balance(state, "bnt")],
+            "vortex_bnt": [get_vortex_balance(state, "bnt")],
+            "erc20contracts_bnbnt": [get_pooltoken_balance(state, "bnt")],
+            "master_vault_bnt": [get_master_vault_balance(state, "bnt")],
+            "staked_bnt": [get_staked_balance(state, "bnt")],
+            "bnbnt_rate": [state.bnbnt_rate],
+        }
+        state.history.append(DataFrame(state_variables))
+        # except KeyError:
+        #     pass
 
     return state
 

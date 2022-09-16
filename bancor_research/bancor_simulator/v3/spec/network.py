@@ -431,7 +431,6 @@ class BancorDapp:
         state = self.get_state(copy_type="initial", timestamp=timestamp)
         tkn_name = tkn_name.lower()
         state.price_feeds[tkn_name] = state.price_feeds["bnt"].values
-
         state.create_whitelisted_tkn(tkn_name)
         handle_whitelisting_tokens(state)
 

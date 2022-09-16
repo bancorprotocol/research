@@ -206,8 +206,7 @@ class BancorDapp:
             state = deposit_tkn(
                 state=state, tkn_name=tkn_name, tkn_amt=tkn_amt, user_name=user_name
             )
-        self.next_transaction(state)
-        handle_logging(
+        state = handle_logging(
             tkn_name=tkn_name,
             tkn_amt=tkn_amt,
             action_name=action_name,
@@ -215,6 +214,8 @@ class BancorDapp:
             transaction_id=self.transaction_id,
             state=state,
         )
+        self.next_transaction(state)
+
 
     def trade(
         self,
@@ -239,8 +240,7 @@ class BancorDapp:
         state = process_trade(
             state, tkn_amt, source_token, target_token, user_name, timestamp
         )
-        self.next_transaction(state)
-        handle_logging(
+        state = handle_logging(
             source_token + "->" + target_token,
             tkn_amt,
             transaction_type,
@@ -248,6 +248,8 @@ class BancorDapp:
             self.transaction_id,
             state,
         )
+        self.next_transaction(state)
+
 
     def begin_cooldown_by_rtkn(
         self,
@@ -268,10 +270,11 @@ class BancorDapp:
         id_number = begin_withdrawal_cooldown_by_rtkn(
             state, tkn_amt, tkn_name, user_name
         )
-        self.next_transaction(state)
-        handle_logging(
+        state = handle_logging(
             tkn_name, tkn_amt, action_name, user_name, self.transaction_id, state
         )
+        self.next_transaction(state)
+
         return id_number
 
     def begin_cooldown_by_ptkn(
@@ -312,8 +315,6 @@ class BancorDapp:
         state = self.get_state(copy_type="initial", timestamp=timestamp)
         tkn_name = state.users[user_name].pending_withdrawals[id_number].tkn_name
         state = process_withdrawal(state, user_name, id_number, timestamp)
-
-        self.next_transaction(state)
         state = handle_logging(
             tkn_name,
             Decimal(0),
@@ -322,6 +323,8 @@ class BancorDapp:
             self.transaction_id,
             state,
         )
+        self.next_transaction(state)
+
 
     def enable_trading(
         self,
@@ -341,8 +344,7 @@ class BancorDapp:
         if bnt_price:
             state.price_feeds.at[state.timestamp, "bnt"] = bnt_price
         state = enable_trading(state, tkn_name)
-        self.next_transaction(state)
-        handle_logging(
+        state = handle_logging(
             tkn_name,
             Decimal("0"),
             transaction_type,
@@ -350,6 +352,8 @@ class BancorDapp:
             state.transaction_id,
             state,
         )
+        self.next_transaction(state)
+
 
     def describe(self, decimals: int = -1):
         """
@@ -429,7 +433,7 @@ class BancorDapp:
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
         tkn_name = tkn_name.lower()
-        state.price_feeds[tkn_name]=[0 for _ in range(len(state.price_feeds))]
+        state.price_feeds[tkn_name]=state.price_feeds['bnt'].values
 
         state.create_whitelisted_tkn(tkn_name)
         handle_whitelisting_tokens(state)

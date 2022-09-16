@@ -217,7 +217,6 @@ class BancorDapp:
         )
         self.next_transaction(state)
 
-
     def trade(
         self,
         tkn_amt: str,
@@ -250,7 +249,6 @@ class BancorDapp:
             state,
         )
         self.next_transaction(state)
-
 
     def begin_cooldown_by_rtkn(
         self,
@@ -326,7 +324,6 @@ class BancorDapp:
         )
         self.next_transaction(state)
 
-
     def enable_trading(
         self,
         tkn_name: str,
@@ -354,7 +351,6 @@ class BancorDapp:
             state,
         )
         self.next_transaction(state)
-
 
     def describe(self, decimals: int = -1):
         """
@@ -434,7 +430,7 @@ class BancorDapp:
         """
         state = self.get_state(copy_type="initial", timestamp=timestamp)
         tkn_name = tkn_name.lower()
-        state.price_feeds[tkn_name]=state.price_feeds['bnt'].values
+        state.price_feeds[tkn_name] = state.price_feeds["bnt"].values
 
         state.create_whitelisted_tkn(tkn_name)
         handle_whitelisting_tokens(state)

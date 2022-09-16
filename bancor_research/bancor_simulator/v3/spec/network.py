@@ -19,6 +19,7 @@ def to_decimal(percent: str):
     except TypeError:
         return percent
 
+
 def to_user_amount(state: State, tkn_name: str, user_name: str, amount: str):
     if amount.endswith("%"):
         return get_user_balance(state, user_name, tkn_name) * to_decimal(amount)

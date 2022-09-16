@@ -777,7 +777,7 @@ class State(GlobalSettings):
                 "decimals": 18,
                 "trading_fee": DEFAULT_TRADING_FEE,
                 "bnt_funding_limit": DEFAULT_BNT_FUNDING_LIMIT,
-                "ep_vault_balance": DEFAULT.EP_VAULT_BALANCE
+                "ep_vault_balance": DEFAULT.EP_VAULT_BALANCE,
             }
         return self
 

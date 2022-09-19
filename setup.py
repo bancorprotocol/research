@@ -18,9 +18,7 @@ setup(
     version=version,
     author='Bancor Network',
     author_email='mike@bancor.network',
-    description='Bancor v3 python spec and simulation library. '
-                'This is an open-source python package developed by the Bancor Research Team.'
-                'It is meant to assist in the design, testing, and validating of Bancor v3 behavior.',
+    description='Bancor v3 python spec, simulator, and emulator library. This is an open-source python package developed by Bancor Research. It is meant to assist in the design, testing, and validating of Bancor v3 behavior.',
     long_description=long_description,
     long_description_content_type="text/markdown",
     url='https://github.com/bancorprotocol/research',

@@ -570,6 +570,12 @@ class State(GlobalSettings):
         """
         self.tokens[tkn_name].vbnt_burned.set(value)
 
+    def set_vault_balance(self, tkn_name: str, value: Decimal):
+        """
+        Set master vault balance.
+        """
+        self.tokens[tkn_name].master_vault.set(value)
+
     def increase_vortex_balance(self, tkn_name: str, value: Decimal):
         """
         Increase vortex_ledger balance by a given amount.
@@ -617,6 +623,12 @@ class State(GlobalSettings):
         Set the trading fee for a given tkn_name.
         """
         self.tokens[tkn_name].trading_fee = value
+
+    def set_bnt_min_liquidity(self, tkn_name: str, value: Decimal):
+        """
+        Set the min trading liquidity for a given tkn_name.
+        """
+        self.tokens[tkn_name].bnt_min_liquidity = value
 
     def set_bnt_funding_limit(self, tkn_name: str, value: Decimal):
         """

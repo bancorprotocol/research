@@ -396,6 +396,7 @@ class BancorDapp:
                 tuple([2, "Pool", "g: Average Inverse Rate"])
             ] = state.tokens[tkn_name].inv_ema_rate
 
+
         # Iterate all reserve tokens
         for tkn_name in reserve_tokens:
             table[tkn_name][tuple([3, "Network", "Master Vault"])] = state.tokens[
@@ -411,10 +412,14 @@ class BancorDapp:
                 tuple([3, "Network", "Protocol Equity"])
             ] = state.tokens[tkn_name].protocol_wallet_pooltokens.balance
 
+
         # Iterate only bnt
         table["bnt"][tuple([3, "Network", "BNT Staked Balance"])] = state.tokens[
             "bnt"
         ].staking_ledger.balance
+        table["bnt"][
+                tuple([3, "Network", "Vortex"])
+            ] = state.tokens["bnt"].vortex_ledger.balance
 
         df = DataFrame(table).fillna(0).sort_index()
         return df.applymap(lambda x: round(x, decimals)) if decimals >= 0 else df

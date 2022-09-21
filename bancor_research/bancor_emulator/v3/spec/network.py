@@ -398,6 +398,7 @@ class BancorDapp:
 
         # Iterate all reserve tokens except bnt
         for token in [reserveToken for reserveToken in reserveTokens if reserveToken is not self.bnt]:
+
             stakedBalance = self.networkInfo.stakedBalance(token)
             tradingLiquidity = self.networkInfo.tradingLiquidity(token)
             currentPoolFunding = self.bntPool.currentPoolFunding(token)
@@ -429,6 +430,8 @@ class BancorDapp:
 
         # Iterate only bnt
         table[self.bnt.symbol()][tuple([3, 'Network', 'BNT Staked Balance'])] = fromWei(self.bntPool.stakedBalance(), self.bnt.decimals())
+
+        table[self.bnt.symbol()][tuple([3, 'Network', 'Vortex'])] = fromWei(self.bntPool.stakedBalance(), self.bnt.decimals())
 
         df = DataFrame(table).fillna(0).sort_index()
         return df.applymap(lambda x: round(x, decimals)) if decimals >= 0 else df

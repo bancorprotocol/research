@@ -3,12 +3,21 @@
 # Licensed under the MIT LICENSE. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------------------------------
 """Utility functions."""
-from bancor_research.bancor_simulator.v3.spec.state import *
-from bancor_research import Decimal, DataFrame
-import json, pickle, cloudpickle
+import cloudpickle
+import json
+import pickle
 
+from bancor_research import Decimal, DataFrame
+from bancor_research.bancor_simulator.v3.spec.state import *
 
 protocol_user = "protocol"
+
+
+def compute_ema(spot_rate: Decimal, ema_rate: Decimal, alpha: Decimal = Decimal('0.2')) -> Decimal:
+    """
+    Computes the ema as a lagging average only once per block, per pool.
+    """
+    return alpha * spot_rate + (1 - alpha) * ema_rate
 
 
 def check_if_program_enabled(start_time: int, end_time: int, timestamp: int):
@@ -31,7 +40,7 @@ def check_pool_shutdown(state: State, tkn_name: str) -> bool:
 
 
 def check_is_bootstrap_reqs_met(
-    state: State, tkn_name: str, bootstrap_liquidity: Decimal
+        state: State, tkn_name: str, bootstrap_liquidity: Decimal
 ) -> bool:
     """
     CHecks if the bootstrap requirements are met for a given tkn_name.
@@ -98,7 +107,7 @@ def compute_bnbnt_amt(state: State, bnt_amt: Decimal) -> Decimal:
 
 
 def compute_changed_bnt_trading_liquidity(
-    a: Decimal, b: Decimal, d: Decimal, e: Decimal, x: Decimal, direction: str
+        a: Decimal, b: Decimal, d: Decimal, e: Decimal, x: Decimal, direction: str
 ) -> Decimal:
     """
     Computes the changed state values according to the swap algorithm.
@@ -106,11 +115,11 @@ def compute_changed_bnt_trading_liquidity(
     if direction == "tkn":
         return a * (b + d * x * (1 - e)) / (b + x)
     elif direction == "bnt":
-        return (a * (a + x) + d * (1 - e) * (a * x + x**2)) / (a + d * x)
+        return (a * (a + x) + d * (1 - e) * (a * x + x ** 2)) / (a + d * x)
 
 
 def compute_changed_tkn_trading_liquidity(
-    a: Decimal, b: Decimal, d: Decimal, x: Decimal, direction: str
+        a: Decimal, b: Decimal, d: Decimal, x: Decimal, direction: str
 ) -> Decimal:
     """
     Computes the changed state values according to the swap algorithm.
@@ -122,7 +131,7 @@ def compute_changed_tkn_trading_liquidity(
 
 
 def compute_target_amt(
-    a: Decimal, b: Decimal, d: Decimal, x: Decimal, direction: str
+        a: Decimal, b: Decimal, d: Decimal, x: Decimal, direction: str
 ) -> Decimal:
     """
     Computes the changed state values according to the swap algorithm.
@@ -141,7 +150,7 @@ def compute_bootstrap_rate(state: State, tkn_name: str) -> Decimal:
 
 
 def compute_master_vault_tkn_tvl(
-    master_vault_balance: Decimal, token_price: Decimal
+        master_vault_balance: Decimal, token_price: Decimal
 ) -> Decimal:
     """
     Computes the master vault tvl for a given tkn.
@@ -150,7 +159,7 @@ def compute_master_vault_tkn_tvl(
 
 
 def compute_max_tkn_deposit(
-    master_vault_tvl: Decimal, target_tvl: Decimal, user_funds: Decimal
+        master_vault_tvl: Decimal, target_tvl: Decimal, user_funds: Decimal
 ) -> Decimal:
     """
     Computes the maximum deposit amount which will not exceed the target tvl.
@@ -249,7 +258,7 @@ def shutdown_pool(state: State, tkn_name: str) -> State:
 
 
 def compute_pool_depth_adjustment(
-    state: State, tkn_name: str, case: str = "none"
+        state: State, tkn_name: str, case: str = "none"
 ) -> Tuple[str, Decimal, Decimal]:
     """
     Computes the quantities of bnt and tkn to add to the pool trading liquidity during a deposit.
@@ -274,30 +283,30 @@ def compute_pool_depth_adjustment(
             )
 
             if (
-                avg_tkn_trading_liquidity <= tkn_excess
-                and bnt_trading_liquidity <= bnt_remaining_funding
+                    avg_tkn_trading_liquidity <= tkn_excess
+                    and bnt_trading_liquidity <= bnt_remaining_funding
             ):
                 case = "case1"
                 bnt_increase = bnt_trading_liquidity
                 tkn_increase = avg_tkn_trading_liquidity
 
             elif (
-                avg_tkn_trading_liquidity <= tkn_excess
-                and bnt_trading_liquidity > bnt_remaining_funding
-                or avg_tkn_trading_liquidity > tkn_excess
-                and tkn_excess_bnt_equivalence >= bnt_remaining_funding
+                    avg_tkn_trading_liquidity <= tkn_excess
+                    and bnt_trading_liquidity > bnt_remaining_funding
+                    or avg_tkn_trading_liquidity > tkn_excess
+                    and tkn_excess_bnt_equivalence >= bnt_remaining_funding
             ):
                 case = "case2"
                 bnt_increase = bnt_remaining_funding
                 tkn_increase = bnt_remaining_funding / rate
 
             elif (
-                tkn_excess < avg_tkn_trading_liquidity
-                and bnt_trading_liquidity <= bnt_remaining_funding
-                or avg_tkn_trading_liquidity > tkn_excess
-                and bnt_trading_liquidity
-                > bnt_remaining_funding
-                > tkn_excess_bnt_equivalence
+                    tkn_excess < avg_tkn_trading_liquidity
+                    and bnt_trading_liquidity <= bnt_remaining_funding
+                    or avg_tkn_trading_liquidity > tkn_excess
+                    and bnt_trading_liquidity
+                    > bnt_remaining_funding
+                    > tkn_excess_bnt_equivalence
             ):
                 case = "case3"
                 bnt_increase = tkn_excess_bnt_equivalence
@@ -319,7 +328,7 @@ def compute_pool_depth_adjustment(
 
 
 def vortex_collection(
-    a: Decimal, b: Decimal, d: Decimal, e: Decimal, x: Decimal, direction: str
+        a: Decimal, b: Decimal, d: Decimal, e: Decimal, x: Decimal, direction: str
 ) -> Decimal:
     """
     Computes the changed state values according to the swap algorithm.
@@ -331,7 +340,7 @@ def vortex_collection(
 
 
 def swap_fee_collection(
-    a: Decimal, b: Decimal, d: Decimal, e: Decimal, x: Decimal, direction: str
+        a: Decimal, b: Decimal, d: Decimal, e: Decimal, x: Decimal, direction: str
 ) -> Decimal:
     """
     Computes the swap fees according to the swap algorithm.
@@ -353,7 +362,6 @@ def handle_whitelisting_tokens(state):
 
         # Get tokens not yet initialized.
         if tkn_name not in state.tokens:
-
             decimals = whitelisted_tokens[tkn_name]["decimals"]
             trading_fee = whitelisted_tokens[tkn_name]["trading_fee"]
             bnt_funding_limit = whitelisted_tokens[tkn_name]["bnt_funding_limit"]
@@ -386,13 +394,13 @@ def handle_whitelisting_tokens(state):
 
 
 def init_protocol(
-    state: State,
-    whitelisted_tokens: dict,
-    usernames: List[str],
-    cooldown_time: int,
-    network_fee: Decimal,
-    bnt_min_liquidity: Decimal,
-    withdrawal_fee: Decimal,
+        state: State,
+        whitelisted_tokens: dict,
+        usernames: List[str],
+        cooldown_time: int,
+        network_fee: Decimal,
+        bnt_min_liquidity: Decimal,
+        withdrawal_fee: Decimal,
 ) -> State:
     """
     Initialize user wallets upon system genesis.
@@ -406,7 +414,6 @@ def init_protocol(
 
         # Get tokens not yet initialized.
         if tkn_name not in state.tokens:
-
             decimals = whitelisted_tokens[tkn_name]["decimals"]
             trading_fee = whitelisted_tokens[tkn_name]["trading_fee"]
             bnt_funding_limit = whitelisted_tokens[tkn_name]["bnt_funding_limit"]
@@ -438,7 +445,6 @@ def init_protocol(
             )
 
     for tkn_name in ["bnt", "bnbnt", "vbnt"]:
-
         state.tokens[tkn_name] = Tokens(
             tkn_name=tkn_name,
             network_fee=network_fee,
@@ -459,12 +465,12 @@ def init_protocol(
 
 
 def handle_logging(
-    tkn_name: str,
-    tkn_amt: Decimal,
-    action_name: str,
-    user_name: str,
-    transaction_id: int,
-    state: State,
+        tkn_name: str,
+        tkn_amt: Decimal,
+        action_name: str,
+        user_name: str,
+        transaction_id: int,
+        state: State,
 ) -> State:
     """
     Logs the system state history after each action.
@@ -566,12 +572,12 @@ def describe(state: State, rates: bool = False, decimals=6) -> DataFrame:
 
 
 def build_json_operation(
-    state: State,
-    tkn_name: str,
-    tkn_amt: Decimal,
-    transaction_type: str,
-    user_name: str,
-    timestamp: int,
+        state: State,
+        tkn_name: str,
+        tkn_amt: Decimal,
+        transaction_type: str,
+        user_name: str,
+        timestamp: int,
 ) -> dict:
     if "tkn" in state.autocompounding_reward_programs:
         program_wallet_bntkn = get_protocol_wallet_balance(state, tkn_name)
@@ -697,7 +703,7 @@ def log_json_operation(state, transaction_type, user_name, amt, timestamp):
 
 
 def validate_input(
-    state: State, tkn_name: str, user_name: str, timestamp: int
+        state: State, tkn_name: str, user_name: str, timestamp: int
 ) -> Tuple[State, str, str]:
     """
     Validates the input for all agent actions.
@@ -734,7 +740,7 @@ def validate_input(
 
 
 def setup_json_simulation(
-    state: State, json_data: dict, tkn_name: str, id_number: int
+        state: State, json_data: dict, tkn_name: str, id_number: int
 ) -> State:
     """This method uploads a pre-formatted JSON file containing simulation modules to run and report on."""
 
@@ -794,12 +800,12 @@ def setup_json_simulation(
 
 
 def generate_emulator_expected_results(
-    state: State,
-    tkn_name: str,
-    tkn_amt: Decimal,
-    transaction_type: str,
-    user_name: str,
-    timestamp: int,
+        state: State,
+        tkn_name: str,
+        tkn_amt: Decimal,
+        transaction_type: str,
+        user_name: str,
+        timestamp: int,
 ) -> dict:
     """
     Get the expected results for a given transaction.

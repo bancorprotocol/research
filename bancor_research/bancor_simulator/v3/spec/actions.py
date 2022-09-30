@@ -59,12 +59,12 @@ def deposit_tkn(state: State, tkn_name: str, tkn_amt: Decimal, user_name: str) -
 
 
 def process_trade(
-        state: State,
-        tkn_amt: Decimal,
-        source_token: str,
-        target_token: str,
-        user_name: str,
-        timestamp: int = 0,
+    state: State,
+    tkn_amt: Decimal,
+    source_token: str,
+    target_token: str,
+    user_name: str,
+    timestamp: int = 0,
 ) -> State:
     """
     Main logic for trade actions.
@@ -114,10 +114,10 @@ def process_trade(
         )
 
     elif (
-            source_token != "bnt"
-            and target_token != "bnt"
-            and is_trading_enabled_source
-            and is_trading_enabled_target
+        source_token != "bnt"
+        and target_token != "bnt"
+        and is_trading_enabled_source
+        and is_trading_enabled_target
     ):
 
         (
@@ -167,14 +167,14 @@ def process_trade(
 
 
 def trade_bnt_for_tkn(
-        state: State,
-        bnt_trading_liquidity: Decimal,
-        tkn_trading_liquidity: Decimal,
-        trading_fee: Decimal,
-        network_fee: Decimal,
-        bnt_amt: Decimal,
-        tkn_name: str,
-        direction: str = "bnt",
+    state: State,
+    bnt_trading_liquidity: Decimal,
+    tkn_trading_liquidity: Decimal,
+    trading_fee: Decimal,
+    network_fee: Decimal,
+    bnt_amt: Decimal,
+    tkn_name: str,
+    direction: str = "bnt",
 ) -> Tuple[State, Decimal]:
     """
     Specific case of `trade` when bnt is the source token.
@@ -230,14 +230,14 @@ def trade_bnt_for_tkn(
 
 
 def trade_tkn_for_bnt(
-        state: State,
-        bnt_trading_liquidity: Decimal,
-        tkn_trading_liquidity: Decimal,
-        trading_fee: Decimal,
-        network_fee: Decimal,
-        tkn_amt: Decimal,
-        tkn_name: str,
-        direction="tkn",
+    state: State,
+    bnt_trading_liquidity: Decimal,
+    tkn_trading_liquidity: Decimal,
+    trading_fee: Decimal,
+    network_fee: Decimal,
+    tkn_amt: Decimal,
+    tkn_name: str,
+    direction="tkn",
 ):
     """
     Specific case of `trade` when bnt is the target token.
@@ -294,10 +294,10 @@ def trade_tkn_for_bnt(
 
 
 def process_withdrawal(
-        state: State,
-        user_name: str,
-        id_number: int,
-        timestamp: int = 0,
+    state: State,
+    user_name: str,
+    id_number: int,
+    timestamp: int = 0,
 ):
     """
     Main withdrawal logic based on the withdraw algorithm of the BIP15 spec.
@@ -441,7 +441,7 @@ def _begin_withdrawal_cooldown(state, tkn_name, user_name, rtkn_amt, ptkn_amt):
 
 
 def unpack_withdrawal_cooldown(
-        state: State, user_name: str, id_number: int
+    state: State, user_name: str, id_number: int
 ) -> Tuple[int, int, str, Decimal, Decimal, str]:
     """
     Introduced to make the withdrawals easier to handle.
@@ -491,10 +491,10 @@ class WithdrawalAlgorithm:
         m = self.trading_fee
         n = self.withdrawal_fee
         hmax = (
-                b
-                * e
-                * (e * n + m * (b + c - e))
-                / ((1 - m) * (b + c - e) * (b + c - e * (1 - n)))
+            b
+            * e
+            * (e * n + m * (b + c - e))
+            / ((1 - m) * (b + c - e) * (b + c - e * (1 - n)))
         )
         return hmax
 
@@ -509,10 +509,10 @@ class WithdrawalAlgorithm:
         m = self.trading_fee
         n = self.withdrawal_fee
         hmax = (
-                b
-                * e
-                * (e * n - m * (b + c - e * (1 - n)))
-                / ((1 - m) * (b + c - e) * (b + c - e * (1 - n)))
+            b
+            * e
+            * (e * n - m * (b + c - e * (1 - n)))
+            / ((1 - m) * (b + c - e) * (b + c - e * (1 - n)))
         )
         return 0  # hmax (retroactively, due to change in contract implementation)
 
@@ -539,9 +539,9 @@ class WithdrawalAlgorithm:
         n = self.withdrawal_fee
         x = self.withdraw_value
         updated_bnt_liquidity = (
-                a
-                * (b * e - m * (b * e + x * (b + c - e * (1 - n))))
-                / ((1 - m) * (b * e + x * (b + c - e * (1 - n))))
+            a
+            * (b * e - m * (b * e + x * (b + c - e * (1 - n))))
+            / ((1 - m) * (b * e + x * (b + c - e * (1 - n))))
         )
         bnt_renounced = Decimal("0")
         updated_tkn_liquidity = (b * e + x * (b + c + e * (n - 1))) / e
@@ -556,7 +556,7 @@ class WithdrawalAlgorithm:
         )
 
     def default_withdrawal_surplus_covered(
-            self,
+        self,
     ):
         """
         Calculates the withdrawal output variables when arbitrage is forbidden, and the excess TKN is sufficient to cover the entire withdrawal amt.
@@ -610,7 +610,7 @@ class WithdrawalAlgorithm:
         n = self.withdrawal_fee
         x = self.withdraw_value
         updated_bnt_liquidity = (
-                a * b * e / (b * e + x * (1 - m) * (b + c - e * (1 - n)))
+            a * b * e / (b * e + x * (1 - m) * (b + c - e * (1 - n)))
         )
         bnt_renounced = Decimal("0")
         updated_tkn_liquidity = (b * e + x * (b + c - e * (1 - n))) / e
@@ -671,11 +671,11 @@ class WithdrawalAlgorithm:
         )
 
     def external_protection(
-            self,
-            bnt_trading_liquidity,
-            tkn_trading_liquidity,
-            bnt_sent_to_user,
-            tkn_sent_to_user,
+        self,
+        bnt_trading_liquidity,
+        tkn_trading_liquidity,
+        bnt_sent_to_user,
+        tkn_sent_to_user,
     ):
         """
         This replaces any BNT that would have been received by the user with TKN.
@@ -728,11 +728,11 @@ class WithdrawalAlgorithm:
         )
 
     def process_withdrawal(
-            self,
-            updated_bnt_liquidity: Decimal = Decimal("0"),
-            bnt_renounced: Decimal = Decimal("0"),
-            updated_tkn_liquidity: Decimal = Decimal("0"),
-            tkn_sent_to_user: Decimal = Decimal("0"),
+        self,
+        updated_bnt_liquidity: Decimal = Decimal("0"),
+        bnt_renounced: Decimal = Decimal("0"),
+        updated_tkn_liquidity: Decimal = Decimal("0"),
+        tkn_sent_to_user: Decimal = Decimal("0"),
     ):
         """
         Evaluates the conditions, and calls the appropriate functions
@@ -900,14 +900,14 @@ def vortex_burner(state: State, user_name: str):
 
 
 def process_arbitrage_trade(
-        tkn_name: str,
-        tkn_token_virtual_balance: Decimal,
-        bnt_virtual_balance: Decimal,
-        bnt_trading_liquidity: Decimal,
-        tkn_trading_liquidity: Decimal,
-        trading_fee: Decimal,
-        user_tkn: Decimal,
-        user_bnt: Decimal,
+    tkn_name: str,
+    tkn_token_virtual_balance: Decimal,
+    bnt_virtual_balance: Decimal,
+    bnt_trading_liquidity: Decimal,
+    tkn_trading_liquidity: Decimal,
+    trading_fee: Decimal,
+    user_tkn: Decimal,
+    user_bnt: Decimal,
 ) -> Tuple[Decimal, str, str, bool]:
     """
     Computes the appropriate arbitrage trade on the tkn_name pool.
@@ -919,24 +919,24 @@ def process_arbitrage_trade(
     q = tkn_token_virtual_balance
 
     bnt_trade_amt = (
-                            -Decimal("2") * a * q
-                            + b * m * p
-                            + (
-                                    (Decimal("2") * a * q - b * m * p) ** Decimal("2")
-                                    - Decimal("4") * a * q * (a * q - b * p)
-                            )
-                            ** (Decimal("1") / Decimal("2"))
-                    ) / (Decimal("2") * q)
+        -Decimal("2") * a * q
+        + b * m * p
+        + (
+            (Decimal("2") * a * q - b * m * p) ** Decimal("2")
+            - Decimal("4") * a * q * (a * q - b * p)
+        )
+        ** (Decimal("1") / Decimal("2"))
+    ) / (Decimal("2") * q)
 
     tkn_trade_amt = (
-                            -Decimal("2") * b * p
-                            + a * m * q
-                            + (
-                                    (Decimal("2") * b * p - a * m * q) ** Decimal("2")
-                                    - Decimal("4") * b * p * (b * p - a * q)
-                            )
-                            ** (Decimal("1") / Decimal("2"))
-                    ) / (Decimal("2") * p)
+        -Decimal("2") * b * p
+        + a * m * q
+        + (
+            (Decimal("2") * b * p - a * m * q) ** Decimal("2")
+            - Decimal("4") * b * p * (b * p - a * q)
+        )
+        ** (Decimal("1") / Decimal("2"))
+    ) / (Decimal("2") * p)
 
     if bnt_trade_amt > 0:
         source_token = "bnt"
@@ -954,11 +954,11 @@ def process_arbitrage_trade(
 
 
 def trade_tkn_to_ema(
-        bnt_trading_liquidity: Decimal,
-        tkn_trading_liquidity: Decimal,
-        trading_fee: Decimal,
-        network_fee: Decimal,
-        future_ema: Decimal,
+    bnt_trading_liquidity: Decimal,
+    tkn_trading_liquidity: Decimal,
+    trading_fee: Decimal,
+    network_fee: Decimal,
+    future_ema: Decimal,
 ) -> Decimal:
     """
     Outputs the tkn_amt that should be traded to force the ema and the spot price together on a given pool.
@@ -969,25 +969,25 @@ def trade_tkn_to_ema(
     e = network_fee
     f = future_ema
     tkn_amt = (
-                      (a * d * (Decimal("1") - e) - Decimal("2") * f * b)
-                      + (
-                              a
-                              * (
-                                      Decimal("4") * f * b * (Decimal("1") - d * (Decimal("1") - e))
-                                      + a * d ** Decimal("2") * (Decimal("1") - e) ** Decimal("2")
-                              )
-                      )
-                      ** (Decimal("1") / Decimal("2"))
-              ) / (Decimal("2") * f)
+        (a * d * (Decimal("1") - e) - Decimal("2") * f * b)
+        + (
+            a
+            * (
+                Decimal("4") * f * b * (Decimal("1") - d * (Decimal("1") - e))
+                + a * d ** Decimal("2") * (Decimal("1") - e) ** Decimal("2")
+            )
+        )
+        ** (Decimal("1") / Decimal("2"))
+    ) / (Decimal("2") * f)
     return tkn_amt
 
 
 def trade_bnt_to_ema(
-        bnt_trading_liquidity,
-        tkn_trading_liquidity,
-        trading_fee,
-        network_fee,
-        future_ema,
+    bnt_trading_liquidity,
+    tkn_trading_liquidity,
+    trading_fee,
+    network_fee,
+    future_ema,
 ):
     """
     Analyze the state of any pool and create a swap that drives the ema and the spot price together.
@@ -999,27 +999,27 @@ def trade_bnt_to_ema(
     e = network_fee
     f = future_ema
     x = (
-                -Decimal("2") * a
-                + b * d * f
-                + (
-                        (Decimal("2") * a - b * d * f) ** Decimal("2")
-                        - Decimal("4") * a * (a - b * f)
-                )
-                ** (Decimal("1") / Decimal("2"))
-        ) / Decimal("2")
+        -Decimal("2") * a
+        + b * d * f
+        + (
+            (Decimal("2") * a - b * d * f) ** Decimal("2")
+            - Decimal("4") * a * (a - b * f)
+        )
+        ** (Decimal("1") / Decimal("2"))
+    ) / Decimal("2")
     a_recursion = (
-                          a * (a + x) + d * (Decimal("1") - e) * (a * x + x ** Decimal("2"))
-                  ) / (a + d * x)
+        a * (a + x) + d * (Decimal("1") - e) * (a * x + x ** Decimal("2"))
+    ) / (a + d * x)
     b_recursion = b * (a + d * x) / (a + x)
     n = 0
     p = Decimal("0.001")
     while a_recursion / b_recursion < f:
         n += 1
         p += Decimal("0.0001")
-        x += x * (f ** p - (a_recursion / b_recursion) ** p) / f
+        x += x * (f**p - (a_recursion / b_recursion) ** p) / f
         a_recursion = (
-                              a * (a + x) + d * (Decimal("1") - e) * (a * x + x ** Decimal("2"))
-                      ) / (a + d * x)
+            a * (a + x) + d * (Decimal("1") - e) * (a * x + x ** Decimal("2"))
+        ) / (a + d * x)
         b_recursion = b * (a + d * x) / (a + x)
         if n > 20000:
             break
@@ -1028,7 +1028,7 @@ def trade_bnt_to_ema(
 
 
 def process_force_moving_average(
-        self, tkn_name: str, user_tkn: Decimal, user_bnt: Decimal
+    self, tkn_name: str, user_tkn: Decimal, user_bnt: Decimal
 ) -> Tuple[Decimal, str, str, bool]:
     """
     Process the trade amount to force the ema and the spot price together.

@@ -967,6 +967,12 @@ def get_user_reward_per_token_paid(state: State, id: int, user_name: str) -> Dec
     )
 
 
+def get_bnt_per_tkn(state: State, tkn_name: str):
+    tkn_price = get_tkn_price(state, tkn_name)
+    bnt_price = get_tkn_price(state, "bnt")
+    return tkn_price / bnt_price
+
+
 def get_tkn_trading_liquidity(state: State, tkn_name: str) -> Decimal:
     """
     The current tkn trading liquidity for a given tkn_name.

@@ -3,12 +3,23 @@
 # Licensed under the MIT LICENSE. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------------------------------
 """Utility functions."""
-from bancor_research.bancor_simulator.v3.spec.state import *
-from bancor_research import Decimal, DataFrame
-import json, pickle, cloudpickle
+import cloudpickle
+import json
+import pickle
 
+from bancor_research import Decimal, DataFrame
+from bancor_research.bancor_simulator.v3.spec.state import *
 
 protocol_user = "protocol"
+
+
+def compute_ema(
+    spot_rate: Decimal, ema_rate: Decimal, alpha: Decimal = Decimal("0.2")
+) -> Decimal:
+    """
+    Computes the ema as a lagging average only once per block, per pool.
+    """
+    return alpha * spot_rate + (1 - alpha) * ema_rate
 
 
 def check_if_program_enabled(start_time: int, end_time: int, timestamp: int):
@@ -353,7 +364,6 @@ def handle_whitelisting_tokens(state):
 
         # Get tokens not yet initialized.
         if tkn_name not in state.tokens:
-
             decimals = whitelisted_tokens[tkn_name]["decimals"]
             trading_fee = whitelisted_tokens[tkn_name]["trading_fee"]
             bnt_funding_limit = whitelisted_tokens[tkn_name]["bnt_funding_limit"]
@@ -406,7 +416,6 @@ def init_protocol(
 
         # Get tokens not yet initialized.
         if tkn_name not in state.tokens:
-
             decimals = whitelisted_tokens[tkn_name]["decimals"]
             trading_fee = whitelisted_tokens[tkn_name]["trading_fee"]
             bnt_funding_limit = whitelisted_tokens[tkn_name]["bnt_funding_limit"]
@@ -438,7 +447,6 @@ def init_protocol(
             )
 
     for tkn_name in ["bnt", "bnbnt", "vbnt"]:
-
         state.tokens[tkn_name] = Tokens(
             tkn_name=tkn_name,
             network_fee=network_fee,
